@@ -1,7 +1,46 @@
 """Tools for working with displayable objects in Cave projects
 """
 from features import CaveFeature
-from validators import OptionListValidator, IsNumeric, CheckType, AlwaysValid
+from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
+    IsNumericIterable
+
+
+class CaveObject(CaveFeature):
+    """Store data on single Cave object
+
+    :param str name: The name of the object
+    :param tuple color: Three floats representing RGB color of object
+    :param bool visible: Is object visible?
+    :param bool lighting: Does object respond to scene lighting?
+    :param float scale: Scaling factor for size of object
+    :param py:class:CaveSound sound: Sound element associated with this object
+    :param content: Content of object; one of CaveText, CaveImage,
+    CaveStereoImage, CaveModel, CaveLight, CavePSys
+    """
+    # TODO: Far more sensible to have Text, Image, etc. subclass this and add
+    # to the argument dictionaries. toXML and fromXML could even be decorators
+    # which take care of the "Object" node packaging
+    # TODO: argument_validators
+    # TODO: default_arguments
+
+    def toXML(self, all_objects_root):
+        """Store CaveObject as Object node within ObjectRoot node
+
+        :param :py:class:xml.etree.ElementTree.Element all_objects_root
+        """
+        CaveFeature.toXML(self, all_objects_root)  # TODO: Replace this
+
+    @classmethod
+    def fromXML(object_root):
+        """Create CaveObject from Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        return CaveFeature.fromXML(object_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of CaveObject in Blender"""
+        raise NotImplementedError  # TODO
 
 
 class CaveText(CaveFeature):
@@ -28,6 +67,25 @@ class CaveText(CaveFeature):
         "font": None,
         "depth": 0.0}
 
+    def toXML(self, object_root):
+        """Store CaveText as Content node within Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+
+    @classmethod
+    def fromXML(content_root):
+        """Create CaveText object from Content node
+
+        :param :py:class:xml.etree.ElementTree.Element content_root
+        """
+        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of CaveText in Blender"""
+        raise NotImplementedError  # TODO
+
 
 class CaveImage(CaveFeature):
     """Represent a flat image in the Cave
@@ -35,6 +93,25 @@ class CaveImage(CaveFeature):
     :param str filename: Filename of image to be displayed"""
     argument_validators = {
         "filename": AlwaysValid("Value should be a string")}
+
+    def toXML(self, object_root):
+        """Store CaveImage as Content node within Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+
+    @classmethod
+    def fromXML(content_root):
+        """Create CaveImage object from Content node
+
+        :param :py:class:xml.etree.ElementTree.Element content_root
+        """
+        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of CaveImage in Blender"""
+        raise NotImplementedError  # TODO
 
 
 class CaveStereoImage(CaveFeature):
@@ -47,6 +124,25 @@ class CaveStereoImage(CaveFeature):
         "left_file": AlwaysValid("Value should be a string"),
         "right_file": AlwaysValid("Value should be a string")}
 
+    def toXML(self, object_root):
+        """Store CaveStereoImage as Content node within Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+
+    @classmethod
+    def fromXML(content_root):
+        """Create CaveStereoImage object from Content node
+
+        :param :py:class:xml.etree.ElementTree.Element content_root
+        """
+        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of CaveStereoImage in Blender"""
+        raise NotImplementedError  # TODO
+
 
 class CaveModel(CaveFeature):
     """Represents a 3d model in the Cave
@@ -58,9 +154,28 @@ class CaveModel(CaveFeature):
         "filename": AlwaysValid("Value should be a string"),
         "check_collisions": AlwaysValid("Value should be a boolean")}
 
+    def toXML(self, object_root):
+        """Store CaveModel as Content node within Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+
+    @classmethod
+    def fromXML(content_root):
+        """Create CaveModel object from Content node
+
+        :param :py:class:xml.etree.ElementTree.Element content_root
+        """
+        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of CaveModel in Blender"""
+        raise NotImplementedError  # TODO
+
 
 class CaveLight(CaveFeature):
-    """Represents a light souce in the Cave
+    """Represents a light source in the Cave
 
     :param str light_type: Type of source, one of "Point", "Directional",
     "Spot"
@@ -76,10 +191,36 @@ class CaveLight(CaveFeature):
         "light_type": OptionListValidator("Point", "Directional", "Spot"),
         "diffuse": AlwaysValid("Value should be a boolean"),
         "specular": AlwaysValid("Value should be a boolean"),
-        "attenuation": IsNumericIterable(3)
+        "attenuation": IsNumericIterable(3),
         "angle": IsNumeric()}
     default_arguments = {
         "diffuse": True,
         "specular": True,
         "attenuation": (1.0, 0.0, 0.0),
         "angle": 30.0}
+
+    def toXML(self, object_root):
+        """Store CaveLight as Content node within Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+
+    @classmethod
+    def fromXML(content_root):
+        """Create CaveLight object from Content node
+
+        :param :py:class:xml.etree.ElementTree.Element content_root
+        """
+        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of CaveLight in Blender"""
+        raise NotImplementedError  # TODO
+
+
+class CavePSys(CaveFeature):
+    """Represents a particle system in the Cave
+
+    NOT YET IMPLEMENTED AT ALL"""
+    # TODO: everything

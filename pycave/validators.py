@@ -59,13 +59,16 @@ class IsNumericIterable(object):
 
 
 class CheckType(object):
-    """Check if type of object matches specified type"""
+    """Check if type of object matches one of specified types"""
 
-    def __init__(self, correct_type):
-        self.correct_type = correct_type
+    def __init__(self, *correct_types):
+        self.correct_types = correct_types
 
     def __call__(self, value):
-        return isinstance(self.correct_type, value)
+        for type_ in self.correct_types:
+            if isinstance(type_, value):
+                return True
+        return False
 
     def help(self):
         return "Value must be of type {}".format(self.correct_type)
