@@ -71,7 +71,23 @@ class CheckType(object):
         return False
 
     def help(self):
-        return "Value must be of type {}".format(self.correct_type)
+        return "Value must be one of {}".format(str(self.correct_types)[1:-2])
+
+
+def CheckContainedType(object):
+
+    def __init__(self, *correct_types):
+        self.type_checker = CheckType(*correct_types)
+
+    def __call__(self, iterable):
+        for value in iterable:
+            if not self.type_checker(value):
+                return False
+        return True
+
+    def help(self):
+        return "Value must be an iterable containing one of the following"
+        "types: {}".format(str(self.correct_types)[1:-2])
 
 
 class AlwaysValid(object):
