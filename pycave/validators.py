@@ -16,26 +16,46 @@ class OptionListValidator(object):
 
 
 class IsNumeric(object):
-    """Return true if value can be interpreted as a numeric type"""
+    """Return true if value can be interpreted as a numeric type
 
-    def __init__(self):
-        pass
+    :param min_value: Optionally sets minimum value. If set to None, check is
+    not performed
+    :param max_value: Optionally sets maximum value. If set to None, check is
+    not performed
+    """
+
+    def __init__(self, min_value=None, max_value=None):
+        self.min_value = min_value
+        self.max_value = max_value
+
+        self.help_string = "Value must be numeric"
+        if self.min_value is not None:
+            self.help_string = " ".join(
+                (self.help_string,  "and greater than {}".format(
+                    self.min_value)))
+        if self.max_value is not None:
+            self.help_string = " ".join(
+                (self.help_string,  "and less than {}".format(
+                    self.max_value)))
 
     def __call__(self, value):
         try:
             float(value)
-            return True
+            if ((self.min_value is None or value >= self.min_value) and
+                    (self.max_value is None or value <= self.max_value)):
+                return True
+
         except TypeError:
             return False
 
     def help(self):
-        return "Value must be numeric"
+        return self.help_string
 
 
 class IsNumericIterable(object):
     """Callable object that returns true if value is a numeric iterable
 
-    :ivar required_length: Optionally sets required length for iterable. If
+    :param required_length: Optionally sets required length for iterable. If
     this attribute is set to None, length is not checked."""
 
     def __init__(self, required_length=None):
@@ -72,22 +92,6 @@ class CheckType(object):
 
     def help(self):
         return "Value must be one of {}".format(str(self.correct_types)[1:-2])
-
-
-def CheckContainedType(object):
-
-    def __init__(self, *correct_types):
-        self.type_checker = CheckType(*correct_types)
-
-    def __call__(self, iterable):
-        for value in iterable:
-            if not self.type_checker(value):
-                return False
-        return True
-
-    def help(self):
-        return "Value must be an iterable containing one of the following"
-        "types: {}".format(str(self.correct_types)[1:-2])
 
 
 class AlwaysValid(object):

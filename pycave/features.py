@@ -18,7 +18,15 @@ class CaveFeature(dict):
 
     argument_validators = {}
     """Dictionary mapping names of valid arguments to callable objects that
-    return true if a given value is valid for that argument"""
+    return true if a given value is valid for that argument
+
+    Note that this is really only used to check simple input from an editor or
+    when reading in an XML file. It is not intended to do type-checking or
+    consistency-checking across features. e.g. Validators might check if
+    reasonable values have been passed in to specify an RGB color, but they
+    would not be used to confirm that everything in a list of CaveProject
+    objects is actually an object. For such higher-level things, we depend on
+    duck-typing."""
     default_arguments = {}
     """Dictionary mapping names of arguments to their default values"""
 

@@ -2,8 +2,7 @@
 """
 from features import CaveFeature
 from placement import CavePlacement
-from validators import CheckContainedType
-from objects import CaveObject
+from validators import AlwaysValid, IsNumeric, IsNumericIterable
 
 
 class CaveProject(CaveFeature):
@@ -23,16 +22,26 @@ class CaveProject(CaveFeature):
     """
     # TODO: argument_validators
     argument_validators = {
-        "objects": CheckContainedType(CaveObject),
-        "groups": {},
-        "timelines": [],
-        "sounds": [],
-        "trigger_events": [],
-        "camera_position": CavePlacement(),
-        "far_clip": 100.0,
-        "background": (0, 0, 0),
-        "allow_movement": False,
-        "allow_rotation": False
+        "objects": AlwaysValid(
+            help_string="This should be a list of CaveObjects in the project"),
+        "groups": AlwaysValid(
+            help_string="This should be a dictionary mapping names to lists"
+            " of CaveObjects"),
+        "timelines": AlwaysValid(
+            help_string="This should be a list of CaveTimelines in the"
+            " project"),
+        "sounds": AlwaysValid(
+            help_string="This should be a list of CaveSounds in the project"),
+        "trigger_events": AlwaysValid(
+            help_string="This should be a list of CaveTriggers in the"
+            " project"),
+        "camera_position": AlwaysValid(
+            help_string="This should be a list of CaveTriggers in the"
+            " project"),
+        "far_clip": IsNumeric(),
+        "background": IsNumericIterable(required_length=3),
+        "allow_movement": AlwaysValid("This should be a boolean"),
+        "allow_rotation": AlwaysValid("This should be a boolean")
         }
     default_arguments = {
         "objects": [],
