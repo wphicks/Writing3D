@@ -51,7 +51,7 @@ class CaveSound(CaveFeature):
     def fromXML(sound_root):
         """Create CaveSound from Sound node
 
-        :param :py:class:xml.etree.ElementTree.Element object_root
+        :param :py:class:xml.etree.ElementTree.Element sound_root
         """
         return CaveFeature.fromXML(sound_root)  # TODO: Replace this
 
