@@ -2,7 +2,7 @@
 """
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from errors import BadCaveXML
+from errors import BadCaveXML, InvalidArgument
 from xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from features import CaveFeature
 from actions import CaveAction
@@ -145,9 +145,6 @@ class CaveObject(CaveFeature):
     :param content: Content of object; one of CaveText, CaveImage,
     CaveStereoImage, CaveModel, CaveLight, CavePSys
     """
-    # TODO: Far more sensible to have Text, Image, etc. subclass this and add
-    # to the argument dictionaries. toXML and fromXML could even be decorators
-    # which take care of the "Object" node packaging
 
     argument_validators = {
         "name": AlwaysValid(
@@ -288,7 +285,7 @@ class CaveText(CaveContent):
             "left", "right", "center"),
         "valign": OptionListValidator(
             "top", "center", "bottom"),
-        "font": AlwaysValid("Value should be a string"),
+        "font": AlwaysValid("Filename of font"),
         "depth": IsNumeric()}
 
     default_arguments = {
@@ -302,7 +299,18 @@ class CaveText(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+        content_root = ET.SubElement(object_root, "Content")
+        text_root = ET.SubElement(
+            content_root, "Text", attrib={
+                "horiz-align": self["halign"],
+                "vert-align": self["valign"],
+                "font": self["font"],
+                "depth": self["depth"]
+                }
+            )
+        text_root.text = self["text"]
+
+        return content_root
 
     @classmethod
     def fromXML(content_root):
@@ -310,7 +318,21 @@ class CaveText(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+        new_text = CaveText()
+        text_root = content_root.find("Text")
+        if text_root is not None:
+            if "horiz-align" in text_root.attrib:
+                new_text["halign"] = text_root.attrib["horiz-align"]
+            if "vert-align" in text_root.attrib:
+                new_text["valign"] = text_root.attrib["vert-align"]
+            if "font" in text_root.attrib:
+                new_text["font"] = text_root.attrib["font"]
+            if "depth" in text_root.attrib:
+                new_text["depth"] = text_root.attrib["depth"]
+            new_text["text"] = text_root.text
+            return new_text
+        raise InvalidArgument(
+            "Content node must contain Text node to create CaveText object")
 
     def blend(self):
         """Create representation of CaveText in Blender"""
