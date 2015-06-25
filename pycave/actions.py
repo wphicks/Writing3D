@@ -6,9 +6,41 @@ project
 from features import CaveFeature
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
+from errors import BadCaveXML
 
 
-class ObjectAction(CaveFeature):
+class CaveAction(CaveFeature):
+    """An action causing a change in the Cave
+
+    Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
+    appropriate subclasses"""
+
+    @classmethod
+    def fromXML(action_root):
+        """Create CaveAction of appropriate subclass given xml root for any
+        action"""
+
+        if action_root.tag == "ObjectChange":
+            return ObjectAction.fromXML(action_root)
+        elif action_root.tag == "GroupRef":
+            return GroupAction.fromXML(action_root)
+        elif action_root.tag == "TimerChange":
+            return TimelineAction.fromXML(action_root)
+        elif action_root.tag == "SoundRef":
+            return SoundAction.fromXML(action_root)
+        elif action_root.tag == "Event":
+            return EventTriggerAction.fromXML(action_root)
+        elif action_root.tag == "MoveCave":
+            return MoveCaveAction.fromXML(action_root)
+        elif action_root.tag == "Restart":
+            return CaveResetAction.fromXML(action_root)
+        else:
+            raise BadCaveXML(
+                "Indicated action {} is not a valid action type".format(
+                    action_root.tag))
+
+
+class ObjectAction(CaveAction):
     """An action causing a change to a CaveObject
 
     :param str object_name: Name of object to change
@@ -62,7 +94,7 @@ class ObjectAction(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class GroupAction(CaveFeature):
+class GroupAction(CaveAction):
     """An action causing a change to a group of CaveObjects
 
     :param str group_name: Name of group to change
@@ -118,7 +150,7 @@ class GroupAction(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class TimelineAction(CaveFeature):
+class TimelineAction(CaveAction):
     """Start or stop a timeline
 
     :param str timeline_name: Name of timeline to change
@@ -144,7 +176,7 @@ class TimelineAction(CaveFeature):
 
     @classmethod
     def fromXML(timer_change_root):
-        """Create TimelineChange from TimerChange node
+        """Create TimelineAction from TimerChange node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
@@ -155,7 +187,7 @@ class TimelineAction(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class SoundAction(CaveFeature):
+class SoundAction(CaveAction):
     """Start or stop a sound
 
     :param str sound_name: Name of sound to change
@@ -190,21 +222,22 @@ class SoundAction(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class EventAction(CaveFeature):
-    """Enable or disable an event
+class EventTriggerAction(CaveAction):
+    """Enable or disable an event trigger
 
-    :param str event_name: Name of object to change
-    :param bool enable: Enable event?"""
+    :param str trigger_name: Name of trigger to enable/disable
+    :param bool enable: Enable trigger?"""
 
     argument_validators = {
-        "object_name": AlwaysValid("Name of an object"),
+        "trigger_name": AlwaysValid("Name of a trigger"),
         "enable": AlwaysValid("Either true or false")
         }
 
     default_arguments = {}
 
     def toXML(self, parent_root):
-        """Store EventChange as Event node within one of several node types
+        """Store EventTriggerAction as Event node within one of several node
+        types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
@@ -212,7 +245,7 @@ class EventAction(CaveFeature):
 
     @classmethod
     def fromXML(event_root):
-        """Create EventChange from Event node
+        """Create EventTriggerAction from Event node
 
         :param :py:class:xml.etree.ElementTree.Element event_root
         """
@@ -223,7 +256,7 @@ class EventAction(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class MoveCaveAction(CaveFeature):
+class MoveCaveAction(CaveAction):
     """Move entire Cave within virtual space
 
     :param bool relative: Move relative to current position?
@@ -262,7 +295,7 @@ class MoveCaveAction(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class CaveResetAction(CaveFeature):
+class CaveResetAction(CaveAction):
     """Reset Cave to initial state
     """
 

@@ -3,16 +3,18 @@ import re
 from errors import BadCaveXML
 
 
-def text2tuple(string, evaluator=str):
-    """Take a string of the format (1,2, 3,...) and return equivalent tuple
+def text2tuple(text, evaluator=str):
+    """Take a string of the format 1,2, 3,... or (1,2, 3,...) or [1,2, 3,...]
+    and return equivalent tuple
 
     :param func evaluator A function used to evaluate each element within the
-    tuple. For instance "float" could be used to read in a tuple of floats.
+    sequence. For instance "float" could be used to read in a tuple of floats.
     Default is "str", yielding a tuple of strings.
     """
     sep_regex = re.compile(r',\s*')
-    string = string.strip()[1:-1]
-    data = sep_regex.split(string)
+    text = text.strip()
+    text = text.strip("[()]")
+    data = sep_regex.split(text)
     return tuple([evaluator(datum) for datum in data])
 
 
@@ -40,6 +42,14 @@ def attrib2bool(root, attrib_name, default=None):
     if attrib_value == "true":
         return True
     return False
+
+
+def text2bool(text):
+    if text == "true":
+        return True
+    if text == "false":
+        return False
+    raise BadCaveXML("Boolean value not set to true or false")
 
 
 def find_xml_text(root, search):

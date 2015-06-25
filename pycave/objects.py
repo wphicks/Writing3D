@@ -1,6 +1,11 @@
 """Tools for working with displayable objects in Cave projects
 """
+import xml.etree.ElementTree as ET
+from collections import defaultdict
+from errors import BadCaveXML
+from xml_tools import find_xml_text, text2bool, text2tuple
 from features import CaveFeature
+from actions import CaveAction
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 
@@ -13,6 +18,7 @@ class CaveLink(CaveFeature):
     :param tuple enabled_color: RGB color when link is enabled
     :param tuple selected_color: RGB color when link is selected
     :param actions: Dictionary mapping number of clicks to CaveActions
+    (negative for any click)
     :param int reset: Number of clicks after which to reset link (negative
     value to never reset)"""
 
@@ -22,7 +28,8 @@ class CaveLink(CaveFeature):
         "enabled_color": IsNumericIterable(required_length=3),
         "selected_color": IsNumericIterable(required_length=3),
         "actions": AlwaysValid(
-            help_string="Must be a dictionary mapping integers to CaveActions"
+            help_string="Must be a dictionary mapping integers to lists of "
+            "CaveActions"
             ),
         "reset": IsNumeric()
         }
@@ -32,7 +39,7 @@ class CaveLink(CaveFeature):
         "remain_enabled": True,
         "enabled_color": (0, 128, 255),
         "selected_color": (255, 0, 0),
-        "actions": {},
+        "actions": defaultdict(list),
         "reset": -1
         }
 
@@ -45,15 +52,78 @@ class CaveLink(CaveFeature):
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+        linkroot_node = ET.SubElement(object_root, "LinkRoot")
+        link_node = ET.SubElement(linkroot_node, "Link")
+
+        node = ET.SubElement(link_node, "Enabled")
+        node.text = str(bool(self["enabled"])).lower()
+        node = ET.SubElement(link_node, "RemainEnabled")
+        node.text = str(bool(self["remain_enabled"])).lower()
+        node = ET.SubElement(link_node, "EnabledColor")
+        node.text = "{},{},{}".format(*self["enabled_color"])
+        node = ET.SubElement(link_node, "SelectedColor")
+        node.text = "{},{},{}".format(*self["selected_color"])
+
+        for clicks, action_list in self["actions"]:
+            for current_action in action_list:
+                actions_node = ET.SubElement(link_node, "Actions")
+                current_action.toXML(actions_node)
+                clicks_node = ET.SubElement(actions_node, "Clicks")
+                if clicks < 0:
+                    ET.SubElement(clicks_node, "Any")
+                else:
+                    ET.SubElement(
+                        clicks_node,
+                        "NumClicks",
+                        attrib={
+                            "num_clicks": str(clicks),
+                            "reset": str(bool(self["reset"] == clicks)).lower()
+                            }
+                        )
+
+        return linkroot_node
 
     @classmethod
     def fromXML(link_root):
         """Create CaveLink from LinkRoot node
 
-        :param :py:class:xml.etree.ElementTree.Element object_root
+        :param :py:class:xml.etree.ElementTree.Element link_root
         """
-        return CaveFeature.fromXML(link_root)  # TODO: Replace this
+        link = CaveLink()
+        link_node = link_root.find("Link")
+        if link_node is None:
+            raise BadCaveXML("LinkRoot element has no Link subelement")
+        link["enabled"] = text2bool(find_xml_text(link_node, "Enabled"))
+        link["remain_enabled"] = text2bool(
+            find_xml_text(link_node, "RemainEnabled"))
+        node = link_node.find("EnabledColor")
+        if node is not None:
+            link["enabled_color"] = text2tuple(node.text)
+        node = link_node.find("SelectedColor")
+        if node is not None:
+            link["selected_color"] = text2tuple(node.text)
+        for actions_node in link_node.findall("Actions"):
+            num_clicks = -1
+            for child in actions_node:
+                if child.tag == "Clicks":
+                    num_clicks_node = child.find("NumClicks")
+                    if num_clicks_node is not None:
+                        try:
+                            num_clicks = num_clicks_node.attrib["num_clicks"]
+                        except KeyError:
+                            raise BadCaveXML(
+                                "num_clicks attribute not set in NumClicks"
+                                "node")
+                        try:
+                            if text2bool(num_clicks_node.attrib["reset"]):
+                                if (num_clicks < link["reset"]
+                                        or link["reset"] == -1):
+                                    link["reset"] = num_clicks
+                        except KeyError:
+                            pass
+                else:
+                    link["actions"][num_clicks].append(
+                        CaveAction.fromXML(child))
 
 
 class CaveObject(CaveFeature):
