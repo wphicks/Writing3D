@@ -351,7 +351,13 @@ class CaveImage(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+        content_root = ET.SubElement(object_root, "Content")
+        ET.SubElement(
+            content_root, "Image", attrib={
+                "filename": self["filename"]
+                }
+            )
+        return content_root
 
     @classmethod
     def fromXML(content_root):
@@ -359,7 +365,16 @@ class CaveImage(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+        new_image = CaveImage()
+        image_root = content_root.find("Image")
+        if image_root is not None:
+            try:
+                new_image["filename"] = image_root.attrib["filename"]
+            except KeyError:
+                raise BadCaveXML("Image node must have filename attribute set")
+            return new_image
+        raise InvalidArgument(
+            "Content node must contain Image node to create CaveImage object")
 
     def blend(self):
         """Create representation of CaveImage in Blender"""
