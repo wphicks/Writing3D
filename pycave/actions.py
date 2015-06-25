@@ -8,23 +8,41 @@ from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 
 
-# Basic division into changes and transitions doesn't make sense; rethink
-# design
-class ObjectChange(CaveFeature):
-    """Store data on a change to an object
+class ObjectAction(CaveFeature):
+    """An action causing a change to a CaveObject
 
     :param str object_name: Name of object to change
-    :param Transition change: Change to apply"""
+    :param float duration: Duration of transition in seconds
+    :param bool visible: If not None, change visibility to this value
+    :param CavePlacement placement: If not None, move based on this placement
+    :param bool move_relative: If True, move relative to original location
+    :param tuple color: If not None, transition to this color
+    :param float scale: If not None, scale by this factor
+    :param str sound_change: One of "Play Sound" or "Stop Sound", which will
+    play or stop sound associated with this object
+    :param str link_change: One of "Enable", "Disable", "Activate", "Activate
+    if enabled", which will affect this object's link
+    """
 
     argument_validators = {
         "object_name": AlwaysValid("Name of an object"),
-        "change": AlwaysValid("Change to apply")
+        "duration": IsNumeric(min_value=0),
+        "visible": AlwaysValid("Either true or false"),
+        "placement": AlwaysValid("A CavePlacement object"),
+        "move_relative": AlwaysValid("Either true or false"),
+        "color": IsNumericIterable(required_length=3),
+        "scale": IsNumeric(min_value=0),
+        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
+        "link_change": OptionListValidator(
+            "Enable", "Disable", "Activate", "Activate if enabled")
         }
 
-    default_arguments = {}
+    default_arguments = {
+        "duration": 1
+        }
 
     def toXML(self, parent_root):
-        """Store ObjectChange as ObjectChange node within one of several node
+        """Store ObjectAction as ObjectChange node within one of several node
         types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
@@ -32,38 +50,56 @@ class ObjectChange(CaveFeature):
         CaveFeature.toXML(self, parent_root)  # TODO: Replace this
 
     @classmethod
-    def fromXML(object_change_root):
-        """Create ObjectChange from ObjectChange node
+    def fromXML(action_root):
+        """Create ObjectAction from ObjectChange node
 
-        :param :py:class:xml.etree.ElementTree.Element transition_root
+        :param :py:class:xml.etree.ElementTree.Element action_root
         """
-        return CaveFeature.fromXML(object_change_root)  # TODO: Replace this
+        return CaveFeature.fromXML(action_root)  # TODO: Replace this
 
     def blend(self):
         """Create representation of change in Blender"""
         raise NotImplementedError  # TODO
 
 
-class GroupChange(CaveFeature):
-    """Store data on a change to a group of objects
+class GroupAction(CaveFeature):
+    """An action causing a change to a group of CaveObjects
 
     :param str group_name: Name of group to change
-    :param Transition change: Change to apply
     :param bool choose_random: Apply change to one object in group, selected
     randomly?
+    :param float duration: Duration of transition in seconds
+    :param bool visible: If not None, change visibility to this value
+    :param CavePlacement placement: If not None, move based on this placement
+    :param bool move_relative: If True, move relative to original location
+    :param tuple color: If not None, transition to this color
+    :param float scale: If not None, scale by this factor
+    :param str sound_change: One of "Play Sound" or "Stop Sound", which will
+    play or stop sound associated with this object
+    :param str link_change: One of "Enable", "Disable", "Activate", "Activate
+    if enabled", which will affect this object's link
     """
 
     argument_validators = {
-        "object_name": AlwaysValid("Name of an object"),
-        "change": AlwaysValid("Change to apply"),
-        "choose_random": AlwaysValid("Either true or false")
+        "group_name": AlwaysValid("Name of a group"),
+        "duration": IsNumeric(min_value=0),
+        "visible": AlwaysValid("Either true or false"),
+        "placement": AlwaysValid("A CavePlacement object"),
+        "move_relative": AlwaysValid("Either true or false"),
+        "color": IsNumericIterable(required_length=3),
+        "scale": IsNumeric(min_value=0),
+        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
+        "link_change": OptionListValidator(
+            "Enable", "Disable", "Activate", "Activate if enabled")
         }
 
     default_arguments = {
-        "choose_random": False}
+        "duration": 1,
+        "choose_random": False
+        }
 
     def toXML(self, parent_root):
-        """Store GroupChange as GroupRef node within one of several node types
+        """Store GroupAction as GroupRef node within one of several node types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
@@ -71,7 +107,7 @@ class GroupChange(CaveFeature):
 
     @classmethod
     def fromXML(groupref_root):
-        """Create GroupChange from GroupRef node
+        """Create GroupAction from GroupRef node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
@@ -82,8 +118,8 @@ class GroupChange(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class TimelineChange(CaveFeature):
-    """Store data on a change to a timeline
+class TimelineAction(CaveFeature):
+    """Start or stop a timeline
 
     :param str timeline_name: Name of timeline to change
     :param str change: One of "Start", "Stop", "Continue", "Start if not
@@ -119,21 +155,22 @@ class TimelineChange(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class SoundChange(CaveFeature):
-    """Store data on a change to a sound
+class SoundAction(CaveFeature):
+    """Start or stop a sound
 
     :param str sound_name: Name of sound to change
-    :param Transition change: Change to apply"""
+    :param str change: One of Start or Stop"""
 
     argument_validators = {
-        "sound_name": AlwaysValid("Name of an object"),
-        "change": AlwaysValid("Change to apply")
+        "sound_name": AlwaysValid("Name of a sound"),
+        "change": OptionListValidator("Start", "Stop")
         }
 
-    default_arguments = {}
+    default_arguments = {
+        "change": "Start"}
 
     def toXML(self, parent_root):
-        """Store ObjectChange as ObjectChange node within one of several node
+        """Store SoundAction as SoundRef node within one of several node
         types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
@@ -141,20 +178,20 @@ class SoundChange(CaveFeature):
         CaveFeature.toXML(self, parent_root)  # TODO: Replace this
 
     @classmethod
-    def fromXML(object_change_root):
-        """Create ObjectChange from ObjectChange node
+    def fromXML(soundref_root):
+        """Create SoundAction from Soundref node
 
-        :param :py:class:xml.etree.ElementTree.Element transition_root
+        :param :py:class:xml.etree.ElementTree.Element soundref_root
         """
-        return CaveFeature.fromXML(object_change_root)  # TODO: Replace this
+        return CaveFeature.fromXML(soundref_root)  # TODO: Replace this
 
     def blend(self):
         """Create representation of change in Blender"""
         raise NotImplementedError  # TODO
 
 
-class EventChange(CaveFeature):
-    """Store data on a change to an event
+class EventAction(CaveFeature):
+    """Enable or disable an event
 
     :param str event_name: Name of object to change
     :param bool enable: Enable event?"""
@@ -177,7 +214,7 @@ class EventChange(CaveFeature):
     def fromXML(event_root):
         """Create EventChange from Event node
 
-        :param :py:class:xml.etree.ElementTree.Element transition_root
+        :param :py:class:xml.etree.ElementTree.Element event_root
         """
         return CaveFeature.fromXML(event_root)  # TODO: Replace this
 
@@ -186,21 +223,26 @@ class EventChange(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class MoveCave(CaveFeature):
-    """Store data on a change to an object
+class MoveCaveAction(CaveFeature):
+    """Move entire Cave within virtual space
 
-    :param str object_name: Name of object to change
-    :param Transition change: Change to apply"""
+    :param bool relative: Move relative to current position?
+    :param float duration: Duration of transition in seconds
+    :param CavePlacement placement: Where to move (position and orientation)
+    """
 
     argument_validators = {
-        "object_name": AlwaysValid("Name of an object"),
-        "change": AlwaysValid("Change to apply")
-    }
+        "relative": AlwaysValid("Either true or false"),
+        "duration": IsNumeric(min_value=0),
+        "placement": AlwaysValid("A CavePlacement object")
+        }
 
-    default_arguments = {}
+    default_arguments = {
+        "duration": 0
+        }
 
     def toXML(self, parent_root):
-        """Store MoveCave as MoveCave node within one of several node
+        """Store MoveCaveAction as MoveCave node within one of several node
         types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
@@ -209,7 +251,7 @@ class MoveCave(CaveFeature):
 
     @classmethod
     def fromXML(move_cave_root):
-        """Create MoveCave from MoveCave node
+        """Create MoveCaveAction from MoveCave node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
@@ -219,50 +261,27 @@ class MoveCave(CaveFeature):
         """Create representation of change in Blender"""
         raise NotImplementedError  # TODO
 
-# TODO: CaveReset
 
-
-class Transition(CaveFeature):
-    """Store data on transitions within Cave
-
-    :param float duration: Duration of transition in seconds
-    :param bool visible: If not None, change visibility to this value
-    :param CavePlacement placement: If not None, move based on this placement
-    :param bool move_relative: If True, move relative to original location
-    :param tuple color: If not None, transition to this color
-    :param float scale: If not None, scale by this factor
-    :param str sound_change: One of "Play Sound" or "Stop Sound"
-    :param str link_change: One of "Enable", "Disable", "Activate", "Activate
-    if enabled"
+class CaveResetAction(CaveFeature):
+    """Reset Cave to initial state
     """
 
-    argument_validators = {
-        "duration": IsNumeric(),
-        "visible": AlwaysValid("Either true or false"),
-        "placement": AlwaysValid("A CavePlacement object"),
-        "move_relative": AlwaysValid("Either true or false"),
-        "color": IsNumericIterable(required_length=3),
-        "scale": IsNumeric(min_value=0),
-        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
-        "link_change": OptionListValidator(
-            "Enable", "Disable", "Activate", "Activate if enabled")
-        }
-
-    default_arguments = {
-        "duration": 1
-        }
-
     def toXML(self, parent_root):
-        """Store Transition as Transition node within one of several node types
+        """Store CaveResetAction as Restart node within one of several node
+        types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
         CaveFeature.toXML(self, parent_root)  # TODO: Replace this
 
     @classmethod
-    def fromXML(transition_root):
-        """Create Transition from Transition node
+    def fromXML(restart_root):
+        """Create CaveRestartAction from Restart node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        return CaveFeature.fromXML(transition_root)  # TODO: Replace this
+        return CaveFeature.fromXML(restart_root)  # TODO: Replace this
+
+    def blend(self):
+        """Create representation of change in Blender"""
+        raise NotImplementedError  # TODO

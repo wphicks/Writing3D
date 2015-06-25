@@ -20,7 +20,7 @@ class CaveProject(CaveFeature):
     :param bool allow_movement: Allow user to navigate within project?
     :param bool allow_rotation: Allow user to rotate withing project?
     """
-    # TODO: argument_validators
+
     argument_validators = {
         "objects": AlwaysValid(
             help_string="This should be a list of CaveObjects in the project"),
@@ -43,6 +43,7 @@ class CaveProject(CaveFeature):
         "allow_movement": AlwaysValid("This should be a boolean"),
         "allow_rotation": AlwaysValid("This should be a boolean")
         }
+
     default_arguments = {
         "objects": [],
         "groups": {},
