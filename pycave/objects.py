@@ -3,9 +3,10 @@
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from errors import BadCaveXML
-from xml_tools import find_xml_text, text2bool, text2tuple
+from xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from features import CaveFeature
 from actions import CaveAction
+from placement import CavePlacement
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 
@@ -56,9 +57,9 @@ class CaveLink(CaveFeature):
         link_node = ET.SubElement(linkroot_node, "Link")
 
         node = ET.SubElement(link_node, "Enabled")
-        node.text = str(bool(self["enabled"])).lower()
+        node.text = bool2text(self["enabled"])
         node = ET.SubElement(link_node, "RemainEnabled")
-        node.text = str(bool(self["remain_enabled"])).lower()
+        node.text = bool2text(self["remain_enabled"])
         node = ET.SubElement(link_node, "EnabledColor")
         node.text = "{},{},{}".format(*self["enabled_color"])
         node = ET.SubElement(link_node, "SelectedColor")
@@ -77,7 +78,7 @@ class CaveLink(CaveFeature):
                         "NumClicks",
                         attrib={
                             "num_clicks": str(clicks),
-                            "reset": str(bool(self["reset"] == clicks)).lower()
+                            "reset": bool2text(self["reset"] == clicks)
                             }
                         )
 
@@ -124,6 +125,8 @@ class CaveLink(CaveFeature):
                 else:
                     link["actions"][num_clicks].append(
                         CaveAction.fromXML(child))
+
+        return link
 
 
 class CaveObject(CaveFeature):
@@ -178,7 +181,27 @@ class CaveObject(CaveFeature):
 
         :param :py:class:xml.etree.ElementTree.Element all_objects_root
         """
-        CaveFeature.toXML(self, all_objects_root)  # TODO: Replace this
+        object_root = ET.SubElement(
+            all_objects_root, "Object", attrib={"name": self["name"]})
+        node = ET.SubElement(object_root, "Visible")
+        node.text = bool2text(self["visible"])
+        node = ET.SubElement(object_root, "Color")
+        node.text = "{},{},{}".format(*self["color"])
+        node = ET.SubElement(object_root, "Lighting")
+        node.text = bool2text(self["lighting"])
+        node = ET.SubElement(object_root, "ClickThrough")
+        node.text = bool2text(self["click_through"])
+        node = ET.SubElement(object_root, "AroundSelfAxis")
+        node.text = bool2text(self["around_own_axis"])
+        if self["sound"] is not None:
+            node = ET.SubElement(
+                object_root, "SoundRef", attrib={"name": self["sound"]})
+            node.text = self["sound"]
+        self["placement"].toXML(object_root)
+        self["link"].toXML(object_root)
+        self["content"].toXML(object_root)
+
+        return object_root
 
     @classmethod
     def fromXML(object_root):
@@ -186,14 +209,71 @@ class CaveObject(CaveFeature):
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        return CaveFeature.fromXML(object_root)  # TODO: Replace this
+        new_object = CaveObject()
+        try:
+            new_object["name"] = object_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("All Object nodes must have a name attribute set")
+        node = object_root.find("Visible")
+        if node is not None:
+            new_object["visible"] = text2bool(node.text)
+        node = object_root.find("Color")
+        if node is not None:
+            new_object["color"] = text2tuple(node.text)
+        node = object_root.find("Lighting")
+        if node is not None:
+            new_object["lighting"] = text2bool(node.text)
+        node = object_root.find("ClickThrough")
+        if node is not None:
+            new_object["click_through"] = text2bool(node.text)
+        node = object_root.find("AroundSelfAxis")
+        if node is not None:
+            new_object["around_own_axis"] = text2bool(node.text)
+        node = object_root.find("SoundRef")
+        if node is not None:
+            try:
+                new_object["sound"] = node.attrib["name"]
+            except KeyError:
+                raise BadCaveXML("SoundRef node must have name attribute set")
+        node = object_root.find("Placement")
+        if node is not None:
+            new_object["placement"] = CavePlacement.fromXML(node)
+        node = object_root.find("Content")
+        if node is not None:
+            new_object["content"] = CaveContent.fromXML(node)
+        return new_object
 
     def blend(self):
         """Create representation of CaveObject in Blender"""
         raise NotImplementedError  # TODO
 
 
-class CaveText(CaveFeature):
+class CaveContent(CaveFeature):
+    """Represents content of a Cave object"""
+
+    @classmethod
+    def fromXML(content_root):
+        """Create object of appropriate subclass from Content node
+
+        :param :py:class:xml.etree.ElementTree.Element content_root
+        """
+        if content_root.find("None"):
+            return CaveContent()
+        if content_root.find("Text"):
+            return CaveText.fromXML(content_root)
+        if content_root.find("Image"):
+            return CaveImage.fromXML(content_root)
+        if content_root.find("StereoImage"):
+            return CaveStereoImage.fromXML(content_root)
+        if content_root.find("Model"):
+            return CaveModel.fromXML(content_root)
+        if content_root.find("Light"):
+            return CaveLight.fromXML(content_root)
+        if content_root.find("ParticleSystem"):
+            return CavePSys.fromXML(content_root)
+
+
+class CaveText(CaveContent):
     """Represents text in the Cave
 
     :param str text: String of text to be displayed
@@ -237,7 +317,7 @@ class CaveText(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class CaveImage(CaveFeature):
+class CaveImage(CaveContent):
     """Represent a flat image in the Cave
 
     :param str filename: Filename of image to be displayed"""
@@ -264,7 +344,7 @@ class CaveImage(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class CaveStereoImage(CaveFeature):
+class CaveStereoImage(CaveContent):
     """Represents different images in left and right eye
 
     :param str left-file: Filename of image to be displayed to left eye
@@ -294,7 +374,7 @@ class CaveStereoImage(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class CaveModel(CaveFeature):
+class CaveModel(CaveContent):
     """Represents a 3d model in the Cave
 
     :param str filename: Filename of model to be displayed
@@ -324,7 +404,7 @@ class CaveModel(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class CaveLight(CaveFeature):
+class CaveLight(CaveContent):
     """Represents a light source in the Cave
 
     :param str light_type: Type of source, one of "Point", "Directional",
@@ -369,7 +449,7 @@ class CaveLight(CaveFeature):
         raise NotImplementedError  # TODO
 
 
-class CavePSys(CaveFeature):
+class CavePSys(CaveContent):
     """Represents a particle system in the Cave
 
     NOT YET IMPLEMENTED AT ALL"""

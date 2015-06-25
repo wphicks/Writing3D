@@ -45,11 +45,19 @@ def attrib2bool(root, attrib_name, default=None):
 
 
 def text2bool(text):
+    """Take string of the form "true" or "false" and return boolean"""
+    text = text.strip()
     if text == "true":
         return True
     if text == "false":
         return False
     raise BadCaveXML("Boolean value not set to true or false")
+
+
+def bool2text(boolean):
+    """Take boolean and return string of the form "true" or "false"
+    """
+    return str(bool(boolean)).lower()
 
 
 def find_xml_text(root, search):
