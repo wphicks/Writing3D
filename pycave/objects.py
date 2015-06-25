@@ -388,15 +388,22 @@ class CaveStereoImage(CaveContent):
     :param str right-file: Filename of image to be displayed to right eye
     """
     argument_validators = {
-        "left_file": AlwaysValid("Value should be a string"),
-        "right_file": AlwaysValid("Value should be a string")}
+        "left_file": AlwaysValid("Filename of left-eye image"),
+        "right_file": AlwaysValid("Filename of right-eye image")}
 
     def toXML(self, object_root):
         """Store CaveStereoImage as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+        content_root = ET.SubElement(object_root, "Content")
+        ET.SubElement(
+            content_root, "StereoImage", attrib={
+                "left_file": self["left-image"],
+                "right_file": self["right-image"]
+                }
+            )
+        return content_root
 
     @classmethod
     def fromXML(content_root):
@@ -404,7 +411,20 @@ class CaveStereoImage(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+        new_image = CaveStereoImage()
+        image_root = content_root.find("StereoImage")
+        if image_root is not None:
+            try:
+                new_image["left_file"] = image_root.attrib["left-image"]
+                new_image["right_file"] = image_root.attrib["right-image"]
+            except KeyError:
+                raise BadCaveXML(
+                    "StereoImage node must have left-image and right-image "
+                    "attributes set")
+            return new_image
+        raise InvalidArgument(
+            "Content node must contain StereoImage node to create "
+            "CaveStereoImage object")
 
     def blend(self):
         """Create representation of CaveStereoImage in Blender"""
@@ -421,12 +441,23 @@ class CaveModel(CaveContent):
         "filename": AlwaysValid("Value should be a string"),
         "check_collisions": AlwaysValid("Value should be a boolean")}
 
+    default_arguments = {
+        "check_collisions": False
+        }
+
     def toXML(self, object_root):
         """Store CaveModel as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+        content_root = ET.SubElement(object_root, "Content")
+        ET.SubElement(
+            content_root, "Model", attrib={
+                "filename": self["filename"],
+                "check-collisions": bool2text(self["check_collisions"])
+                }
+            )
+        return content_root
 
     @classmethod
     def fromXML(content_root):
@@ -434,7 +465,21 @@ class CaveModel(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+        new_model = CaveModel()
+        model_root = content_root.find("Model")
+        if model_root is not None:
+            try:
+                new_model["filename"] = model_root.attrib["filename"]
+            except KeyError:
+                raise BadCaveXML(
+                    "StereoImage node must have filename attribute set")
+            if "check-collisions" in model_root.attrib:
+                new_model["check_collisions"] = text2bool(
+                    model_root.attrib["check-collisions"])
+            return new_model
+        raise InvalidArgument(
+            "Content node must contain StereoImage node to create "
+            "CaveStereoImage object")
 
     def blend(self):
         """Create representation of CaveModel in Blender"""
