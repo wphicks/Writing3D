@@ -508,15 +508,31 @@ class CaveLight(CaveContent):
     default_arguments = {
         "diffuse": True,
         "specular": True,
-        "attenuation": (1.0, 0.0, 0.0),
-        "angle": 30.0}
+        "attenuation": [1, 0, 0],
+        "angle": 30}
 
     def toXML(self, object_root):
         """Store CaveLight as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        CaveFeature.toXML(self, object_root)  # TODO: Replace this
+        content_root = ET.SubElement(object_root, "Content")
+        light_root = ET.SubElement(
+            content_root, "Light")
+        if not self.is_default("diffuse"):
+            light_root.attrib["diffuse"] = bool2text(self["diffuse"])
+        if not self.is_default("specular"):
+            light_root.attrib["specular"] = bool2text(self["specular"])
+        if not self.is_default("attenuation"):
+            light_root.attrib["const_atten"] = str(self["attenuation"][0])
+            light_root.attrib["lin_atten"] = str(self["attenuation"][1])
+            light_root.attrib["quad_atten"] = str(self["attenuation"][2])
+        if self["light_type"] == "Point":
+            ET.SubElement(light_root, "Point")
+        if self["light_type"] == "Directional":
+            ET.SubElement(light_root, "Directional")
+        if self["light_type"] == "Spot":
+            ET.SubElement(light_root, "Spot", attrib={"angle": self["angle"]})
 
     @classmethod
     def fromXML(content_root):
@@ -524,7 +540,30 @@ class CaveLight(CaveContent):
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        return CaveFeature.fromXML(content_root)  # TODO: Replace this
+        new_light = CaveLight()
+        light_root = content_root.find("Light")
+        if light_root is not None:
+            if "diffuse" in light_root.attrib:
+                new_light["diffuse"] = text2bool(light_root.attrib["diffuse"])
+            if "specular" in light_root.attrib:
+                new_light["specular"] = text2bool(
+                    light_root.attrib["specular"])
+            for index, factor in enumerate(("const_atten", "lin_atten",
+                                            "quad_atten")):
+                if factor in light_root.attrib:
+                    new_light["attenuation"][index] = text2bool(
+                        light_root.attrib[factor])
+            for light_type in CaveLight.argument_validators[
+                    "light_type"].valid_options:
+                type_root = light_root.find(light_type)
+                if type_root is not None:
+                    new_light["light_type"] = light_type
+                    if "angle" in type_root.attrib:
+                        new_light["angle"] = float(type_root.attrib["angle"])
+                    break
+            return new_light
+        raise InvalidArgument(
+            "Content node must contain Light node to create CaveLight object")
 
     def blend(self):
         """Create representation of CaveLight in Blender"""
