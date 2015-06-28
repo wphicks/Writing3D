@@ -3,10 +3,12 @@
 Here, actions refer generically to any discrete change in elements of a Cave
 project
 """
+import xml.etree.ElementTree as ET
 from features import CaveFeature
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from errors import BadCaveXML
+from xml_tools import bool2text
 
 
 class CaveAction(CaveFeature):
@@ -79,7 +81,40 @@ class ObjectAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        change_root = ET.SubElement(
+            parent_root, "ObjectChange", attrib={"name": self["object_name"]}
+            )
+        trans_root = ET.SubElement(
+            change_root, "Transition", attrib={"duration": self["duration"]})
+        if "visible" in self:
+            node = ET.SubElement(trans_root, "Visible")
+            node.text = bool2text(self["visible"])
+        if "placement" in self:
+            if self["move_relative"]:
+                node = ET.SubElement(trans_root, "MoveRel")
+            else:
+                node = ET.SubElement(trans_root, "Movement")
+            self["placement"].toXML(node)
+        if "color" in self:
+            node = ET.SubElement(trans_root, "Color")
+            node.text = "{},{},{}".format(*self["color"])
+        if "scale" in self:
+            node = ET.SubElement(trans_root, "Scale")
+            node.text = str(self["scale"])
+        if "sound_change" in self:
+            node = ET.SubElement(
+                trans_root, "Sound", attrib={"action", self["sound_change"]})
+        if "link_change" in self:
+            node = ET.SubElement(trans_root, "LinkChange")
+            if self["link_change"] == "Enable":
+                ET.SubElement(node, "link_on")
+            elif self["link_change"] == "Disable":
+                ET.SubElement(node, "link_off")
+            elif self["link_change"] == "Activate":
+                ET.SubElement(node, "activate")
+            elif self["link_change"] == "Activate if enabled":
+                ET.SubElement(node, "activate_if_on")
+        return change_root
 
     @classmethod
     def fromXML(action_root):
