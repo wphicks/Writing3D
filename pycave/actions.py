@@ -5,10 +5,11 @@ project
 """
 import xml.etree.ElementTree as ET
 from features import CaveFeature
+from placement import CavePlacement
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from errors import BadCaveXML
-from xml_tools import bool2text
+from xml_tools import bool2text, text2bool
 
 
 class CaveAction(CaveFeature):
@@ -122,7 +123,32 @@ class ObjectAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element action_root
         """
-        return CaveFeature.fromXML(action_root)  # TODO: Replace this
+        new_action = ObjectAction()
+        try:
+            new_action["object_name"] = action_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("ObjectChange node must have name attribute set")
+        trans_root = action_root.find("Transition")
+        if "duration" in trans_root.attrib:
+            new_action["duration"] = float(trans_root.attrib["duration"])
+        node = trans_root.find("Visible")
+        if node is not None:
+            new_action["visible"] = text2bool(node.text)
+        node = trans_root.find("MoveRel")
+        if node is not None:
+            new_action["move_relative"] = True
+        else:
+            node = trans_root.find("Movement")
+        if node is not None:
+            new_action["move_relative"] = new_action.get(
+                "move_relative", False)
+            place_root = node.find("Placement")
+            if place_root is None:
+                raise BadCaveXML(
+                    "Movement or MoveRel node requires Placement child node")
+            new_action["placement"] = CavePlacement.fromXML(place_root)
+
+        return new_action
 
     def blend(self):
         """Create representation of change in Blender"""
