@@ -168,13 +168,14 @@ class GroupAction(CaveAction):
     :param tuple color: If not None, transition to this color
     :param float scale: If not None, scale by this factor
     :param str sound_change: One of "Play Sound" or "Stop Sound", which will
-    play or stop sound associated with this object
+    play or stop sound associated with this group
     :param str link_change: One of "Enable", "Disable", "Activate", "Activate
     if enabled", which will affect this object's link
     """
 
     argument_validators = {
         "group_name": AlwaysValid("Name of a group"),
+        "choose_random": AlwaysValid("Either true or false"),
         "duration": IsNumeric(min_value=0),
         "visible": AlwaysValid("Either true or false"),
         "placement": AlwaysValid("A CavePlacement object"),
@@ -196,15 +197,79 @@ class GroupAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        change_root = ET.SubElement(
+            parent_root, "GroupRef", attrib={"name": self["group_name"]}
+            )
+        if not self.is_default("choose_random"):
+            change_root.attrib["random"] = bool2text(self["choose_random"])
+        trans_root = ET.SubElement(
+            change_root, "Transition", attrib={"duration": self["duration"]})
+        if "visible" in self:
+            node = ET.SubElement(trans_root, "Visible")
+            node.text = bool2text(self["visible"])
+        if "placement" in self:
+            if self["move_relative"]:
+                node = ET.SubElement(trans_root, "MoveRel")
+            else:
+                node = ET.SubElement(trans_root, "Movement")
+            self["placement"].toXML(node)
+        if "color" in self:
+            node = ET.SubElement(trans_root, "Color")
+            node.text = "{},{},{}".format(*self["color"])
+        if "scale" in self:
+            node = ET.SubElement(trans_root, "Scale")
+            node.text = str(self["scale"])
+        if "sound_change" in self:
+            node = ET.SubElement(
+                trans_root, "Sound", attrib={"action", self["sound_change"]})
+        if "link_change" in self:
+            node = ET.SubElement(trans_root, "LinkChange")
+            if self["link_change"] == "Enable":
+                ET.SubElement(node, "link_on")
+            elif self["link_change"] == "Disable":
+                ET.SubElement(node, "link_off")
+            elif self["link_change"] == "Activate":
+                ET.SubElement(node, "activate")
+            elif self["link_change"] == "Activate if enabled":
+                ET.SubElement(node, "activate_if_on")
+        return change_root
 
     @classmethod
-    def fromXML(groupref_root):
+    def fromXML(action_root):
         """Create GroupAction from GroupRef node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        return CaveFeature.fromXML(groupref_root)  # TODO: Replace this
+        new_action = GroupAction()
+        try:
+            new_action["group_name"] = action_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("GroupRef node must have name attribute set")
+        try:
+            new_action["choose_random"] = action_root.attrib["random"]
+        except KeyError:
+            pass
+        trans_root = action_root.find("Transition")
+        if "duration" in trans_root.attrib:
+            new_action["duration"] = float(trans_root.attrib["duration"])
+        node = trans_root.find("Visible")
+        if node is not None:
+            new_action["visible"] = text2bool(node.text)
+        node = trans_root.find("MoveRel")
+        if node is not None:
+            new_action["move_relative"] = True
+        else:
+            node = trans_root.find("Movement")
+        if node is not None:
+            new_action["move_relative"] = new_action.get(
+                "move_relative", False)
+            place_root = node.find("Placement")
+            if place_root is None:
+                raise BadCaveXML(
+                    "Movement or MoveRel node requires Placement child node")
+            new_action["placement"] = CavePlacement.fromXML(place_root)
+
+        return new_action
 
     def blend(self):
         """Create representation of change in Blender"""
