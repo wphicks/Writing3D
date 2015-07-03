@@ -8,7 +8,7 @@ from features import CaveFeature
 from placement import CavePlacement
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
-from errors import BadCaveXML
+from errors import BadCaveXML, InvalidArgument
 from xml_tools import bool2text, text2bool
 
 
@@ -298,7 +298,23 @@ class TimelineAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        try:
+            change_root = ET.SubElement(
+                parent_root, "TimerChange",
+                attrib={"name": self["timeline_name"]})
+        except KeyError:
+            raise InvalidArgument(
+                "TimelineAction must have timeline_name key set")
+        try:
+            change_type = self["change"]
+        except KeyError:
+            raise InvalidArgument(
+                "TimelineAction must have change key set")
+        if change_type in ("Start", "Stop", "Continue"):
+            ET.SubElement(change_root, change_type.lower())
+        elif change_type == "Start if not started":
+            ET.SubElement(change_root, "start_if_not_started")
+        return change_root
 
     @classmethod
     def fromXML(timer_change_root):
