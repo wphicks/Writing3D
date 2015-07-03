@@ -9,7 +9,7 @@ from placement import CavePlacement
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from errors import BadCaveXML, InvalidArgument
-from xml_tools import bool2text, text2bool
+from xml_tools import bool2text, text2bool, text2tuple
 
 
 class CaveAction(CaveFeature):
@@ -76,6 +76,10 @@ class ObjectAction(CaveAction):
         "duration": 1
         }
 
+    link_xml_tags = {
+        "Enable": "link_on", "Disable": "link_off", "Activate": "activate",
+        "Activate if enabled": "activate_if_on"}
+
     def toXML(self, parent_root):
         """Store ObjectAction as ObjectChange node within one of several node
         types
@@ -107,14 +111,7 @@ class ObjectAction(CaveAction):
                 trans_root, "Sound", attrib={"action", self["sound_change"]})
         if "link_change" in self:
             node = ET.SubElement(trans_root, "LinkChange")
-            if self["link_change"] == "Enable":
-                ET.SubElement(node, "link_on")
-            elif self["link_change"] == "Disable":
-                ET.SubElement(node, "link_off")
-            elif self["link_change"] == "Activate":
-                ET.SubElement(node, "activate")
-            elif self["link_change"] == "Activate if enabled":
-                ET.SubElement(node, "activate_if_on")
+            ET.SubElement(node, self.link_xml_tags[self["link_change"]])
         return change_root
 
     @classmethod
@@ -147,7 +144,26 @@ class ObjectAction(CaveAction):
                 raise BadCaveXML(
                     "Movement or MoveRel node requires Placement child node")
             new_action["placement"] = CavePlacement.fromXML(place_root)
-        #TODO: THIS IS NOT COMPLETE. MUST ADD COLOR, SCALE AND LINKCHANGE
+        node = trans_root.find("Color")
+        if node is not None:
+            try:
+                new_action["color"] = text2tuple(node.text, evaluator=int)
+            except InvalidArgument:
+                new_action["color"] = (255, 255, 255)
+        node = trans_root.find("Scale")
+        if node is not None:
+            try:
+                new_action["scale"] = float(node.text.strip())
+            except TypeError:
+                new_action["scale"] = 1
+        node = trans_root.find("Sound")
+        if node is not None:
+            new_action["sound_change"] = node.text.strip()
+        node = trans_root.find("LinkChange")
+        for key, value in new_action.link_xml_tags:
+            if node.find(value) is not None:
+                new_action["link_change"] = key
+                break
 
         return new_action
 
@@ -192,6 +208,10 @@ class GroupAction(CaveAction):
         "duration": 1,
         "choose_random": False
         }
+
+    link_xml_tags = {
+        "Enable": "link_on", "Disable": "link_off", "Activate": "activate",
+        "Activate if enabled": "activate_if_on"}
 
     def toXML(self, parent_root):
         """Store GroupAction as GroupRef node within one of several node types
@@ -269,7 +289,26 @@ class GroupAction(CaveAction):
                 raise BadCaveXML(
                     "Movement or MoveRel node requires Placement child node")
             new_action["placement"] = CavePlacement.fromXML(place_root)
-        #TODO: THIS IS NOT COMPLETE. MUST ADD COLOR, SCALE AND LINKCHANGE
+        node = trans_root.find("Color")
+        if node is not None:
+            try:
+                new_action["color"] = text2tuple(node.text, evaluator=int)
+            except InvalidArgument:
+                new_action["color"] = (255, 255, 255)
+        node = trans_root.find("Scale")
+        if node is not None:
+            try:
+                new_action["scale"] = float(node.text.strip())
+            except TypeError:
+                new_action["scale"] = 1
+        node = trans_root.find("Sound")
+        if node is not None:
+            new_action["sound_change"] = node.text.strip()
+        node = trans_root.find("LinkChange")
+        for key, value in new_action.link_xml_tags:
+            if node.find(value) is not None:
+                new_action["link_change"] = key
+                break
 
         return new_action
 
