@@ -8,7 +8,7 @@ from features import CaveFeature
 from placement import CavePlacement
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
-from errors import BadCaveXML, InvalidArgument
+from errors import BadCaveXML, InvalidArgument, ConsistencyError
 from xml_tools import bool2text, text2bool, text2tuple
 
 
@@ -349,12 +349,12 @@ class TimelineAction(CaveAction):
                 parent_root, "TimerChange",
                 attrib={"name": self["timeline_name"]})
         except KeyError:
-            raise InvalidArgument(
+            raise ConsistencyError(
                 "TimelineAction must have timeline_name key set")
         try:
             ET.SubElement(change_root, self.change_xml_tags[self["change"]])
         except KeyError:
-            raise InvalidArgument(
+            raise ConsistencyError(
                 "TimelineAction must have change key set")
         return change_root
 
@@ -404,7 +404,15 @@ class SoundAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        try:
+            attrib = {"name": self["sound_name"]}
+        except KeyError:
+            raise ConsistencyError(
+                "SoundAction must specify sound_name to act on")
+        if not self.is_default("change"):
+            attrib["action"] = self["change"]
+        sound_root = ET.SubElement(parent_root, "SoundRef", attrib=attrib)
+        return sound_root
 
     @classmethod
     def fromXML(soundref_root):

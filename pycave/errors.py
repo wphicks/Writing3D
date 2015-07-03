@@ -14,3 +14,15 @@ class InvalidArgument(Exception):
     value passed for such an option."""
     def __init__(self, message):
         super(InvalidArgument, self).__init__(message)
+
+
+class ConsistencyError(Exception):
+    """Exception thrown for use of a Cave feature with options set incorrectly
+
+    Examples could include not specifying a required attribute or specifying a
+    value that does not make sense in the context of the entire project. More
+    concretely, if an ObjectAction does not specify what object it is changing,
+    a ConsistencyError will be thrown before that action can be written to XML
+    or displayed in the Cave."""
+    def __init__(self, message):
+        super(InvalidArgument, self).__init__(message)
