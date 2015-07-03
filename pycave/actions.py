@@ -147,6 +147,7 @@ class ObjectAction(CaveAction):
                 raise BadCaveXML(
                     "Movement or MoveRel node requires Placement child node")
             new_action["placement"] = CavePlacement.fromXML(place_root)
+        #TODO: THIS IS NOT COMPLETE. MUST ADD COLOR, SCALE AND LINKCHANGE
 
         return new_action
 
@@ -268,6 +269,7 @@ class GroupAction(CaveAction):
                 raise BadCaveXML(
                     "Movement or MoveRel node requires Placement child node")
             new_action["placement"] = CavePlacement.fromXML(place_root)
+        #TODO: THIS IS NOT COMPLETE. MUST ADD COLOR, SCALE AND LINKCHANGE
 
         return new_action
 
@@ -292,6 +294,11 @@ class TimelineAction(CaveAction):
 
     default_arguments = {}
 
+    change_xml_tags = {
+        "Start": "start", "Stop": "stop", "Continue": "continue",
+        "Start if not started": "start_if_not_started"
+        }
+
     def toXML(self, parent_root):
         """Store TimelineChange as TimerChange node within one of several node
         types
@@ -306,14 +313,10 @@ class TimelineAction(CaveAction):
             raise InvalidArgument(
                 "TimelineAction must have timeline_name key set")
         try:
-            change_type = self["change"]
+            ET.SubElement(change_root, self.change_xml_tags[self["change"]])
         except KeyError:
             raise InvalidArgument(
                 "TimelineAction must have change key set")
-        if change_type in ("Start", "Stop", "Continue"):
-            ET.SubElement(change_root, change_type.lower())
-        elif change_type == "Start if not started":
-            ET.SubElement(change_root, "start_if_not_started")
         return change_root
 
     @classmethod
@@ -322,7 +325,20 @@ class TimelineAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        return CaveFeature.fromXML(timer_change_root)  # TODO: Replace this
+        new_action = TimelineAction()
+        try:
+            new_action["timeline_name"] = timer_change_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML(
+                "TimerChange node must have name attribute set")
+        for key, value in new_action.change_xml_tags:
+            if timer_change_root.find(value) is not None:
+                new_action["change"] = key
+        if "change" not in new_action:
+            raise BadCaveXML(
+                "TimerChange node must have child specifying timeline change")
+
+        return new_action
 
     def blend(self):
         """Create representation of change in Blender"""
