@@ -454,7 +454,18 @@ class EventTriggerAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        try:
+            action_root = ET.SubElement(
+                parent_root, "Event",
+                attrib={
+                    "name": self["trigger_name"], "enable": self["enable"]
+                    }
+                )
+        except KeyError:
+            raise ConsistencyError(
+                "EventTriggerAction must specify both trigger_name and enable")
+
+        return action_root
 
     @classmethod
     def fromXML(event_root):
@@ -462,7 +473,15 @@ class EventTriggerAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element event_root
         """
-        return CaveFeature.fromXML(event_root)  # TODO: Replace this
+        new_action = EventTriggerAction()
+        try:
+            new_action["trigger_name"] = event_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("Event node must specify name attribute")
+        try:
+            new_action["enable"] = event_root.attrib["enable"]
+        except KeyError:
+            raise BadCaveXML("Event node must specify enable attribute")
 
     def blend(self):
         """Create representation of change in Blender"""
