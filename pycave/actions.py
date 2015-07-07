@@ -416,11 +416,19 @@ class SoundAction(CaveAction):
 
     @classmethod
     def fromXML(soundref_root):
-        """Create SoundAction from Soundref node
+        """Create SoundAction from SoundRef node
 
         :param :py:class:xml.etree.ElementTree.Element soundref_root
         """
-        return CaveFeature.fromXML(soundref_root)  # TODO: Replace this
+        new_action = SoundAction()
+        try:
+            new_action["sound_name"] = soundref_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("SoundRef node must specify name attribute")
+        if "action" in soundref_root.attrib:
+            new_action["change"] = soundref_root.attrib["action"]
+
+        return new_action
 
     def blend(self):
         """Create representation of change in Blender"""
