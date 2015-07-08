@@ -573,7 +573,8 @@ class CaveResetAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        action_root = ET.SubElement(parent_root, "Restart")
+        return action_root
 
     @classmethod
     def fromXML(restart_root):
@@ -581,7 +582,7 @@ class CaveResetAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        return CaveFeature.fromXML(restart_root)  # TODO: Replace this
+        return CaveResetAction()
 
     def blend(self):
         """Create representation of change in Blender"""
