@@ -512,7 +512,26 @@ class MoveCaveAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
         """
-        CaveFeature.toXML(self, parent_root)  # TODO: Replace this
+        action_root = ET.SubElement(parent_root, "MoveCave")
+        if not self.is_default("duration"):
+            action_root.attrib["duration"] = str(self["duration"])
+        try:
+            relative = self["relative"]
+        except KeyError:
+            raise ConsistencyError(
+                'MoveCaveAction must specify a value for "relative" key'
+                )
+        if relative:
+            ET.SubElement(action_root, "Relative")
+        else:
+            ET.SubElement(action_root, "Absolute")
+        try:
+            self["placement"].toXML(action_root)
+        except KeyError:
+            raise ConsistencyError(
+                'MoveCaveAction must specify a value for "placement" key'
+                )
+        return action_root
 
     @classmethod
     def fromXML(move_cave_root):
@@ -520,7 +539,24 @@ class MoveCaveAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        return CaveFeature.fromXML(move_cave_root)  # TODO: Replace this
+        new_action = MoveCaveAction()
+        if "duration" in move_cave_root.attrib:
+            new_action["duration"] = move_cave_root.attrib["duration"]
+        if move_cave_root.find("Relative") is not None:
+            new_action["relative"] = True
+        elif move_cave_root.find("Absolute") is not None:
+            new_action["relative"] = False
+        else:
+            raise BadCaveXML(
+                "MoveCave node must contain either Absolute or Relative child"
+                )
+        place_node = move_cave_root.find("Placement")
+        if place_node is None:
+            raise BadCaveXML(
+                "MoveCave node must contain Placement child node"
+                )
+        new_action["placement"] = CavePlacement.fromXML(place_node)
+        return new_action
 
     def blend(self):
         """Create representation of change in Blender"""
