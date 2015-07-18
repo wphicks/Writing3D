@@ -1,24 +1,45 @@
 """Tools for working with timelines in Cave projects
 """
+import xml.etree.ElementTree as ET
 from features import CaveFeature
+from actions import CaveAction
 from validators import AlwaysValid
 from errors import ConsistencyError, BadCaveXML
 from xmltools import bool2text, text2bool
-import xml.etree.ElementTree as ET
 
 
 class SortedList(list):
     """A list that is guaranteed to remain sorted
-    
+
     :param compare: Comparison function for sorting"""
-    def __init__(self, init_list=None, compare=None):
+    def __init__(self, init_list=None, compare=cmp):
         self.compare = compare
         super(SortedList, self).__init__(init_list)
-        self.sort(cmp=self.compare)
+        self.sort()
+
+    def __setitem__(self, index, value):
+        super(SortedList, self).__setitem__(index, value)
+        self.sort()
 
     def add(self, new_item):
+        """Add new_item to list, maintaining proper ordering"""
         for index, item in enumerate(self):
-            if self.compare(
+            if self.compare(new_item, item) < 0:
+                return super(SortedList, self).insert(index, new_item)
+        return super(SortedList, self).insert(len(self), new_item)
+
+    def sort(self, cmp=None):
+        return super(SortedList, self).sort(cmp=self.compare)
+
+    def append(self, value):
+        self.add(value)
+
+    def extend(self, value_list):
+        for value in value_list:
+            self.add(value)
+
+    def reverse(self):
+        raise NotImplementedError("Cannot reverse a SortedList")
 
 
 class CaveTimeline(CaveFeature):
@@ -79,13 +100,13 @@ class CaveTimeline(CaveFeature):
         for timed_action in timeline_root.findall("TimedActions"):
             try:
                 action_time = float(timed_action.attrib["seconds-time"])
-            except KeyError, ValueError:
+            except (KeyError, ValueError):
                 raise BadCaveXML(
                     "TimedActions node must specify numeric seconds-time "
                     "attribute")
             for child in timed_action.getchildren():
                 new_timeline["actions"].add(
-                    (action_time, CaveAction.fromXML(child))
+                    (action_time, CaveAction.fromXML(child)))
 
         return new_timeline
 
