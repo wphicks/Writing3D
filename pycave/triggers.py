@@ -15,22 +15,7 @@ from xml_tools import bool2text
 def TriggerXMLDecorator(fromXML):
     """Decorator for fromXML to gather data not specific to subclass"""
     def wrapped_fromXML(trigger_class, xml_root):
-        new_trigger = trigger_class()
-        try:
-            new_trigger["name"] = xml_root.attrib["name"]
-        except KeyError:
-            raise BadCaveXML("EventTrigger must specify name attribute")
-        xml_tags = {
-            "enabled": "enabled", "remain_enabled": "remain-enabled",
-            "duration": "duration"}
-        for key, tag in xml_tags:
-            if tag in xml_root.attrib:
-                new_trigger[key] = xml_root.attrib[tag]
-        action_root = xml_root.find("Actions")
-        if action_root is not None:
-            for child in action_root.getchildren():
-                new_trigger["actions"].append(CaveAction.fromXML(child))
-        return fromXML(xml_root).update(new_trigger)
+        return fromXML(xml_root).update(trigger_class._nakedFromXML(xml_root))
     return wrapped_fromXML
 
 
@@ -91,7 +76,33 @@ class CaveTrigger(CaveFeature):
     # issue. Actually, by decorating the subclasses, we ensure that a fully
     # valid CaveTrigger is always returned, even if the subclass fromXMLs are
     # called directly, not through CaveTrigger.
-    @staticmethod
+    @classmethod
+    def _nakedFromXML(trigger_class, trigger_root):
+        """Create only a base CaveTrigger from XML
+
+        This method only sets those attributes common to all triggers. It is
+        used to ensure that all types of trigger return a complete object of
+        the most sensible type  using their fromXML methods
+        """
+        new_trigger = trigger_class()
+        try:
+            new_trigger["name"] = xml_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("EventTrigger must specify name attribute")
+        xml_tags = {
+            "enabled": "enabled", "remain_enabled": "remain-enabled",
+            "duration": "duration"}
+        for key, tag in xml_tags:
+            if tag in xml_root.attrib:
+                new_trigger[key] = xml_root.attrib[tag]
+        action_root = xml_root.find("Actions")
+        if action_root is not None:
+            for child in action_root.getchildren():
+                new_trigger["actions"].append(CaveAction.fromXML(child))
+        return new_trigger
+
+    @classmethod
+    @TriggerXMLDecorator
     def fromXML(trigger_root):
         """Create CaveTrigger from EventTrigger node
 
@@ -104,8 +115,7 @@ class CaveTrigger(CaveFeature):
         for tag, trigger_class in tag_class_dict:
             if trigger_root.find(tag) is not None:
                 return trigger_class.fromXML(trigger_root)
-        raise BadCaveXML(
-            "EventTrigger node must contain HeadTrack or MoveTrack child")
+        return CaveTrigger()
 
     def blend(self):
         """Create representation of CaveTrigger in Blender"""
