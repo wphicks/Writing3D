@@ -18,7 +18,7 @@ class CaveAction(CaveFeature):
     Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
     appropriate subclasses"""
 
-    @classmethod
+    @staticmethod
     def fromXML(action_root):
         """Create CaveAction of appropriate subclass given xml root for any
         action"""
@@ -115,12 +115,12 @@ class ObjectAction(CaveAction):
         return change_root
 
     @classmethod
-    def fromXML(action_root):
+    def fromXML(action_class, action_root):
         """Create ObjectAction from ObjectChange node
 
         :param :py:class:xml.etree.ElementTree.Element action_root
         """
-        new_action = ObjectAction()
+        new_action = action_class()
         try:
             new_action["object_name"] = action_root.attrib["name"]
         except KeyError:
@@ -256,12 +256,12 @@ class GroupAction(CaveAction):
         return change_root
 
     @classmethod
-    def fromXML(action_root):
+    def fromXML(action_class, action_root):
         """Create GroupAction from GroupRef node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        new_action = GroupAction()
+        new_action = action_class()
         try:
             new_action["group_name"] = action_root.attrib["name"]
         except KeyError:
@@ -359,12 +359,12 @@ class TimelineAction(CaveAction):
         return change_root
 
     @classmethod
-    def fromXML(timer_change_root):
+    def fromXML(action_class, timer_change_root):
         """Create TimelineAction from TimerChange node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        new_action = TimelineAction()
+        new_action = action_class
         try:
             new_action["timeline_name"] = timer_change_root.attrib["name"]
         except KeyError:
@@ -415,12 +415,12 @@ class SoundAction(CaveAction):
         return sound_root
 
     @classmethod
-    def fromXML(soundref_root):
+    def fromXML(action_class, soundref_root):
         """Create SoundAction from SoundRef node
 
         :param :py:class:xml.etree.ElementTree.Element soundref_root
         """
-        new_action = SoundAction()
+        new_action = action_class()
         try:
             new_action["sound_name"] = soundref_root.attrib["name"]
         except KeyError:
@@ -468,12 +468,12 @@ class EventTriggerAction(CaveAction):
         return action_root
 
     @classmethod
-    def fromXML(event_root):
+    def fromXML(action_class, event_root):
         """Create EventTriggerAction from Event node
 
         :param :py:class:xml.etree.ElementTree.Element event_root
         """
-        new_action = EventTriggerAction()
+        new_action = action_class()
         try:
             new_action["trigger_name"] = event_root.attrib["name"]
         except KeyError:
@@ -534,12 +534,12 @@ class MoveCaveAction(CaveAction):
         return action_root
 
     @classmethod
-    def fromXML(move_cave_root):
+    def fromXML(action_class, move_cave_root):
         """Create MoveCaveAction from MoveCave node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        new_action = MoveCaveAction()
+        new_action = action_class()
         if "duration" in move_cave_root.attrib:
             new_action["duration"] = move_cave_root.attrib["duration"]
         if move_cave_root.find("Relative") is not None:
@@ -577,12 +577,12 @@ class CaveResetAction(CaveAction):
         return action_root
 
     @classmethod
-    def fromXML(restart_root):
+    def fromXML(action_class, restart_root):
         """Create CaveRestartAction from Restart node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        return CaveResetAction()
+        return action_class()
 
     def blend(self):
         """Create representation of change in Blender"""

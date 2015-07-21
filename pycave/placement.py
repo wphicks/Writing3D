@@ -31,8 +31,8 @@ class CaveRotation(CaveFeature):
                 " rotation mode")
 
     @classmethod
-    def fromXML(rot_root):
-        rotation = CaveRotation()
+    def fromXML(rot_class, rot_root):
+        rotation = rot_class()
         rotation["rotation_mode"] = rot_root.tag
         try:
             rotation_vector = rot_root.attrib["rotation"]
@@ -81,8 +81,8 @@ class CavePlacement(CaveFeature):
             self["rotation"].toXML(place_root)
 
     @classmethod
-    def fromXML(place_root):
-        placement = CavePlacement()
+    def fromXML(place_class, place_root):
+        placement = place_class()
         rel_root = place_root.find("RelativeTo")
         if rel_root is not None:
             placement["relative_to"] = rel_root.text.strip()

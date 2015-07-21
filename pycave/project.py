@@ -36,8 +36,7 @@ class CaveProject(CaveFeature):
             help_string="This should be a list of CaveTriggers in the"
             " project"),
         "camera_position": AlwaysValid(
-            help_string="This should be a list of CaveTriggers in the"
-            " project"),
+            help_string="A CavePlacement object"),
         "far_clip": IsNumeric(),
         "background": IsNumericIterable(required_length=3),
         "allow_movement": AlwaysValid("This should be a boolean"),
@@ -63,7 +62,7 @@ class CaveProject(CaveFeature):
         CaveFeature.toXML(self, None)  # TODO: Replace this
 
     @classmethod
-    def fromXML(project_root):
+    def fromXML(project_class, project_root):
         """Create CaveProject from Story node of Cave XML
 
         :param :py:class:xml.etree.ElementTree.Element project_root

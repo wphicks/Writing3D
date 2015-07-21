@@ -90,12 +90,12 @@ class CaveTimeline(CaveFeature):
         return timeline_root
 
     @classmethod
-    def fromXML(timeline_root):
+    def fromXML(timeline_class, timeline_root):
         """Create CaveTimeline from Timeline node of Cave XML
 
         :param :py:class:xml.etree.ElementTree.Element timeline_root
         """
-        new_timeline = CaveTimeline()
+        new_timeline = timeline_class()
         try:
             new_timeline["name"] = timeline_root.attrib["name"]
         except KeyError:

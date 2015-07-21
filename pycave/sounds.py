@@ -86,12 +86,12 @@ class CaveSound(CaveFeature):
         return sound_root
 
     @classmethod
-    def fromXML(sound_root):
+    def fromXML(sound_class, sound_root):
         """Create CaveSound from Sound node
 
         :param :py:class:xml.etree.ElementTree.Element sound_root
         """
-        new_sound = CaveSound()
+        new_sound = sound_class()
         try:
             new_sound["name"] = sound_root.attrib["name"]
         except KeyError:

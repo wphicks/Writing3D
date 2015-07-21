@@ -85,12 +85,12 @@ class CaveLink(CaveFeature):
         return linkroot_node
 
     @classmethod
-    def fromXML(link_root):
+    def fromXML(link_class, link_root):
         """Create CaveLink from LinkRoot node
 
         :param :py:class:xml.etree.ElementTree.Element link_root
         """
-        link = CaveLink()
+        link = link_class()
         link_node = link_root.find("Link")
         if link_node is None:
             raise BadCaveXML("LinkRoot element has no Link subelement")
@@ -201,12 +201,12 @@ class CaveObject(CaveFeature):
         return object_root
 
     @classmethod
-    def fromXML(object_root):
+    def fromXML(object_class, object_root):
         """Create CaveObject from Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
-        new_object = CaveObject()
+        new_object = object_class()
         try:
             new_object["name"] = object_root.attrib["name"]
         except KeyError:
@@ -248,7 +248,7 @@ class CaveObject(CaveFeature):
 class CaveContent(CaveFeature):
     """Represents content of a Cave object"""
 
-    @classmethod
+    @staticmethod
     def fromXML(content_root):
         """Create object of appropriate subclass from Content node
 
@@ -268,6 +268,7 @@ class CaveContent(CaveFeature):
             return CaveLight.fromXML(content_root)
         if content_root.find("ParticleSystem"):
             return CavePSys.fromXML(content_root)
+        raise BadCaveXML("No known child node found in Content node")
 
 
 class CaveText(CaveContent):
@@ -313,12 +314,12 @@ class CaveText(CaveContent):
         return content_root
 
     @classmethod
-    def fromXML(content_root):
+    def fromXML(text_class, content_root):
         """Create CaveText object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        new_text = CaveText()
+        new_text = text_class()
         text_root = content_root.find("Text")
         if text_root is not None:
             if "horiz-align" in text_root.attrib:
@@ -360,12 +361,12 @@ class CaveImage(CaveContent):
         return content_root
 
     @classmethod
-    def fromXML(content_root):
+    def fromXML(image_class, content_root):
         """Create CaveImage object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        new_image = CaveImage()
+        new_image = image_class()
         image_root = content_root.find("Image")
         if image_root is not None:
             try:
@@ -406,12 +407,12 @@ class CaveStereoImage(CaveContent):
         return content_root
 
     @classmethod
-    def fromXML(content_root):
+    def fromXML(image_class, content_root):
         """Create CaveStereoImage object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        new_image = CaveStereoImage()
+        new_image = image_class()
         image_root = content_root.find("StereoImage")
         if image_root is not None:
             try:
@@ -460,12 +461,12 @@ class CaveModel(CaveContent):
         return content_root
 
     @classmethod
-    def fromXML(content_root):
+    def fromXML(model_class, content_root):
         """Create CaveModel object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        new_model = CaveModel()
+        new_model = model_class()
         model_root = content_root.find("Model")
         if model_root is not None:
             try:
@@ -535,12 +536,12 @@ class CaveLight(CaveContent):
             ET.SubElement(light_root, "Spot", attrib={"angle": self["angle"]})
 
     @classmethod
-    def fromXML(content_root):
+    def fromXML(light_class, content_root):
         """Create CaveLight object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        new_light = CaveLight()
+        new_light = light_class()
         light_root = content_root.find("Light")
         if light_root is not None:
             if "diffuse" in light_root.attrib:
