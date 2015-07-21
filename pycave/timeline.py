@@ -6,7 +6,7 @@ from features import CaveFeature
 from actions import CaveAction
 from validators import AlwaysValid
 from errors import ConsistencyError, BadCaveXML
-from xmltools import bool2text, text2bool
+from xml_tools import bool2text, text2bool
 
 
 class SortedList(MutableSequence):
@@ -27,6 +27,12 @@ class SortedList(MutableSequence):
 
     def __len__(self):
         return len(self._data)
+
+    def __getitem__(self, index):
+        return self._data[index]
+
+    def insert(self, index, new_item):
+        self._data.insert(index, new_item)
 
     def add(self, new_item):
         """Add new_item to list, maintaining proper ordering"""
