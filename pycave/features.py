@@ -30,10 +30,10 @@ class CaveFeature(dict):
     default_arguments = {}
     """Dictionary mapping names of arguments to their default values"""
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         super(CaveFeature, self).__init__()
-        for key, value in args:
-            self.__setitem__(key, value)
+        self.update(args)
+        self.update(kwargs)
 
     def __setitem__(self, key, value):
         if key not in self.argument_validators:
@@ -44,14 +44,12 @@ class CaveFeature(dict):
                 "{} is not a valid value for option {}".format(value, key))
         super(CaveFeature, self).__setitem__(key, value)
 
-    def __getitem__(self, key):
-        try:
-            return super(CaveFeature, self).__getitem__(key)
-        except KeyError as not_found_error:
-            try:
-                return self.default_arguments[key]
-            except KeyError:
-                raise not_found_error
+    def __missing__(self, key):
+        return self.default_arguments[key]
+
+    def update(self, other):
+        for key, value in other:
+            self.__setitem__(key, value)
 
     def toXML(self, parent_root):
         """Store data in Cave XML format within parent_root
@@ -63,7 +61,7 @@ class CaveFeature(dict):
         raise NotImplementedError("toXML not defined for this feature")
 
     @classmethod
-    def fromXML(xml_root):
+    def fromXML(feature_class, xml_root):
         """Create CaveFeature object from xml node for such a feature
 
         Since this differs for every Cave feature, subclasses MUST override

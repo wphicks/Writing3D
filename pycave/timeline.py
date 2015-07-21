@@ -1,6 +1,7 @@
 """Tools for working with timelines in Cave projects
 """
 import xml.etree.ElementTree as ET
+from collections import MutableSequence
 from features import CaveFeature
 from actions import CaveAction
 from validators import AlwaysValid
@@ -8,28 +9,34 @@ from errors import ConsistencyError, BadCaveXML
 from xmltools import bool2text, text2bool
 
 
-class SortedList(list):
+class SortedList(MutableSequence):
     """A list that is guaranteed to remain sorted
 
     :param compare: Comparison function for sorting"""
-    def __init__(self, init_list=None, compare=cmp):
+    def __init__(self, init_list=[], compare=cmp):
         self.compare = compare
-        super(SortedList, self).__init__(init_list)
+        self._data = init_list
         self.sort()
 
     def __setitem__(self, index, value):
-        super(SortedList, self).__setitem__(index, value)
+        self._data.__setitem__(index, value)
         self.sort()
+
+    def __delitem__(self, index):
+        del self._data[index]
+
+    def __len__(self):
+        return len(self._data)
 
     def add(self, new_item):
         """Add new_item to list, maintaining proper ordering"""
         for index, item in enumerate(self):
             if self.compare(new_item, item) < 0:
-                return super(SortedList, self).insert(index, new_item)
-        return super(SortedList, self).insert(len(self), new_item)
+                self._data.insert(index, new_item)
+        self._data.insert(len(self), new_item)
 
     def sort(self, cmp=None):
-        return super(SortedList, self).sort(cmp=self.compare)
+        self._data.sort(cmp=self.compare)
 
     def append(self, value):
         self.add(value)
