@@ -26,3 +26,9 @@ class ConsistencyError(Exception):
     or displayed in the Cave."""
     def __init__(self, message):
         super(InvalidArgument, self).__init__(message)
+
+
+class BadXMLChain(Exception):
+    """Thrown when malformed XMLChain object is used"""
+    def __init__(self, message):
+        super(BadCaveXML, self).__init__(message)
