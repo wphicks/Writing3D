@@ -2,6 +2,7 @@
 """
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+from math import pi
 from errors import BadCaveXML, InvalidArgument
 from xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from features import CaveFeature
@@ -9,6 +10,12 @@ from actions import CaveAction
 from placement import CavePlacement
 from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
+import warnings
+try:
+    import bpy
+except ImportError:
+    warnings.warn(
+        "Module bpy not found. Loading pycave.objects as standalone")
 
 
 class CaveLink(CaveFeature):
@@ -216,7 +223,7 @@ class CaveObject(CaveFeature):
             new_object["visible"] = text2bool(node.text)
         node = object_root.find("Color")
         if node is not None:
-            new_object["color"] = text2tuple(node.text)
+            new_object["color"] = text2tuple(node.text, evaluator=int)
         node = object_root.find("Lighting")
         if node is not None:
             new_object["lighting"] = text2bool(node.text)
@@ -238,15 +245,56 @@ class CaveObject(CaveFeature):
         node = object_root.find("Content")
         if node is not None:
             new_object["content"] = CaveContent.fromXML(node)
+            new_object["scale"] = (
+                new_object["scale"] * new_object["content"].blender_scaling)
         return new_object
+
+    def blend_material(self):
+        """Create material for use in Blender"""
+        new_material = bpy.data.materials.new(
+            "{}_material".format(self["name"]))
+        new_material.diffuse_color = [
+            channel/255.0 for channel in self["color"]]
+        new_material.specular_color = new_material.diffuse_color
+        new_material.use_shadeless = self["lighting"]
+        new_material.use_transparency = True
+        return new_material
 
     def blend(self):
         """Create representation of CaveObject in Blender"""
-        raise NotImplementedError  # TODO
+        blender_object = self["content"].blend()
+        if "depth" in self["content"]:
+            # Make extrusion independent of scale
+            blender_object.data.extrude = (
+                blender_object.data.extrude / self["scale"])
+        blender_object.select = True
+        bpy.ops.object.convert(target='MESH', keep_original=False)
+        bpy.context.scene.objects.active = blender_object
+        bpy.ops.object.transform_apply(rotation=True)
+        blender_object.name = self["name"]
+        blender_object.hide_render = self["visible"]
+        blender_object.scale = [self["scale"], ] * 3
+        bpy.ops.object.transform_apply(scale=True)
+        #TODO: Apply placement
+        #TODO: Apply link
+        if self["click_through"]:
+            #TODO: Is there another way to achieve this?
+            blender_object.game.physics_type = 'NO_COLLISION'
+        else:
+            blender_object.game.physics_type = 'STATIC'
+
+        blender_object.active_material = self.blend_material()
+        blender_object.layers = [layer == 0 for layer in xrange(20)]
+
+        blender_object.select = False
+
+        return blender_object
 
 
 class CaveContent(CaveFeature):
     """Represents content of a Cave object"""
+
+    blender_scaling = 1
 
     @staticmethod
     def fromXML(content_root):
@@ -293,7 +341,10 @@ class CaveText(CaveContent):
         "halign": "center",
         "valign": "center",
         "font": None,
-        "depth": 0.0}
+        "depth": 0}
+
+    blender_scaling = 0.2
+    blender_depth_scaling = 0.01
 
     def toXML(self, object_root):
         """Store CaveText as Content node within Object node
@@ -306,7 +357,7 @@ class CaveText(CaveContent):
                 "horiz-align": self["halign"],
                 "vert-align": self["valign"],
                 "font": self["font"],
-                "depth": self["depth"]
+                "depth": self["depth"]/self.blender_depth_scaling
                 }
             )
         text_root.text = self["text"]
@@ -329,7 +380,9 @@ class CaveText(CaveContent):
             if "font" in text_root.attrib:
                 new_text["font"] = text_root.attrib["font"]
             if "depth" in text_root.attrib:
-                new_text["depth"] = text_root.attrib["depth"]
+                new_text["depth"] = (
+                    text_root.attrib["depth"] *
+                    text_class.blender_depth_scaling)
             new_text["text"] = text_root.text
             return new_text
         raise InvalidArgument(
@@ -337,7 +390,16 @@ class CaveText(CaveContent):
 
     def blend(self):
         """Create representation of CaveText in Blender"""
-        raise NotImplementedError  # TODO
+        bpy.ops.object.text_add(rotation=(pi/2, 0, 0))
+        new_text_object = bpy.context.object
+        new_text_object.data.body = self["text"]
+        #TODO: Get proper font directory
+        new_text_object.data.font = bpy.data.fonts.load(self["font"])
+        new_text_object.data.extrude = self["depth"]
+        new_text_object.data.fill_mode = "BOTH"
+        new_text_object.align = self["halign"].upper()
+        #TODO: Vertical alignment. This is non-trivial
+        return new_text_object
 
 
 class CaveImage(CaveContent):
