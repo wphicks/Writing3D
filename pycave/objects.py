@@ -268,8 +268,10 @@ class CaveObject(CaveFeature):
             blender_object.data.extrude = (
                 blender_object.data.extrude / self["scale"])
         blender_object.select = True
+        #TODO: Clarify when to select and when to activate
         bpy.ops.object.convert(target='MESH', keep_original=False)
         bpy.context.scene.objects.active = blender_object
+        #NOTE: Do not think the above line is necessary if already selected
         bpy.ops.object.transform_apply(rotation=True)
         blender_object.name = self["name"]
         blender_object.hide_render = self["visible"]

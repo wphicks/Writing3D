@@ -5,6 +5,12 @@ from validators import OptionListValidator, IsNumericIterable, IsNumeric, \
     CheckType
 from errors import BadCaveXML
 from xml_tools import text2tuple
+import warnings
+try:
+    import bpy
+except ImportError:
+    warnings.warn(
+        "Module bpy not found. Loading pycave.objects as standalone")
 
 
 class CaveRotation(CaveFeature):
@@ -68,6 +74,12 @@ class CavePlacement(CaveFeature):
         "relative_to": "Center",
         "position": (0, 0, 0),
         "rotation": CaveRotation()}
+    relative_to_objects = {}
+    """Dictionary mapping names of relative_to options to Blender
+    representations
+
+    In default CaveWriting, these are simply the four walls, but this can be
+    overridden to provide additional functionality"""
 
     def toXML(self, parent_root):
         place_root = ET.SubElement(parent_root, "Placement")
@@ -89,9 +101,51 @@ class CavePlacement(CaveFeature):
         pos_root = place_root.find("Position")
         if pos_root is not None:
             placement["position"] = text2tuple(pos_root.text.strip())
+            # Switch to Blender axis system, where positive z axis is up
+            placement["position"] = [
+                placement["position"][0],
+                -placement["position"][2],
+                placement["position"][1]]
+            # Convert values to Blender units
+            placement["position"] = [
+                coord*0.3048 for coord in placement["position"]]
         for rotation_mode in ["Axis", "LookAt", "Normal"]:
             rot_root = place_root.find(rotation_mode)
             if rot_root is not None:
                 placement["rotation"] = CaveRotation.fromXML(rot_root)
                 return placement
         return placement
+
+    def _create_relative_to_objects(
+            self,
+            wall_positions={
+                "FrontWall": (0, 1.2192, 0),
+                "LeftWall": (-1.2192, 0, 0),
+                "RightWall": (1.2192, 0, 0),
+                "FloorWall": (0, 0, -1.2192)}
+            ):
+        """Create Blender objects corresponding to relative_to options if
+        necessary"""
+        if len(self.relative_to_objects) != len(
+                self.argument_validators["relative_to"].valid_options) - 1:
+            for wall_name, position in wall_positions:
+                bpy.ops.object.add(
+                    type="EMPTY",
+                    location=self["position"],
+                    rotation=(0, 0, 0),
+                    layers=[layer == 2 for layer in xrange(1, 21)]
+                )
+                #TODO: Check rotation of walls
+                self.relative_to_objects[wall_name] = bpy.context.object
+                self.relative_to_objects[wall_name].name = wall_name
+
+        return self.relative_to_objects
+
+    def place_blender_object(self, blender_object):
+        """Place Blender object in specified position and orientation
+        """
+        self._create_relative_to_objects()
+        if self["relative_to"] != "Center":
+            blender_object.parent = self.relative_to_objects[
+                self["relative_to"]]
+        blender_object.layers = [layer == 1 for layer in xrange(1, 21)]
