@@ -1,8 +1,8 @@
 """Tools for working with Cave projects
 """
-from features import CaveFeature
-from placement import CavePlacement
-from validators import AlwaysValid, IsNumeric, IsNumericIterable
+from .features import CaveFeature
+from .placement import CavePlacement
+from .validators import AlwaysValid, IsNumeric, IsNumericIterable
 
 
 class CaveProject(CaveFeature):

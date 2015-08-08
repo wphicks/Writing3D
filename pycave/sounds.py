@@ -1,10 +1,10 @@
 """Tools for working with sounds in Cave projects
 """
 import xml.etree.ElementTree as ET
-from features import CaveFeature
-from validators import AlwaysValid, IsNumeric, OptionListValidator
-from errors import ConsistencyError, BadCaveXML
-from xml_tools import bool2text, text2bool
+from .features import CaveFeature
+from .validators import AlwaysValid, IsNumeric, OptionListValidator
+from .errors import ConsistencyError, BadCaveXML
+from .xml_tools import bool2text, text2bool
 
 
 class CaveSound(CaveFeature):

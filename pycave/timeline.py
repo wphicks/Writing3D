@@ -2,11 +2,11 @@
 """
 import xml.etree.ElementTree as ET
 from collections import MutableSequence
-from features import CaveFeature
-from actions import CaveAction
-from validators import AlwaysValid
-from errors import ConsistencyError, BadCaveXML
-from xml_tools import bool2text, text2bool
+from .features import CaveFeature
+from .actions import CaveAction
+from .validators import AlwaysValid
+from .errors import ConsistencyError, BadCaveXML
+from .xml_tools import bool2text, text2bool
 
 
 class SortedList(MutableSequence):

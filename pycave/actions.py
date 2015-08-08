@@ -4,12 +4,12 @@ Here, actions refer generically to any discrete change in elements of a Cave
 project
 """
 import xml.etree.ElementTree as ET
-from features import CaveFeature
-from placement import CavePlacement
-from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
+from .features import CaveFeature
+from .placement import CavePlacement
+from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
-from errors import BadCaveXML, InvalidArgument, ConsistencyError
-from xml_tools import bool2text, text2bool, text2tuple
+from .errors import BadCaveXML, InvalidArgument, ConsistencyError
+from .xml_tools import bool2text, text2bool, text2tuple
 
 
 class CaveAction(CaveFeature):

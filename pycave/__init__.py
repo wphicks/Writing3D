@@ -1,10 +1,10 @@
 """A module for working with Cave Writing projects
 """
-import project
-import features
-import objects
-import timeline
-import placement
-import errors
-import validators
-import xml_tools
+from . import project
+from . import features
+from . import objects
+from . import timeline
+from . import placement
+from . import errors
+from . import validators
+from . import xml_tools

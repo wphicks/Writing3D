@@ -3,12 +3,12 @@
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from math import pi
-from errors import BadCaveXML, InvalidArgument
-from xml_tools import find_xml_text, text2bool, text2tuple, bool2text
-from features import CaveFeature
-from actions import CaveAction
-from placement import CavePlacement
-from validators import OptionListValidator, IsNumeric,  AlwaysValid,\
+from .errors import BadCaveXML, InvalidArgument
+from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
+from .features import CaveFeature
+from .actions import CaveAction
+from .placement import CavePlacement
+from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 import warnings
 try:
@@ -286,7 +286,7 @@ class CaveObject(CaveFeature):
             blender_object.game.physics_type = 'STATIC'
 
         blender_object.active_material = self.blend_material()
-        blender_object.layers = [layer == 0 for layer in xrange(20)]
+        blender_object.layers = [layer == 0 for layer in range(20)]
 
         blender_object.select = False
 

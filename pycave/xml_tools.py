@@ -1,6 +1,6 @@
 """Convenience tools for working with Cave xml"""
 import re
-from errors import BadCaveXML
+from .errors import BadCaveXML
 
 
 def text2tuple(text, evaluator=str):

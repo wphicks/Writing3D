@@ -1,10 +1,10 @@
 """Tools for working with placement of objects within Cave"""
 import xml.etree.ElementTree as ET
-from features import CaveFeature
-from validators import OptionListValidator, IsNumericIterable, IsNumeric, \
+from .features import CaveFeature
+from .validators import OptionListValidator, IsNumericIterable, IsNumeric, \
     CheckType
-from errors import BadCaveXML
-from xml_tools import text2tuple
+from .errors import BadCaveXML
+from .xml_tools import text2tuple
 import warnings
 try:
     import bpy
@@ -133,7 +133,7 @@ class CavePlacement(CaveFeature):
                     type="EMPTY",
                     location=self["position"],
                     rotation=(0, 0, 0),
-                    layers=[layer == 2 for layer in xrange(1, 21)]
+                    layers=[layer == 2 for layer in range(1, 21)]
                 )
                 #TODO: Check rotation of walls
                 self.relative_to_objects[wall_name] = bpy.context.object
@@ -148,4 +148,4 @@ class CavePlacement(CaveFeature):
         if self["relative_to"] != "Center":
             blender_object.parent = self.relative_to_objects[
                 self["relative_to"]]
-        blender_object.layers = [layer == 1 for layer in xrange(1, 21)]
+        blender_object.layers = [layer == 1 for layer in range(1, 21)]

@@ -4,12 +4,12 @@ Here, triggers are any events within the Cave that can be used to start another
 action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
 import xml.etree.ElementTree as ET
-from features import CaveFeature
-from actions import CaveAction
-from validators import AlwaysValid, IsNumeric, IsNumericIterable, \
+from .features import CaveFeature
+from .actions import CaveAction
+from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
     OptionListValidator
-from errors import ConsistencyError, BadCaveXML, InvalidArgument
-from xml_tools import bool2text, text2tuple, text2bool
+from .errors import ConsistencyError, BadCaveXML, InvalidArgument
+from .xml_tools import bool2text, text2tuple, text2bool
 
 
 class CaveTrigger(CaveFeature):

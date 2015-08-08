@@ -6,7 +6,7 @@ may appear in such a project. This may be as sophisticated as a "Timeline" or
 as simple as a "Placement" for an object (since Placement features define
 position, and potentially multiple kinds of rotation).
 """
-from errors import InvalidArgument
+from .errors import InvalidArgument
 
 
 class CaveFeature(dict):
