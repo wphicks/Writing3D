@@ -12,9 +12,10 @@ from .xml_tools import bool2text, text2bool
 class SortedList(MutableSequence):
     """A list that is guaranteed to remain sorted
 
-    :param compare: Comparison function for sorting"""
-    def __init__(self, init_list=[], compare=cmp):
-        self.compare = compare
+    :param init_list: Initial list of elements (not necessarily sorted)
+    :param sort_key: Key function for sorting"""
+    def __init__(self, init_list=[], sort_key=None):
+        self.sort_key = sort_key
         self._data = init_list
         self.sort()
 
@@ -37,12 +38,12 @@ class SortedList(MutableSequence):
     def add(self, new_item):
         """Add new_item to list, maintaining proper ordering"""
         for index, item in enumerate(self):
-            if self.compare(new_item, item) < 0:
+            if self.sort_key(new_item) < self.sort_key(item):
                 self._data.insert(index, new_item)
         self._data.insert(len(self), new_item)
 
-    def sort(self, cmp=None):
-        self._data.sort(cmp=self.compare)
+    def sort(self):
+        self._data.sort(key=self.sort_key)
 
     def append(self, value):
         self.add(value)
