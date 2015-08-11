@@ -29,6 +29,19 @@ def convert_to_legacy_axes(vector):
     return tuple((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
 
 
+def matrix_from_look(look_direction, up_direction=mathutils.Vector((0, 1, 0))):
+    """Create rotation_matrix from look-at direction"""
+    rotation_matrix = mathutils.Matrix.Rotation(0, 4, (0, 0, 1))
+    frame_y = look_direction
+    frame_x = frame_y.cross(up_direction)
+    frame_z = frame_x.cross(frame_y)
+    rotation_matrix = mathutils.Matrix().to_3x3()
+    rotation_matrix.col[0] = frame_x
+    rotation_matrix.col[1] = frame_y
+    rotation_matrix.col[2] = frame_z
+    return rotation_matrix
+
+
 class CaveRotation(CaveFeature):
     """Stores data on rotation of objects within Cave"""
     argument_validators = {
@@ -88,17 +101,18 @@ class CaveRotation(CaveFeature):
             ).normalized()
 
             up_direction = mathutils.Vector(self["up_vector"]).normalized()
+            rotation_matrix = matrix_from_look(look_direction, up_direction)
 
-            frame_y = look_direction
-            frame_x = frame_y.cross(up_direction)
-            frame_z = frame_x.cross(frame_y)
-            rotation_matrix = mathutils.Matrix().to_3x3()
-            rotation_matrix.col[0] = frame_x
-            rotation_matrix.col[1] = frame_y
-            rotation_matrix.col[2] = frame_z
         elif self["rotation_mode"] == "Normal":
-            # direction = mathutils.Vector(self["rotation_vector"])
-            pass
+            current_normal = mathutils.Vector((1, 0, 0))
+            current_normal.rotate(blender_object.rotation_euler)
+            # NOTE: Not absolutely sure that the above is sufficient to deal
+            # with previously rotated objects, but the behavior here is a
+            # little ambiguous anyway
+            difference = mathutils.Vector(
+                self["rotation_vector"]).rotation_difference(current_normal)
+            rotation_matrix = difference.to_matrix()
+
         return rotation_matrix
 
     def rotate(self, blender_object):
