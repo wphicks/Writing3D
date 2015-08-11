@@ -33,7 +33,7 @@ class CaveFeature(dict):
     def __init__(self, *args, **kwargs):
         super(CaveFeature, self).__init__()
         self.update(args)
-        self.update(kwargs)
+        self.update(kwargs.items())
 
     def __setitem__(self, key, value):
         if key not in self.argument_validators:

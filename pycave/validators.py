@@ -85,6 +85,7 @@ class CheckType(object):
         self.correct_types = correct_types
 
     def __call__(self, value):
+        raise NotImplementedError
         for type_ in self.correct_types:
             if isinstance(type_, value):
                 return True

@@ -202,7 +202,8 @@ class CaveObject(CaveFeature):
                 object_root, "SoundRef", attrib={"name": self["sound"]})
             node.text = self["sound"]
         self["placement"].toXML(object_root)
-        self["link"].toXML(object_root)
+        if self["link"] is not None:
+            self["link"].toXML(object_root)
         self["content"].toXML(object_root)
 
         return object_root
@@ -263,21 +264,14 @@ class CaveObject(CaveFeature):
     def blend(self):
         """Create representation of CaveObject in Blender"""
         blender_object = self["content"].blend()
-        if "depth" in self["content"]:
-            # Make extrusion independent of scale
-            blender_object.data.extrude = (
-                blender_object.data.extrude / self["scale"])
-        blender_object.select = True
-        #TODO: Clarify when to select and when to activate
-        bpy.ops.object.convert(target='MESH', keep_original=False)
-        bpy.context.scene.objects.active = blender_object
-        #NOTE: Do not think the above line is necessary if already selected
-        bpy.ops.object.transform_apply(rotation=True)
-        blender_object.name = self["name"]
+        blender_object.name = "_".join((self["name"], "object"))
         blender_object.hide_render = self["visible"]
         blender_object.scale = [self["scale"], ] * 3
-        bpy.ops.object.transform_apply(scale=True)
-        #TODO: Apply placement
+        if "depth" in self["content"]:
+            # Make extrusion independent of scale
+            blender_object.scale[2] = 1
+
+        self["placement"].place(blender_object)
         #TODO: Apply link
         if self["click_through"]:
             #TODO: Is there another way to achieve this?
@@ -288,7 +282,8 @@ class CaveObject(CaveFeature):
         blender_object.active_material = self.blend_material()
         blender_object.layers = [layer == 0 for layer in range(20)]
 
-        blender_object.select = False
+        #TODO: Add around_own_axis
+        #TODO: Add sound
 
         return blender_object
 
@@ -396,11 +391,15 @@ class CaveText(CaveContent):
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
         #TODO: Get proper font directory
-        new_text_object.data.font = bpy.data.fonts.load(self["font"])
+        if self["font"] is not None:
+            new_text_object.data.font = bpy.data.fonts.load(self["font"])
         new_text_object.data.extrude = self["depth"]
         new_text_object.data.fill_mode = "BOTH"
-        new_text_object.align = self["halign"].upper()
+        new_text_object.data.align = self["halign"].upper()
         #TODO: Vertical alignment. This is non-trivial
+        new_text_object.select = True
+        bpy.ops.object.convert(target='MESH', keep_original=False)
+        new_text_object.select = False
         return new_text_object
 
 

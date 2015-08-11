@@ -1,16 +1,32 @@
 """Tools for working with placement of objects within Cave"""
 import xml.etree.ElementTree as ET
+import math
 from .features import CaveFeature
 from .validators import OptionListValidator, IsNumericIterable, IsNumeric, \
-    CheckType
+    AlwaysValid
 from .errors import BadCaveXML
 from .xml_tools import text2tuple
 import warnings
 try:
     import bpy
+    import mathutils
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.objects as standalone")
+
+
+def convert_to_blender_axes(vector):
+    """Convert from legacy axis orientation and scale to Blender
+
+    In Blender, positive z-axis points up"""
+    return tuple((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
+
+
+def convert_to_legacy_axes(vector):
+    """Convert from Blender axis orientation and scale to legacy
+
+    In Blender, positive z-axis points up"""
+    return tuple((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
 
 
 class CaveRotation(CaveFeature):
@@ -19,10 +35,12 @@ class CaveRotation(CaveFeature):
         "rotation_mode": OptionListValidator(
             "None", "Axis", "LookAt", "Normal"),
         "rotation_vector": IsNumericIterable(3),
+        "up_vector": IsNumericIterable(3),
         "rotation_angle": IsNumeric()}
     default_arguments = {
-        "rotation_mode": None,
+        "rotation_mode": "None",
         "rotation_vector": None,
+        "up_vector": convert_to_blender_axes((0, 1, 0)),
         "rotation_angle": 0.0}
 
     def toXML(self, parent_root):
@@ -42,7 +60,8 @@ class CaveRotation(CaveFeature):
         rotation["rotation_mode"] = rot_root.tag
         try:
             rotation_vector = rot_root.attrib["rotation"]
-            rotation["rotation_vector"] = text2tuple(rotation_vector)
+            rotation["rotation_vector"] = convert_to_blender_axes(
+                text2tuple(rotation_vector))
         except KeyError:  # No rotation vector specified
             pass
         try:
@@ -53,6 +72,41 @@ class CaveRotation(CaveFeature):
                 raise BadCaveXML("Rotation angle must be specified as a float")
         except KeyError:  # No rotation vector specified
             pass
+
+    def get_rotation_matrix(self, blender_object):
+        rotation_matrix = mathutils.Matrix.Rotation(0, 4, (0, 0, 1))
+        if self["rotation_mode"] == "Axis":
+            rotation_matrix = mathutils.Matrix.Rotation(
+                math.radians(self["rotation_angle"]),
+                4,  # Size of rotation matrix (4x4)
+                self["rotation_vector"]
+            )
+        elif self["rotation_mode"] == "LookAt":
+            look_direction = (
+                blender_object.location -
+                mathutils.Vector(self["rotation_vector"])
+            ).normalized()
+
+            up_direction = mathutils.Vector(self["up_vector"]).normalized()
+
+            frame_y = look_direction
+            frame_x = frame_y.cross(up_direction)
+            frame_z = frame_x.cross(frame_y)
+            rotation_matrix = mathutils.Matrix().to_3x3()
+            rotation_matrix.col[0] = frame_x
+            rotation_matrix.col[1] = frame_y
+            rotation_matrix.col[2] = frame_z
+        elif self["rotation_mode"] == "Normal":
+            # direction = mathutils.Vector(self["rotation_vector"])
+            pass
+        return rotation_matrix
+
+    def rotate(self, blender_object):
+        """Rotate Blender object to specified orientation
+        """
+        blender_object.rotation_euler.rotate(self.get_rotation_matrix(
+            blender_object))
+        return blender_object
 
 
 class CavePlacement(CaveFeature):
@@ -69,7 +123,7 @@ class CavePlacement(CaveFeature):
         "relative_to": OptionListValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
         "position": IsNumericIterable(3),
-        "rotation": CheckType(CaveRotation)}
+        "rotation": AlwaysValid("A CaveRotation")}
     default_arguments = {
         "relative_to": "Center",
         "position": (0, 0, 0),
@@ -100,15 +154,8 @@ class CavePlacement(CaveFeature):
             placement["relative_to"] = rel_root.text.strip()
         pos_root = place_root.find("Position")
         if pos_root is not None:
-            placement["position"] = text2tuple(pos_root.text.strip())
-            # Switch to Blender axis system, where positive z axis is up
-            placement["position"] = [
-                placement["position"][0],
-                -placement["position"][2],
-                placement["position"][1]]
-            # Convert values to Blender units
-            placement["position"] = [
-                coord*0.3048 for coord in placement["position"]]
+            placement["position"] = convert_to_legacy_axes(
+                text2tuple(pos_root.text.strip()))
         for rotation_mode in ["Axis", "LookAt", "Normal"]:
             rot_root = place_root.find(rotation_mode)
             if rot_root is not None:
@@ -119,29 +166,33 @@ class CavePlacement(CaveFeature):
     def _create_relative_to_objects(
             self,
             wall_positions={
-                "FrontWall": (0, 1.2192, 0),
-                "LeftWall": (-1.2192, 0, 0),
-                "RightWall": (1.2192, 0, 0),
-                "FloorWall": (0, 0, -1.2192)}
+                "FrontWall": convert_to_blender_axes((0, 0, -4)),
+                "LeftWall": convert_to_blender_axes((-4, 0, 0)),
+                "RightWall": convert_to_blender_axes((4, 0, 0)),
+                "FloorWall": convert_to_blender_axes((0, 0, -4))},
+            wall_rotations={
+                "FrontWall": (0, 0, 0),
+                "LeftWall": (0, 0, math.pi/2),
+                "RightWall": (0, 0, -math.pi/2),
+                "FloorWall": (-math.pi/2, 0, 0)}
             ):
         """Create Blender objects corresponding to relative_to options if
         necessary"""
         if len(self.relative_to_objects) != len(
                 self.argument_validators["relative_to"].valid_options) - 1:
-            for wall_name, position in wall_positions:
+            for wall_name, position in wall_positions.items():
                 bpy.ops.object.add(
                     type="EMPTY",
-                    location=self["position"],
-                    rotation=(0, 0, 0),
-                    layers=[layer == 2 for layer in range(1, 21)]
+                    location=position,
+                    rotation=wall_rotations[wall_name],
+                    layers=[layer == 3 for layer in range(1, 21)]
                 )
-                #TODO: Check rotation of walls
                 self.relative_to_objects[wall_name] = bpy.context.object
                 self.relative_to_objects[wall_name].name = wall_name
 
         return self.relative_to_objects
 
-    def place_blender_object(self, blender_object):
+    def place(self, blender_object):
         """Place Blender object in specified position and orientation
         """
         self._create_relative_to_objects()
@@ -149,3 +200,7 @@ class CavePlacement(CaveFeature):
             blender_object.parent = self.relative_to_objects[
                 self["relative_to"]]
         blender_object.layers = [layer == 1 for layer in range(1, 21)]
+
+        blender_object.location = self["position"]
+        self["rotation"].rotate(blender_object)
+        return blender_object
