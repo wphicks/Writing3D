@@ -584,7 +584,15 @@ class CaveModel(CaveContent):
 
     def blend(self):
         """Create representation of CaveModel in Blender"""
-        raise NotImplementedError  # TODO
+        #TODO: Get proper directory
+        bpy.ops.import_scene.obj(filepath=self["filename"])
+        model_pieces = bpy.context.selected_objects
+        for piece in model_pieces:
+            bpy.context.scene.objects.active = piece
+            bpy.ops.object.convert(target='MESH', keep_original=False)
+        bpy.ops.object.join()
+        new_model = bpy.context.object
+        return new_model
 
 
 class CaveLight(CaveContent):
