@@ -1,5 +1,6 @@
 """Tools for working with displayable objects in Cave projects
 """
+import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from math import pi
@@ -16,6 +17,27 @@ try:
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.objects as standalone")
+
+
+def generate_material_from_image(filename):
+    """Generate Blender material from image for texturing"""
+    material_name = bpy.path.display_name_from_filepath(filename)
+    material = bpy.data.materials.new(name=material_name)
+    texture_slot = material.texture_slots.add()
+    texture_name = '_'.join(
+        (os.path.splitext(os.path.basename(filename))[0],
+         "image_texture")
+    )
+    #TODO: Get image directory
+    image_texture = bpy.data.textures.new(texture_name, type="IMAGE")
+    image = bpy.data.images.load(filename)
+    # NOTE: The above already raises a sensible RuntimeError if file is not
+    # found
+    image_texture.image = image
+    texture_slot.texture = image_texture
+    texture_slot.texture_coords = 'UV'
+
+    return material
 
 
 class CaveLink(CaveFeature):
@@ -442,7 +464,22 @@ class CaveImage(CaveContent):
 
     def blend(self):
         """Create representation of CaveImage in Blender"""
-        raise NotImplementedError  # TODO
+        bpy.ops.mesh.primitive_plane_add(rotation=(pi/2, 0, 0))
+        new_image_object = bpy.context.object
+
+        material = generate_material_from_image(self["filename"])
+        image = material.texture_slots[0].texture.image
+
+        new_image_object.active_material = material
+
+        new_image_object.dimensions = image.size[0], image.size[1], 0
+        new_image_object.data.uv_textures.new()
+        new_image_object.data.materials.append(material)
+        new_image_object.data.uv_textures[0].data[0].image = image
+        material.game_settings.use_backface_culling = False
+        material.game_settings.alpha_blend = 'ALPHA'
+
+        return new_image_object
 
 
 class CaveStereoImage(CaveContent):
@@ -542,8 +579,8 @@ class CaveModel(CaveContent):
                     model_root.attrib["check-collisions"])
             return new_model
         raise InvalidArgument(
-            "Content node must contain StereoImage node to create "
-            "CaveStereoImage object")
+            "Content node must contain Model node to create "
+            "CaveModel object")
 
     def blend(self):
         """Create representation of CaveModel in Blender"""
