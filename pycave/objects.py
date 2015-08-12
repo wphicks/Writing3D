@@ -3,7 +3,7 @@
 import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from math import pi
+import math
 from .errors import BadCaveXML, InvalidArgument
 from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from .features import CaveFeature
@@ -29,13 +29,18 @@ def generate_material_from_image(filename):
          "image_texture")
     )
     #TODO: Get image directory
-    image_texture = bpy.data.textures.new(texture_name, type="IMAGE")
-    image = bpy.data.images.load(filename)
+    image_texture = bpy.data.textures.new(name=texture_name, type="IMAGE")
+    image_texture.image = bpy.data.images.load(filename)
     # NOTE: The above already raises a sensible RuntimeError if file is not
     # found
-    image_texture.image = image
+    image_texture.image.use_alpha = True
     texture_slot.texture = image_texture
     texture_slot.texture_coords = 'UV'
+
+    #material.alpha = 0.0
+    #material.specular_alpha = 0.0
+    #texture_slot.use_map_alpha
+    #material.use_transparency = True
 
     return material
 
@@ -272,16 +277,21 @@ class CaveObject(CaveFeature):
                 new_object["scale"] * new_object["content"].blender_scaling)
         return new_object
 
-    def blend_material(self):
-        """Create material for use in Blender"""
-        new_material = bpy.data.materials.new(
-            "{}_material".format(self["name"]))
-        new_material.diffuse_color = [
+    def apply_material(self, blender_object):
+        """Apply properties of object to material for Blender object"""
+        if blender_object.active_material is None:
+            blender_object.active_material = bpy.data.materials.new(
+                "{}_material".format(self["name"]))
+            if blender_object.active_material is None:
+                # Object cannot have active material
+                return blender_object
+        blender_object.active_material.diffuse_color = [
             channel/255.0 for channel in self["color"]]
-        new_material.specular_color = new_material.diffuse_color
-        new_material.use_shadeless = self["lighting"]
-        new_material.use_transparency = True
-        return new_material
+        blender_object.active_material.specular_color = (
+            blender_object.active_material.diffuse_color)
+        blender_object.active_material.use_shadeless = not self["lighting"]
+        blender_object.active_material.use_transparency = True
+        return blender_object
 
     def blend(self):
         """Create representation of CaveObject in Blender"""
@@ -301,7 +311,7 @@ class CaveObject(CaveFeature):
         else:
             blender_object.game.physics_type = 'STATIC'
 
-        blender_object.active_material = self.blend_material()
+        self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
         #TODO: Add around_own_axis
@@ -409,7 +419,7 @@ class CaveText(CaveContent):
 
     def blend(self):
         """Create representation of CaveText in Blender"""
-        bpy.ops.object.text_add(rotation=(pi/2, 0, 0))
+        bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
         #TODO: Get proper font directory
@@ -464,7 +474,7 @@ class CaveImage(CaveContent):
 
     def blend(self):
         """Create representation of CaveImage in Blender"""
-        bpy.ops.mesh.primitive_plane_add(rotation=(pi/2, 0, 0))
+        bpy.ops.mesh.primitive_plane_add(rotation=(math.pi/2, 0, 0))
         new_image_object = bpy.context.object
 
         material = generate_material_from_image(self["filename"])
@@ -605,10 +615,10 @@ class CaveLight(CaveContent):
     :param tuple attenuation: Tuple of 3 floats specifying constant, linear,
     and
     quadratic attenuation of light source respectively
-    :param float angle: Angle in degrees specifying direction of spot light
-    source (TODO Clarify how)
+    :param float angle: Angle in degrees specifying spread of spot light
+    source
     """
-    arguments_list = {
+    argument_validators = {
         "light_type": OptionListValidator("Point", "Directional", "Spot"),
         "diffuse": AlwaysValid("Value should be a boolean"),
         "specular": AlwaysValid("Value should be a boolean"),
@@ -676,7 +686,33 @@ class CaveLight(CaveContent):
 
     def blend(self):
         """Create representation of CaveLight in Blender"""
-        raise NotImplementedError  # TODO
+        #TODO: Check default direction of lights in legacy
+        light_type_conversion = {
+            "Point": "POINT", "Directional": "SUN", "Spot": "SPOT"
+        }
+        bpy.ops.object.lamp_add(
+            type=light_type_conversion[self["light_type"]],
+            rotation=(-math.pi/2, 0, 0)
+        )
+        new_light_object = bpy.context.object
+        new_light_object.data.use_diffuse = self["diffuse"]
+        new_light_object.data.use_specular = self["specular"]
+        new_light_object.data.energy = (
+            new_light_object.data.energy/self["attenuation"][0]
+        )
+        if self["light_type"] != "Directional":
+            new_light_object.data.falloff_type = "LINEAR_QUADRATIC_WEIGHTED"
+            new_light_object.data.linear_attenuation = self["attenuation"][1]
+            new_light_object.data.quadratic_attenuation = self[
+                "attenuation"][2]
+        new_light_object.data.distance = 1
+        # NOTE: Blender and OpenGL define attenuation factors differently, and
+        # this implementation is in no way equivalent to that in the legacy
+        # software. The implementation of constant attenuation is particularly
+        # suspect, as is the distance.
+        if self["light_type"] == "Spot":
+            new_light_object.data.spot_size = math.radians(self["angle"])
+        return new_light_object
 
 
 class CavePSys(CaveContent):
