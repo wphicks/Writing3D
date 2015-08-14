@@ -74,12 +74,13 @@ class CaveLink(CaveFeature):
         "remain_enabled": True,
         "enabled_color": (0, 128, 255),
         "selected_color": (255, 0, 0),
-        "actions": defaultdict(list),
         "reset": -1
         }
 
     def __init__(self, *args, **kwargs):
         super(CaveLink, self).__init__(*args, **kwargs)
+        if "actions" not in self:
+            self["actions"] = defaultdict(list),
         self.num_clicks = 0
 
     def toXML(self, object_root):
@@ -224,6 +225,8 @@ class CaveObject(CaveFeature):
         node.text = bool2text(self["click_through"])
         node = ET.SubElement(object_root, "AroundSelfAxis")
         node.text = bool2text(self["around_own_axis"])
+        node = ET.SubElement(object_root, "Scale")
+        node.text = str(self["scale"] / self["content"].blender_scaling)
         if self["sound"] is not None:
             node = ET.SubElement(
                 object_root, "SoundRef", attrib={"name": self["sound"]})
@@ -261,6 +264,9 @@ class CaveObject(CaveFeature):
         node = object_root.find("AroundSelfAxis")
         if node is not None:
             new_object["around_own_axis"] = text2bool(node.text)
+        node = object_root.find("Scale")
+        if node is not None:
+            new_object["scale"] = float(node.text)
         node = object_root.find("SoundRef")
         if node is not None:
             try:
@@ -331,19 +337,19 @@ class CaveContent(CaveFeature):
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
-        if content_root.find("None"):
+        if content_root.find("None") is not None:
             return CaveContent()
-        if content_root.find("Text"):
+        if content_root.find("Text") is not None:
             return CaveText.fromXML(content_root)
-        if content_root.find("Image"):
+        if content_root.find("Image") is not None:
             return CaveImage.fromXML(content_root)
-        if content_root.find("StereoImage"):
+        if content_root.find("StereoImage") is not None:
             return CaveStereoImage.fromXML(content_root)
-        if content_root.find("Model"):
+        if content_root.find("Model") is not None:
             return CaveModel.fromXML(content_root)
-        if content_root.find("Light"):
+        if content_root.find("Light") is not None:
             return CaveLight.fromXML(content_root)
-        if content_root.find("ParticleSystem"):
+        if content_root.find("ParticleSystem") is not None:
             return CavePSys.fromXML(content_root)
         raise BadCaveXML("No known child node found in Content node")
 
@@ -381,14 +387,16 @@ class CaveText(CaveContent):
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
         content_root = ET.SubElement(object_root, "Content")
+        attrib = {
+            "horiz-align": self["halign"],
+            "vert-align": self["valign"],
+            "depth": str(self["depth"]/self.blender_depth_scaling)
+        }
+        if not self.is_default("font"):
+            attrib["font"] = self["font"]
         text_root = ET.SubElement(
-            content_root, "Text", attrib={
-                "horiz-align": self["halign"],
-                "vert-align": self["valign"],
-                "font": self["font"],
-                "depth": self["depth"]/self.blender_depth_scaling
-                }
-            )
+            content_root, "Text", attrib=attrib
+        )
         text_root.text = self["text"]
 
         return content_root
@@ -410,7 +418,7 @@ class CaveText(CaveContent):
                 new_text["font"] = text_root.attrib["font"]
             if "depth" in text_root.attrib:
                 new_text["depth"] = (
-                    text_root.attrib["depth"] *
+                    float(text_root.attrib["depth"]) *
                     text_class.blender_depth_scaling)
             new_text["text"] = text_root.text
             return new_text
@@ -627,7 +635,7 @@ class CaveLight(CaveContent):
     default_arguments = {
         "diffuse": True,
         "specular": True,
-        "attenuation": [1, 0, 0],
+        "attenuation": (1, 0, 0),
         "angle": 30}
 
     def toXML(self, object_root):
@@ -651,7 +659,8 @@ class CaveLight(CaveContent):
         if self["light_type"] == "Directional":
             ET.SubElement(light_root, "Directional")
         if self["light_type"] == "Spot":
-            ET.SubElement(light_root, "Spot", attrib={"angle": self["angle"]})
+            ET.SubElement(light_root, "Spot", attrib={
+                "angle": str(self["angle"])})
 
     @classmethod
     def fromXML(light_class, content_root):
@@ -667,11 +676,13 @@ class CaveLight(CaveContent):
             if "specular" in light_root.attrib:
                 new_light["specular"] = text2bool(
                     light_root.attrib["specular"])
+            new_light["attenuation"] = list(new_light["attenuation"])
             for index, factor in enumerate(("const_atten", "lin_atten",
                                             "quad_atten")):
                 if factor in light_root.attrib:
                     new_light["attenuation"][index] = text2bool(
                         light_root.attrib[factor])
+            new_light["attenuation"] = tuple(new_light["attenuation"])
             for light_type in CaveLight.argument_validators[
                     "light_type"].valid_options:
                 type_root = light_root.find(light_type)

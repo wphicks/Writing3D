@@ -59,8 +59,10 @@ class CaveRotation(CaveFeature):
     def toXML(self, parent_root):
         if not self.is_default("rotation_mode"):
             rot_root = ET.SubElement(parent_root, self["rotation_mode"])
-            rot_root.attrib["rotation"] = str(tuple(self["rotation_vector"]))
+            rot_root.attrib["rotation"] = str(convert_to_legacy_axes(
+                self["rotation_vector"]))
             rot_root.attrib["angle"] = str(self["rotation_angle"])
+            return rot_root
         elif not (self.is_default("rotation_vector") and
                   self.is_default("rotation_angle")):
             raise BadCaveXML(
@@ -74,7 +76,7 @@ class CaveRotation(CaveFeature):
         try:
             rotation_vector = rot_root.attrib["rotation"]
             rotation["rotation_vector"] = convert_to_blender_axes(
-                text2tuple(rotation_vector))
+                text2tuple(rotation_vector, evaluator=float))
         except KeyError:  # No rotation vector specified
             pass
         try:
@@ -85,6 +87,7 @@ class CaveRotation(CaveFeature):
                 raise BadCaveXML("Rotation angle must be specified as a float")
         except KeyError:  # No rotation vector specified
             pass
+        return rotation
 
     def get_rotation_matrix(self, blender_object):
         rotation_matrix = mathutils.Matrix.Rotation(0, 4, (0, 0, 1))
@@ -141,13 +144,18 @@ class CavePlacement(CaveFeature):
     default_arguments = {
         "relative_to": "Center",
         "position": (0, 0, 0),
-        "rotation": CaveRotation()}
+        }
     relative_to_objects = {}
     """Dictionary mapping names of relative_to options to Blender
     representations
 
     In default CaveWriting, these are simply the four walls, but this can be
     overridden to provide additional functionality"""
+
+    def __init__(self, *args, **kwargs):
+        super(CavePlacement, self).__init__(*args, **kwargs)
+        if "rotation" not in self:
+            self["rotation"] = CaveRotation()
 
     def toXML(self, parent_root):
         place_root = ET.SubElement(parent_root, "Placement")
@@ -156,9 +164,10 @@ class CavePlacement(CaveFeature):
             rel_root.text = self["relative_to"]
         if not self.is_default("position"):
             pos_root = ET.SubElement(place_root, "Position")
-            pos_root.text = str(tuple(self["position"]))
+            pos_root.text = str(convert_to_legacy_axes(self["position"]))
         if not self.is_default("rotation"):
             self["rotation"].toXML(place_root)
+        return place_root
 
     @classmethod
     def fromXML(place_class, place_root):
@@ -168,8 +177,8 @@ class CavePlacement(CaveFeature):
             placement["relative_to"] = rel_root.text.strip()
         pos_root = place_root.find("Position")
         if pos_root is not None:
-            placement["position"] = convert_to_legacy_axes(
-                text2tuple(pos_root.text.strip()))
+            placement["position"] = convert_to_blender_axes(
+                text2tuple(pos_root.text.strip(), evaluator=float))
         for rotation_mode in ["Axis", "LookAt", "Normal"]:
             rot_root = place_root.find(rotation_mode)
             if rot_root is not None:
@@ -177,6 +186,7 @@ class CavePlacement(CaveFeature):
                 return placement
         return placement
 
+    #TODO: Deal with non-standard wall placements
     def _create_relative_to_objects(
             self,
             wall_positions={

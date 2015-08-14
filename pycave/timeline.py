@@ -72,9 +72,13 @@ class CaveTimeline(CaveFeature):
             help_string="A dictionary mapping CaveActions to floats")
         }
     default_arguments = {
-        "start_immediately": True,
-        "actions": SortedList()
+        "start_immediately": True
         }
+
+    def __init__(self, *args, **kwargs):
+        super(CaveTimeline, self).__init__(*args, **kwargs)
+        if "actions" not in self:
+            self["actions"] = SortedList()
 
     def toXML(self, all_timelines_root):
         """Store CaveTimeline as Timeline node within TimelineRoot node

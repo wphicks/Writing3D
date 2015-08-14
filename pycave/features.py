@@ -29,6 +29,9 @@ class CaveFeature(dict):
     duck-typing."""
     default_arguments = {}
     """Dictionary mapping names of arguments to their default values"""
+    blender_scaling = 1
+    """Scaling factor used to convert back and forth between Blender and legacy
+    units"""
 
     def __init__(self, *args, **kwargs):
         super(CaveFeature, self).__init__()
@@ -71,10 +74,10 @@ class CaveFeature(dict):
         """
         raise NotImplementedError("fromXML not defined for this feature")
 
-    def is_default(self, key, value):
+    def is_default(self, key):
         """Return true if value equals default for key, false otherwise"""
         try:
-            return value == self.default_arguments[key]
+            return self[key] == self.default_arguments[key]
         except KeyError:
             # If no default exists, always return False
             return False

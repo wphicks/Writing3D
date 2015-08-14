@@ -18,13 +18,13 @@ class CaveTrigger(CaveFeature):
     :ivar base_trigger: A trigger object wrapped by this trigger (see
     __setitem__ and __getitem__ implementation for details)
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.base_trigger = BareTrigger()
-        super(CaveTrigger, self).__init__()
+        super(CaveTrigger, self).__init__(*args, **kwargs)
 
     def __setitem__(self, key, value):
         try:
-            return super(HeadTrackTrigger, self).__setitem__(key, value)
+            return super(CaveTrigger, self).__setitem__(key, value)
         except InvalidArgument as bad_key_error:
             try:
                 self.base_trigger.__setitem__(key, value)
@@ -33,7 +33,7 @@ class CaveTrigger(CaveFeature):
 
     def __getitem__(self, key):
         try:
-            return super(HeadTrackTrigger, self).__getitem__(key)
+            return super(CaveTrigger, self).__getitem__(key)
         except KeyError as not_found_error:
             try:
                 return self.base_trigger.__getitem__(key)
@@ -86,8 +86,12 @@ class BareTrigger(CaveFeature):
         "enabled": True,
         "remain_enabled": True,
         "duration": 0,
-        "actions": []
         }
+
+    def __init__(self, *args, **kwargs):
+        super(BareTrigger, self).__init__(*args, **kwargs)
+        if "actions" not in self:
+            self["actions"] = []
 
     def toXML(self, all_triggers_root):
         """Store BareTrigger as EventTrigger node within EventRoot node
