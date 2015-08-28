@@ -3,6 +3,7 @@
 Here, actions refer generically to any discrete change in elements of a Cave
 project
 """
+import warnings
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .placement import CavePlacement
@@ -10,6 +11,11 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
+try:
+    import bpy
+except ImportError:
+    warnings.warn(
+        "Module bpy not found. Loading pycave.actions as standalone")
 
 
 class CaveAction(CaveFeature):
@@ -169,6 +175,15 @@ class ObjectAction(CaveAction):
 
     def blend(self):
         """Create representation of change in Blender"""
+        blender_name = "_".join((self["name"], "object"))
+        blender_object = bpy.data.objects[blender_name]
+        bpy.context.scene.objects.active = blender_object
+        if "placement" in self:
+            bpy.ops.logic.actuator_add(
+                type="MOTION",
+                object=blender_object,
+                name="_".join((blender_name, "motion_actuator"))
+            )
         raise NotImplementedError  # TODO
 
 

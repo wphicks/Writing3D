@@ -297,13 +297,14 @@ class CaveObject(CaveFeature):
             blender_object.active_material.diffuse_color)
         blender_object.active_material.use_shadeless = not self["lighting"]
         blender_object.active_material.use_transparency = True
+        blender_object.active_material.use_nodes = False
         return blender_object
 
     def blend(self):
         """Create representation of CaveObject in Blender"""
         blender_object = self["content"].blend()
         blender_object.name = "_".join((self["name"], "object"))
-        blender_object.hide_render = self["visible"]
+        blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
         if "depth" in self["content"]:
             # Make extrusion independent of scale
@@ -486,6 +487,7 @@ class CaveImage(CaveContent):
         new_image_object = bpy.context.object
 
         material = generate_material_from_image(self["filename"])
+        material.use_nodes = False
         image = material.texture_slots[0].texture.image
 
         new_image_object.active_material = material

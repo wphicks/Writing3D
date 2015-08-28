@@ -3,6 +3,7 @@
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 import warnings
+import math
 from .features import CaveFeature
 from .placement import CavePlacement, CaveRotation, convert_to_blender_axes
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable
@@ -299,5 +300,9 @@ class CaveProject(CaveFeature):
     def blend(self):
         """Create representation of CaveProject in Blender"""
         clear_blender_scene()
+        bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
+        self.main_camera = bpy.context.object
+        self.main_camera.layers = [layer == 0 for layer in range(20)]
+        self["desktop_camera_placement"].place(self.main_camera)
         for object_ in self["objects"]:
             object_.blend()
