@@ -11,11 +11,38 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
+from . import bge_templates
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.actions as standalone")
+
+
+def generate_python_controller(object_name):
+    """Generate a new Python controller for object
+
+    :return Name of new controller
+    """
+    blender_object = bpy.data.objects[object_name]
+    controller_count = 0
+    while True:
+        controller_name = "_".join(
+            (object_name, "controller", "{}".format(controller_count)))
+        if controller_name not in blender_object.game.controllers:
+            break
+        controller_count += 1
+    bpy.ops.logic.controller_add(
+        type='PYTHON',
+        object=object_name,
+        name=controller_name)
+    #TODO: Set proper build directory
+    # Note: This assumes that files have been properly cleared during
+    # object.blend()
+    with open(".".join((object_name, "py")), 'a') as control_file:
+        control_file.write("\ndef activate_{}:\n    pass\n".format(
+            controller_name))
+    return controller_name
 
 
 class CaveAction(CaveFeature):
@@ -175,16 +202,82 @@ class ObjectAction(CaveAction):
 
     def blend(self):
         """Create representation of change in Blender"""
-        blender_name = "_".join((self["name"], "object"))
-        blender_object = bpy.data.objects[blender_name]
+        blender_object_name = "_".join((self["object_name"], "object"))
+        blender_object = bpy.data.objects[blender_object_name]
         bpy.context.scene.objects.active = blender_object
+
+        # A new controller is needed to hold the logic for each action
+        self.controller_name = generate_python_controller(blender_object_name)
+        controller = blender_object.game.controllers[self.controller_name]
+        controller.mode = "MODULE"
+        controller.module = "{}.activate_{}".format(
+            blender_object_name, self.controller_name)
+
+        # Property used to control when action is triggered
+        property_name = self.controller_name
+        bpy.ops.object.game_property_new(
+            type='BOOL',
+            name=property_name
+        )
+        blender_object.game.properties[property_name].value = False
+
+        # Actuator to change property
+        actuator_name = self.controller_name
+        bpy.ops.logic.actuator_add(
+            type="PROPERTY",
+            object=blender_object_name,
+            name=actuator_name
+        )
+        blender_object.game.actuators[-1].name = actuator_name
+        blender_object.game.actuators[actuator_name].property = property_name
+
+        # Sensor to detect current property value
+        sensor_name = self.controller_name
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=blender_object_name,
+            name=sensor_name
+        )
+        blender_object.game.sensors[-1].name = sensor_name
+        # WARNING: For some reason, setting the name via sensor_add results in
+        # distorted sensor names sometimes. The above line is a workaround
+        # which guarantees that the sensor is properly named. Blender source
+        # bug?
+        blender_object.game.sensors[sensor_name].property = property_name
+        blender_object.game.sensors[sensor_name].value = "True"
+
+        # Sensor to detect when property has changed
+        change_sensor_name = "_".join((self.controller_name, "change"))
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=blender_object_name,
+            name=change_sensor_name
+        )
+        blender_object.game.sensors[-1].name = change_sensor_name
+        blender_object.game.sensors[change_sensor_name].property =\
+            property_name
+        blender_object.game.sensors[change_sensor_name].evaluation_type =\
+            "PROPCHANGED"
+
+        #TODO: Proper directory
+        controller_filename = ".".join((blender_object_name, "py"))
         if "placement" in self:
-            bpy.ops.logic.actuator_add(
-                type="MOTION",
-                object=blender_object,
-                name="_".join((blender_name, "motion_actuator"))
-            )
-        raise NotImplementedError  # TODO
+            actuator_name = "_".join((blender_object_name, "motion_actuator"))
+            if actuator_name not in blender_object.game.actuators:
+                bpy.ops.logic.actuator_add(
+                    type="MOTION",
+                    object=blender_object_name,
+                    name=actuator_name
+                )
+            with open(controller_filename, "a") as controller_file:
+                controller_file.write(bge_templates.LINEAR_MOVEMENT.format(
+                    actuator_name=actuator_name,
+                    property_sensor_name=sensor_name,
+                    change_sensor_name=change_sensor_name,
+                    target_position=self["placement"]["position"],
+                    duration=self["duration"]
+                    )
+                )
 
 
 class GroupAction(CaveAction):

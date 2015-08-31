@@ -1,5 +1,6 @@
 """Tools for working with timelines in Cave projects
 """
+import warnings
 import xml.etree.ElementTree as ET
 from collections import MutableSequence
 from .features import CaveFeature
@@ -7,6 +8,11 @@ from .actions import CaveAction
 from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
+try:
+    import bpy
+except ImportError:
+    warnings.warn(
+        "Module bpy not found. Loading pycave.actions as standalone")
 
 
 class SortedList(MutableSequence):
@@ -66,10 +72,10 @@ class CaveTimeline(CaveFeature):
     """
     argument_validators = {
         "name": AlwaysValid(
-            help_string="A string specifying a unique name for this sound"),
+            help_string="A string specifying a unique name for this timeline"),
         "start_immediately": AlwaysValid(help_string="Either true or false"),
         "actions": AlwaysValid(
-            help_string="A dictionary mapping CaveActions to floats")
+            help_string="A list of (float, CaveAction) tuples")
         }
     default_arguments = {
         "start_immediately": True
@@ -130,4 +136,5 @@ class CaveTimeline(CaveFeature):
 
     def blend(self):
         """Create representation of CaveTimeline in Blender"""
-        raise NotImplementedError  # TODO
+        for time, action in self["actions"]:
+            raise
