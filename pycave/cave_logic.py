@@ -21,51 +21,52 @@ def activate_{cont_name}(cont):
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     sensor = cont.sensors["{cont_name}"]
+    print(sensor.positive)
     change_sensor = cont.sensors["{cont_name}_change"]
+    print(change_sensor.positive)
     property_actuator = cont.actuators["{cont_name}"]
     if {start_immediately}:
         root_sensor = cont.sensors["ROOT"]
         if root_sensor.positive:
             own["activation_time"] = monotonic()
             property_actuator.value = "True"
-            print(own["{cont_name}"])
-            cont.activate("{cont_name}")
-            print(own["{cont_name}"])
-    print("BASE")
+            cont.activate(property_actuator)
     if change_sensor.positive and sensor.positive:
         own["activation_time"] = monotonic()
+    if sensor.positive:
         property_actuator.value = "True"
-        cont.activate("{cont_name}")
+        cont.activate(property_actuator)
     if monotonic() - own["activation_time"] > {duration}:
         property_actuator.value = "False"
-        cont.activate("{cont_name}")
+        cont.activate(property_actuator)
 """
 
 LINEAR_MOVEMENT = """
     actuator = cont.actuators["{actuator_name}"]
     target_position = {target_position}
     if change_sensor.positive and sensor.positive and {duration} != 0:
-        for i in range(3):
-            actuator.linV[i] = (target_position[i] -
-                own.position[i])/{duration}
-    if change_sensor.positive and sensor.negative:
-        for i in range(3):
-            actuator.linV[i] = 0
-            actuator.Loc[i] = {target_position}[i]
-    cont.activate("{actuator_name}")
+        print("LIN1")
+        actuator.dLoc = [(target_position[i] - own.position[i])/{duration}
+            for i in range(3)]
+    if change_sensor.positive and not sensor.positive:
+        print("LIN2")
+        actuator.dLoc = [0, 0, 0]
+        actuator.Loc[i] = {target_position}
+    cont.activate(actuator)
 """
 
 
 # Does a property changed through a python script properly register as changed
 # to a property sensor?
 ACTION_ACTIVATION = """
-    print("ACTION_ACTIVATION")
     if (sensor.positive
             and not scene.objects["{target_object}"]["{controller_name}"]
             and own["activation_time"] >= {action_time}):
-        scene.objects["{target_object}"].actuators[
-            "{controller_name}"].value="True"
-        cont.activate["{controller_name}"]
+        print("ACTION_ACTIVATION")
+        actuator = scene.objects["{target_object}"].actuators[
+            "{controller_name}"]
+        actuator.value = "True"
+        cont.activate(actuator)
 """
 
 
@@ -76,6 +77,7 @@ def generate_object_control_script(object_name):
     """
     script_name = ".".join((object_name, "py"))
     #TODO: Set proper build directory
+    bpy.data.texts.new(script_name)
     with open(script_name, 'w') as control_file:
         control_file.write(HEADER)
     return script_name
