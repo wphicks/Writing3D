@@ -11,7 +11,7 @@ from .actions import CaveAction
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
-from . import bge_templates
+from .cave_logic import generate_object_control_script
 import warnings
 try:
     import bpy
@@ -44,18 +44,6 @@ def generate_material_from_image(filename):
     #material.use_transparency = True
 
     return material
-
-
-def generate_object_control_script(object_name):
-    """Generates initial script for Blender Python controller for this object
-
-    :return Name of script
-    """
-    script_name = ".".join((object_name, "py"))
-    #TODO: Set proper build directory
-    with open(script_name, 'w') as control_file:
-        control_file.write(bge_templates.HEADER)
-    return script_name
 
 
 class CaveLink(CaveFeature):

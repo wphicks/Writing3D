@@ -8,6 +8,8 @@ from .actions import CaveAction
 from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
+from .cave_logic import generate_python_controller,\
+    add_action_activation_logic, generate_object_control_script
 try:
     import bpy
 except ImportError:
@@ -85,6 +87,8 @@ class CaveTimeline(CaveFeature):
         super(CaveTimeline, self).__init__(*args, **kwargs)
         if "actions" not in self:
             self["actions"] = SortedList()
+        else:
+            self["actions"] = SortedList(self["actions"])
 
     def toXML(self, all_timelines_root):
         """Store CaveTimeline as Timeline node within TimelineRoot node
@@ -136,5 +140,25 @@ class CaveTimeline(CaveFeature):
 
     def blend(self):
         """Create representation of CaveTimeline in Blender"""
+        timeline_name = "_".join((self["name"], "timeline"))
+        bpy.ops.object.add(
+            type="EMPTY",
+            layers=[layer == 20 for layer in range(1, 21)],
+        )
+        timeline_object = bpy.context.object
+        timeline_object.name = timeline_name
+        if len(self["actions"]) == 0:
+            return timeline_object
+
+        generate_object_control_script(timeline_name)
+        timeline_controller_name = generate_python_controller(
+            timeline_name, duration=self["actions"][-1][0],
+            start_immediately=self["start_immediately"])
+
         for time, action in self["actions"]:
-            raise
+            action.blend()
+            add_action_activation_logic(
+                timeline_name, timeline_controller_name,
+                action.blender_object_name,
+                action.controller_name,
+                action_time=time)

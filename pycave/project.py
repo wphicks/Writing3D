@@ -14,6 +14,7 @@ from .timeline import CaveTimeline
 from .groups import CaveGroup
 from .triggers import CaveTrigger
 from .errors import BadCaveXML
+from .cave_logic import generate_project_root
 try:
     import bpy
 except ImportError:
@@ -300,9 +301,12 @@ class CaveProject(CaveFeature):
     def blend(self):
         """Create representation of CaveProject in Blender"""
         clear_blender_scene()
+        generate_project_root()
+        bpy.data.scenes["Scene"].layers = [
+            layer in (1, 3, 20) for layer in range(1, 21)]
         bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
         self.main_camera = bpy.context.object
-        self.main_camera.layers = [layer == 0 for layer in range(20)]
+        self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
         for object_ in self["objects"]:
             object_.blend()
