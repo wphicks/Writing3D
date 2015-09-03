@@ -36,7 +36,11 @@ def activate_{cont_name}(cont):
     if sensor.positive:
         property_actuator.value = "True"
         cont.activate(property_actuator)
-    if monotonic() - own["activation_time"] > {duration}:
+    if (
+            sensor.positive and
+            not change_sensor.positive and
+            (monotonic() - own["activation_time"] >= {duration})):
+        print("WHOOOOAAAA")
         property_actuator.value = "False"
         cont.activate(property_actuator)
 """
@@ -76,10 +80,8 @@ def generate_object_control_script(object_name):
     :return Name of script
     """
     script_name = ".".join((object_name, "py"))
-    #TODO: Set proper build directory
     bpy.data.texts.new(script_name)
-    with open(script_name, 'w') as control_file:
-        control_file.write(HEADER)
+    bpy.data.texts[script_name].write(HEADER)
     return script_name
 
 
@@ -92,15 +94,39 @@ def generate_project_root():
     root_object = bpy.context.object
     bpy.context.scene.objects.active = root_object
     root_object.name = "ROOT"
+    bpy.ops.object.game_property_new(
+        type='BOOL',
+        name="ROOT"
+    )
+    root_object.game.properties["ROOT"].value = True
     bpy.ops.logic.sensor_add(
-        type="DELAY",
+        type="PROPERTY",
         object="ROOT",
         name="ROOT"
     )
     root_object.game.sensors[-1].name = "ROOT"
-    root_object.game.sensors["ROOT"].delay = 0
-    root_object.game.sensors["ROOT"].duration = 0
-    root_object.game.sensors["ROOT"].use_repeat = False
+
+    root_object.game.sensors["ROOT"].property = "ROOT"
+    root_object.game.sensors["ROOT"].value = "True"
+
+    bpy.ops.logic.controller_add(
+        type='LOGIC_AND',
+        object="ROOT",
+        name="ROOT")
+    root_object.game.controllers[-1].name = "ROOT"
+    controller = root_object.game.controllers["ROOT"]
+    controller.link(sensor=root_object.game.sensors["ROOT"])
+
+    bpy.ops.logic.actuator_add(
+        type="PROPERTY",
+        object="ROOT",
+        name="run_once"
+    )
+    root_object.game.actuators[-1].name = "run_once"
+    root_object.game.actuators["run_once"].property = "ROOT"
+    root_object.game.actuators["run_once"].value = "False"
+
+    controller.link(actuator=root_object.game.actuators["run_once"])
 
     return root_object
 
@@ -195,14 +221,13 @@ def generate_python_controller(
     if start_immediately:
         link_to_root(object_name, controller_name)
 
-    #TODO: Set proper build directory
-    with open(".".join((object_name, "py")), 'a') as control_file:
-        control_file.write(BASE_FUNCTION.format(
-            cont_name=controller_name,
-            duration=duration,
-            start_immediately=start_immediately
-            )
+    script_name = ".".join((object_name, "py"))
+    bpy.data.texts[script_name].write(BASE_FUNCTION.format(
+        cont_name=controller_name,
+        duration=duration,
+        start_immediately=start_immediately
         )
+    )
 
     return controller_name
 
@@ -224,7 +249,7 @@ def add_motion_logic(
     #TODO: Proper directory
     blender_object = bpy.data.objects[object_name]
     controller = blender_object.game.controllers[controller_name]
-    controller_filename = ".".join((object_name, "py"))
+    script_name = ".".join((object_name, "py"))
     actuator_name = "_".join((object_name, "motion_actuator"))
     if actuator_name not in blender_object.game.actuators:
         bpy.ops.logic.actuator_add(
@@ -234,13 +259,12 @@ def add_motion_logic(
         )
     controller.link(
         actuator=blender_object.game.actuators[actuator_name])
-    with open(controller_filename, "a") as controller_file:
-        controller_file.write(LINEAR_MOVEMENT.format(
-            actuator_name=actuator_name,
-            target_position=target_position,
-            duration=duration
-            )
+    bpy.data.texts[script_name].write(LINEAR_MOVEMENT.format(
+        actuator_name=actuator_name,
+        target_position=target_position,
+        duration=duration
         )
+    )
 
 
 def add_action_activation_logic(
@@ -249,14 +273,13 @@ def add_action_activation_logic(
     blender_object = bpy.data.objects[object_name]
     target_object = bpy.data.objects[target_object_name]
     controller = blender_object.game.controllers[controller_name]
-    controller_filename = ".".join((object_name, "py"))
+    script_name = ".".join((object_name, "py"))
     controller.link(
         actuator=target_object.game.actuators[target_controller_name])
-    with open(controller_filename, "a") as controller_file:
-        controller_file.write(
-            ACTION_ACTIVATION.format(
-                target_object=target_object_name,
-                controller_name=target_controller_name,
-                action_time=action_time
-            )
+    bpy.data.texts[script_name].write(
+        ACTION_ACTIVATION.format(
+            target_object=target_object_name,
+            controller_name=target_controller_name,
+            action_time=action_time
         )
+    )
