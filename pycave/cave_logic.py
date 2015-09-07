@@ -50,11 +50,11 @@ LINEAR_MOVEMENT = """
     target_position = {target_position}
     if change_sensor.positive and sensor.positive and {duration} != 0:
         print("LIN1")
-        actuator.dLoc = [(target_position[i] - own.position[i])/{duration}
+        actuator.linV = [(target_position[i] - own.position[i])/{duration}
             for i in range(3)]
     if change_sensor.positive and not sensor.positive:
         print("LIN2")
-        actuator.dLoc = [0, 0, 0]
+        actuator.linV = [0, 0, 0]
         actuator.Loc[i] = {target_position}
     cont.activate(actuator)
 """
@@ -189,7 +189,7 @@ def generate_python_controller(
     blender_object.game.actuators[actuator_name].property = property_name
     blender_object.game.actuators[actuator_name].value = "True"
     controller.link(actuator=blender_object.game.actuators[actuator_name])
-    # Sensor to detect current property value
+    # Sensor to detect when property gets set to True
     sensor_name = controller_name
     bpy.ops.logic.sensor_add(
         type="PROPERTY",
@@ -217,6 +217,28 @@ def generate_python_controller(
     blender_object.game.sensors[change_sensor_name].evaluation_type =\
         "PROPCHANGED"
     controller.link(sensor=blender_object.game.sensors[change_sensor_name])
+
+    #Sensor and property to detect time since activation
+    timer_property_name = "_".join((controller_name, "time"))
+    bpy.ops.object.game_property_new(
+        type='TIMER',
+        name=timer_property_name
+    )
+    bpy.ops.logic.sensor_add(
+        type="PROPERTY",
+        object=object_name,
+        name=timer_property_name
+    )
+    blender_object.game.sensors[-1].name = timer_property_name
+    blender_object.game.sensors[timer_property_name].property =\
+        timer_property_name
+    blender_object.game.sensors[timer_property_name].evaluation_type =\
+        "PROPINTERVAL"
+    blender_object.game.sensors[timer_property_name].value_min = "{}".format(
+        duration)
+    blender_object.game.sensors[timer_property_name].value_max =\
+        timer_property_name
+    controller.link(sensor=blender_object.game.sensors[timer_property_name])
 
     if start_immediately:
         link_to_root(object_name, controller_name)
@@ -248,6 +270,7 @@ def add_motion_logic(
         object_name, controller_name, target_position, duration):
     #TODO: Proper directory
     blender_object = bpy.data.objects[object_name]
+    blender_object.game.physics_type = 'DYNAMIC'
     controller = blender_object.game.controllers[controller_name]
     script_name = ".".join((object_name, "py"))
     actuator_name = "_".join((object_name, "motion_actuator"))

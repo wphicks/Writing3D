@@ -314,10 +314,9 @@ class CaveObject(CaveFeature):
         self["placement"].place(blender_object)
         #TODO: Apply link
         if self["click_through"]:
-            #TODO: Is there another way to achieve this?
-            blender_object.game.physics_type = 'NO_COLLISION'
-        else:
-            blender_object.game.physics_type = 'STATIC'
+            pass
+            #TODO
+        blender_object.game.physics_type = 'NO_COLLISION'
 
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
