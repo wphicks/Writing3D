@@ -302,6 +302,7 @@ class CaveProject(CaveFeature):
         """Create representation of CaveProject in Blender"""
         clear_blender_scene()
         generate_project_root()
+        bpy.data.scenes["Scene"].game_settings.physics_gravity = 0
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
         bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))

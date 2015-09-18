@@ -8,7 +8,7 @@ except ImportError:
         "Module bpy not found. Loading pycave.cave_logic as standalone")
 
 HEADER = """import bge
-from time import monotonic"""
+"""
 
 
 START_IMMEDIATELY = """
@@ -21,26 +21,19 @@ def activate_{cont_name}(cont):
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     sensor = cont.sensors["{cont_name}"]
-    print(sensor.positive)
-    change_sensor = cont.sensors["{cont_name}_change"]
-    print(change_sensor.positive)
+    time_sensor = cont.sensors["{cont_name}_time"]
     property_actuator = cont.actuators["{cont_name}"]
+    print(sensor.positive)
+    print("TIME: ", time_sensor.positive)
     if {start_immediately}:
         root_sensor = cont.sensors["ROOT"]
         if root_sensor.positive:
-            own["activation_time"] = monotonic()
+            own["{cont_name}_time"] = 0.0
             property_actuator.value = "True"
             cont.activate(property_actuator)
-    if change_sensor.positive and sensor.positive:
-        own["activation_time"] = monotonic()
     if sensor.positive:
-        property_actuator.value = "True"
-        cont.activate(property_actuator)
-    if (
-            sensor.positive and
-            not change_sensor.positive and
-            (monotonic() - own["activation_time"] >= {duration})):
-        print("WHOOOOAAAA")
+        own["{cont_name}_time"] = 0.0
+    if sensor.positive and time_sensor.positive:
         property_actuator.value = "False"
         cont.activate(property_actuator)
 """
@@ -48,24 +41,23 @@ def activate_{cont_name}(cont):
 LINEAR_MOVEMENT = """
     actuator = cont.actuators["{actuator_name}"]
     target_position = {target_position}
-    if change_sensor.positive and sensor.positive and {duration} != 0:
+    if sensor.positive and {duration} != 0:
         print("LIN1")
         actuator.linV = [(target_position[i] - own.position[i])/{duration}
             for i in range(3)]
-    if change_sensor.positive and not sensor.positive:
+    if time_sensor.positive and not sensor.positive:
         print("LIN2")
         actuator.linV = [0, 0, 0]
-        actuator.Loc[i] = {target_position}
+        actuator.dLoc = [{target_position}[i] - own.position[i] for i in
+            range(3)]
     cont.activate(actuator)
+    actuator.dLoc = [0, 0, 0]
 """
 
 
-# Does a property changed through a python script properly register as changed
-# to a property sensor?
 ACTION_ACTIVATION = """
     if (sensor.positive
-            and not scene.objects["{target_object}"]["{controller_name}"]
-            and own["activation_time"] >= {action_time}):
+            and not scene.objects["{target_object}"]["{controller_name}"]):
         print("ACTION_ACTIVATION")
         actuator = scene.objects["{target_object}"].actuators[
             "{controller_name}"]
@@ -204,19 +196,6 @@ def generate_python_controller(
     blender_object.game.sensors[sensor_name].property = property_name
     blender_object.game.sensors[sensor_name].value = "True"
     controller.link(sensor=blender_object.game.sensors[sensor_name])
-    # Sensor to detect when property has changed
-    change_sensor_name = "_".join((controller_name, "change"))
-    bpy.ops.logic.sensor_add(
-        type="PROPERTY",
-        object=object_name,
-        name=change_sensor_name
-    )
-    blender_object.game.sensors[-1].name = change_sensor_name
-    blender_object.game.sensors[change_sensor_name].property =\
-        property_name
-    blender_object.game.sensors[change_sensor_name].evaluation_type =\
-        "PROPCHANGED"
-    controller.link(sensor=blender_object.game.sensors[change_sensor_name])
 
     #Sensor and property to detect time since activation
     timer_property_name = "_".join((controller_name, "time"))
@@ -234,10 +213,11 @@ def generate_python_controller(
         timer_property_name
     blender_object.game.sensors[timer_property_name].evaluation_type =\
         "PROPINTERVAL"
+    # NOTE: This should be changed to a straight Greater Than evaluation for
+    # Blender 2.71
     blender_object.game.sensors[timer_property_name].value_min = "{}".format(
         duration)
-    blender_object.game.sensors[timer_property_name].value_max =\
-        timer_property_name
+    blender_object.game.sensors[timer_property_name].value_max = "9999999"
     controller.link(sensor=blender_object.game.sensors[timer_property_name])
 
     if start_immediately:
