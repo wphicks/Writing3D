@@ -17,52 +17,71 @@ START_IMMEDIATELY = """
 
 BASE_FUNCTION = """
 def activate_{cont_name}(cont):
-    print("{cont_name}")
+    print("\\n{cont_name}")
     scene = bge.logic.getCurrentScene()
     own = cont.owner
+    print(own["{cont_name}_time"])
     sensor = cont.sensors["{cont_name}"]
     time_sensor = cont.sensors["{cont_name}_time"]
+    change_sensor = cont.sensors["{cont_name}_change"]
     property_actuator = cont.actuators["{cont_name}"]
-    print(sensor.positive)
-    print("TIME: ", time_sensor.positive)
+    print("Controller active:", sensor.positive)
+    print("Controller changed:", change_sensor.positive)
+    print("Duration exceeded:", time_sensor.positive)
     if {start_immediately}:
         root_sensor = cont.sensors["ROOT"]
         if root_sensor.positive:
             own["{cont_name}_time"] = 0.0
+            own["{cont_name}_ind"] = 0
             property_actuator.value = "True"
             cont.activate(property_actuator)
-    if sensor.positive:
+    if sensor.positive and change_sensor.positive:
+        print("{cont_name}: ", "RESET")
         own["{cont_name}_time"] = 0.0
-    if sensor.positive and time_sensor.positive:
+        own["{cont_name}_ind"] = 0
+    if sensor.positive and own["{cont_name}_time"] > {duration}:
         property_actuator.value = "False"
         cont.activate(property_actuator)
 """
 
 LINEAR_MOVEMENT = """
+    print("actuator: {actuator_name}")
     actuator = cont.actuators["{actuator_name}"]
     target_position = {target_position}
-    if sensor.positive and {duration} != 0:
-        print("LIN1")
+    if sensor.positive and change_sensor.positive and {duration} != 0:
+        print("Starting movement")
         actuator.linV = [(target_position[i] - own.position[i])/{duration}
             for i in range(3)]
-    if time_sensor.positive and not sensor.positive:
-        print("LIN2")
+    if change_sensor.positive and not sensor.positive:
+        print("Stopping movement:", own.position)
         actuator.linV = [0, 0, 0]
+        print("After setting:", actuator.linV)
         actuator.dLoc = [{target_position}[i] - own.position[i] for i in
             range(3)]
     cont.activate(actuator)
+    print(own.position)
+    print(actuator.linV)
+    print(own.getVelocity())
     actuator.dLoc = [0, 0, 0]
 """
 
 
-ACTION_ACTIVATION = """
+IMMEDIATE_ACTION_CONDITION = """
+    if (sensor.positive):
+"""
+TRIGGERED_ACTION_CONDITION = """
+    print("{trigger_sensor}:", cont.sensors["{trigger_sensor}"].positive)
     if (sensor.positive
-            and not scene.objects["{target_object}"]["{controller_name}"]):
-        print("ACTION_ACTIVATION")
-        actuator = scene.objects["{target_object}"].actuators[
-            "{controller_name}"]
-        actuator.value = "True"
-        cont.activate(actuator)
+            and cont.sensors["{trigger_sensor}"].positive):
+"""
+ACTION_ACTIVATION = """
+        if own["{cont_name}_ind"] == {activation_index}:
+            print("Activating action")
+            actuator = scene.objects["{target_object}"].actuators[
+                "{target_controller_name}"]
+            actuator.value = "True"
+            cont.activate(actuator)
+            own["{cont_name}_ind"] += 1
 """
 
 
@@ -196,6 +215,19 @@ def generate_python_controller(
     blender_object.game.sensors[sensor_name].property = property_name
     blender_object.game.sensors[sensor_name].value = "True"
     controller.link(sensor=blender_object.game.sensors[sensor_name])
+    # Sensor to detect when property has changed
+    change_sensor_name = "_".join((controller_name, "change"))
+    bpy.ops.logic.sensor_add(
+        type="PROPERTY",
+        object=object_name,
+        name=change_sensor_name
+    )
+    blender_object.game.sensors[-1].name = change_sensor_name
+    blender_object.game.sensors[change_sensor_name].property =\
+        property_name
+    blender_object.game.sensors[change_sensor_name].evaluation_type =\
+        "PROPCHANGED"
+    controller.link(sensor=blender_object.game.sensors[change_sensor_name])
 
     #Sensor and property to detect time since activation
     timer_property_name = "_".join((controller_name, "time"))
@@ -203,22 +235,8 @@ def generate_python_controller(
         type='TIMER',
         name=timer_property_name
     )
-    bpy.ops.logic.sensor_add(
-        type="PROPERTY",
-        object=object_name,
-        name=timer_property_name
-    )
-    blender_object.game.sensors[-1].name = timer_property_name
-    blender_object.game.sensors[timer_property_name].property =\
-        timer_property_name
-    blender_object.game.sensors[timer_property_name].evaluation_type =\
-        "PROPINTERVAL"
-    # NOTE: This should be changed to a straight Greater Than evaluation for
-    # Blender 2.71
-    blender_object.game.sensors[timer_property_name].value_min = "{}".format(
-        duration)
-    blender_object.game.sensors[timer_property_name].value_max = "9999999"
-    controller.link(sensor=blender_object.game.sensors[timer_property_name])
+    add_time_sensor(
+        object_name, controller_name, duration, timer_property_name)
 
     if start_immediately:
         link_to_root(object_name, controller_name)
@@ -232,6 +250,35 @@ def generate_python_controller(
     )
 
     return controller_name
+
+
+def add_time_sensor(object_name, controller_name, time, sensor_name):
+    """Add a property sensor to trigger after a particular time
+
+    :param str object_name: Name of object to add sensor to
+    :param str controller_name: Name of controller to add sensor to
+    :param float time: Time after which to trigger sensor
+    :param str sensor_name: Name of sensor to be created"""
+    blender_object = bpy.data.objects[object_name]
+    bpy.context.scene.objects.active = blender_object
+    controller = blender_object.game.controllers[controller_name]
+    timer_property_name = "_".join((controller_name, "time"))
+    bpy.ops.logic.sensor_add(
+        type="PROPERTY",
+        object=object_name,
+        name=sensor_name
+    )
+    blender_object.game.sensors[-1].name = sensor_name
+    blender_object.game.sensors[sensor_name].property =\
+        timer_property_name
+    blender_object.game.sensors[sensor_name].evaluation_type =\
+        "PROPINTERVAL"
+    blender_object.game.sensors[sensor_name].value_min = "{}".format(
+        time)
+    blender_object.game.sensors[sensor_name].value_max = "9999999"
+    controller.link(sensor=blender_object.game.sensors[sensor_name])
+
+    return sensor_name
 
 
 def link_to_root(object_name, controller_name):
@@ -248,7 +295,6 @@ def link_to_root(object_name, controller_name):
 
 def add_motion_logic(
         object_name, controller_name, target_position, duration):
-    #TODO: Proper directory
     blender_object = bpy.data.objects[object_name]
     blender_object.game.physics_type = 'DYNAMIC'
     controller = blender_object.game.controllers[controller_name]
@@ -272,17 +318,25 @@ def add_motion_logic(
 
 def add_action_activation_logic(
         object_name, controller_name, target_object_name,
-        target_controller_name, action_time=0):
+        target_controller_name, trigger=None, activation_index=0):
     blender_object = bpy.data.objects[object_name]
     target_object = bpy.data.objects[target_object_name]
     controller = blender_object.game.controllers[controller_name]
     script_name = ".".join((object_name, "py"))
     controller.link(
         actuator=target_object.game.actuators[target_controller_name])
+    if trigger is None:
+        action_script = "".join(
+            (IMMEDIATE_ACTION_CONDITION, ACTION_ACTIVATION))
+    else:
+        action_script = "".join(
+            (TRIGGERED_ACTION_CONDITION, ACTION_ACTIVATION))
     bpy.data.texts[script_name].write(
-        ACTION_ACTIVATION.format(
+        action_script.format(
+            cont_name=controller_name,
             target_object=target_object_name,
-            controller_name=target_controller_name,
-            action_time=action_time
+            target_controller_name=target_controller_name,
+            trigger_sensor=trigger,
+            activation_index=activation_index
         )
     )

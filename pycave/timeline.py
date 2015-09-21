@@ -9,7 +9,8 @@ from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
 from .cave_logic import generate_python_controller,\
-    add_action_activation_logic, generate_object_control_script
+    add_action_activation_logic, generate_object_control_script,\
+    add_time_sensor
 try:
     import bpy
 except ImportError:
@@ -155,10 +156,22 @@ class CaveTimeline(CaveFeature):
             timeline_name, duration=self["actions"][-1][0],
             start_immediately=self["start_immediately"])
 
+        event_index = 0
         for time, action in self["actions"]:
             action.blend()
+            trigger_sensor = None
+            if time != 0:
+                event_name = "_".join(
+                    (timeline_name, "{}".format(event_index)))
+                trigger_sensor = add_time_sensor(
+                    timeline_name,
+                    timeline_controller_name,
+                    time,
+                    event_name)
             add_action_activation_logic(
                 timeline_name, timeline_controller_name,
                 action.blender_object_name,
                 action.controller_name,
-                action_time=time)
+                trigger=trigger_sensor,
+                activation_index=event_index)
+            event_index += 1
