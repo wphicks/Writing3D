@@ -1,4 +1,4 @@
-"""Tools for implementing a CaveAction in blender"""
+"""Tools for implementing a CaveTrigger in blender"""
 
 import warnings
 try:
@@ -6,22 +6,24 @@ try:
 except ImportError:
     warnings.warn(
         "Module bpy not found. \
-Loading pycave.cave_logic.blender_action as standalone")
+Loading pycave.cave_logic.blender_trigger as standalone")
 
 
-class BlenderAction(object):
-    """A single unit of action in the Blender environment
+class BlenderTrigger(object):
+    """A control element used to activate events within Blender
 
-    Note that while this frequently corresponds to a single CaveAction, it may
-    correspond to part of a CaveAction or several CaveActions
+    Note that while this frequently corresponds to a single CaveFeature, it may
+    correspond to part of a CaveFeature or several CaveFeatures. For instance,
+    a CaveTimeline constitutes a single BlenderTrigger, which will trigger
+    multiple events.
 
     :param str blender_object_name: The name of the blender object to which
-    action is attached
-    :ivar blender_object: The blender object to which this action is attached
-    :ivar name: A unique (to the associated object) name for this action
+    trigger is attached
+    :ivar blender_object: The blender object to which this trigger is attached
+    :ivar name: A unique (to the associated object) name for this trigger
     """
     def get_object(self):
-        """Return the Blender object associated with this action
+        """Return the Blender object associated with this trigger
 
         :note Subclasses may create the object if necessary but should check to
         see if the object already exists
@@ -30,14 +32,14 @@ class BlenderAction(object):
         return blender_object
 
     def make_object_active(self):
-        """Make this action's object the currently active object"""
+        """Make this trigger's object the currently active object"""
         bpy.context.scene.objects.active = self.blender_object
         return self.blender_object
 
     def create_controller(self):
-        """Create a Python controller for this action
+        """Create a Python controller for this trigger
 
-        This controller will have the same name as the action itself
+        This controller will have the same name as the trigger itself
         """
         self.make_object_active()
         bpy.ops.logic.controller_add(
@@ -50,11 +52,11 @@ class BlenderAction(object):
         return controller
 
     def create_control_property(self):
-        """Create a boolean property to control this action
+        """Create a boolean property to control this trigger
 
-        Iff this property is set to True, the action will be activated. Actions
+        Iff this property is set to True, the trigger will be activated. Triggers
         should not change anything within Blender unless this property is True.
-        This property will have the same name as the action itself.
+        This property will have the same name as the trigger itself.
         """
         self.make_object_active()
         bpy.ops.object.game_property_new(
@@ -66,7 +68,7 @@ class BlenderAction(object):
     def create_control_sensor(self):
         """Create a sensor to detect when control property is set to True
 
-        This sensor will have the same name as the action itself.
+        This sensor will have the same name as the trigger itself.
         """
         self.make_object_active()
         bpy.ops.logic.sensor_add(
@@ -84,7 +86,7 @@ class BlenderAction(object):
         """Create a sensor to detect when control property is changed
 
         This sensor will be named [NAME]_change where [NAME] is the name of the
-        action.
+        trigger.
         """
         self.make_object_active()
         sensor_name = "{}_change".format(self.name)
@@ -103,7 +105,7 @@ class BlenderAction(object):
         """Create an actuator that will set control property to desired
         value
 
-        This actuator will have the same name as the action itself.
+        This actuator will have the same name as the trigger itself.
         """
         self.make_object_active()
         bpy.ops.logic.actuator_add(
@@ -120,13 +122,13 @@ class BlenderAction(object):
     def __init__(self, blender_object_name):
         self.blender_object_name = blender_object_name
         self.blender_object = self.get_object()
-        # Create a unique name for this action
-        action_count = 0
+        # Create a unique name for this trigger
+        trigger_count = 0
         while True:
-            action_name = "action_{}".format(action_count)
-            if action_name not in self.blender_object.game.controllers:
+            trigger_name = "trigger_{}".format(trigger_count)
+            if trigger_name not in self.blender_object.game.controllers:
                 break
-            action_count += 1
+            trigger_count += 1
 
         self.controller = self.create_controller()
         self.actuator = self.create_actuator()
@@ -135,10 +137,10 @@ class BlenderAction(object):
         self.change_sensor = self.create_change_sensor()
 
 
-class TimedAction(BlenderAction):
-    """A Blender action which turns itself off after a specified duration
+class TimedTrigger(BlenderTrigger):
+    """A Blender trigger which turns itself off after a specified duration
 
-    TimedActions also create an associated Timer property in Blender which
+    TimedTriggers also create an associated Timer property in Blender which
     keeps track of how long they have been active"""
 
     def create_timer_property(self):
@@ -186,7 +188,7 @@ class TimedAction(BlenderAction):
         return sensor
 
     def __init__(self, blender_object_name, duration):
-        super(TimedAction, self).__init__(blender_object_name)
+        super(TimedTrigger, self).__init__(blender_object_name)
         self.duration = duration
         self.timer_name = "{}_timer".format(self.name)
         self.timer = self.create_timer_property()
