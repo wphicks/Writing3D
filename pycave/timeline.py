@@ -8,9 +8,7 @@ from .actions import CaveAction
 from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
-from .cave_logic import generate_python_controller,\
-    add_action_activation_logic, generate_object_control_script,\
-    add_time_sensor
+from .cave_logic.blender_trigger import BlenderTrigger, TimedTrigger
 try:
     import bpy
 except ImportError:
@@ -151,27 +149,19 @@ class CaveTimeline(CaveFeature):
         if len(self["actions"]) == 0:
             return timeline_object
 
-        generate_object_control_script(timeline_name)
-        timeline_controller_name = generate_python_controller(
-            timeline_name, duration=self["actions"][-1][0],
-            start_immediately=self["start_immediately"])
+        duration = self["actions"][-1][0]
+        if duration <= 0:
+            blender_trigger = BlenderTrigger(timeline_name)
+        else:
+            blender_trigger = TimedTrigger(timeline_name, duration)
 
-        event_index = 0
         for time, action in self["actions"]:
-            action.blend()
-            trigger_sensor = None
-            if time != 0:
-                event_name = "_".join(
-                    (timeline_name, "{}".format(event_index)))
-                trigger_sensor = add_time_sensor(
-                    timeline_name,
-                    timeline_controller_name,
-                    time,
-                    event_name)
-            add_action_activation_logic(
-                timeline_name, timeline_controller_name,
-                action.blender_object_name,
-                action.controller_name,
-                trigger=trigger_sensor,
-                activation_index=event_index)
-            event_index += 1
+            if time <= 0:
+                blender_trigger.add_to_script_body("""
+    if sensor.positive and change_sensor.positive:""")
+            else:
+                time_sensor = blender_trigger.create_time_sensor(time)
+                blender_trigger.add_to_timed_body("""
+    if sensor.positive and cont.sensors["{time_sensor}"].positive:""".format(
+                    time_sensor.name)
+                )

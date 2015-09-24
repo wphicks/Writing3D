@@ -1,4 +1,4 @@
-"""Tools for implementing a CaveTrigger in blender"""
+"""Tools for activating an event in Blender"""
 
 import warnings
 try:
@@ -22,6 +22,7 @@ class BlenderTrigger(object):
     :ivar blender_object: The blender object to which this trigger is attached
     :ivar name: A unique (to the associated object) name for this trigger
     """
+
     def get_object(self):
         """Return the Blender object associated with this trigger
 
@@ -54,9 +55,9 @@ class BlenderTrigger(object):
     def create_control_property(self):
         """Create a boolean property to control this trigger
 
-        Iff this property is set to True, the trigger will be activated. Triggers
-        should not change anything within Blender unless this property is True.
-        This property will have the same name as the trigger itself.
+        Iff this property is set to True, the trigger will be activated.
+        Triggers should not change anything within Blender unless this property
+        is True.  This property will have the same name as the trigger itself.
         """
         self.make_object_active()
         bpy.ops.object.game_property_new(
@@ -119,6 +120,33 @@ class BlenderTrigger(object):
         self.controller.link(actuator=actuator)
         return actuator
 
+    def get_script_template_values(self):
+        """Generate a dictionary used to fill in templates which will create
+        the control script for this trigger"""
+        return {
+            "name": self.name,
+            "control_sensor": self.control_sensor.name,
+            "change_sensor": self.change_sensor.name,
+            "control_actuator": self.actuator.name
+        }
+
+    def add_to_script_body(self, script_string):
+        """Append to body of script (after header but before footer)"""
+        self.body.append(script_string)
+
+    def write_to_script(self):
+        """Write this trigger to the Python script associated with its
+        object"""
+        script_name = ".".join((self.blender_object_name, "py"))
+        if script_name not in bpy.data.texts:
+            bpy.data.texts.new(script_name)
+        script = bpy.data.texts[script_name]
+        template_values = self.get_script_template_values
+        script.write("\n".join(self.header).format(**template_values))
+        script.write("\n".join(self.body).format(**template_values))
+        script.write("\n".join(self.footer).format(**template_values))
+        return script
+
     def __init__(self, blender_object_name):
         self.blender_object_name = blender_object_name
         self.blender_object = self.get_object()
@@ -135,6 +163,16 @@ class BlenderTrigger(object):
         self.control_property = self.create_control_property()
         self.control_sensor = self.create_control_sensor()
         self.change_sensor = self.create_change_sensor()
+
+        self.header = ["""
+def activate_{name}(cont):
+    own = cont.owner
+    sensor = cont.sensors["{control_sensor}"]
+    change_sensor = cont.sensors["{change_sensor}"]
+    control_actuator = cont.actuators["{control_actuator}"]
+"""]
+        self.footer = [""]
+        self.body = []
 
 
 class TimedTrigger(BlenderTrigger):
@@ -187,9 +225,52 @@ class TimedTrigger(BlenderTrigger):
 
         return sensor
 
+    def get_script_template_values(self):
+        template_values = super(
+            TimedTrigger, self).get_script_template_values()
+        template_values.extend({
+            "duration_sensor": self.duration_sensor.name,
+            "timer_name": self.timer_name
+            }
+        )
+        return template_values
+
+    def add_to_timed_body(self, script_string):
+        """Append to timed section of script
+
+        All timed events are invoked after all immediate or untimed events.
+        This allows the timer to be reset if necessary before moving on to
+        timed events"""
+        self.timed_body.append(script_string)
+
+    def write_to_script(self):
+        # TODO: This is highly inelegant. Figure out a good way to do this
+        # without separate body and timed_body sections
+        body_len = len(self.body)
+        self.body.extend(self.timed_body)
+        script = super(TimedTrigger, self).write_to_script()
+        self.body = self.body[:body_len]
+        return script
+
     def __init__(self, blender_object_name, duration):
         super(TimedTrigger, self).__init__(blender_object_name)
         self.duration = duration
         self.timer_name = "{}_timer".format(self.name)
         self.timer = self.create_timer_property()
         self.duration_sensor = self.create_duration_sensor(self.duration)
+
+        self.header.append("""
+    duration_sensor = cont.sensors["{duration_sensor}"]
+    """)
+
+        self.timed_body = ["""
+    if sensor.positive and change_sensor.positive:
+        own["{timer_name}"] = 0
+        return
+        """]
+
+        self.footer.append("""
+    if sensor.positive and duration_sensor.positive:
+        control_actuator.value = "False"
+        cont.activate(control_actuator)
+    """)
