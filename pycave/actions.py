@@ -11,7 +11,8 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
-from .cave_logic import generate_python_controller, add_motion_logic
+from .cave_logic.blender_trigger import TimedTrigger
+from .cave_logic.blender_action import LinearMovement
 try:
     import bpy
 except ImportError:
@@ -180,14 +181,28 @@ class ObjectAction(CaveAction):
         blender_object = bpy.data.objects[self.blender_object_name]
         bpy.context.scene.objects.active = blender_object
 
-        # A new controller is needed to hold the logic for each action
-        self.controller_name = generate_python_controller(
-            self.blender_object_name, duration=self["duration"])
+        blender_trigger = TimedTrigger(
+            self.blender_object_name, self["duration"])
+
+        actions = []
 
         if "placement" in self:
-            add_motion_logic(
-                self.blender_object_name, self.controller_name,
-                self["placement"]["position"], self["duration"])
+            actions.append(LinearMovement(blender_trigger, self["placement"]))
+
+        if len(actions) != 0:
+            blender_trigger.add_to_script_body("""
+    if sensor.positive and change_sensor.positive:
+            """)
+            for action_ in actions:
+                blender_trigger.add_to_script_body(action_.create_on_script())
+            if self["duration"] != 0:
+                blender_trigger.add_to_script_body("""
+    if sensor.negative and change_sensor.positive:
+                """)
+            for action_ in actions:
+                blender_trigger.add_to_script_body(action_.create_off_script())
+
+        blender_trigger.write_to_script()
 
         return blender_object
 

@@ -316,7 +316,7 @@ class CaveObject(CaveFeature):
         if self["click_through"]:
             pass
             #TODO
-        blender_object.game.physics_type = 'NO_COLLISION'
+        blender_object.game.physics_type = 'DYNAMIC'
 
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]

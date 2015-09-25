@@ -9,6 +9,54 @@ except ImportError:
 Loading pycave.cave_logic.blender_trigger as standalone")
 
 
+def generate_project_root():
+    """Generate a "ROOT" object which is used to activate initial actions"""
+    if "ROOT" in bpy.data.objects:
+        return bpy.data.objects["ROOT"]
+    bpy.ops.object.add(
+        type="EMPTY",
+        layers=[layer == 20 for layer in range(1, 21)],
+    )
+    root_object = bpy.context.object
+    bpy.context.scene.objects.active = root_object
+    root_object.name = "ROOT"
+    bpy.ops.object.game_property_new(
+        type='BOOL',
+        name="ROOT"
+    )
+    root_object.game.properties["ROOT"].value = True
+    bpy.ops.logic.sensor_add(
+        type="PROPERTY",
+        object="ROOT",
+        name="ROOT"
+    )
+    root_object.game.sensors[-1].name = "ROOT"
+
+    root_object.game.sensors["ROOT"].property = "ROOT"
+    root_object.game.sensors["ROOT"].value = "True"
+
+    bpy.ops.logic.controller_add(
+        type='LOGIC_AND',
+        object="ROOT",
+        name="ROOT")
+    root_object.game.controllers[-1].name = "ROOT"
+    controller = root_object.game.controllers["ROOT"]
+    controller.link(sensor=root_object.game.sensors["ROOT"])
+
+    bpy.ops.logic.actuator_add(
+        type="PROPERTY",
+        object="ROOT",
+        name="run_once"
+    )
+    root_object.game.actuators[-1].name = "run_once"
+    root_object.game.actuators["run_once"].property = "ROOT"
+    root_object.game.actuators["run_once"].value = "False"
+
+    controller.link(actuator=root_object.game.actuators["run_once"])
+
+    return root_object
+
+
 class BlenderTrigger(object):
     """A control element used to activate events within Blender
 
@@ -64,7 +112,9 @@ class BlenderTrigger(object):
             type='BOOL',
             name=self.name
         )
-        return self.blender_object.game.properties[self.name]
+        control_property = self.blender_object.game.properties[self.name]
+        control_property.value = "False"
+        return control_property
 
     def create_control_sensor(self):
         """Create a sensor to detect when control property is set to True
@@ -120,6 +170,37 @@ class BlenderTrigger(object):
         self.controller.link(actuator=actuator)
         return actuator
 
+    def create_index_property(self):
+        """Create a property that keeps track of how many actions have been
+        triggered by this trigger
+
+        This index should increment with each action associated with this
+        trigger in order to keep track of which actions have already been
+        triggered. This is mostly useful for preventing timed actions from
+        being repeatedly triggered but may be used for other cases in which a
+        sensor remains active after the associated action has already occurred.
+        """
+        self.make_object_active()
+        property_name = "{}_index".format(self.name)
+        bpy.ops.object.game_property_new(
+            type='INTEGER',
+            name=property_name
+        )
+        index_property = self.blender_object.game.properties[property_name]
+        index_property.value = "0"
+        return index_property
+
+    def start_immediately(self):
+        """Causes trigger to start immediately when project starts"""
+        root_object = generate_project_root()
+        self.controller.link(sensor=root_object.game.sensors["ROOT"])
+        self.add_to_script_body("""
+    root_sensor = cont.sensors["ROOT"]
+    if root_sensor.positive:
+        control_actuator.value = "True"
+        cont.activate(control_actuator)
+        """)
+
     def get_script_template_values(self):
         """Generate a dictionary used to fill in templates which will create
         the control script for this trigger"""
@@ -127,12 +208,15 @@ class BlenderTrigger(object):
             "name": self.name,
             "control_sensor": self.control_sensor.name,
             "change_sensor": self.change_sensor.name,
+            "index_property": self.index_property.name,
             "control_actuator": self.actuator.name
         }
 
-    def add_to_script_body(self, script_string):
+    def add_to_script_body(self, script_string, section=0):
         """Append to body of script (after header but before footer)"""
-        self.body.append(script_string)
+        while len(self.body) <= section:
+            self.body.append([])
+        self.body[section].append(script_string)
 
     def write_to_script(self):
         """Write this trigger to the Python script associated with its
@@ -140,10 +224,14 @@ class BlenderTrigger(object):
         script_name = ".".join((self.blender_object_name, "py"))
         if script_name not in bpy.data.texts:
             bpy.data.texts.new(script_name)
+            bpy.data.texts[script_name].write("import bge")
         script = bpy.data.texts[script_name]
         template_values = self.get_script_template_values
         script.write("\n".join(self.header).format(**template_values))
-        script.write("\n".join(self.body).format(**template_values))
+        script.write("\n".join(
+            "\n".join(section) for section in self.body
+            ).format(**template_values)
+        )
         script.write("\n".join(self.footer).format(**template_values))
         return script
 
@@ -163,16 +251,26 @@ class BlenderTrigger(object):
         self.control_property = self.create_control_property()
         self.control_sensor = self.create_control_sensor()
         self.change_sensor = self.create_change_sensor()
+        self.index_property = self.create_index_property()
 
         self.header = ["""
 def activate_{name}(cont):
+    scene = bge.logic.getCurrentScene()
     own = cont.owner
     sensor = cont.sensors["{control_sensor}"]
     change_sensor = cont.sensors["{change_sensor}"]
     control_actuator = cont.actuators["{control_actuator}"]
 """]
         self.footer = [""]
-        self.body = []
+        self.body = [[], []]
+        # Note: Body is divided up into multiple sections to allow for
+        # separation of execution when order matters. For instance, after
+        # resetting the timer in a timed trigger, no timed actions should be
+        # activated until the next frame.
+        self.add_to_script_body("""
+    if sensor.positive and change_sensor.positive:
+        own["{index_property}"] = 0
+        """)
 
 
 class TimedTrigger(BlenderTrigger):
@@ -235,23 +333,6 @@ class TimedTrigger(BlenderTrigger):
         )
         return template_values
 
-    def add_to_timed_body(self, script_string):
-        """Append to timed section of script
-
-        All timed events are invoked after all immediate or untimed events.
-        This allows the timer to be reset if necessary before moving on to
-        timed events"""
-        self.timed_body.append(script_string)
-
-    def write_to_script(self):
-        # TODO: This is highly inelegant. Figure out a good way to do this
-        # without separate body and timed_body sections
-        body_len = len(self.body)
-        self.body.extend(self.timed_body)
-        script = super(TimedTrigger, self).write_to_script()
-        self.body = self.body[:body_len]
-        return script
-
     def __init__(self, blender_object_name, duration):
         super(TimedTrigger, self).__init__(blender_object_name)
         self.duration = duration
@@ -263,11 +344,11 @@ class TimedTrigger(BlenderTrigger):
     duration_sensor = cont.sensors["{duration_sensor}"]
     """)
 
-        self.timed_body = ["""
+        self.add_to_script_body("""
     if sensor.positive and change_sensor.positive:
         own["{timer_name}"] = 0
         return
-        """]
+        """, section=1)
 
         self.footer.append("""
     if sensor.positive and duration_sensor.positive:

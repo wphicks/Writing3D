@@ -9,6 +9,7 @@ from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
 from .cave_logic.blender_trigger import BlenderTrigger, TimedTrigger
+from .cave_logic.blender_action import ActivateOtherAction
 try:
     import bpy
 except ImportError:
@@ -154,14 +155,31 @@ class CaveTimeline(CaveFeature):
             blender_trigger = BlenderTrigger(timeline_name)
         else:
             blender_trigger = TimedTrigger(timeline_name, duration)
+        if self["start_immediately"]:
+            blender_trigger.start_immediately()
 
+        action_index = 0
         for time, action in self["actions"]:
+            action.blend()
+            activation = ActivateOtherAction(
+                blender_trigger,
+                action.blender_action)
             if time <= 0:
                 blender_trigger.add_to_script_body("""
     if sensor.positive and change_sensor.positive:""")
+                blender_trigger.add_to_script_body(
+                    activation.create_on_script()
+                )
             else:
                 time_sensor = blender_trigger.create_time_sensor(time)
-                blender_trigger.add_to_timed_body("""
-    if sensor.positive and cont.sensors["{time_sensor}"].positive:""".format(
-                    time_sensor.name)
+                blender_trigger.add_to_script_body("""
+    if (sensor.positive and cont.sensors["{time_sensor}"].positive
+        and own["{index_property}"] == {index}:""".format(
+                    time_sensor=time_sensor.name,
+                    index_property=blender_trigger.index_property.name,
+                    index=action_index), section=1
                 )
+                blender_trigger.add_to_script_body(
+                    activation.create_on_script(), section=1)
+            action_index += 1
+        blender_trigger.write_to_script()
