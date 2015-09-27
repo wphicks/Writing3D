@@ -9,7 +9,7 @@ from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
 from .cave_logic.blender_trigger import BlenderTrigger, TimedTrigger
-from .cave_logic.blender_action import ActivateOtherAction
+from .cave_logic.blender_action import ActivateTrigger
 try:
     import bpy
 except ImportError:
@@ -161,9 +161,9 @@ class CaveTimeline(CaveFeature):
         action_index = 0
         for time, action in self["actions"]:
             action.blend()
-            activation = ActivateOtherAction(
+            activation = ActivateTrigger(
                 blender_trigger,
-                action.blender_action)
+                action.blender_trigger)
             if time <= 0:
                 blender_trigger.add_to_script_body("""
     if sensor.positive and change_sensor.positive:""")
@@ -174,7 +174,7 @@ class CaveTimeline(CaveFeature):
                 time_sensor = blender_trigger.create_time_sensor(time)
                 blender_trigger.add_to_script_body("""
     if (sensor.positive and cont.sensors["{time_sensor}"].positive
-        and own["{index_property}"] == {index}:""".format(
+        and own["{index_property}"] == {index}):""".format(
                     time_sensor=time_sensor.name,
                     index_property=blender_trigger.index_property.name,
                     index=action_index), section=1

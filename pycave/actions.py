@@ -181,28 +181,31 @@ class ObjectAction(CaveAction):
         blender_object = bpy.data.objects[self.blender_object_name]
         bpy.context.scene.objects.active = blender_object
 
-        blender_trigger = TimedTrigger(
+        self.blender_trigger = TimedTrigger(
             self.blender_object_name, self["duration"])
 
         actions = []
 
         if "placement" in self:
-            actions.append(LinearMovement(blender_trigger, self["placement"]))
+            actions.append(
+                LinearMovement(self.blender_trigger, self["placement"]))
 
         if len(actions) != 0:
-            blender_trigger.add_to_script_body("""
+            self.blender_trigger.add_to_script_body("""
     if sensor.positive and change_sensor.positive:
             """)
             for action_ in actions:
-                blender_trigger.add_to_script_body(action_.create_on_script())
+                self.blender_trigger.add_to_script_body(
+                    action_.create_on_script())
             if self["duration"] != 0:
-                blender_trigger.add_to_script_body("""
-    if sensor.negative and change_sensor.positive:
+                self.blender_trigger.add_to_script_body("""
+    if not sensor.positive and change_sensor.positive:
                 """)
             for action_ in actions:
-                blender_trigger.add_to_script_body(action_.create_off_script())
+                self.blender_trigger.add_to_script_body(
+                    action_.create_off_script())
 
-        blender_trigger.write_to_script()
+        self.blender_trigger.write_to_script()
 
         return blender_object
 

@@ -11,7 +11,6 @@ from .actions import CaveAction
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
-from .cave_logic import generate_object_control_script
 import warnings
 try:
     import bpy
@@ -317,14 +316,13 @@ class CaveObject(CaveFeature):
             pass
             #TODO
         blender_object.game.physics_type = 'DYNAMIC'
+        blender_object.game.use_ghost = True
 
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
         #TODO: Add around_own_axis
         #TODO: Add sound
-
-        generate_object_control_script(blender_object.name)
 
         return blender_object
 

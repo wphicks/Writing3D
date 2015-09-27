@@ -97,7 +97,8 @@ class BlenderTrigger(object):
             name=self.name)
         controller = self.blender_object.game.controllers[self.name]
         controller.mode = "MODULE"
-        controller.module = "{}.{}".format(self.blender_object_name, self.name)
+        controller.module = "{}.activate_{}".format(
+            self.blender_object_name, self.name)
         return controller
 
     def create_control_property(self):
@@ -113,7 +114,7 @@ class BlenderTrigger(object):
             name=self.name
         )
         control_property = self.blender_object.game.properties[self.name]
-        control_property.value = "False"
+        control_property.value = False
         return control_property
 
     def create_control_sensor(self):
@@ -127,6 +128,7 @@ class BlenderTrigger(object):
             object=self.blender_object_name,
             name=self.name
         )
+        self.blender_object.game.sensors[-1].name = self.name
         sensor = self.blender_object.game.sensors[self.name]
         sensor.property = self.name
         sensor.value = "True"
@@ -164,6 +166,7 @@ class BlenderTrigger(object):
             object=self.blender_object_name,
             name=self.name
         )
+        self.blender_object.game.actuators[-1].name = self.name
         actuator = self.blender_object.game.actuators[self.name]
         actuator.property = self.name
         actuator.value = "True"
@@ -183,11 +186,11 @@ class BlenderTrigger(object):
         self.make_object_active()
         property_name = "{}_index".format(self.name)
         bpy.ops.object.game_property_new(
-            type='INTEGER',
+            type='INT',
             name=property_name
         )
         index_property = self.blender_object.game.properties[property_name]
-        index_property.value = "0"
+        index_property.value = 0
         return index_property
 
     def start_immediately(self):
@@ -226,7 +229,7 @@ class BlenderTrigger(object):
             bpy.data.texts.new(script_name)
             bpy.data.texts[script_name].write("import bge")
         script = bpy.data.texts[script_name]
-        template_values = self.get_script_template_values
+        template_values = self.get_script_template_values()
         script.write("\n".join(self.header).format(**template_values))
         script.write("\n".join(
             "\n".join(section) for section in self.body
@@ -241,8 +244,8 @@ class BlenderTrigger(object):
         # Create a unique name for this trigger
         trigger_count = 0
         while True:
-            trigger_name = "trigger_{}".format(trigger_count)
-            if trigger_name not in self.blender_object.game.controllers:
+            self.name = "trigger_{}".format(trigger_count)
+            if self.name not in self.blender_object.game.controllers:
                 break
             trigger_count += 1
 
@@ -326,7 +329,7 @@ class TimedTrigger(BlenderTrigger):
     def get_script_template_values(self):
         template_values = super(
             TimedTrigger, self).get_script_template_values()
-        template_values.extend({
+        template_values.update({
             "duration_sensor": self.duration_sensor.name,
             "timer_name": self.timer_name
             }
@@ -338,7 +341,7 @@ class TimedTrigger(BlenderTrigger):
         self.duration = duration
         self.timer_name = "{}_timer".format(self.name)
         self.timer = self.create_timer_property()
-        self.duration_sensor = self.create_duration_sensor(self.duration)
+        self.duration_sensor = self.create_time_sensor(self.duration)
 
         self.header.append("""
     duration_sensor = cont.sensors["{duration_sensor}"]

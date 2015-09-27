@@ -14,7 +14,6 @@ from .timeline import CaveTimeline
 from .groups import CaveGroup
 from .triggers import CaveTrigger
 from .errors import BadCaveXML
-from .cave_logic import generate_project_root
 try:
     import bpy
 except ImportError:
@@ -301,7 +300,6 @@ class CaveProject(CaveFeature):
     def blend(self):
         """Create representation of CaveProject in Blender"""
         clear_blender_scene()
-        generate_project_root()
         bpy.data.scenes["Scene"].game_settings.physics_gravity = 0
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
