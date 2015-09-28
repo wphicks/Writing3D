@@ -95,6 +95,7 @@ class LinearMovement(BlenderAction):
         motion_actuator.linV = [
             (target_position[i] - own.position[i])/{duration} for i in
             range(3)]
+        print(own.orientation)
         cont.activate(motion_actuator)""".format(
                 duration=duration,
                 target_position=tuple(target_placement["position"]),
@@ -114,3 +115,7 @@ class LinearMovement(BlenderAction):
             motion_actuator=motion_actuator.name
             )
         )
+
+
+class VisibilityChange(BlenderAction):
+    """Used to change the visibility of a Blender object"""

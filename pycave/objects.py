@@ -429,6 +429,7 @@ class CaveText(CaveContent):
     def blend(self):
         """Create representation of CaveText in Blender"""
         bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
+        bpy.ops.object.transform_apply(rotation=True)
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
         #TODO: Get proper font directory
@@ -484,6 +485,7 @@ class CaveImage(CaveContent):
     def blend(self):
         """Create representation of CaveImage in Blender"""
         bpy.ops.mesh.primitive_plane_add(rotation=(math.pi/2, 0, 0))
+        bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
 
         material = generate_material_from_image(self["filename"])
@@ -707,6 +709,8 @@ class CaveLight(CaveContent):
             type=light_type_conversion[self["light_type"]],
             rotation=(-math.pi/2, 0, 0)
         )
+        # TODO: Why isn't the following working?
+        # bpy.ops.object.transform_apply(rotation=True)
         new_light_object = bpy.context.object
         new_light_object.data.use_diffuse = self["diffuse"]
         new_light_object.data.use_specular = self["specular"]
