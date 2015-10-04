@@ -309,3 +309,6 @@ class CaveProject(CaveFeature):
         self["desktop_camera_placement"].place(self.main_camera)
         for object_ in self["objects"]:
             object_.blend()
+        for timeline in self["timelines"]:
+            timeline.blend()
+            timeline.write_blender_logic()

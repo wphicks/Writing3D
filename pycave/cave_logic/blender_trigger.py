@@ -227,7 +227,9 @@ class BlenderTrigger(object):
         script_name = ".".join((self.blender_object_name, "py"))
         if script_name not in bpy.data.texts:
             bpy.data.texts.new(script_name)
-            bpy.data.texts[script_name].write("import bge")
+            bpy.data.texts[script_name].write("""
+import bge
+from mathutils import Quaternion""")
         script = bpy.data.texts[script_name]
         template_values = self.get_script_template_values()
         script.write("\n".join(self.header).format(**template_values))

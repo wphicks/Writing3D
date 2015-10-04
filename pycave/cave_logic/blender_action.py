@@ -77,29 +77,46 @@ class LinearMovement(BlenderAction):
             )
             motion_actuator = self.trigger.blender_object.game.actuators[
                 "MOVE"]
-            motion_actuator.mode = "OBJECT_SERVO"
+            motion_actuator.mode = "OBJECT_NORMAL"
         self.trigger.controller.link(actuator=motion_actuator)
         return motion_actuator
 
-    def __init__(self, trigger, target_placement):
-        super(LinearMovement, self).__init__(trigger)
-        motion_actuator = self.create_movement_actuator()
-        try:
-            duration = trigger.duration
-        except AttributeError:
-            duration = 0
-        if duration != 0:
+    def create_rotation_logic(self):
+        """Add rotation logic to trigger script"""
+        if self.target_placement["rotation"]["rotation_mode"] == "Axis":
+            target_rotation = self.target_placement[
+                "rotation"].get_rotation_matrix(
+                self.trigger.blender_object).to_quaternion()
+            if self.relative:
+                pass
+            else:
+                self.on_body.append("""
+        #rotation = own.
+        print(dir(own))""")
+
+    def create_position_logic(self):
+        """Add positional movement logic to trigger script"""
+        if self.duration != 0:
+            if self.relative:
+                self.on_body.append("""
+        target_position = [own.position[i] + {target_position}[i] for i in
+            range(3)]""".format(
+                    target_position=tuple(self.target_placement["position"]))
+                )
+            else:
+                self.on_body.append("""
+        target_position = {target_position}""".format(
+                    target_position=tuple(self.target_placement["position"]))
+                )
             self.on_body.append("""
-        target_position = {target_position}
         motion_actuator = cont.actuators["{motion_actuator}"]
         motion_actuator.linV = [
             (target_position[i] - own.position[i])/{duration} for i in
             range(3)]
-        print(own.orientation)
         cont.activate(motion_actuator)""".format(
-                duration=duration,
-                target_position=tuple(target_placement["position"]),
-                motion_actuator=motion_actuator.name
+                duration=self.duration,
+                target_position=tuple(self.target_placement["position"]),
+                motion_actuator=self.motion_actuator.name
                 )
             )
         self.off_body.append("""
@@ -110,11 +127,25 @@ class LinearMovement(BlenderAction):
             for i in range(3)]
         cont.activate(motion_actuator)
         motion_actuator.dLoc = [0, 0, 0]
+        own.setLinearVelocity([0,0,0]) # Nasty workaround for Blender 2.69
         cont.activate(motion_actuator)""".format(
-            target_position=tuple(target_placement["position"]),
-            motion_actuator=motion_actuator.name
+            target_position=tuple(self.target_placement["position"]),
+            motion_actuator=self.motion_actuator.name
             )
         )
+
+    def __init__(self, trigger, target_placement, relative=False):
+        super(LinearMovement, self).__init__(trigger)
+        self.relative = relative
+        self.motion_actuator = self.create_movement_actuator()
+        self.trigger = trigger
+        self.target_placement = target_placement
+        try:
+            self.duration = trigger.duration
+        except AttributeError:
+            self.duration = 0
+        self.create_position_logic()
+        self.create_rotation_logic()
 
 
 class VisibilityChange(BlenderAction):

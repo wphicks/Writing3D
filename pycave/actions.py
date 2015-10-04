@@ -98,7 +98,8 @@ class ObjectAction(CaveAction):
             parent_root, "ObjectChange", attrib={"name": self["object_name"]}
             )
         trans_root = ET.SubElement(
-            change_root, "Transition", attrib={"duration": self["duration"]})
+            change_root, "Transition",
+            attrib={"duration": str(self["duration"])})
         if "visible" in self:
             node = ET.SubElement(trans_root, "Visible")
             node.text = bool2text(self["visible"])
@@ -177,7 +178,7 @@ class ObjectAction(CaveAction):
 
     def blend(self):
         """Create representation of change in Blender"""
-        self.blender_object_name = "_".join((self["object_name"], "object"))
+        self.blender_object_name = "_".join(("object", self["object_name"]))
         blender_object = bpy.data.objects[self.blender_object_name]
         bpy.context.scene.objects.active = blender_object
 
@@ -205,9 +206,16 @@ class ObjectAction(CaveAction):
                 self.blender_trigger.add_to_script_body(
                     action_.create_off_script())
 
-        self.blender_trigger.write_to_script()
-
         return blender_object
+
+    def write_blender_logic(self):
+        """Write Python logic for this action to necessary scripts"""
+        try:
+            return self.blender_trigger.write_to_script()
+        except AttributeError:
+            warnings.warn(
+                "blend() method must be called before write_blender_logic()")
+            return None
 
 
 class GroupAction(CaveAction):

@@ -152,34 +152,44 @@ class CaveTimeline(CaveFeature):
 
         duration = self["actions"][-1][0]
         if duration <= 0:
-            blender_trigger = BlenderTrigger(timeline_name)
+            self.blender_trigger = BlenderTrigger(timeline_name)
         else:
-            blender_trigger = TimedTrigger(timeline_name, duration)
+            self.blender_trigger = TimedTrigger(timeline_name, duration)
         if self["start_immediately"]:
-            blender_trigger.start_immediately()
+            self.blender_trigger.start_immediately()
 
         action_index = 0
         for time, action in self["actions"]:
             action.blend()
             activation = ActivateTrigger(
-                blender_trigger,
+                self.blender_trigger,
                 action.blender_trigger)
             if time <= 0:
-                blender_trigger.add_to_script_body("""
+                self.blender_trigger.add_to_script_body("""
     if sensor.positive and change_sensor.positive:""")
-                blender_trigger.add_to_script_body(
+                self.blender_trigger.add_to_script_body(
                     activation.create_on_script()
                 )
             else:
-                time_sensor = blender_trigger.create_time_sensor(time)
-                blender_trigger.add_to_script_body("""
+                time_sensor = self.blender_trigger.create_time_sensor(time)
+                self.blender_trigger.add_to_script_body("""
     if (sensor.positive and cont.sensors["{time_sensor}"].positive
         and own["{index_property}"] == {index}):""".format(
                     time_sensor=time_sensor.name,
-                    index_property=blender_trigger.index_property.name,
+                    index_property=self.blender_trigger.index_property.name,
                     index=action_index), section=1
                 )
-                blender_trigger.add_to_script_body(
+                self.blender_trigger.add_to_script_body(
                     activation.create_on_script(), section=1)
             action_index += 1
-        blender_trigger.write_to_script()
+
+    def write_blender_logic(self):
+        """Write Python logic for this action to necessary scripts"""
+        try:
+            for time, action in self["actions"]:
+                action.write_blender_logic()
+            return self.blender_trigger.write_to_script()
+        except AttributeError:
+            warnings.warn(
+                "blend() method must be called before write_blender_logic()")
+            return None

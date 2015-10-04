@@ -303,7 +303,7 @@ class CaveObject(CaveFeature):
     def blend(self):
         """Create representation of CaveObject in Blender"""
         blender_object = self["content"].blend()
-        blender_object.name = "_".join((self["name"], "object"))
+        blender_object.name = "_".join(("object", self["name"]))
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
         if "depth" in self["content"]:
@@ -325,6 +325,15 @@ class CaveObject(CaveFeature):
         #TODO: Add sound
 
         return blender_object
+
+    def write_blender_logic(self):
+        """Write Python logic for this object to associated script"""
+        try:
+            return self.blender_trigger.write_to_script()
+        except AttributeError:
+            warnings.warn(
+                "blend() method must be called before write_blender_logic()")
+            return None
 
 
 class CaveContent(CaveFeature):
