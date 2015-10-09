@@ -91,8 +91,36 @@ class LinearMovement(BlenderAction):
                 pass
             else:
                 self.on_body.append("""
-        #rotation = own.
-        print(dir(own))""")
+        rotation = own.orientation.to_quaternion()
+        target_rotation = Quaternion()
+        target_rotation.w={w}
+        target_rotation.x={x}
+        target_rotation.y={y}
+        target_rotation.z={z}
+        rotation_delta = target_rotation.rotation_difference(rotation)
+        angular_velocity = rotation_delta.angle*rotation_delta.axis/{duration}
+        motion_actuator = cont.actuators["{motion_actuator}"]
+        motion_actuator.angV = angular_velocity
+        cont.activate(motion_actuator)
+        """.format(
+                    w=target_rotation.w,
+                    x=target_rotation.x,
+                    y=target_rotation.y,
+                    z=target_rotation.z,
+                    duration=self.duration,
+                    motion_actuator=self.motion_actuator.name
+                    )
+                )
+        self.off_body.append("""
+        motion_actuator = cont.actuators["{motion_actuator}"]
+        motion_actuator.angV = [0, 0, 0]
+        own.angularVelocity = [0, 0, 0]
+        print(own.angularVelocity)
+        cont.activate(motion_actuator)
+        """.format(
+            motion_actuator=self.motion_actuator.name
+            )
+        )
 
     def create_position_logic(self):
         """Add positional movement logic to trigger script"""
