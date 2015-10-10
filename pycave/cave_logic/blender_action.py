@@ -177,4 +177,39 @@ class LinearMovement(BlenderAction):
 
 
 class VisibilityChange(BlenderAction):
-    """Used to change the visibility of a Blender object"""
+    """Used to change the visibility of a Blender object
+
+    :param bool visibility: Whether object should be visible after action has
+    been executed"""
+
+    def create_visibility_actuator(self):
+        try:
+            visibility_actuator = self.trigger.blender_object.game.actuators[
+                "VISIBILITY"]
+        except KeyError:
+            self.trigger.make_object_active()
+            bpy.ops.logic.actuator_add(
+                type="VISIBILITY",
+                object=self.trigger.blender_object_name,
+                name="VISIBILITY"
+            )
+            visibility_actuator = self.trigger.blender_object.game.actuators[
+                "VISIBILITY"]
+        self.trigger.controller.link(actuator=visibility_actuator)
+        return visibility_actuator
+
+    def create_visibility_logic(self):
+        self.on_body.append("""
+        visibility_actuator = cont.actuators["{visibility_actuator}"]
+        visibility_actuator.visibility = {visibility}
+        cont.activate(visibility_actuator)""".format(
+            visibility_actuator=self.visibility_actuator.name,
+            visibility=self.visibility
+            )
+        )
+
+    def __init__(self, trigger, visibility):
+        super(VisibilityChange, self).__init__(trigger)
+        self.visibility = visibility
+        self.visibility_actuator = self.create_visibility_actuator()
+        self.create_visibility_logic()

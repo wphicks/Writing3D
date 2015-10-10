@@ -12,7 +12,7 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .cave_logic.blender_trigger import TimedTrigger
-from .cave_logic.blender_action import LinearMovement
+from .cave_logic.blender_action import LinearMovement, VisibilityChange
 try:
     import bpy
 except ImportError:
@@ -190,6 +190,10 @@ class ObjectAction(CaveAction):
         if "placement" in self:
             actions.append(
                 LinearMovement(self.blender_trigger, self["placement"]))
+        if "visible" in self:
+            actions.append(
+                VisibilityChange(self.blender_trigger, self["visible"])
+            )
 
         if len(actions) != 0:
             self.blender_trigger.add_to_script_body("""
