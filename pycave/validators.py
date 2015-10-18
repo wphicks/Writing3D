@@ -1,21 +1,32 @@
 """Tools for validating options provided to Cave features"""
-# TODO: convert to universal help and help strings
 
 
-class OptionListValidator(object):
+class Validator(object):
+    """Callable object for validating input"""
+
+    def __init__(self):
+        self.help_string = "No help available for this option"
+
+    def __call__(self, value):
+        return False
+
+    def help(self):
+        return self.help_string
+
+
+class OptionListValidator(Validator):
     """Callable object that returns true if value is in given list"""
 
     def __init__(self, *valid_options):
         self.valid_options = set(valid_options)
+        self.help_string = "Value must be one of " + " ,".join(
+            self.valid_options)
 
     def __call__(self, value):
         return value in self.valid_options
 
-    def help(self):
-        return "Value must be one of " + " ,".join(self.valid_options)
 
-
-class IsNumeric(object):
+class IsNumeric(Validator):
     """Return true if value can be interpreted as a numeric type
 
     :param min_value: Optionally sets minimum value. If set to None, check is
@@ -48,11 +59,8 @@ class IsNumeric(object):
         except TypeError:
             return False
 
-    def help(self):
-        return self.help_string
 
-
-class IsNumericIterable(object):
+class IsNumericIterable(Validator):
     """Callable object that returns true if value is a numeric iterable
 
     :param required_length: Optionally sets required length for iterable. If
@@ -60,6 +68,12 @@ class IsNumericIterable(object):
 
     def __init__(self, required_length=None):
         self.required_length = required_length
+        if self.required_length is not None:
+            self.help_sting = \
+                "Value must be a sequence of {} numeric values".format(
+                    self.required_length)
+        else:
+            self.help_string = "Value must be a sequence of numeric values"
 
     def __call__(self, iterable):
         try:
@@ -71,31 +85,8 @@ class IsNumericIterable(object):
         except TypeError:
             return False  # Non-iterable
 
-    def help(self):
-        if self.required_length is not None:
-            return "Value must be a sequence of {} numeric values".format(
-                self.required_length)
-        return "Value must be a sequence of numeric values"
 
-
-class CheckType(object):
-    """Check if type of object matches one of specified types"""
-
-    def __init__(self, *correct_types):
-        self.correct_types = correct_types
-
-    def __call__(self, value):
-        raise NotImplementedError
-        for type_ in self.correct_types:
-            if isinstance(type_, value):
-                return True
-        return False
-
-    def help(self):
-        return "Value must be one of {}".format(str(self.correct_types)[1:-2])
-
-
-class AlwaysValid(object):
+class AlwaysValid(Validator):
     """Always returns True"""
 
     def __init__(self,
@@ -105,5 +96,26 @@ class AlwaysValid(object):
     def __call__(self, value):
         return True
 
-    def help(self):
-        return self.help_string
+
+class CheckClass(Validator):
+    """Returns True if value is of given class
+
+    Also offers the "coerce" method, which will attempt to create object of
+    specified class from value.
+    Note: While this is not an especially Pythonic check, it is used sparsely
+    and avoids the hassle of building up individual validators for input
+    purposes."""
+
+    def __init__(self, correct_class=bool, help_string=None):
+        self.correct_class = correct_class
+        if help_string is None:
+            self.help_string = "Value must be of type {}".format(
+                self.correct_class)
+        else:
+            self.help_string = help_string
+
+    def __call__(self, value):
+        return isinstance(value, self.correct_class)
+
+    def coerce(self, value):
+        return self.correct_class(value)
