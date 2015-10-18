@@ -431,6 +431,10 @@ class TimelineAction(CaveAction):
 
     def blend(self):
         """Create representation of change in Blender"""
+        self.blender_object_name = "_".join(
+            (self["timeline_name"], "timeline"))
+        #self.blender_trigger = BlenderTrigger(self.blender_object_name)
+        #self.blender_action = ActivateTrigger(
         raise NotImplementedError  # TODO
 
 

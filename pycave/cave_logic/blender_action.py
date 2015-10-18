@@ -37,24 +37,77 @@ class BlenderAction(object):
 
 
 class ActivateTrigger(BlenderAction):
-    """Used to activate a BlenderTrigger
+    """Used to activate or pause a BlenderTrigger
 
     :param BlenderAction other_trigger: The trigger to activate"""
 
-    def __init__(self, trigger, other_trigger):
+    def __init__(self, trigger, other_trigger, action="Start"):
         super(ActivateTrigger, self).__init__(trigger)
         self.other_trigger = other_trigger
         self.trigger.controller.link(actuator=other_trigger.actuator)
         self.on_body.append("""
-        current_actuator = scene.objects["{other_object_name}"].actuators[
+        other_object = scene.objects["{other_object_name}"]
+        current_actuator = other_object.actuators[
             "{actuator_name}"]
-        current_actuator.value = "True"
-        cont.activate(current_actuator)
         """.format(
-            object_name=self.trigger.blender_object_name,
             other_object_name=self.other_trigger.blender_object_name,
             actuator_name=other_trigger.actuator.name)
         )
+        if action == "Start":
+            self.on_body.append("""
+        current_actuator.value = "True"
+        other_object["{pause_index_property}"] = 0
+        other_object["{pause_time_property}"] = 0
+        cont.activate(current_actuator)
+        """.format(
+                pause_index_property=self.other_trigger.pause_index_name,
+                pause_time_property=self.other_trigger.pause_time_name)
+            )
+        elif action == "Stop":
+            self.on_body.append("""
+        current_actuator.value = "False"
+        other_object["{pause_index_property}"] = other_object[
+            "{index_property}"]
+        """.format(
+                pause_index_property=self.other_trigger.pause_index_name)
+            )
+            try:
+                self.on_body.append("""
+        other_object["{pause_time_property}"] = other_object[
+            "{time_property}"]
+        """.format(
+                    pause_time_property=self.other_trigger.pause_time_name,
+                    time_property=self.other_trigger.timer_name
+                    )
+                )
+            except AttributeError:
+                pass
+            self.on_body.append("""
+        cont.activate(current_actuator)
+            """)
+        elif action == "Continue":
+            self.on_body.append("""
+        current_actuator.value = "True"
+        cont.activate(current_actuator)
+        """)
+        elif action == "Start if not started":
+            self.on_body.append("""
+        if other_object["{trigger_name}"]:
+            current_actuator.value = "True"
+            other_object["{pause_index_property}"] = 0
+        """.format(
+                trigger_name=self.other_trigger.name,
+                pause_index_property=self.other_trigger.pause_index_name)
+            )
+            try:
+                self.on_body.append("""
+            other_object["{pause_time_property}"] = 0
+        """.format(pause_time_property=self.other_trigger.pause_time_name))
+            except AttributeError:
+                pass
+            self.on_body.append("""
+            cont.activate(current_actuator)
+            """)
 
 
 class LinearMovement(BlenderAction):
@@ -115,7 +168,6 @@ class LinearMovement(BlenderAction):
         motion_actuator = cont.actuators["{motion_actuator}"]
         motion_actuator.angV = [0, 0, 0]
         own.angularVelocity = [0, 0, 0]
-        print(own.angularVelocity)
         cont.activate(motion_actuator)
         """.format(
             motion_actuator=self.motion_actuator.name

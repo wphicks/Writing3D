@@ -75,9 +75,6 @@ class CaveFeature(dict):
         raise NotImplementedError("fromXML not defined for this feature")
 
     def is_default(self, key):
-        """Return true if value equals default for key, false otherwise"""
-        try:
-            return self[key] == self.default_arguments[key]
-        except KeyError:
-            # If no default exists, always return False
-            return False
+        """Return true if value has not been set for key and default exists,
+        false otherwise"""
+        return (key not in self and key in self.default_arguments)

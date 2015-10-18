@@ -173,6 +173,28 @@ class BlenderTrigger(object):
         self.controller.link(actuator=actuator)
         return actuator
 
+    def create_pause_index_property(self):
+        """Create a property which will keep track of timer value when last
+        stopped
+
+        This property is used to facilitate pausing of an action or series of
+        actions. For instance, when a timeline is stopped, the current action
+        index is stored. If the timeline is then told to continue, the action
+        index will be set to the stored index, allowing execution to continue
+        from that point.  This property will have a name specified by the
+        pause_index_name attribute of this object. See also the
+        create_pause_time_property method for TimedTrigger objects.
+        """
+        self.make_object_active()
+        bpy.ops.object.game_property_new(
+            type='INT',
+            name=self.pause_index_name
+        )
+        pause_property = self.blender_object.game.properties[
+            self.pause_index_name]
+        pause_property.value = 0
+        return pause_property
+
     def create_index_property(self):
         """Create a property that keeps track of how many actions have been
         triggered by this trigger
@@ -212,7 +234,8 @@ class BlenderTrigger(object):
             "control_sensor": self.control_sensor.name,
             "change_sensor": self.change_sensor.name,
             "index_property": self.index_property.name,
-            "control_actuator": self.actuator.name
+            "control_actuator": self.actuator.name,
+            "pause_index_property": self.pause_index_name
         }
 
     def add_to_script_body(self, script_string, section=0):
@@ -257,6 +280,8 @@ from mathutils import Quaternion""")
         self.control_sensor = self.create_control_sensor()
         self.change_sensor = self.create_change_sensor()
         self.index_property = self.create_index_property()
+        self.pause_index_name = "{}_pausei".format(self.name)
+        self.create_pause_index_property()
 
         self.header = ["""
 def activate_{name}(cont):
@@ -274,7 +299,7 @@ def activate_{name}(cont):
         # activated until the next frame.
         self.add_to_script_body("""
     if sensor.positive and change_sensor.positive:
-        own["{index_property}"] = 0
+        own["{index_property}"] = own["{pause_index_property}"]
         """)
 
 
@@ -283,6 +308,28 @@ class TimedTrigger(BlenderTrigger):
 
     TimedTriggers also create an associated Timer property in Blender which
     keeps track of how long they have been active"""
+
+    def create_pause_time_property(self):
+        """Create a property which will keep track of timer value when last
+        stopped
+
+        This property is used to facilitate pausing of an action or series of
+        actions. For instance, when a timeline is stopped, the current time is
+        stored. If the timeline is then told to continue, the timer will be set
+        to the stored time, allowing execution to continue from that point.
+        This property will have a name specified by the pause_time_name
+        attribute of this object. See also the create_pause_index_property
+        method.
+        """
+        self.make_object_active()
+        bpy.ops.object.game_property_new(
+            type='FLOAT',
+            name=self.pause_time_name
+        )
+        pause_property = self.blender_object.game.properties[
+            self.pause_time_name]
+        pause_property.value = 0
+        return pause_property
 
     def create_timer_property(self):
         """Create a property which will keep track of time since activation
@@ -333,7 +380,8 @@ class TimedTrigger(BlenderTrigger):
             TimedTrigger, self).get_script_template_values()
         template_values.update({
             "duration_sensor": self.duration_sensor.name,
-            "timer_name": self.timer_name
+            "timer_name": self.timer_name,
+            "pause_time_property": self.pause_time_name
             }
         )
         return template_values
@@ -342,8 +390,10 @@ class TimedTrigger(BlenderTrigger):
         super(TimedTrigger, self).__init__(blender_object_name)
         self.duration = duration
         self.timer_name = "{}_timer".format(self.name)
+        self.pause_time_name = "{}_pauset".format(self.name)
         self.timer = self.create_timer_property()
         self.duration_sensor = self.create_time_sensor(self.duration)
+        self.create_pause_time_property()
 
         self.header.append("""
     duration_sensor = cont.sensors["{duration_sensor}"]
@@ -351,7 +401,7 @@ class TimedTrigger(BlenderTrigger):
 
         self.add_to_script_body("""
     if sensor.positive and change_sensor.positive:
-        own["{timer_name}"] = 0
+        own["{timer_name}"] = own["{pause_time_property}"]
         return
         """, section=1)
 
