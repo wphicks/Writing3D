@@ -158,12 +158,14 @@ class CaveTimeline(CaveFeature):
         if self["start_immediately"]:
             self.blender_trigger.start_immediately()
 
+    def blend_actions(self):
         action_index = 0
         for time, action in self["actions"]:
             action.blend()
             activation = ActivateTrigger(
                 self.blender_trigger,
-                action.blender_trigger)
+                action.blender_trigger.blender_object_name,
+                action.blender_trigger.actuator.name)
             if time <= 0:
                 self.blender_trigger.add_to_script_body("""
     if sensor.positive and change_sensor.positive:""")
@@ -185,6 +187,7 @@ class CaveTimeline(CaveFeature):
 
     def write_blender_logic(self):
         """Write Python logic for this action to necessary scripts"""
+        self.blend_actions()
         try:
             for time, action in self["actions"]:
                 action.write_blender_logic()

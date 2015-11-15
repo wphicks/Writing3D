@@ -311,4 +311,5 @@ class CaveProject(CaveFeature):
             object_.blend()
         for timeline in self["timelines"]:
             timeline.blend()
+        for timeline in self["timelines"]:
             timeline.write_blender_logic()

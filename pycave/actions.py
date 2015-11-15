@@ -11,8 +11,9 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
-from .cave_logic.blender_trigger import TimedTrigger
-from .cave_logic.blender_action import LinearMovement, VisibilityChange
+from .cave_logic.blender_trigger import TimedTrigger, BlenderTrigger
+from .cave_logic.blender_action import LinearMovement, VisibilityChange,\
+    ActivateTrigger
 try:
     import bpy
 except ImportError:
@@ -431,11 +432,16 @@ class TimelineAction(CaveAction):
 
     def blend(self):
         """Create representation of change in Blender"""
-        self.blender_object_name = "_".join(
-            (self["timeline_name"], "timeline"))
-        #self.blender_trigger = BlenderTrigger(self.blender_object_name)
-        #self.blender_action = ActivateTrigger(
-        raise NotImplementedError  # TODO
+        timeline_name = "_".join((self["timeline_name"], "timeline"))
+        timeline_object = bpy.data.objects[timeline_name]
+        bpy.context.scene.objects.active = timeline_object
+        trigger_name = "trigger_0"  # Trigger for whole timeline should always
+                                    # be zeroth trigger
+        self.blender_trigger = BlenderTrigger(timeline_name)
+        self.blender_action = ActivateTrigger(
+            self.blender_trigger, timeline_name, trigger_name,
+            action=self["change"])
+        return timeline_object
 
 
 class SoundAction(CaveAction):
