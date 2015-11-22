@@ -239,7 +239,7 @@ class CaveTimeline(CaveFeature):
             "            if own['offset_time'] != 0:",
             "                own['start_time'] = (",
             "                    monotonic() - own['offset_time'])",
-            "                own['offset_time] = 0",
+            "                own['offset_time'] = 0",
             "        except KeyError:",
             "            raise RuntimeError(",
             "                'Must start timeline before continue is used')",
@@ -247,6 +247,10 @@ class CaveTimeline(CaveFeature):
             "        index = own['offset_index'] + own['action_index']"
         ]
         action_index = 0
+        if len(self["actions"]) == 0:
+            max_time = 0
+        else:
+            max_time = self["actions"][-1][0]
         for time, action in self["actions"]:
             script_text.extend(
                 ["".join(("        ", line)) for line in
@@ -256,6 +260,9 @@ class CaveTimeline(CaveFeature):
                     )]
             )
             action_index += 1
+            max_time = max(max_time, action.end_time)
         script_text.append("        own['action_index'] = index")
         script_text.append("        own['offset_index'] = 0")
+        script_text.append("        if time > {}:".format(max_time))
+        script_text.append("            own['status'] = 'Stop'")
         script.write("\n".join(script_text))

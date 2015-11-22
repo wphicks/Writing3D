@@ -316,3 +316,5 @@ class CaveProject(CaveFeature):
             timeline.blend()
         for event in self["trigger_events"]:
             event.blend()
+        for timeline in self["timelines"]:
+            timeline.write_blender_logic()

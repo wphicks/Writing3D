@@ -3,7 +3,7 @@
 Here, actions refer generically to any discrete change in elements of a Cave
 project
 """
-import warnings
+#import warnings
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .placement import CavePlacement
@@ -12,11 +12,11 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name
-try:
-    import bpy
-except ImportError:
-    warnings.warn(
-        "Module bpy not found. Loading pycave.actions as standalone")
+#try:
+#    import bpy
+#except ImportError:
+#    warnings.warn(
+#        "Module bpy not found. Loading pycave.actions as standalone")
 
 
 class CaveAction(CaveFeature):
@@ -208,6 +208,63 @@ class ObjectAction(CaveAction):
         continue_conditional = "if {}:".format(
             " and ".join(continue_conditional))
         end_conditional = "if {}:".format(" and ".join(end_conditional))
+
+        #Actions to take immediately when condition is first activated
+        script_text.append(start_conditional)
+        script_text.append("    index += 1")
+        if "visible" in self:
+            script_text.append("    blender_object.setVisible(True)")
+
+        #Actions to take at each timestep for which action is active
+        script_text.append(continue_conditional)
+        script_text.append("    remaining_time = {} - time".format(
+            self.end_time)
+        )
+        if "visible" in self:
+            script_text.append(
+                "    remaining_alpha = {} - blender_object.color[3]".format(
+                    int(self["visible"])
+                )
+            )
+            script_text.append(
+                "    delta_alpha = remaining_alpha/remaining_time/60"
+            )  # Logic tick rate is 60 Hz
+            script_text.extend([
+                "    new_color = blender_object.color",
+                "    new_color[3] += delta_alpha",
+                "    blender_object.color = new_color"]
+            )
+        if "color" in self:
+            script_text.extend([
+                "    delta_color = [",
+                "        ({}[i] -".format(
+                    [channel/255.0 for channel in self["color"]]),
+                "            blender_object.color[i])/remaining_time/60",
+                "        for i in range(3)]",
+                "    delta_color.append(0)",
+                "    blender_object.color = [",
+                "        (blender_object.color[i] + delta_color[i])",
+                "        for i in range(4)]"
+                ]
+            )
+
+        #Actions to take at end of action
+        script_text.append(end_conditional)
+        if "visible" in self:
+            script_text.extend([
+                "    new_color = blender_object.color",
+                "    new_color[3] = {}".format(int(self["visible"])),
+                "    blender_object.color = new_color"]
+            )
+            script_text.append("    blender_object.setVisible({})".format(
+                self["visible"]))
+        if "color" in self:
+            script_text.extend([
+                "    new_color = {}".format(
+                    [channel/255.0 for channel in self["color"]]),
+                "    new_color.append(blender_object.color[3])",
+                "    blender_object.color = new_color"]
+            )
 
         return script_text
 

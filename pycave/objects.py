@@ -292,13 +292,17 @@ class CaveObject(CaveFeature):
             if blender_object.active_material is None:
                 # Object cannot have active material
                 return blender_object
-        blender_object.active_material.diffuse_color = [
-            channel/255.0 for channel in self["color"]]
-        blender_object.active_material.specular_color = (
-            blender_object.active_material.diffuse_color)
+        #blender_object.active_material.diffuse_color = [
+        #    channel/255.0 for channel in self["color"]]
+        #blender_object.active_material.specular_color = (
+        #    blender_object.active_material.diffuse_color)
         blender_object.active_material.use_shadeless = not self["lighting"]
         blender_object.active_material.use_transparency = True
         blender_object.active_material.use_nodes = False
+        blender_object.active_material.use_object_color = True
+        color = [channel/255.0 for channel in self["color"]]
+        color.append(int(self["visible"]))
+        blender_object.color = color
         return blender_object
 
     def blend(self):
@@ -570,6 +574,7 @@ class CaveModel(CaveContent):
     :param str filename: Filename of model to be displayed
     :param bool check_collisions: TODO Clarify what this does
     """
+    #TODO: Does not seem to play nice with GLSL shader. FIX THIS.
     argument_validators = {
         "filename": AlwaysValid("Value should be a string"),
         "check_collisions": AlwaysValid("Value should be a boolean")}
