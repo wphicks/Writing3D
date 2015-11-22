@@ -80,7 +80,8 @@ class ObjectAction(CaveAction):
         }
 
     default_arguments = {
-        "duration": 1
+        "duration": 1,
+        "move_relative": False
         }
 
     link_xml_tags = {
@@ -234,6 +235,30 @@ class ObjectAction(CaveAction):
                 "    new_color[3] += delta_alpha",
                 "    blender_object.color = new_color"]
             )
+        if "placement" in self and self["duration"] != 0:
+            if self["move_relative"]:
+                if "position" in self["placement"]:
+                    script_text.append("    delta_pos = {}".format(
+                        [coord/self["duration"]/60. for coord in
+                            self["placement"]["position"]]
+                        )
+                    )
+            else:
+                if "position" in self["placement"]:
+                    script_text.extend([
+                        "    delta_pos = [",
+                        "        ({}[i] - blender_object.position[i]".format(
+                            list(self["placement"]["position"])),
+                        "            )/remaining_time/60",
+                        "        for i in range(3)]",
+                        ]
+                    )
+            if "position" in self["placement"]:
+                script_text.extend([
+                    "    blender_object.position = [",
+                    "        delta_pos[i] + blender_object.position[i]",
+                    "        for i in range(3)]"]
+                )
         if "color" in self:
             script_text.extend([
                 "    delta_color = [",
@@ -245,6 +270,17 @@ class ObjectAction(CaveAction):
                 "    blender_object.color = [",
                 "        (blender_object.color[i] + delta_color[i])",
                 "        for i in range(4)]"
+                ]
+            )
+        if "scale" in self:
+            script_text.extend([
+                "    delta_scale = [",
+                "        ({}[i] -".format([self["scale"]]*3),
+                "            blender_object.scaling[i])/remaining_time/60",
+                "        for i in range(3)]",
+                "    blender_object.scaling = [",
+                "        (blender_object.scaling[i] + delta_scale[i])",
+                "        for i in range(3)]"
                 ]
             )
 
@@ -265,6 +301,26 @@ class ObjectAction(CaveAction):
                 "    new_color.append(blender_object.color[3])",
                 "    blender_object.color = new_color"]
             )
+        if "scale" in self:
+            script_text.append(
+                "    blender_object.scaling = {}".format([self["scale"]]*3)
+            )
+        if "placement" in self and self["duration"] == 0:
+            if self["move_relative"]:
+                if "position" in self["placement"]:
+                    script_text.extend([
+                        "    blender_object.position = [",
+                        "        {}[i] + blender_object.position[i]".format(
+                            self["placement"]["position"]),
+                        "        for i in range(3)]"]
+                    )
+            else:
+                if "position" in self["placement"]:
+                    script_text.append(
+                        "    blender_object.position = {}".format(
+                            self["placement"]["position"]
+                        )
+                    )
 
         return script_text
 

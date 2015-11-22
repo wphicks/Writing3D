@@ -263,6 +263,6 @@ class CaveTimeline(CaveFeature):
             max_time = max(max_time, action.end_time)
         script_text.append("        own['action_index'] = index")
         script_text.append("        own['offset_index'] = 0")
-        script_text.append("        if time > {}:".format(max_time))
+        script_text.append("        if time >= {}:".format(max_time))
         script_text.append("            own['status'] = 'Stop'")
         script.write("\n".join(script_text))
