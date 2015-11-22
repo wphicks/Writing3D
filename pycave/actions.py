@@ -11,8 +11,6 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
-from .cave_logic.blender_trigger import TimedTrigger
-from .cave_logic.blender_action import LinearMovement, VisibilityChange
 try:
     import bpy
 except ImportError:
@@ -178,48 +176,7 @@ class ObjectAction(CaveAction):
 
     def blend(self):
         """Create representation of change in Blender"""
-        self.blender_object_name = "_".join(("object", self["object_name"]))
-        blender_object = bpy.data.objects[self.blender_object_name]
-        bpy.context.scene.objects.active = blender_object
-
-        self.blender_trigger = TimedTrigger(
-            self.blender_object_name, self["duration"])
-
-        actions = []
-
-        if "placement" in self:
-            actions.append(
-                LinearMovement(self.blender_trigger, self["placement"]))
-        if "visible" in self:
-            actions.append(
-                VisibilityChange(self.blender_trigger, self["visible"])
-            )
-
-        if len(actions) != 0:
-            self.blender_trigger.add_to_script_body("""
-    if sensor.positive and change_sensor.positive:
-            """)
-            for action_ in actions:
-                self.blender_trigger.add_to_script_body(
-                    action_.create_on_script())
-            if self["duration"] != 0:
-                self.blender_trigger.add_to_script_body("""
-    if not sensor.positive and change_sensor.positive:
-                """)
-            for action_ in actions:
-                self.blender_trigger.add_to_script_body(
-                    action_.create_off_script())
-
-        return blender_object
-
-    def write_blender_logic(self):
-        """Write Python logic for this action to necessary scripts"""
-        try:
-            return self.blender_trigger.write_to_script()
-        except AttributeError:
-            warnings.warn(
-                "blend() method must be called before write_blender_logic()")
-            return None
+        raise NotImplementedError  # TODO
 
 
 class GroupAction(CaveAction):

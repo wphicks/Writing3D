@@ -8,13 +8,15 @@ from .actions import CaveAction
 from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
-from .cave_logic.blender_trigger import BlenderTrigger, TimedTrigger
-from .cave_logic.blender_action import ActivateTrigger
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.actions as standalone")
+
+
+def generate_blender_timeline_name(string):
+    return "{}_timeline".format(string)
 
 
 class SortedList(MutableSequence):
@@ -140,56 +142,124 @@ class CaveTimeline(CaveFeature):
 
     def blend(self):
         """Create representation of CaveTimeline in Blender"""
-        timeline_name = "_".join((self["name"], "timeline"))
+        blender_object_name = generate_blender_timeline_name(self["name"])
+        #Create EMPTY object to represent timeline
         bpy.ops.object.add(
             type="EMPTY",
             layers=[layer == 20 for layer in range(1, 21)],
         )
         timeline_object = bpy.context.object
-        timeline_object.name = timeline_name
-        if len(self["actions"]) == 0:
-            return timeline_object
+        bpy.context.scene.objects.active = timeline_object
+        timeline_object.name = blender_object_name
 
-        duration = self["actions"][-1][0]
-        if duration <= 0:
-            self.blender_trigger = BlenderTrigger(timeline_name)
-        else:
-            self.blender_trigger = TimedTrigger(timeline_name, duration)
+        #Create property to start, continue, or stop timeline
+        bpy.ops.object.game_property_new(
+            type='STRING',
+            name='status'
+        )
         if self["start_immediately"]:
-            self.blender_trigger.start_immediately()
+            timeline_object.game.properties["status"].value = "Start"
+        else:
+            timeline_object.game.properties["status"].value = "Stop"
 
-        action_index = 0
-        for time, action in self["actions"]:
-            action.blend()
-            activation = ActivateTrigger(
-                self.blender_trigger,
-                action.blender_trigger)
-            if time <= 0:
-                self.blender_trigger.add_to_script_body("""
-    if sensor.positive and change_sensor.positive:""")
-                self.blender_trigger.add_to_script_body(
-                    activation.create_on_script()
-                )
-            else:
-                time_sensor = self.blender_trigger.create_time_sensor(time)
-                self.blender_trigger.add_to_script_body("""
-    if (sensor.positive and cont.sensors["{time_sensor}"].positive
-        and own["{index_property}"] == {index}):""".format(
-                    time_sensor=time_sensor.name,
-                    index_property=self.blender_trigger.index_property.name,
-                    index=action_index), section=1
-                )
-                self.blender_trigger.add_to_script_body(
-                    activation.create_on_script(), section=1)
-            action_index += 1
+        #Create property sensor to initiate timeline
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=blender_object_name,
+            name="start_sensor"
+        )
+        timeline_object.game.sensors[-1].name = "start_sensor"
+        start_sensor = timeline_object.game.sensors["start_sensor"]
+        start_sensor.property = "status"
+        start_sensor.value = "Start"
+
+        #Create property sensor to activate actions
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=blender_object_name,
+            name="active_sensor"
+        )
+        timeline_object.game.sensors[-1].name = "active_sensor"
+        active_sensor = timeline_object.game.sensors["active_sensor"]
+        active_sensor.use_pulse_true_level = True
+        active_sensor.frequency = 1
+        active_sensor.property = "status"
+        active_sensor.value = "Continue"
+
+        #Create property sensor to pause timeline
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=blender_object_name,
+            name="stop_sensor"
+        )
+        timeline_object.game.sensors[-1].name = "stop_sensor"
+        stop_sensor = timeline_object.game.sensors["stop_sensor"]
+        stop_sensor.property = "status"
+        stop_sensor.value = "Stop"
+
+        #Create controller to effect timeline actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=blender_object_name,
+            name="activate")
+        controller = timeline_object.game.controllers["activate"]
+        controller.mode = "MODULE"
+        controller.module = "{}.activate".format(blender_object_name)
+        controller.link(sensor=start_sensor)
+        controller.link(sensor=active_sensor)
+        controller.link(sensor=stop_sensor)
+
+        return timeline_object
 
     def write_blender_logic(self):
-        """Write Python logic for this action to necessary scripts"""
-        try:
-            for time, action in self["actions"]:
-                action.write_blender_logic()
-            return self.blender_trigger.write_to_script()
-        except AttributeError:
-            warnings.warn(
-                "blend() method must be called before write_blender_logic()")
-            return None
+        blender_object_name = generate_blender_timeline_name(self["name"])
+
+        #Create controller script
+        script_name = ".".join((blender_object_name, "py"))
+        bpy.data.texts.new(script_name)
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "import bge",
+            "from time import monotonic",
+            "def activate(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    status = own['status']",
+            "    if status == 'Start':",
+            "        own['start_time'] = monotonic()",
+            "        own['action_index'] = 0",
+            "        own['offset_time'] = 0",
+            "        own['offset_index'] = 0",
+            "        own['status'] = 'Continue'",
+            "    if status == 'Stop':",
+            "        try:",
+            "            own['offset_time'] = monotonic() - own['start_time']",
+            "            own['offset_index'] = own['action_index']",
+            "        except KeyError:",
+            "            pass",
+            "    if status == 'Continue':",
+            "        try:",
+            "            if own['offset_time'] != 0:",
+            "                own['start_time'] = (",
+            "                    monotonic() - own['offset_time'])",
+            "                own['offset_time] = 0",
+            "        except KeyError:",
+            "            raise RuntimeError(",
+            "                'Must start timeline before continue is used')",
+            "        time = monotonic() - own['start_time']",
+            "        index = own['offset_index'] + own['action_index']"
+        ]
+        action_index = 0
+        for time, action in self["actions"]:
+            script_text.extend(
+                ["".join(("        ", line)) for line in
+                    action.generate_blender_logic(
+                        time_condition=time,
+                        index_condition=action_index
+                    )]
+            )
+            script_text.append("        index += 1")
+            action_index += 1
+        script_text.append("        own['action_index'] = index")
+        script_text.append("        own['offset_index'] = 0")
+        script.write("\n".join(script_text))
