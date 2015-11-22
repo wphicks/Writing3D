@@ -13,7 +13,7 @@ from .sounds import CaveSound
 from .timeline import CaveTimeline
 from .groups import CaveGroup
 from .triggers import CaveTrigger
-from .errors import BadCaveXML
+from .errors import BadCaveXML, ConsistencyError
 try:
     import bpy
 except ImportError:
@@ -141,6 +141,15 @@ class CaveProject(CaveFeature):
                     )
                 )
             }
+
+    def find_timeline(self, name):
+        """Returns timeline of specified name if available"""
+        #TODO: Very inefficient, but note that this must keep up with changes
+        #in names
+        for timeline in self["timelines"]:
+            if timeline["name"] == name:
+                return timeline
+        raise ConsistencyError("Timeline {} not found".format(name))
 
     def toXML(self):
         """Store CaveProject as Cave XML tree

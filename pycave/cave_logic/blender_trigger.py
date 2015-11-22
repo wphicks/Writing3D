@@ -110,11 +110,11 @@ class BlenderTrigger(object):
         """
         self.make_object_active()
         bpy.ops.object.game_property_new(
-            type='BOOL',
+            type='STRING',
             name=self.name
         )
         control_property = self.blender_object.game.properties[self.name]
-        control_property.value = False
+        control_property.value = "Stop"
         return control_property
 
     def create_control_sensor(self):

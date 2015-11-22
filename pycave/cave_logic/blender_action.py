@@ -42,6 +42,7 @@ class ActivateTrigger(BlenderAction):
     :param BlenderAction other_trigger: The trigger to activate"""
 
     def __init__(self, trigger, other_trigger, action="Start"):
+    def __init__(self, trigger, other_object, actuator, controller, action="Start"):
         super(ActivateTrigger, self).__init__(trigger)
         self.other_trigger = other_trigger
         self.trigger.controller.link(actuator=other_trigger.actuator)

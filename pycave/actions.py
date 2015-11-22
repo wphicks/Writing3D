@@ -11,8 +11,9 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
-from .cave_logic.blender_trigger import TimedTrigger
-from .cave_logic.blender_action import LinearMovement, VisibilityChange
+from .cave_logic.blender_trigger import TimedTrigger, BlenderTrigger
+from .cave_logic.blender_action import LinearMovement, VisibilityChange,\
+    ActivateTrigger
 try:
     import bpy
 except ImportError:
@@ -49,6 +50,15 @@ class CaveAction(CaveFeature):
             raise BadCaveXML(
                 "Indicated action {} is not a valid action type".format(
                     action_root.tag))
+
+    def write_blender_logic(self):
+        """Write Python logic for this action to necessary scripts"""
+        try:
+            return self.blender_trigger.write_to_script()
+        except AttributeError:
+            warnings.warn(
+                "blend() method must be called before write_blender_logic()")
+            return None
 
 
 class ObjectAction(CaveAction):
@@ -211,15 +221,6 @@ class ObjectAction(CaveAction):
                     action_.create_off_script())
 
         return blender_object
-
-    def write_blender_logic(self):
-        """Write Python logic for this action to necessary scripts"""
-        try:
-            return self.blender_trigger.write_to_script()
-        except AttributeError:
-            warnings.warn(
-                "blend() method must be called before write_blender_logic()")
-            return None
 
 
 class GroupAction(CaveAction):
@@ -433,9 +434,13 @@ class TimelineAction(CaveAction):
         """Create representation of change in Blender"""
         self.blender_object_name = "_".join(
             (self["timeline_name"], "timeline"))
-        #self.blender_trigger = BlenderTrigger(self.blender_object_name)
-        #self.blender_action = ActivateTrigger(
-        raise NotImplementedError  # TODO
+        self.blender_trigger = BlenderTrigger(self.blender_object_name)
+        self.blender_action = ActivateTrigger(
+            self.blender_trigger,
+            self.project.find_timeline(self["timeline_name"]).blender_trigger,
+            action=self["change"]
+        )
+        return self.blender_trigger
 
 
 class SoundAction(CaveAction):
