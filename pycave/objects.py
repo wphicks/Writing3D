@@ -11,6 +11,7 @@ from .actions import CaveAction
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
+from .names import generate_blender_object_name, generate_blender_material_name
 import warnings
 try:
     import bpy
@@ -287,7 +288,7 @@ class CaveObject(CaveFeature):
         """Apply properties of object to material for Blender object"""
         if blender_object.active_material is None:
             blender_object.active_material = bpy.data.materials.new(
-                "{}_material".format(self["name"]))
+                generate_blender_material_name(self["name"]))
             if blender_object.active_material is None:
                 # Object cannot have active material
                 return blender_object
@@ -303,7 +304,7 @@ class CaveObject(CaveFeature):
     def blend(self):
         """Create representation of CaveObject in Blender"""
         blender_object = self["content"].blend()
-        blender_object.name = "_".join(("object", self["name"]))
+        blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
         if "depth" in self["content"]:

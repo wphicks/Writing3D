@@ -11,6 +11,7 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
+from .names import generate_blender_object_name
 try:
     import bpy
 except ImportError:
@@ -174,9 +175,41 @@ class ObjectAction(CaveAction):
 
         return new_action
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        raise NotImplementedError  # TODO
+    def _blender_object_selection(self):
+        blender_object_name = generate_blender_object_name(self["object_name"])
+        return "blender_object = scene.objects['{}']".format(
+            blender_object_name)
+
+    def generate_blender_logic(
+            self, time_condition=0, index_condition=None):
+        """Generate Python logic for implementing action
+
+        :param float time_condition: Time at which action should start
+        :param int index_condition: Index used to keep track of what actions
+        have already been triggered, e.g. in a timeline of multiple actions"""
+        script_text = [self._blender_object_selection()]
+
+        #Specify conditions under which action should proceed
+        start_conditional = []
+        continue_conditional = []
+        end_conditional = []
+        self.end_time = self["duration"] + time_condition
+
+        start_conditional.append("time >= {}".format(time_condition))
+        continue_conditional.append("time >= {} and time < {}".format(
+            time_condition, self.end_time))
+        end_conditional.append("time >= {}".format(self.end_time))
+
+        if index_condition is not None:
+            start_conditional.append("index == {}".format(index_condition))
+            continue_conditional.append("index >= {}".format(index_condition))
+
+        start_conditional = "if {}:".format(" and ".join(start_conditional))
+        continue_conditional = "if {}:".format(
+            " and ".join(continue_conditional))
+        end_conditional = "if {}:".format(" and ".join(end_conditional))
+
+        return script_text
 
 
 class GroupAction(CaveAction):

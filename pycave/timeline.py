@@ -8,15 +8,12 @@ from .actions import CaveAction
 from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
+from .names import generate_blender_timeline_name
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.actions as standalone")
-
-
-def generate_blender_timeline_name(string):
-    return "{}_timeline".format(string)
 
 
 class SortedList(MutableSequence):
@@ -258,7 +255,6 @@ class CaveTimeline(CaveFeature):
                         index_condition=action_index
                     )]
             )
-            script_text.append("        index += 1")
             action_index += 1
         script_text.append("        own['action_index'] = index")
         script_text.append("        own['offset_index'] = 0")
