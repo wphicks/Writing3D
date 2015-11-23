@@ -54,7 +54,7 @@ class CaveRotation(CaveFeature):
         "rotation_mode": "None",
         "rotation_vector": None,
         "up_vector": convert_to_blender_axes((0, 1, 0)),
-        "rotation_angle": 0.0}
+        "rotation_angle": 0}
 
     def toXML(self, parent_root):
         if not self.is_default("rotation_mode"):

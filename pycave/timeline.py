@@ -217,6 +217,7 @@ class CaveTimeline(CaveFeature):
         script = bpy.data.texts[script_name]
         script_text = [
             "import bge",
+            "import mathutils",
             "from time import monotonic",
             "def activate(cont):",
             "    scene = bge.logic.getCurrentScene()",

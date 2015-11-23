@@ -4,6 +4,8 @@ Here, actions refer generically to any discrete change in elements of a Cave
 project
 """
 #import warnings
+import mathutils
+import math
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .placement import CavePlacement
@@ -215,6 +217,32 @@ class ObjectAction(CaveAction):
         script_text.append("    index += 1")
         if "visible" in self:
             script_text.append("    blender_object.setVisible(True)")
+        if "placement" in self and "rotation" in self["placement"]:
+            if self["placement"][
+                    "rotation"]["rotation_mode"] == "Axis":
+                axis = mathutils.Vector(
+                    self["placement"]["rotation"]["rotation_vector"])
+                axis.normalize()
+                angle = (
+                    self["placement"]["rotation"]["rotation_angle"] *
+                    math.pi / 180)
+                if not self["move_relative"]:
+                    script_text.extend([
+                        "    orientation ="
+                        "blender_object.orientation.to_quaternion()",
+                        "    target_orientation = mathutils.Quaternion(",
+                        "        {}, {})".format(tuple(axis), angle),
+                        "    print(target_orientation.to_matrix())",
+                        "    print(scene.objects['object_hello2'].orientation)",
+                        "    rotation = (",
+                        "        -target_orientation.rotation_difference(",
+                        "            orientation))",
+                        "    blender_object['angV'] = (",
+                        "        rotation.angle /",
+                        "        {} *".format(
+                            (self["duration"]*30, 1)[self["duration"] == 0]),
+                        "        rotation.axis)"]
+                    )
 
         #Actions to take at each timestep for which action is active
         script_text.append(continue_conditional)
@@ -259,6 +287,29 @@ class ObjectAction(CaveAction):
                     "        delta_pos[i] + blender_object.position[i]",
                     "        for i in range(3)]"]
                 )
+            if "rotation" in self["placement"]:
+                if self["placement"][
+                        "rotation"]["rotation_mode"] == "Axis":
+                    axis = mathutils.Vector(
+                        self["placement"]["rotation"]["rotation_vector"])
+                    axis.normalize()
+                    angle = (
+                        self["placement"]["rotation"]["rotation_angle"] *
+                        math.pi / 180)
+                    if self["move_relative"]:
+                        delta_rot = axis * angle / 60 / self["duration"] * 2
+                        # I have absolutely no idea why the factor of 2 is
+                        # necessary in the above line.
+                        script_text.append(
+                            "    delta_rot = {}".format(tuple(delta_rot)),
+                        )
+                    else:
+                        script_text.append(
+                            "    delta_rot = blender_object['angV']"
+                        )
+
+                script_text.append(
+                    "    blender_object.applyRotation(delta_rot)")
         if "color" in self:
             script_text.extend([
                 "    delta_color = [",
