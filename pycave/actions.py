@@ -369,6 +369,13 @@ class ObjectAction(CaveAction):
                             self["placement"]["position"]
                         )
                     )
+                if "rotation" in self["placement"]:
+                    if (self["placement"]["rotation"]["rotation_mode"] ==
+                            "Axis"):
+                        script_text.extend([
+                            "    delta_rot = blender_object['angV']",
+                            "    blender_object.applyRotation(delta_rot)"]
+                        )
 
         return script_text
 
