@@ -223,24 +223,22 @@ class ObjectAction(CaveAction):
                 axis = mathutils.Vector(
                     self["placement"]["rotation"]["rotation_vector"])
                 axis.normalize()
-                angle = (
-                    self["placement"]["rotation"]["rotation_angle"] *
-                    math.pi / 180)
+                angle = math.radians(
+                    self["placement"]["rotation"]["rotation_angle"])
                 if not self["move_relative"]:
                     script_text.extend([
                         "    orientation ="
                         "blender_object.orientation.to_quaternion()",
                         "    target_orientation = mathutils.Quaternion(",
                         "        {}, {})".format(tuple(axis), angle),
-                        "    print(target_orientation.to_matrix())",
-                        "    print(scene.objects['object_hello2'].orientation)",
                         "    rotation = (",
-                        "        -target_orientation.rotation_difference(",
+                        "        target_orientation.rotation_difference(",
                         "            orientation))",
                         "    blender_object['angV'] = (",
-                        "        rotation.angle /",
+                        "        -rotation.angle /",
                         "        {} *".format(
                             (self["duration"]*30, 1)[self["duration"] == 0]),
+                        # Don't know why the factor of -2, but it works
                         "        rotation.axis)"]
                     )
 
@@ -293,9 +291,8 @@ class ObjectAction(CaveAction):
                     axis = mathutils.Vector(
                         self["placement"]["rotation"]["rotation_vector"])
                     axis.normalize()
-                    angle = (
-                        self["placement"]["rotation"]["rotation_angle"] *
-                        math.pi / 180)
+                    angle = math.radians(
+                        self["placement"]["rotation"]["rotation_angle"])
                     if self["move_relative"]:
                         delta_rot = axis * angle / 60 / self["duration"] * 2
                         # I have absolutely no idea why the factor of 2 is

@@ -443,7 +443,6 @@ class CaveText(CaveContent):
     def blend(self):
         """Create representation of CaveText in Blender"""
         bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
-        bpy.ops.object.transform_apply(rotation=True)
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
         #TODO: Get proper font directory
@@ -455,6 +454,7 @@ class CaveText(CaveContent):
         #TODO: Vertical alignment. This is non-trivial
         new_text_object.select = True
         bpy.ops.object.convert(target='MESH', keep_original=False)
+        bpy.ops.object.transform_apply(rotation=True)
         new_text_object.select = False
         return new_text_object
 
