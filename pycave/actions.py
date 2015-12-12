@@ -218,29 +218,54 @@ class ObjectAction(CaveAction):
         if "visible" in self:
             script_text.append("    blender_object.setVisible(True)")
         if "placement" in self and "rotation" in self["placement"]:
-            if self["placement"][
-                    "rotation"]["rotation_mode"] == "Axis":
-                axis = mathutils.Vector(
-                    self["placement"]["rotation"]["rotation_vector"])
-                axis.normalize()
-                angle = math.radians(
-                    self["placement"]["rotation"]["rotation_angle"])
-                if not self["move_relative"]:
+            vector = mathutils.Vector(
+                self["placement"]["rotation"]["rotation_vector"])
+            vector.normalize()
+            if self["move_relative"]:
+                if self["placement"][
+                        "rotation"]["rotation_mode"] == "Axis":
+                    angle = math.radians(
+                        self["placement"]["rotation"]["rotation_angle"])
+                    script_text.append(
+                        "    rotation = mathutils.Quaternion({}, {})".format(
+                            tuple(vector), angle)
+            else:
+                script_text.append(
+                    "    orientation ="
+                    "blender_object.orientation.to_quaternion()")
+
+                if self["placement"][
+                        "rotation"]["rotation_mode"] == "Axis":
+                    angle = math.radians(
+                        self["placement"]["rotation"]["rotation_angle"])
                     script_text.extend([
-                        "    orientation ="
-                        "blender_object.orientation.to_quaternion()",
                         "    target_orientation = mathutils.Quaternion(",
-                        "        {}, {})".format(tuple(axis), angle),
+                        "        {}, {})".format(tuple(vector), angle),
                         "    rotation = (",
                         "        target_orientation.rotation_difference(",
-                        "            orientation))",
-                        "    blender_object['angV'] = (",
-                        "        -rotation.angle /",
-                        "        {} *".format(
-                            (self["duration"]*30, 1)[self["duration"] == 0]),
-                        # Don't know why the factor of -2, but it works
-                        "        rotation.axis)"]
+                        "            orientation))"]
                     )
+
+                elif self["placement"][
+                        "rotation"]["rotation_mode"] == "Normal":
+                    script_text.extend([
+                        "    current_normal = mathutils.Vector((1, 0, 0))",
+                        "    current_normal.rotate(",
+                        "        blender_object.orientation)",
+                        "    rotation = mathutils.Vector(",
+                        "        {}).rotation_difference(".format(
+                            tuple(vector)),
+                        "        current_normal)"]
+                    )
+
+                script_text.extend([
+                    "    blender_object['angV'] = (",
+                    "        -rotation.angle /",
+                    "        {} *".format(
+                        (self["duration"]*30, 1)[self["duration"] == 0]),
+                    # Don't know why the factor of -2, but it works
+                    "        rotation.axis)"]
+                )
 
         #Actions to take at each timestep for which action is active
         script_text.append(continue_conditional)
@@ -262,15 +287,14 @@ class ObjectAction(CaveAction):
                 "    blender_object.color = new_color"]
             )
         if "placement" in self and self["duration"] != 0:
-            if self["move_relative"]:
-                if "position" in self["placement"]:
+            if "position" in self["placement"]:
+                if self["move_relative"]:
                     script_text.append("    delta_pos = {}".format(
                         [coord/self["duration"]/60. for coord in
                             self["placement"]["position"]]
                         )
                     )
-            else:
-                if "position" in self["placement"]:
+                else:
                     script_text.extend([
                         "    delta_pos = [",
                         "        ({}[i] - blender_object.position[i]".format(
@@ -279,7 +303,6 @@ class ObjectAction(CaveAction):
                         "        for i in range(3)]",
                         ]
                     )
-            if "position" in self["placement"]:
                 script_text.extend([
                     "    blender_object.position = [",
                     "        delta_pos[i] + blender_object.position[i]",
