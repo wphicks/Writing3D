@@ -20,6 +20,8 @@ from .names import generate_blender_object_name
 #    warnings.warn(
 #        "Module bpy not found. Loading pycave.actions as standalone")
 
+# TODO: Switch linear motion over to same style as angV
+
 
 class CaveAction(CaveFeature):
     """An action causing a change in the Cave
@@ -224,12 +226,48 @@ class ObjectAction(CaveAction):
             if self["move_relative"]:
                 if self["placement"][
                         "rotation"]["rotation_mode"] == "Axis":
+                    axis = mathutils.Vector(
+                        self["placement"]["rotation"]["rotation_vector"])
+                    axis.normalize()
                     angle = math.radians(
                         self["placement"]["rotation"]["rotation_angle"])
                     script_text.append(
                         "    rotation = mathutils.Quaternion({}, {})".format(
-                            tuple(vector), angle)
-            else:
+                            tuple(vector), -angle))
+                elif self["placement"][
+                        "rotation"]["rotation_mode"] == "Normal":
+                    # TODO: Is this the legacy behavior?
+                    script_text.extend([
+                        "    current_normal = mathutils.Vector((1, 0, 0))",
+                        "    rotation = mathutils.Vector(",
+                        "        {}).rotation_difference(".format(
+                            tuple(vector)),
+                        "        current_normal)"]
+                    )
+                elif self["placement"][
+                        "rotation"]["rotation_mode"] == "LookAt":
+                    script_text.extend([
+                        "    look_direction = (",
+                        "        blender_object.position +",
+                        "        mathutils.Vector({}) -".format(
+                            self["placement"]["position"]),
+                        "        mathutils.Vector({})).normalized()".format(
+                            self["placement"]["rotation"]["rotation_vector"]),
+                        "    up_direction = mathutils.Vector(",
+                        "        {}).normalized()".format(
+                            self["placement"]["rotation"]["up_vector"]),
+                        "    rotation_matrix = mathutils.Matrix.Rotation("
+                        "    0, 4, (0, 0, 1))",
+                        "    frame_y = look_direction",
+                        "    frame_x = frame_y.cross(up_direction)",
+                        "    frame_z = frame_x.cross(frame_y)",
+                        "    rotation_matrix = mathutils.Matrix().to_3x3()",
+                        "    rotation_matrix.col[0] = frame_x",
+                        "    rotation_matrix.col[1] = frame_y",
+                        "    rotation_matrix.col[2] = frame_z",
+                        "    rotation = rotation_matrix.to_quaternion()"]
+                    )
+            else:  # Not move relative
                 script_text.append(
                     "    orientation ="
                     "blender_object.orientation.to_quaternion()")
@@ -240,7 +278,7 @@ class ObjectAction(CaveAction):
                         self["placement"]["rotation"]["rotation_angle"])
                     script_text.extend([
                         "    target_orientation = mathutils.Quaternion(",
-                        "        {}, {})".format(tuple(vector), angle),
+                        "        {}, {})".format(tuple(vector), -angle),
                         "    rotation = (",
                         "        target_orientation.rotation_difference(",
                         "            orientation))"]
@@ -258,14 +296,37 @@ class ObjectAction(CaveAction):
                         "        current_normal)"]
                     )
 
-                script_text.extend([
-                    "    blender_object['angV'] = (",
-                    "        -rotation.angle /",
-                    "        {} *".format(
-                        (self["duration"]*30, 1)[self["duration"] == 0]),
-                    # Don't know why the factor of -2, but it works
-                    "        rotation.axis)"]
-                )
+                elif self["placement"][
+                        "rotation"]["rotation_mode"] == "LookAt":
+                    script_text.extend([
+                        "    look_direction = (",
+                        "        mathutils.Vector({}) -".format(
+                            self["placement"]["position"]),
+                        "        mathutils.Vector({})).normalized()".format(
+                            self["placement"]["rotation"]["rotation_vector"]),
+                        "    up_direction = mathutils.Vector(",
+                        "        {}).normalized()".format(
+                            self["placement"]["rotation"]["up_vector"]),
+                        "    rotation_matrix = mathutils.Matrix.Rotation("
+                        "    0, 4, (0, 0, 1))",
+                        "    frame_y = look_direction",
+                        "    frame_x = frame_y.cross(up_direction)",
+                        "    frame_z = frame_x.cross(frame_y)",
+                        "    rotation_matrix = mathutils.Matrix().to_3x3()",
+                        "    rotation_matrix.col[0] = frame_x",
+                        "    rotation_matrix.col[1] = frame_y",
+                        "    rotation_matrix.col[2] = frame_z",
+                        "    rotation = rotation_matrix.to_quaternion()"]
+                    )
+
+            script_text.extend([
+                "    blender_object['angV'] = (",
+                "        rotation.angle /",
+                "        {} *".format(
+                    (self["duration"]*30, 1)[self["duration"] == 0]),
+                # Don't know why the factor of 2, but it works
+                "        rotation.axis)"]
+            )
 
         #Actions to take at each timestep for which action is active
         script_text.append(continue_conditional)
@@ -309,24 +370,9 @@ class ObjectAction(CaveAction):
                     "        for i in range(3)]"]
                 )
             if "rotation" in self["placement"]:
-                if self["placement"][
-                        "rotation"]["rotation_mode"] == "Axis":
-                    axis = mathutils.Vector(
-                        self["placement"]["rotation"]["rotation_vector"])
-                    axis.normalize()
-                    angle = math.radians(
-                        self["placement"]["rotation"]["rotation_angle"])
-                    if self["move_relative"]:
-                        delta_rot = axis * angle / 60 / self["duration"] * 2
-                        # I have absolutely no idea why the factor of 2 is
-                        # necessary in the above line.
-                        script_text.append(
-                            "    delta_rot = {}".format(tuple(delta_rot)),
-                        )
-                    else:
-                        script_text.append(
-                            "    delta_rot = blender_object['angV']"
-                        )
+                script_text.append(
+                    "    delta_rot = blender_object['angV']"
+                )
 
                 script_text.append(
                     "    blender_object.applyRotation(delta_rot)")
