@@ -24,3 +24,8 @@ def generate_trigger_name(string):
 def generate_enabled_name(string):
     """Generate name for enabled properties"""
     return "{}_enabled".format(string)
+
+
+def generate_group_name(string):
+    """Generate name used for Blender group"""
+    return "group_{}".format(string)

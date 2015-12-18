@@ -1,7 +1,15 @@
+import warnings
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .validators import AlwaysValid
 from .errors import BadCaveXML, ConsistencyError
+from .names import generate_group_name, \
+    generate_blender_object_name
+try:
+    import bpy
+except ImportError:
+    warnings.warn(
+        "Module bpy not found. Loading pycave.actions as standalone")
 
 
 class CaveGroup(CaveFeature):
@@ -23,6 +31,7 @@ class CaveGroup(CaveFeature):
 
     def __init__(self, *args, **kwargs):
         super(CaveGroup, self).__init__(*args, **kwargs)
+        #TODO: It should be possible to initialize with values
         if "objects" not in self:
             self["objects"] = []
         if "groups" not in self:
@@ -63,3 +72,27 @@ class CaveGroup(CaveFeature):
                     group["groups"].append(child.attrib["name"])
                 except KeyError:
                     raise BadCaveXML("Groups node has no name attrib")
+
+    def blend_objects(self):
+        """Store data on objects in group in Blender script"""
+        group_name = generate_group_name(self["name"])
+        script = bpy.data.texts["group_defs.py"]
+        object_names = [
+            generate_blender_object_name(object_) for object_ in
+            self["objects"]
+        ]
+        script.write("\n{} = {}".format(
+            group_name, object_names))
+        return script
+
+    def blend_groups(self):
+        """Store data on groups in group in Blender script"""
+        group_name = generate_group_name(self["name"])
+        script = bpy.data.texts["group_defs.py"]
+        script_text = [""]
+        for group in self["groups"]:
+            script_text.append(
+                "{}.extend({})".format(
+                    group_name, generate_group_name(group))
+            )
+        script.write("\n".join(script_text))

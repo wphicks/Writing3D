@@ -4,6 +4,7 @@ Here, triggers are any events within the Cave that can be used to start another
 action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
 import warnings
+import math
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .actions import CaveAction
@@ -66,6 +67,7 @@ class CaveTrigger(CaveFeature):
     def blend(self):
         """Create representation of CaveTrigger in Blender"""
         trigger_name = generate_trigger_name(self["name"])
+        enabled_name = generate_enabled_name(trigger_name)
         #Create EMPTY object to represent trigger
         bpy.ops.object.add(
             type="EMPTY",
@@ -129,10 +131,43 @@ class CaveTrigger(CaveFeature):
         controller.link(sensor=active_sensor)
         controller.link(sensor=stop_sensor)
 
+        #Enable or disable trigger on main camera
+        camera_object = bpy.data.objects["CAMERA"]
+        bpy.context.scene.objects.active = camera_object
+        bpy.ops.object.game_property_new(
+            type='BOOLEAN',
+            name=enabled_name
+        )
+        camera_object.game.properties[enabled_name].value = self["enabled"]
+
+        #Create property sensor to enable position detection
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object="CAMERA",
+            name=enabled_name
+        )
+        camera_object.game.sensors[-1].name = enabled_name
+        enable_sensor = camera_object.game.sensors[enabled_name]
+        enable_sensor.use_pulse_true_level = True
+        enable_sensor.frequency = 1
+        enable_sensor.property = enabled_name
+        enable_sensor.value = self["enabled"]
+
+        #Create controller to activate trigger actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object="CAMERA",
+            name=trigger_name)
+        controller = trigger_object.game.controllers[trigger_name]
+        controller.mode = "MODULE"
+        controller.module = "{}.detect_event".format(trigger_name)
+        controller.link(sensor=enabled_name)
+
         return trigger_object
 
     def write_blender_logic(self):
         trigger_name = generate_trigger_name(self["name"])
+        enabled_name = generate_enabled_name(trigger_name)
 
         #Create controller script
         script_name = ".".join((trigger_name, "py"))
@@ -140,6 +175,7 @@ class CaveTrigger(CaveFeature):
         script = bpy.data.texts[script_name]
         script_text = [
             "import bge",
+            "from group_defs import *",
             "import mathutils",
             "from time import monotonic",
             "def activate(cont):",
@@ -174,6 +210,9 @@ class CaveTrigger(CaveFeature):
         script_text.append("        own['offset_index'] = 0")
         script_text.append("        if time >= {}:".format(max_time))
         script_text.append("            own['status'] = 'Stop'")
+        script_text.append(
+            "            scene.cameras['CAMERA'][{}] = {}".format(
+                enabled_name, self["remain_enabled"]))
         script.write("\n".join(script_text))
 
 
@@ -276,55 +315,6 @@ class HeadTrackTrigger(CaveTrigger):
                 "HeadTrack node must contain None, PointTarget,"
                 " DirectionTarget, or ObjectTarget child node")
 
-    def blend(self):
-        trigger_object = super(HeadTrackTrigger, self).blend()
-        trigger_name = trigger_object.name
-        enabled_name = generate_enabled_name(trigger_name)
-
-        camera_object = bpy.data.objects["CAMERA"]
-        bpy.context.scene.objects.active = camera_object
-        bpy.ops.object.game_property_new(
-            type='BOOLEAN',
-            name=enabled_name
-        )
-        camera_object.game.properties[enabled_name].value = self["enabled"]
-
-        #Create property sensor to enable position detection
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object="CAMERA",
-            name=enabled_name
-        )
-        trigger_object.game.sensors[-1].name = enabled_name
-        enable_sensor = camera_object.game.sensors[enabled_name]
-        enable_sensor.use_pulse_true_level = True
-        enable_sensor.frequency = 1
-        enable_sensor.property = enabled_name
-        enable_sensor.value = self["enabled"]
-
-        #Create controller to activate trigger actions
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object="CAMERA",
-            name=trigger_name)
-        controller = trigger_object.game.controllers[trigger_name]
-        controller.mode = "MODULE"
-        controller.module = "{}.detect_event".format(trigger_name)
-        controller.link(sensor=enabled_name)
-    return trigger_object
-
-    def write_blender_logic(self):
-        super(HeadTrackTrigger, self).write_blender_logic()
-        trigger_name = generate_trigger_name(self["name"])
-
-        #Create script to detect head position
-        script_name = ".".join((trigger_name, "py"))
-        script = bpy.data.texts[script_name]
-        script.write(
-            "\n            scene.cameras['CAMERA'][{}] = {}".format(
-                enabled_name, self["remain_enabled"])
-        )
-
 
 class HeadPositionTrigger(HeadTrackTrigger):
     """For triggers based on position of user in Cave
@@ -388,7 +378,7 @@ class HeadPositionTrigger(HeadTrackTrigger):
             "    inside = True",
             "    corners = {}".format(
                 zip(self["box"]["corner1"], self["box"]["corner2"])),
-            "    for i in range({}):".format((3,2)[self["box"]["ignore_y"]]),
+            "    for i in range({}):".format((3, 2)[self["box"]["ignore_y"]]),
             "        if (",
             "                position[i] < min(corners[i]) or",
             "                position[i] > max(corners[i])):",
@@ -523,7 +513,7 @@ class LookAtDirection(HeadTrackTrigger):
         return new_trigger
 
     def write_blender_logic(self):
-        super(LookAtObject, self).write_blender_logic()
+        super(LookAtDirection, self).write_blender_logic()
         trigger_name = generate_trigger_name(self["name"])
 
         #Create script to detect head position
@@ -694,6 +684,49 @@ class MovementTrigger(CaveTrigger):
             raise BadCaveXML("Source node must have Box child")
         new_trigger["box"] = EventBox.fromXML(node)
         return new_trigger
+
+    def write_blender_logic(self):
+        super(MovementTrigger, self).write_blender_logic()
+        trigger_name = generate_trigger_name(self["name"])
+
+        #Create script to detect head position
+        script_name = ".".join((trigger_name, "py"))
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "\ndef detect_event(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    corners = {}".format(
+                zip(self["box"]["corner1"], self["box"]["corner2"]))
+        ]
+        if self["type"] == "Single Object":
+            script_text.append(
+                "    all_objects = ['{}']".format(
+                    self["object_name"])
+            )
+        else:
+            script_text.append(
+                "    all_objects = {}".format(
+                    self["object_name"])
+            )
+        script_text.extend([
+            "    all_objects = [",
+            "scene.objects[object_name] for object_name in all_objects",
+            "    in_region = {}".format(
+                self["type"] == "Group(All)"),
+            "    for object_ in all_objects:",
+            "        position = object_.position",
+            "        in_region = (in_region {}".format(
+                ("or", "and")[self["type"] == "Group(All)"]),
+            "            {}(position[i] < min(corners[i]) or".format(
+                ("", "not ")[self["box"]["direction"] == "Inside"]),
+            "               position[i] > max(corners[i])))",
+            "    if in_region:",
+            "        trigger = scene.objects['{}']".format(
+                trigger_name),
+            "        trigger['status'] = 'Start'"
+        ])
+        script.write("\n".join(script_text))
 
 
 class EventBox(CaveFeature):

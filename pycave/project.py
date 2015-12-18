@@ -297,6 +297,20 @@ class CaveProject(CaveFeature):
         with open(filename, "w") as file_:
             file_.write(self.toprettyxml())
 
+    def sort_groups(self):
+        """Sort groups such that no group contains a later group"""
+        new_groups = []
+        while len(self["groups"]):
+            group = self["groups"].pop()
+            cur_len = len(new_groups)
+            for i in range(cur_len):
+                if group["name"] in new_groups[i]["groups"]:
+                    new_groups.insert(i, group)
+                    break
+            if cur_len == len(new_groups):
+                new_groups.append(group)
+        self["groups"] = new_groups
+
     def blend(self):
         """Create representation of CaveProject in Blender"""
         clear_blender_scene()
@@ -309,6 +323,12 @@ class CaveProject(CaveFeature):
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
+        self.sort_groups()
+        bpy.data.texts.new("group_defs.py")
+        for group in self["groups"]:
+            group.blend_objects()
+        for group in self["groups"]:
+            group.blend_groups()
         for object_ in self["objects"]:
             object_.blend()
         for sound in self["sounds"]:

@@ -13,7 +13,7 @@ try:
     import bpy
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.actions as standalone")
+        "Module bpy not found. Loading pycave.timeline as standalone")
 
 
 class SortedList(MutableSequence):
@@ -217,6 +217,7 @@ class CaveTimeline(CaveFeature):
         script = bpy.data.texts[script_name]
         script_text = [
             "import bge",
+            "from group_defs import *",
             "import mathutils",
             "from time import monotonic",
             "def activate(cont):",
