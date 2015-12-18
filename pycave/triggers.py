@@ -11,7 +11,8 @@ from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
     OptionListValidator
 from .errors import ConsistencyError, BadCaveXML, InvalidArgument
 from .xml_tools import bool2text, text2tuple, text2bool
-from .names import generate_trigger_name, generate_enabled_name
+from .names import generate_trigger_name, generate_enabled_name, \
+    generate_blender_object_name
 try:
     import bpy
 except ImportError:
@@ -275,6 +276,55 @@ class HeadTrackTrigger(CaveTrigger):
                 "HeadTrack node must contain None, PointTarget,"
                 " DirectionTarget, or ObjectTarget child node")
 
+    def blend(self):
+        trigger_object = super(HeadTrackTrigger, self).blend()
+        trigger_name = trigger_object.name
+        enabled_name = generate_enabled_name(trigger_name)
+
+        camera_object = bpy.data.objects["CAMERA"]
+        bpy.context.scene.objects.active = camera_object
+        bpy.ops.object.game_property_new(
+            type='BOOLEAN',
+            name=enabled_name
+        )
+        camera_object.game.properties[enabled_name].value = self["enabled"]
+
+        #Create property sensor to enable position detection
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object="CAMERA",
+            name=enabled_name
+        )
+        trigger_object.game.sensors[-1].name = enabled_name
+        enable_sensor = camera_object.game.sensors[enabled_name]
+        enable_sensor.use_pulse_true_level = True
+        enable_sensor.frequency = 1
+        enable_sensor.property = enabled_name
+        enable_sensor.value = self["enabled"]
+
+        #Create controller to activate trigger actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object="CAMERA",
+            name=trigger_name)
+        controller = trigger_object.game.controllers[trigger_name]
+        controller.mode = "MODULE"
+        controller.module = "{}.detect_event".format(trigger_name)
+        controller.link(sensor=enabled_name)
+    return trigger_object
+
+    def write_blender_logic(self):
+        super(HeadTrackTrigger, self).write_blender_logic()
+        trigger_name = generate_trigger_name(self["name"])
+
+        #Create script to detect head position
+        script_name = ".".join((trigger_name, "py"))
+        script = bpy.data.texts[script_name]
+        script.write(
+            "\n            scene.cameras['CAMERA'][{}] = {}".format(
+                enabled_name, self["remain_enabled"])
+        )
+
 
 class HeadPositionTrigger(HeadTrackTrigger):
     """For triggers based on position of user in Cave
@@ -323,42 +373,6 @@ class HeadPositionTrigger(HeadTrackTrigger):
             new_trigger["box"] = EventBox.fromXML(box_node)
         return new_trigger
 
-    def blend(self):
-        trigger_object = super(HeadPositionTrigger, self).blend()
-        trigger_name = trigger_object.name
-        enabled_name = generate_enabled_name(trigger_name)
-
-        camera_object = bpy.data.objects["CAMERA"]
-        bpy.context.scene.objects.active = camera_object
-        bpy.ops.object.game_property_new(
-            type='BOOLEAN',
-            name=enabled_name
-        )
-        camera_object.game.properties[enabled_name].value = self["enabled"]
-
-        #Create property sensor to enable position detection
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object="CAMERA",
-            name=enabled_name
-        )
-        trigger_object.game.sensors[-1].name = enabled_name
-        enable_sensor = camera_object.game.sensors[enabled_name]
-        enable_sensor.use_pulse_true_level = True
-        enable_sensor.frequency = 1
-        enable_sensor.property = enabled_name
-        enable_sensor.value = self["enabled"]
-
-        #Create controller to activate trigger actions
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object="CAMERA",
-            name=trigger_name)
-        controller = trigger_object.game.controllers[trigger_name]
-        controller.mode = "MODULE"
-        controller.module = "{}.detect_event".format(trigger_name)
-        controller.link(sensor=enabled_name)
-
     def write_blender_logic(self):
         super(HeadPositionTrigger, self).write_blender_logic()
         trigger_name = generate_trigger_name(self["name"])
@@ -367,21 +381,34 @@ class HeadPositionTrigger(HeadTrackTrigger):
         script_name = ".".join((trigger_name, "py"))
         script = bpy.data.texts[script_name]
         script_text = [
-            "\n            scene.cameras['CAMERA'][{}] = {}".format(
-                enabled_name, self["remain_enabled"]),
-            "",
-            "def detect_event(cont):",
+            "\ndef detect_event(cont):",
             "    scene = bge.logic.getCurrentScene()",
             "    own = cont.owner",
-            "    position = own.location"
-        ]#Start here
+            "    position = own.position",
+            "    inside = True",
+            "    corners = {}".format(
+                zip(self["box"]["corner1"], self["box"]["corner2"])),
+            "    for i in range({}):".format((3,2)[self["box"]["ignore_y"]]),
+            "        if (",
+            "                position[i] < min(corners[i]) or",
+            "                position[i] > max(corners[i])):",
+            "            inside = False",
+            "            break",
+            "    if {}:".format(
+                ("not inside", "inside")[
+                    self["box"]["direction"] == "Inside"]),
+            "        trigger = scene.objects['{}']".format(
+                trigger_name),
+            "        trigger['status'] = 'Start'"
+        ]
+        script.write("\n".join(script_text))
 
 
 class LookAtPoint(HeadTrackTrigger):
     """For event triggers based on user looking at a point
 
     :param tuple point: The point to look at
-    :param float angle: TODO: clarify"""
+    :param float angle: TODO: clarify (WARNING: currently does nothing)"""
 
     argument_validators = {
         "point": IsNumericIterable(required_length=3),
@@ -425,23 +452,31 @@ class LookAtPoint(HeadTrackTrigger):
         new_trigger["angle"] = float(node.attrib["angle"])
         return new_trigger
 
-    def blend(self):
+    def write_blender_logic(self):
+        super(LookAtPoint, self).write_blender_logic()
         trigger_name = generate_trigger_name(self["name"])
-        enabled_name = generate_enabled_name(trigger_name)
 
-        camera_object = bpy.data.objects["CAMERA"]
-        bpy.context.scene.objects.active = camera_object
-        bpy.ops.object.game_property_new(
-            type='BOOLEAN',
-            name=enabled_name
-        )
+        #Create script to detect head position
+        script_name = ".".join((trigger_name, "py"))
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "\ndef detect_event(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    if own.pointInsideFrustrum({}):".format(
+                tuple(self["point"])),
+            "        trigger = scene.objects['{}']".format(
+                trigger_name),
+            "        trigger['status'] = 'Start'"
+        ]
+        script.write("\n".join(script_text))
 
 
 class LookAtDirection(HeadTrackTrigger):
     """For event triggers based on user looking in a direction
 
     :param tuple direction: Direction in which to look
-    :param float angle: TODO: clarify"""
+    :param float angle: Look direction must be within this angle of target"""
 
     argument_validators = {
         "direction": IsNumericIterable(required_length=3),
@@ -487,12 +522,36 @@ class LookAtDirection(HeadTrackTrigger):
         new_trigger["angle"] = float(node.attrib["angle"])
         return new_trigger
 
+    def write_blender_logic(self):
+        super(LookAtObject, self).write_blender_logic()
+        trigger_name = generate_trigger_name(self["name"])
+
+        #Create script to detect head position
+        script_name = ".".join((trigger_name, "py"))
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "\ndef detect_event(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    cam_dir = (own.matrix_world.to_quaternion() *",
+            "        mathutils.Vector((0, 1, 0)))",
+            "    target_dir = mathutils.Vector({})".format(
+                tuple(self["direction"])),
+            "    angle = abs(cam_dir.angle(target_dir, 1.571))",
+            "    if angle < {}:".format(
+                math.radians(self["angle"])),
+            "        trigger = scene.objects['{}']".format(
+                trigger_name),
+            "        trigger['status'] = 'Start'"
+        ]
+        script.write("\n".join(script_text))
+
 
 class LookAtObject(HeadTrackTrigger):
     """For event triggers based on user looking at an object
 
     :param str object: Name of the object to look at
-    :param float angle: TODO: clarify"""
+    :param float angle: TODO: clarify (WARNING: currently does nothing)"""
 
     argument_validators = {
         "object": AlwaysValid("The name of the object to look at"),
@@ -529,6 +588,27 @@ class LookAtObject(HeadTrackTrigger):
         node = node.find("ObjectTarget")
         new_trigger["object"] = node.attrib["name"].strip()
         return new_trigger
+
+    def write_blender_logic(self):
+        super(LookAtObject, self).write_blender_logic()
+        trigger_name = generate_trigger_name(self["name"])
+
+        #Create script to detect head position
+        script_name = ".".join((trigger_name, "py"))
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "\ndef detect_event(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    position = scene.objects[{}].position".format(
+                generate_blender_object_name(self["object"])),
+            "    if own.pointInsideFrustrum({}):".format(
+                tuple(self["point"])),
+            "        trigger = scene.objects['{}']".format(
+                trigger_name),
+            "        trigger['status'] = 'Start'"
+        ]
+        script.write("\n".join(script_text))
 
 
 class MovementTrigger(CaveTrigger):
