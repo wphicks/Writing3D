@@ -27,6 +27,46 @@ def clear_blender_scene():
     bpy.ops.object.delete()
 
 
+def add_key_movement(
+        blender_object, move_name, key, direction, speed):
+    """Convenience function for adding keyboard-controlled motion to
+    Blender object
+
+    :param blender_object: object to add motion to
+    :param str move_name: Name for controller
+    :param str key: Key used to activate motion
+    :param int direction: 0, 1, 2 for x, y, z
+    :param float speed: Speed of motion"""
+    bpy.context.scene.objects.active = blender_object
+    bpy.ops.logic.sensor_add(
+        type="KEYBOARD",
+        object=blender_object.name,
+        name=move_name
+    )
+    blender_object.game.sensors[-1].name = move_name
+    sensor = blender_object.game.sensors[move_name]
+    sensor.key = key
+    bpy.ops.logic.controller_add(
+        type='LOGIC_AND',
+        object=blender_object.name,
+        name=move_name
+    )
+    blender_object.game.controllers[-1].name = move_name
+    controller = blender_object.game.controllers[move_name]
+    bpy.ops.logic.actuator_add(
+        type="MOTION",
+        object=blender_object.name,
+        name=move_name
+    )
+    blender_object.game.actuators[-1].name = move_name
+    actuator = blender_object.game.actuators[move_name]
+    actuator.mode = "OBJECT_NORMAL"
+    actuator.offset_location[direction] = speed
+    actuator.use_local_location = True
+    controller.link(actuator=actuator)
+    controller.link(sensor=sensor)
+
+
 class CaveProject(CaveFeature):
     """Represent entire project for display in Cave
 
@@ -311,6 +351,28 @@ class CaveProject(CaveFeature):
                 new_groups.append(group)
         self["groups"] = new_groups
 
+    def setup_camera(self):
+        bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
+        self.main_camera = bpy.context.object
+        self.main_camera.name = "CAMERA"
+        self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
+        self["desktop_camera_placement"].place(self.main_camera)
+
+    def setup_controls(self):
+        bpy.context.scene.objects.active = self.main_camera
+        if self["allow_rotation"]:
+            bpy.ops.logic.sensor_add(
+                type="MOUSE",
+                object=self.main_camera.name,
+                name="Mouse"
+            )
+        #TODO: Mouselook script and actuators
+        if self["allow_movement"]:
+            add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
+            add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
+            add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
+            add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
+
     def blend(self):
         """Create representation of CaveProject in Blender"""
         clear_blender_scene()
@@ -318,11 +380,8 @@ class CaveProject(CaveFeature):
         bpy.data.scenes["Scene"].game_settings.material_mode = "GLSL"
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
-        bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
-        self.main_camera = bpy.context.object
-        self.main_camera.name = "CAMERA"
-        self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
-        self["desktop_camera_placement"].place(self.main_camera)
+        self.setup_camera()
+        self.setup_controls()
         self.sort_groups()
         bpy.data.texts.new("group_defs.py")
         for group in self["groups"]:
