@@ -219,6 +219,7 @@ class ObjectAction(CaveAction):
         script_text.append("    index += 1")
         if "visible" in self:
             script_text.append("    blender_object.setVisible(True)")
+        # Is the above line really correct?
         if "placement" in self and "rotation" in self["placement"]:
             vector = mathutils.Vector(
                 self["placement"]["rotation"]["rotation_vector"])

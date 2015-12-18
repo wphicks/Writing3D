@@ -306,6 +306,7 @@ class CaveProject(CaveFeature):
             layer in (1, 3, 20) for layer in range(1, 21)]
         bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
         self.main_camera = bpy.context.object
+        self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
         for object_ in self["objects"]:

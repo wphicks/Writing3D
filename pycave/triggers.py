@@ -3,6 +3,7 @@
 Here, triggers are any events within the Cave that can be used to start another
 action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
+import warnings
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .actions import CaveAction
@@ -10,6 +11,12 @@ from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
     OptionListValidator
 from .errors import ConsistencyError, BadCaveXML, InvalidArgument
 from .xml_tools import bool2text, text2tuple, text2bool
+from .names import generate_trigger_name, generate_enabled_name
+try:
+    import bpy
+except ImportError:
+    warnings.warn(
+        "Module bpy not found. Loading pycave.actions as standalone")
 
 
 class CaveTrigger(CaveFeature):
@@ -57,7 +64,116 @@ class CaveTrigger(CaveFeature):
 
     def blend(self):
         """Create representation of CaveTrigger in Blender"""
-        raise NotImplementedError  # TODO
+        trigger_name = generate_trigger_name(self["name"])
+        #Create EMPTY object to represent trigger
+        bpy.ops.object.add(
+            type="EMPTY",
+            layers=[layer == 20 for layer in range(1, 21)],
+        )
+        trigger_object = bpy.context.object
+        bpy.context.scene.objects.active = trigger_object
+        trigger_object.name = trigger_name
+
+        #Create property to start, continue, or stop trigger actions
+        bpy.ops.object.game_property_new(
+            type='STRING',
+            name='status'
+        )
+        trigger_object.game.properties["status"].value = "Stop"
+
+        #Create property sensor to initiate trigger actions
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=trigger_name,
+            name="start_sensor"
+        )
+        trigger_object.game.sensors[-1].name = "start_sensor"
+        start_sensor = trigger_object.game.sensors["start_sensor"]
+        start_sensor.property = "status"
+        start_sensor.value = "Start"
+
+        #Create property sensor to continue actions
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=trigger_name,
+            name="active_sensor"
+        )
+        trigger_object.game.sensors[-1].name = "active_sensor"
+        active_sensor = trigger_object.game.sensors["active_sensor"]
+        active_sensor.use_pulse_true_level = True
+        active_sensor.frequency = 1
+        active_sensor.property = "status"
+        active_sensor.value = "Continue"
+
+        #Create property sensor to stop trigger execution
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=trigger_name,
+            name="stop_sensor"
+        )
+        trigger_object.game.sensors[-1].name = "stop_sensor"
+        stop_sensor = trigger_object.game.sensors["stop_sensor"]
+        stop_sensor.property = "status"
+        stop_sensor.value = "Stop"
+
+        #Create controller to effect trigger actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=trigger_name,
+            name="activate")
+        controller = trigger_object.game.controllers["activate"]
+        controller.mode = "MODULE"
+        controller.module = "{}.activate".format(trigger_name)
+        controller.link(sensor=start_sensor)
+        controller.link(sensor=active_sensor)
+        controller.link(sensor=stop_sensor)
+
+        return trigger_object
+
+    def write_blender_logic(self):
+        trigger_name = generate_trigger_name(self["name"])
+
+        #Create controller script
+        script_name = ".".join((trigger_name, "py"))
+        bpy.data.texts.new(script_name)
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "import bge",
+            "import mathutils",
+            "from time import monotonic",
+            "def activate(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    status = own['status']",
+            "    if status == 'Start':",
+            "        own['start_time'] = monotonic()",
+            "        own['action_index'] = 0",
+            "        own['status'] = 'Continue'",
+            "    if status == 'Continue':",
+            "        try:",
+            "            time = monotonic() - own['start_time']",
+            "            index = own['action_index']"
+            "        except KeyError:",
+            "            raise RuntimeError(",
+            "                'Must activate trigger before continue is used')",
+        ]
+        action_index = 0
+        max_time = self["duration"]
+        for action in self["actions"]:
+            script_text.extend(
+                ["".join(("        ", line)) for line in
+                    action.generate_blender_logic(
+                        time_condition=0,
+                        index_condition=action_index
+                    )]
+            )
+            action_index += 1
+            max_time = max(max_time, action.end_time)
+        script_text.append("        own['action_index'] = index")
+        script_text.append("        own['offset_index'] = 0")
+        script_text.append("        if time >= {}:".format(max_time))
+        script_text.append("            own['status'] = 'Stop'")
+        script.write("\n".join(script_text))
 
 
 class BareTrigger(CaveFeature):
@@ -68,7 +184,7 @@ class BareTrigger(CaveFeature):
     :param bool remain-enabled: Should this remain enabled after it is
     triggered?
     :param float duration: TODO: Clarify
-    :param actions: List of names of CaveActions to be triggered
+    :param actions: List of CaveActions to be triggered
     """
     argument_validators = {
         "name": AlwaysValid(
@@ -207,6 +323,59 @@ class HeadPositionTrigger(HeadTrackTrigger):
             new_trigger["box"] = EventBox.fromXML(box_node)
         return new_trigger
 
+    def blend(self):
+        trigger_object = super(HeadPositionTrigger, self).blend()
+        trigger_name = trigger_object.name
+        enabled_name = generate_enabled_name(trigger_name)
+
+        camera_object = bpy.data.objects["CAMERA"]
+        bpy.context.scene.objects.active = camera_object
+        bpy.ops.object.game_property_new(
+            type='BOOLEAN',
+            name=enabled_name
+        )
+        camera_object.game.properties[enabled_name].value = self["enabled"]
+
+        #Create property sensor to enable position detection
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object="CAMERA",
+            name=enabled_name
+        )
+        trigger_object.game.sensors[-1].name = enabled_name
+        enable_sensor = camera_object.game.sensors[enabled_name]
+        enable_sensor.use_pulse_true_level = True
+        enable_sensor.frequency = 1
+        enable_sensor.property = enabled_name
+        enable_sensor.value = self["enabled"]
+
+        #Create controller to activate trigger actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object="CAMERA",
+            name=trigger_name)
+        controller = trigger_object.game.controllers[trigger_name]
+        controller.mode = "MODULE"
+        controller.module = "{}.detect_event".format(trigger_name)
+        controller.link(sensor=enabled_name)
+
+    def write_blender_logic(self):
+        super(HeadPositionTrigger, self).write_blender_logic()
+        trigger_name = generate_trigger_name(self["name"])
+
+        #Create script to detect head position
+        script_name = ".".join((trigger_name, "py"))
+        script = bpy.data.texts[script_name]
+        script_text = [
+            "\n            scene.cameras['CAMERA'][{}] = {}".format(
+                enabled_name, self["remain_enabled"]),
+            "",
+            "def detect_event(cont):",
+            "    scene = bge.logic.getCurrentScene()",
+            "    own = cont.owner",
+            "    position = own.location"
+        ]#Start here
+
 
 class LookAtPoint(HeadTrackTrigger):
     """For event triggers based on user looking at a point
@@ -255,6 +424,17 @@ class LookAtPoint(HeadTrackTrigger):
             node.attrib["point"], evaluator=float)
         new_trigger["angle"] = float(node.attrib["angle"])
         return new_trigger
+
+    def blend(self):
+        trigger_name = generate_trigger_name(self["name"])
+        enabled_name = generate_enabled_name(trigger_name)
+
+        camera_object = bpy.data.objects["CAMERA"]
+        bpy.context.scene.objects.active = camera_object
+        bpy.ops.object.game_property_new(
+            type='BOOLEAN',
+            name=enabled_name
+        )
 
 
 class LookAtDirection(HeadTrackTrigger):
