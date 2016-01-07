@@ -14,6 +14,7 @@ from .timeline import CaveTimeline
 from .groups import CaveGroup
 from .triggers import CaveTrigger
 from .errors import BadCaveXML
+from .blender_scripts import MOUSE_LOOK_SCRIPT
 try:
     import bpy
 except ImportError:
@@ -364,8 +365,45 @@ class CaveProject(CaveFeature):
             bpy.ops.logic.sensor_add(
                 type="MOUSE",
                 object=self.main_camera.name,
-                name="Mouse"
+                name="Look"
             )
+            self.main_camera.game.sensors[-1].name = "Look"
+            sensor = self.main_camera.game.sensors["Look"]
+            sensor.mouse_event = "MOVEMENT"
+            bpy.ops.logic.controller_add(
+                type='PYTHON',
+                object=self.main_camera.name,
+                name="Look")
+            self.main_camera.game.controllers[-1].name = "Look"
+            controller = self.main_camera.game.controllers["Look"]
+            controller.mode = "MODULE"
+            controller.module = "mouse.look"
+            bpy.data.texts.new("mouse.py")
+            script = bpy.data.texts["mouse.py"]
+            script.write(MOUSE_LOOK_SCRIPT)
+            bpy.ops.logic.actuator_add(
+                type="MOTION",
+                object=self.main_camera.name,
+                name="Look_x"
+            )
+            self.main_camera.game.actuators[-1].name = "Look_x"
+            actuator = self.main_camera.game.actuators["Look_x"]
+            actuator.mode = "OBJECT_NORMAL"
+            actuator.use_local_rotation = True
+            controller.link(actuator=actuator)
+
+            bpy.ops.logic.actuator_add(
+                type="MOTION",
+                object=self.main_camera.name,
+                name="Look_y"
+            )
+            self.main_camera.game.actuators[-1].name = "Look_y"
+            actuator = self.main_camera.game.actuators["Look_y"]
+            actuator.mode = "OBJECT_NORMAL"
+            actuator.use_local_rotation = False
+            controller.link(actuator=actuator)
+
+            controller.link(sensor=sensor)
         #TODO: Mouselook script and actuators
         if self["allow_movement"]:
             add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
