@@ -26,6 +26,7 @@ class Activator(object):
 
     def __init__(self, name_string, actions):
         self.name_string = name_string
+        self.actions = actions
         self.script_header = """
 import bge
 from group_defs import *
@@ -65,7 +66,7 @@ def activate(cont):
         # FOOTER BEGINS HERE
         own['action_index'] = index
         own['offset_index'] = 0
-        if time >= {}:
+        if time >= {max_time}:
             own['status'] = 'Stop'
 """
 
@@ -106,7 +107,7 @@ def activate(cont):
         still process the remainder of its actions"""
         self.select_base_object()
         bpy.ops.object.game_property_new(
-            type='BOOLEAN',
+            type='BOOL',
             name='enabled'
         )
         self.base_object.game.properties["enabled"].value = initial_value
@@ -229,11 +230,11 @@ def activate(cont):
         activating CaveActions"""
         action_logic = ["        # ACTION LOGIC BEGINS HERE"]
         action_index = 0
-        if len(self["actions"]) == 0:
+        if len(self.actions) == 0:
             max_time = 0
         else:
-            max_time = self["actions"][-1][0]
-        for time, action in self["actions"]:
+            max_time = self.actions[-1][0]
+        for time, action in self.actions:
             action_logic.extend(
                 ["".join(("        ", line)) for line in
                     action.generate_blender_logic(
@@ -243,6 +244,7 @@ def activate(cont):
             )
             action_index += 1
             max_time = max(max_time, action.end_time)
+        self.script_footer = self.script_footer.format(max_time=max_time)
         return "\n".join(action_logic)
 
     def create_blender_objects(self):
@@ -280,3 +282,11 @@ class BlenderTimeline(Activator):
     @property
     def name(self):
         return generate_blender_timeline_name(self.name_string)
+
+    def create_status_property(self):
+        return super(BlenderTimeline, self).create_status_property(
+            initial_value=("Stop", "Start")[self.start_immediately])
+
+    def __init__(self, name, actions, start_immediately=False):
+        super(BlenderTimeline, self).__init__(name, actions)
+        self.start_immediately = start_immediately

@@ -134,7 +134,9 @@ class CaveTimeline(CaveFeature):
 
     def blend(self):
         """Create Blender object to implement CaveTimeline"""
-        self.activator = BlenderTimeline(self["name"], self["actions"])
+        self.activator = BlenderTimeline(
+            self["name"], self["actions"],
+            start_immediately=self["start_immediately"])
         self.activator.create_blender_objects()
         return self.activator.base_object
 
