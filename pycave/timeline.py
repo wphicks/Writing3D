@@ -1,6 +1,5 @@
 """Tools for working with timelines in Cave projects
 """
-import warnings
 import xml.etree.ElementTree as ET
 from collections import MutableSequence
 from .features import CaveFeature
@@ -8,12 +7,8 @@ from .actions import CaveAction
 from .validators import AlwaysValid
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
-from .names import generate_blender_timeline_name
-try:
-    import bpy
-except ImportError:
-    warnings.warn(
-        "Module bpy not found. Loading pycave.timeline as standalone")
+from .activators import BlenderTimeline
+from .errors import EBKAC
 
 
 class SortedList(MutableSequence):
@@ -138,133 +133,23 @@ class CaveTimeline(CaveFeature):
         return new_timeline
 
     def blend(self):
-        """Create representation of CaveTimeline in Blender"""
-        blender_object_name = generate_blender_timeline_name(self["name"])
-        #Create EMPTY object to represent timeline
-        bpy.ops.object.add(
-            type="EMPTY",
-            layers=[layer == 20 for layer in range(1, 21)],
-        )
-        timeline_object = bpy.context.object
-        bpy.context.scene.objects.active = timeline_object
-        timeline_object.name = blender_object_name
+        """Create Blender object to implement CaveTimeline"""
+        self.activator = BlenderTimeline(self["name"], self["actions"])
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
-        #Create property to start, continue, or stop timeline
-        bpy.ops.object.game_property_new(
-            type='STRING',
-            name='status'
-        )
-        if self["start_immediately"]:
-            timeline_object.game.properties["status"].value = "Start"
-        else:
-            timeline_object.game.properties["status"].value = "Stop"
-
-        #Create property sensor to initiate timeline
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=blender_object_name,
-            name="start_sensor"
-        )
-        timeline_object.game.sensors[-1].name = "start_sensor"
-        start_sensor = timeline_object.game.sensors["start_sensor"]
-        start_sensor.property = "status"
-        start_sensor.value = "Start"
-
-        #Create property sensor to activate actions
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=blender_object_name,
-            name="active_sensor"
-        )
-        timeline_object.game.sensors[-1].name = "active_sensor"
-        active_sensor = timeline_object.game.sensors["active_sensor"]
-        active_sensor.use_pulse_true_level = True
-        active_sensor.frequency = 1
-        active_sensor.property = "status"
-        active_sensor.value = "Continue"
-
-        #Create property sensor to pause timeline
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=blender_object_name,
-            name="stop_sensor"
-        )
-        timeline_object.game.sensors[-1].name = "stop_sensor"
-        stop_sensor = timeline_object.game.sensors["stop_sensor"]
-        stop_sensor.property = "status"
-        stop_sensor.value = "Stop"
-
-        #Create controller to effect timeline actions
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=blender_object_name,
-            name="activate")
-        controller = timeline_object.game.controllers["activate"]
-        controller.mode = "MODULE"
-        controller.module = "{}.activate".format(blender_object_name)
-        controller.link(sensor=start_sensor)
-        controller.link(sensor=active_sensor)
-        controller.link(sensor=stop_sensor)
-
-        return timeline_object
+    def link_blender_logic(self):
+        """Link BGE logic bricks for this CaveTimeline"""
+        try:
+            self.activator.link_logic_bricks()
+        except AttributeError:
+            raise EBKAC(
+                "blend() must be called before link_blender_logic()")
 
     def write_blender_logic(self):
-        blender_object_name = generate_blender_timeline_name(self["name"])
-
-        #Create controller script
-        script_name = ".".join((blender_object_name, "py"))
-        bpy.data.texts.new(script_name)
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "import bge",
-            "from group_defs import *",
-            "import mathutils",
-            "from time import monotonic",
-            "def activate(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    status = own['status']",
-            "    if status == 'Start':",
-            "        own['start_time'] = monotonic()",
-            "        own['action_index'] = 0",
-            "        own['offset_time'] = 0",
-            "        own['offset_index'] = 0",
-            "        own['status'] = 'Continue'",
-            "    if status == 'Stop':",
-            "        try:",
-            "            own['offset_time'] = monotonic() - own['start_time']",
-            "            own['offset_index'] = own['action_index']",
-            "        except KeyError:",
-            "            pass",
-            "    if status == 'Continue':",
-            "        try:",
-            "            if own['offset_time'] != 0:",
-            "                own['start_time'] = (",
-            "                    monotonic() - own['offset_time'])",
-            "                own['offset_time'] = 0",
-            "        except KeyError:",
-            "            raise RuntimeError(",
-            "                'Must start timeline before continue is used')",
-            "        time = monotonic() - own['start_time']",
-            "        index = own['offset_index'] + own['action_index']"
-        ]
-        action_index = 0
-        if len(self["actions"]) == 0:
-            max_time = 0
-        else:
-            max_time = self["actions"][-1][0]
-        for time, action in self["actions"]:
-            script_text.extend(
-                ["".join(("        ", line)) for line in
-                    action.generate_blender_logic(
-                        time_condition=time,
-                        index_condition=action_index
-                    )]
-            )
-            action_index += 1
-            max_time = max(max_time, action.end_time)
-        script_text.append("        own['action_index'] = index")
-        script_text.append("        own['offset_index'] = 0")
-        script_text.append("        if time >= {}:".format(max_time))
-        script_text.append("            own['status'] = 'Stop'")
-        script.write("\n".join(script_text))
+        """Write any necessary game engine logic for this CaveTimeline"""
+        try:
+            self.activator.write_python_logic()
+        except AttributeError:
+            raise EBKAC(
+                "blend() must be called before write_blender_logic()")

@@ -26,3 +26,16 @@ class ConsistencyError(Exception):
     or displayed in the Cave."""
     def __init__(self, message):
         super(InvalidArgument, self).__init__(message)
+
+
+class EBKAC(Exception):
+    """Exception thrown when methods are called in a logically nonsensical
+    order or given obviously nonsensical input
+
+    E.g. Setting a property on an object before creating that object.
+    This error should never be raised for improper input of a value for a Cave
+    feature (i.e. in a GUI project creator) but only when someone is using the
+    underlying methods of that feature in a dangerous and irrational way.
+    """
+    def __init__(self, message):
+        super(EBKAC, self).__init__(message)

@@ -422,6 +422,8 @@ class CaveProject(CaveFeature):
         self.setup_controls()
         self.sort_groups()
         bpy.data.texts.new("group_defs.py")
+
+        # Create Objects
         for group in self["groups"]:
             group.blend_objects()
         for group in self["groups"]:
@@ -430,9 +432,15 @@ class CaveProject(CaveFeature):
             object_.blend()
         for sound in self["sounds"]:
             sound.blend()
+
+        # Create Activators
         for timeline in self["timelines"]:
             timeline.blend()
-        for event in self["trigger_events"]:
-            event.blend()
+        #for event in self["trigger_events"]:
+        #    event.blend()
+        # Link game engine logic bricks for Activators
+        for timeline in self["timelines"]:
+            timeline.link_blender_logic()
+        # Write any necessary game engine logic for Activators
         for timeline in self["timelines"]:
             timeline.write_blender_logic()
