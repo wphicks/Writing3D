@@ -29,3 +29,8 @@ def generate_enabled_name(string):
 def generate_group_name(string):
     """Generate name used for Blender group"""
     return "group_{}".format(string)
+
+
+def generate_link_name(string):
+    """Generate name used for Blender link"""
+    return "link_{}".format(string)

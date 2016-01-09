@@ -11,7 +11,8 @@ from .actions import CaveAction
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
-from .names import generate_blender_object_name, generate_blender_material_name
+from .names import generate_blender_object_name,\
+    generate_blender_material_name, generate_link_name, generate_enabled_name
 import warnings
 try:
     import bpy
@@ -163,6 +164,111 @@ class CaveLink(CaveFeature):
                         CaveAction.fromXML(child))
 
         return link
+
+    def blend(self, owner):
+        """Create representation of CaveLink in Blender
+
+        :param str owner: Name of CaveObject to which link is applied"""
+
+        link_name = generate_link_name(owner)
+        enabled_name = generate_enabled_name(link_name)
+        owner_name = generate_blender_object_name(owner)
+
+        owner_object = bpy.data.objects[owner_name]
+        bpy.context.scene.objects.active = owner_object
+
+        #Create property to start, continue, or stop link actions
+        bpy.ops.object.game_property_new(
+            type='STRING',
+            name='status'
+        )
+        owner_object.game.properties["status"].value = "Stop"
+
+        #Create property sensor to initiate link actions
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=owner_name,
+            name="start_sensor"
+        )
+        owner_object.game.sensors[-1].name = "start_sensor"
+        start_sensor = owner_object.game.sensors["start_sensor"]
+        start_sensor.property = "status"
+        start_sensor.value = "Start"
+
+        #Create property sensor to continue link actions
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=owner_name,
+            name="active_sensor"
+        )
+        owner_object.game.sensors[-1].name = "active_sensor"
+        active_sensor = owner_object.game.sensors["active_sensor"]
+        active_sensor.use_pulse_true_level = True
+        active_sensor.frequency = 1
+        active_sensor.property = "status"
+        active_sensor.value = "Continue"
+
+        #Create property sensor to stop link execution
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=owner_name,
+            name="stop_sensor"
+        )
+        owner_object.game.sensors[-1].name = "stop_sensor"
+        stop_sensor = owner_object.game.sensors["stop_sensor"]
+        stop_sensor.property = "status"
+        stop_sensor.value = "Stop"
+
+        #Create controller to effect link actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=owner_name,
+            name="activate")
+        controller = owner_object.game.controllers["activate"]
+        controller.mode = "MODULE"
+        controller.module = "{}.activate".format(owner_name)
+        controller.link(sensor=start_sensor)
+        controller.link(sensor=active_sensor)
+        controller.link(sensor=stop_sensor)
+
+        #Enable or disable link
+        bpy.ops.object.game_property_new(
+            type='BOOLEAN',
+            name=enabled_name
+        )
+        owner_object.game.properties[enabled_name].value = self["enabled"]
+
+        #Create property to track number of clicks
+        bpy.ops.object.game_property_new(
+            type='INT',
+            name="CLICKS"
+        )
+        owner_object.game.properties["CLICKS"].value = 0
+
+        #Create property sensor to enable position detection
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object="CAMERA",
+            name=enabled_name
+        )
+        camera_object.game.sensors[-1].name = enabled_name
+        enable_sensor = camera_object.game.sensors[enabled_name]
+        enable_sensor.use_pulse_true_level = True
+        enable_sensor.frequency = 1
+        enable_sensor.property = enabled_name
+        enable_sensor.value = self["enabled"]
+
+        #Create controller to activate trigger actions
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object="CAMERA",
+            name=trigger_name)
+        controller = trigger_object.game.controllers[trigger_name]
+        controller.mode = "MODULE"
+        controller.module = "{}.detect_event".format(trigger_name)
+        controller.link(sensor=enabled_name)
+
+        return trigger_object
 
 
 class CaveObject(CaveFeature):
