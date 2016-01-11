@@ -3,22 +3,17 @@
 Here, triggers are any events within the Cave that can be used to start another
 action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
-import warnings
-import math
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .actions import CaveAction
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
     OptionListValidator
-from .errors import ConsistencyError, BadCaveXML, InvalidArgument
+from .errors import ConsistencyError, BadCaveXML, InvalidArgument, \
+    EBKAC
 from .xml_tools import bool2text, text2tuple, text2bool
-from .names import generate_trigger_name, generate_enabled_name, \
-    generate_blender_object_name
-try:
-    import bpy
-except ImportError:
-    warnings.warn(
-        "Module bpy not found. Loading pycave.actions as standalone")
+from .activators import BlenderTrigger, BlenderPositionTrigger, \
+    BlenderPointTrigger, BlenderDirectionTrigger, BlenderLookObjectTrigger, \
+    BlenderObjectPositionTrigger
 
 
 class CaveTrigger(CaveFeature):
@@ -66,157 +61,28 @@ class CaveTrigger(CaveFeature):
 
     def blend(self):
         """Create representation of CaveTrigger in Blender"""
-        trigger_name = generate_trigger_name(self["name"])
-        enabled_name = generate_enabled_name(trigger_name)
-        #Create EMPTY object to represent trigger
-        bpy.ops.object.add(
-            type="EMPTY",
-            layers=[layer == 20 for layer in range(1, 21)],
-        )
-        trigger_object = bpy.context.object
-        bpy.context.scene.objects.active = trigger_object
-        trigger_object.name = trigger_name
+        self.activator = BlenderTrigger(
+            self["name"],
+            self["actions"],
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"])
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
-        #Create property to start, continue, or stop trigger actions
-        bpy.ops.object.game_property_new(
-            type='STRING',
-            name='status'
-        )
-        trigger_object.game.properties["status"].value = "Stop"
-
-        #Create property sensor to initiate trigger actions
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=trigger_name,
-            name="start_sensor"
-        )
-        trigger_object.game.sensors[-1].name = "start_sensor"
-        start_sensor = trigger_object.game.sensors["start_sensor"]
-        start_sensor.property = "status"
-        start_sensor.value = "Start"
-
-        #Create property sensor to continue actions
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=trigger_name,
-            name="active_sensor"
-        )
-        trigger_object.game.sensors[-1].name = "active_sensor"
-        active_sensor = trigger_object.game.sensors["active_sensor"]
-        active_sensor.use_pulse_true_level = True
-        active_sensor.frequency = 1
-        active_sensor.property = "status"
-        active_sensor.value = "Continue"
-
-        #Create property sensor to stop trigger execution
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=trigger_name,
-            name="stop_sensor"
-        )
-        trigger_object.game.sensors[-1].name = "stop_sensor"
-        stop_sensor = trigger_object.game.sensors["stop_sensor"]
-        stop_sensor.property = "status"
-        stop_sensor.value = "Stop"
-
-        #Create controller to effect trigger actions
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=trigger_name,
-            name="activate")
-        controller = trigger_object.game.controllers["activate"]
-        controller.mode = "MODULE"
-        controller.module = "{}.activate".format(trigger_name)
-        controller.link(sensor=start_sensor)
-        controller.link(sensor=active_sensor)
-        controller.link(sensor=stop_sensor)
-
-        #Enable or disable trigger on main camera
-        camera_object = bpy.data.objects["CAMERA"]
-        bpy.context.scene.objects.active = camera_object
-        bpy.ops.object.game_property_new(
-            type='BOOLEAN',
-            name=enabled_name
-        )
-        camera_object.game.properties[enabled_name].value = self["enabled"]
-
-        #Create property sensor to enable position detection
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object="CAMERA",
-            name=enabled_name
-        )
-        camera_object.game.sensors[-1].name = enabled_name
-        enable_sensor = camera_object.game.sensors[enabled_name]
-        enable_sensor.use_pulse_true_level = True
-        enable_sensor.frequency = 1
-        enable_sensor.property = enabled_name
-        enable_sensor.value = self["enabled"]
-
-        #Create controller to activate trigger actions
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object="CAMERA",
-            name=trigger_name)
-        controller = trigger_object.game.controllers[trigger_name]
-        controller.mode = "MODULE"
-        controller.module = "{}.detect_event".format(trigger_name)
-        controller.link(sensor=enabled_name)
-
-        return trigger_object
+    def link_blender_logic(self):
+        """Link BGE logic bricks for this CaveTrigger"""
+        try:
+            self.activator.link_logic_bricks()
+        except AttributeError:
+            raise EBKAC(
+                "blend() must be called before link_blender_logic()")
 
     def write_blender_logic(self):
-        trigger_name = generate_trigger_name(self["name"])
-        enabled_name = generate_enabled_name(trigger_name)
-
-        #Create controller script
-        script_name = ".".join((trigger_name, "py"))
-        bpy.data.texts.new(script_name)
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "import bge",
-            "from group_defs import *",
-            "import mathutils",
-            "from time import monotonic",
-            "def activate(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    status = own['status']",
-            "    if not own['enabled']:",
-            "        own['status'] = 'Stop'",
-            "        return",
-            "    if status == 'Start':",
-            "        own['start_time'] = monotonic()",
-            "        own['action_index'] = 0",
-            "        own['status'] = 'Continue'",
-            "    if status == 'Continue':",
-            "        try:",
-            "            time = monotonic() - own['start_time']",
-            "            index = own['action_index']"
-            "        except KeyError:",
-            "            raise RuntimeError(",
-            "                'Must activate trigger before continue is used')",
-        ]
-        action_index = 0
-        max_time = self["duration"]
-        for action in self["actions"]:
-            script_text.extend(
-                ["".join(("        ", line)) for line in
-                    action.generate_blender_logic(
-                        time_condition=0,
-                        index_condition=action_index
-                    )]
-            )
-            action_index += 1
-            max_time = max(max_time, action.end_time)
-        script_text.append("        own['action_index'] = index")
-        script_text.append("        own['offset_index'] = 0")
-        script_text.append("        if time >= {}:".format(max_time))
-        script_text.append("            own['status'] = 'Stop'")
-        script_text.append(
-            "            scene.cameras['CAMERA'][{}] = {}".format(
-                enabled_name, self["remain_enabled"]))
-        script.write("\n".join(script_text))
+        try:
+            self.activator.write_python_logic()
+        except AttributeError:
+            raise EBKAC(
+                "blend() must be called before write_blender_logic()")
 
 
 class BareTrigger(CaveFeature):
@@ -366,35 +232,16 @@ class HeadPositionTrigger(HeadTrackTrigger):
             new_trigger["box"] = EventBox.fromXML(box_node)
         return new_trigger
 
-    def write_blender_logic(self):
-        super(HeadPositionTrigger, self).write_blender_logic()
-        trigger_name = generate_trigger_name(self["name"])
-
-        #Create script to detect head position
-        script_name = ".".join((trigger_name, "py"))
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "\ndef detect_event(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    position = own.position",
-            "    inside = True",
-            "    corners = {}".format(
-                zip(self["box"]["corner1"], self["box"]["corner2"])),
-            "    for i in range({}):".format((3, 2)[self["box"]["ignore_y"]]),
-            "        if (",
-            "                position[i] < min(corners[i]) or",
-            "                position[i] > max(corners[i])):",
-            "            inside = False",
-            "            break",
-            "    if {}:".format(
-                ("not inside", "inside")[
-                    self["box"]["direction"] == "Inside"]),
-            "        trigger = scene.objects['{}']".format(
-                trigger_name),
-            "        trigger['status'] = 'Start'"
-        ]
-        script.write("\n".join(script_text))
+    def blend(self):
+        """Create representation of CaveTrigger in Blender"""
+        self.activator = BlenderPositionTrigger(
+            self["name"],
+            self["actions"],
+            self["box"],
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"])
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
 
 class LookAtPoint(HeadTrackTrigger):
@@ -445,24 +292,16 @@ class LookAtPoint(HeadTrackTrigger):
         new_trigger["angle"] = float(node.attrib["angle"])
         return new_trigger
 
-    def write_blender_logic(self):
-        super(LookAtPoint, self).write_blender_logic()
-        trigger_name = generate_trigger_name(self["name"])
-
-        #Create script to detect head position
-        script_name = ".".join((trigger_name, "py"))
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "\ndef detect_event(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    if own.pointInsideFrustrum({}):".format(
-                tuple(self["point"])),
-            "        trigger = scene.objects['{}']".format(
-                trigger_name),
-            "        trigger['status'] = 'Start'"
-        ]
-        script.write("\n".join(script_text))
+    def blend(self):
+        """Create representation of CaveTrigger in Blender"""
+        self.activator = BlenderPointTrigger(
+            self["name"],
+            self["actions"],
+            self["point"],
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"])
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
 
 class LookAtDirection(HeadTrackTrigger):
@@ -515,29 +354,16 @@ class LookAtDirection(HeadTrackTrigger):
         new_trigger["angle"] = float(node.attrib["angle"])
         return new_trigger
 
-    def write_blender_logic(self):
-        super(LookAtDirection, self).write_blender_logic()
-        trigger_name = generate_trigger_name(self["name"])
-
-        #Create script to detect head position
-        script_name = ".".join((trigger_name, "py"))
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "\ndef detect_event(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    cam_dir = (own.matrix_world.to_quaternion() *",
-            "        mathutils.Vector((0, 1, 0)))",
-            "    target_dir = mathutils.Vector({})".format(
-                tuple(self["direction"])),
-            "    angle = abs(cam_dir.angle(target_dir, 1.571))",
-            "    if angle < {}:".format(
-                math.radians(self["angle"])),
-            "        trigger = scene.objects['{}']".format(
-                trigger_name),
-            "        trigger['status'] = 'Start'"
-        ]
-        script.write("\n".join(script_text))
+    def blend(self):
+        """Create representation of CaveTrigger in Blender"""
+        self.activator = BlenderDirectionTrigger(
+            self["name"],
+            self["actions"],
+            self["direction"],
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"])
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
 
 class LookAtObject(HeadTrackTrigger):
@@ -582,26 +408,16 @@ class LookAtObject(HeadTrackTrigger):
         new_trigger["object"] = node.attrib["name"].strip()
         return new_trigger
 
-    def write_blender_logic(self):
-        super(LookAtObject, self).write_blender_logic()
-        trigger_name = generate_trigger_name(self["name"])
-
-        #Create script to detect head position
-        script_name = ".".join((trigger_name, "py"))
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "\ndef detect_event(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    position = scene.objects[{}].position".format(
-                generate_blender_object_name(self["object"])),
-            "    if own.pointInsideFrustrum({}):".format(
-                tuple(self["point"])),
-            "        trigger = scene.objects['{}']".format(
-                trigger_name),
-            "        trigger['status'] = 'Start'"
-        ]
-        script.write("\n".join(script_text))
+    def blend(self):
+        """Create representation of CaveTrigger in Blender"""
+        self.activator = BlenderLookObjectTrigger(
+            self["name"],
+            self["actions"],
+            self["object"],
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"])
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
 
 class MovementTrigger(CaveTrigger):
@@ -688,48 +504,24 @@ class MovementTrigger(CaveTrigger):
         new_trigger["box"] = EventBox.fromXML(node)
         return new_trigger
 
-    def write_blender_logic(self):
-        super(MovementTrigger, self).write_blender_logic()
-        trigger_name = generate_trigger_name(self["name"])
-
-        #Create script to detect head position
-        script_name = ".".join((trigger_name, "py"))
-        script = bpy.data.texts[script_name]
-        script_text = [
-            "\ndef detect_event(cont):",
-            "    scene = bge.logic.getCurrentScene()",
-            "    own = cont.owner",
-            "    corners = {}".format(
-                zip(self["box"]["corner1"], self["box"]["corner2"]))
-        ]
+    def blend(self):
+        """Create representation of CaveTrigger in Blender"""
         if self["type"] == "Single Object":
-            script_text.append(
-                "    all_objects = ['{}']".format(
-                    self["object_name"])
-            )
+            objects_string = "['{}']".format(self["object_name"])
         else:
-            script_text.append(
-                "    all_objects = {}".format(
-                    self["object_name"])
-            )
-        script_text.extend([
-            "    all_objects = [",
-            "scene.objects[object_name] for object_name in all_objects",
-            "    in_region = {}".format(
-                self["type"] == "Group(All)"),
-            "    for object_ in all_objects:",
-            "        position = object_.position",
-            "        in_region = (in_region {}".format(
-                ("or", "and")[self["type"] == "Group(All)"]),
-            "            {}(position[i] < min(corners[i]) or".format(
-                ("", "not ")[self["box"]["direction"] == "Inside"]),
-            "               position[i] > max(corners[i])))",
-            "    if in_region:",
-            "        trigger = scene.objects['{}']".format(
-                trigger_name),
-            "        trigger['status'] = 'Start'"
-        ])
-        script.write("\n".join(script_text))
+            objects_string = self["object_name"]
+        if "All" in self["type"]:
+            detect_any = False
+        self.activator = BlenderObjectPositionTrigger(
+            self["name"],
+            self["actions"],
+            self["box"],
+            objects_string,
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"],
+            detect_any=detect_any)
+        self.activator.create_blender_objects()
+        return self.activator.base_object
 
 
 class EventBox(CaveFeature):
