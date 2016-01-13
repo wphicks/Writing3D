@@ -14,6 +14,7 @@ except ImportError:
 
 class BlenderLookAtTrigger(BlenderTrigger):
     """Activator based on where user is looking"""
+    # TODO: Restructure methods to be consistent with other triggers
 
     def select_camera(self):
         """Select the main camera for modifications"""
@@ -146,10 +147,12 @@ class BlenderPointTrigger(BlenderLookAtTrigger):
             "\ndef detect_event(cont):",
             "    scene = bge.logic.getCurrentScene()",
             "    own = cont.owner",
-            "    if own.pointInsideFrustrum({}):".format(
-                tuple(self["point"])),
-            "        trigger = scene.objects['{}']".format(
+            "    trigger = scene.objects['{}']".format(
                 self.name),
+            "    if (own.pointInsideFrustrum({})".format(
+                tuple(self["point"])),
+            "            and trigger['enabled'] and",
+            "            trigger['status'] == 'Stop'):",
             "        trigger['status'] = 'Start'"
         ]
         detection_logic = "\n".join(detection_logic)
@@ -180,10 +183,11 @@ class BlenderDirectionTrigger(BlenderLookAtTrigger):
             "    target_dir = mathutils.Vector({})".format(
                 tuple(self.direction)),
             "    angle = abs(cam_dir.angle(target_dir, 1.571))",
-            "    if angle < {}:".format(
-                math.radians(self.angle)),
-            "        trigger = scene.objects['{}']".format(
+            "    trigger = scene.objects['{}']".format(
                 self.name),
+            "    if (angle < {}".format(math.radians(self.angle)),
+            "            and trigger['enabled'] and"
+            "            trigger['status'] == 'Stop'):"
             "        trigger['status'] = 'Start'"
         ]
         detection_logic = "\n".join(detection_logic)
@@ -213,9 +217,11 @@ class BlenderLookObjectTrigger(BlenderLookAtTrigger):
             "    own = cont.owner",
             "    position = scene.objects[{}].position".format(
                 self.look_at_object),
-            "    if own.pointInsideFrustrum(position):",
-            "        trigger = scene.objects['{}']".format(
+            "    trigger = scene.objects['{}']".format(
                 self.name),
+            "    if (own.pointInsideFrustrum(position)",
+            "            and trigger['enabled']",
+            "            and trigger['status'] == 'Stop'):",
             "        trigger['status'] = 'Start'"
         ]
         detection_logic = "\n".join(detection_logic)

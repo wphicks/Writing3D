@@ -430,6 +430,7 @@ class CaveProject(CaveFeature):
             group.blend_groups()
         for object_ in self["objects"]:
             object_.blend()
+        # TODO: Call methods to add links
         for sound in self["sounds"]:
             sound.blend()
 
@@ -441,6 +442,12 @@ class CaveProject(CaveFeature):
         # Link game engine logic bricks for Activators
         for timeline in self["timelines"]:
             timeline.link_blender_logic()
+        for object_ in self["objects"]:
+            if object_["link"] is not None:
+                object_["link"].link_blender_logic()
         # Write any necessary game engine logic for Activators
         for timeline in self["timelines"]:
             timeline.write_blender_logic()
+        for object_ in self["objects"]:
+            if object_["link"] is not None:
+                object_["link"].write_blender_logic()

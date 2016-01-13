@@ -17,17 +17,18 @@ class BlenderPositionTrigger(BlenderTrigger):
             "    inside = True",
             "    corners = {}".format(
                 zip(self.box["corner1"], self.box["corner2"])),
+            "    trigger = scene.objects['{}']".format(
+                self.name),
             "    for i in range({}):".format((3, 2)[self.box["ignore_y"]]),
             "        if (",
             "                position[i] < min(corners[i]) or",
             "                position[i] > max(corners[i])):",
             "            inside = False",
             "            break",
-            "    if {}:".format(
+            "    if ({} and trigger['enabled'] and".format(
                 ("not inside", "inside")[
                     self.box["direction"] == "Inside"]),
-            "        trigger = scene.objects['{}']".format(
-                self.name),
+            "            trigger['status'] == 'Stop'):"
             "        trigger['status'] = 'Start'"
         ]
         detection_logic = "\n".join(detection_logic)

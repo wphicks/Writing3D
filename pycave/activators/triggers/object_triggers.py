@@ -1,4 +1,4 @@
-"""A Blender-based implementation of triggers based on the state of objects in
+"""A Blender implementation of triggers based on the state of objects in
 virtual space
 """
 import warnings
@@ -14,7 +14,15 @@ except ImportError:
 
 class BlenderObjectPositionTrigger(BlenderTrigger):
     """Activator based on position of objects in virtual space
+
+    :param str objects_string: A string containing either a
+    Python-formatted list of names of Blender objects or a single valid
+    group name (e.g. "['object_myobj1', 'object_myobj2']" or "group_mygrp"
+    :param bool detect_any: True if trigger should activate when any
+    specified object passes the box's boundaries as specified, False if
+    trigger should activate when ALL specified objects have done so
     """
+
     def create_enabled_sensor(self):
         """Add a sensor to fire continuously while trigger is enabled"""
 
@@ -60,13 +68,8 @@ class BlenderObjectPositionTrigger(BlenderTrigger):
 
     def generate_detection_logic(self):
         """Add a function to Python control script to detect user position
+        """
 
-        :param str objects_string: A string containing either a
-        Python-formatted list of names of Blender objects or a single valid
-        group name (e.g. "['object_myobj1', 'object_myobj2']" or "group_mygrp"
-        :param bool detect_any: True if trigger should activate when any
-        specified object passes the box's boundaries as specified, False if
-        trigger should activate when ALL specified objects have done so"""
         detection_logic = [
             "\ndef detect_event(cont):",
             "    scene = bge.logic.getCurrentScene()",
@@ -84,7 +87,9 @@ class BlenderObjectPositionTrigger(BlenderTrigger):
             "            {}(position[i] < min(corners[i]) or".format(
                 ("", "not ")[self.box["direction"] == "Inside"]),
             "               position[i] > max(corners[i])))",
-            "    if in_region:",
+            "    if (",
+            "            in_region and own['enabled'] and",
+            "            own['status'] == 'Stop'):",
             "        own['status'] = 'Start'"
         ]
         detection_logic = "\n".join(detection_logic)

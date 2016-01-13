@@ -1,6 +1,6 @@
 """A Blender-based implementation of event triggers"""
 from pycave.names import generate_trigger_name
-from .activators import Activator
+from pycave.activators import Activator
 
 
 class BlenderTrigger(Activator):

@@ -1,15 +1,13 @@
 """Classes used to initiate actions in Blender
 """
 import warnings
-import math
 from .errors import EBKAC
-from .names import generate_blender_timeline_name, generate_trigger_name,\
-    generate_blender_object_name
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.timeline as standalone")
+#TODO: Add checks on detect_events for if trigger is already started
 
 
 class Activator(object):

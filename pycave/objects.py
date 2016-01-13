@@ -4,7 +4,7 @@ import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 import math
-from .errors import BadCaveXML, InvalidArgument
+from .errors import BadCaveXML, InvalidArgument, EBKAC
 from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from .features import CaveFeature
 from .actions import CaveAction
@@ -12,6 +12,7 @@ from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .names import generate_blender_object_name, generate_blender_material_name
+from .activators import BlenderClickTrigger
 import warnings
 try:
     import bpy
@@ -163,6 +164,37 @@ class CaveLink(CaveFeature):
                         CaveAction.fromXML(child))
 
         return link
+
+    def blend(self, object_name):
+        """Create Blender object to implement CaveLink
+
+        :param str object_name: The name of the object to which link is
+        assigned"""
+        self.activator = BlenderClickTrigger(
+            self["name"], self["actions"], object_name,
+            enable_immediately=self["enabled"],
+            remain_enabled=self["remain_enabled"],
+            select_color=self["selected_color"],
+            enable_color=self["enabled_color"]
+        )
+        self.activator.create_blender_objects()
+        return self.activator.base_object
+
+    def link_blender_logic(self):
+        """Link BGE logic bricks for this CaveLink"""
+        try:
+            self.activator.link_logic_bricks()
+        except AttributeError:
+            raise EBKAC(
+                "blend() must be called before link_blender_logic()")
+
+    def write_blender_logic(self):
+        """Write any necessary game engine logic for this CaveTimeline"""
+        try:
+            self.activator.write_python_logic()
+        except AttributeError:
+            raise EBKAC(
+                "blend() must be called before write_blender_logic()")
 
 
 class CaveObject(CaveFeature):
@@ -317,6 +349,8 @@ class CaveObject(CaveFeature):
 
         self["placement"].place(blender_object)
         #TODO: Apply link
+        if self["link"] is not None:
+            self["link"].blend(generate_blender_object_name(self["name"]))
         if self["click_through"]:
             pass
             #TODO
