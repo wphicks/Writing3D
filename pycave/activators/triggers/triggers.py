@@ -11,10 +11,11 @@ class BlenderTrigger(Activator):
         return generate_trigger_name(self.name_string)
 
     def generate_action_logic(self):
-        action_logic = [super(BlenderTrigger, self).generate_action_logic()]
+        action_logic = ["        # ACTION LOGIC BEGINS HERE"]
         max_time = self.duration
-        #TODO: The above is incorrect. Duration is actually a measure of how
-        #long a trigger must remain triggered before its actions begin
+        # TODO: The above is not a full implementation of duration. Duration is
+        # actually a measure of how long a trigger must remain triggered
+        # before its actions begin
         action_index = 0
         for action in self.actions:
             action_logic.extend(

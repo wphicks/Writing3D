@@ -1,7 +1,7 @@
 """Classes used to initiate actions in Blender
 """
 import warnings
-from .errors import EBKAC
+from pycave.errors import EBKAC
 try:
     import bpy
 except ImportError:

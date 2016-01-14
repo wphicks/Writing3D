@@ -186,7 +186,7 @@ class ObjectAction(CaveAction):
             blender_object_name)
 
     def generate_blender_logic(
-            self, time_condition=0, index_condition=None):
+            self, time_condition=0, index_condition=None, click_condition=-1):
         """Generate Python logic for implementing action
 
         :param float time_condition: Time at which action should start
@@ -208,6 +208,10 @@ class ObjectAction(CaveAction):
         if index_condition is not None:
             start_conditional.append("index == {}".format(index_condition))
             continue_conditional.append("index >= {}".format(index_condition))
+
+        if click_condition > 0:
+            start_conditional.append("own['clicks'] == {}".format(
+                click_condition))
 
         start_conditional = "if {}:".format(" and ".join(start_conditional))
         continue_conditional = "if {}:".format(

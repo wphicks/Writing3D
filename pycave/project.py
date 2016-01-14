@@ -14,7 +14,7 @@ from .timeline import CaveTimeline
 from .groups import CaveGroup
 from .triggers import CaveTrigger
 from .errors import BadCaveXML
-from .blender_scripts import MOUSE_LOOK_SCRIPT
+from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
 try:
     import bpy
 except ImportError:
@@ -361,55 +361,89 @@ class CaveProject(CaveFeature):
 
     def setup_controls(self):
         bpy.context.scene.objects.active = self.main_camera
-        if self["allow_rotation"]:
-            bpy.ops.logic.sensor_add(
-                type="MOUSE",
-                object=self.main_camera.name,
-                name="Look"
-            )
-            self.main_camera.game.sensors[-1].name = "Look"
-            sensor = self.main_camera.game.sensors["Look"]
-            sensor.mouse_event = "MOVEMENT"
-            bpy.ops.logic.controller_add(
-                type='PYTHON',
-                object=self.main_camera.name,
-                name="Look")
-            self.main_camera.game.controllers[-1].name = "Look"
-            controller = self.main_camera.game.controllers["Look"]
-            controller.mode = "MODULE"
-            controller.module = "mouse.look"
-            bpy.data.texts.new("mouse.py")
-            script = bpy.data.texts["mouse.py"]
-            script.write(MOUSE_LOOK_SCRIPT)
-            bpy.ops.logic.actuator_add(
-                type="MOTION",
-                object=self.main_camera.name,
-                name="Look_x"
-            )
-            self.main_camera.game.actuators[-1].name = "Look_x"
-            actuator = self.main_camera.game.actuators["Look_x"]
-            actuator.mode = "OBJECT_NORMAL"
-            actuator.use_local_rotation = True
-            controller.link(actuator=actuator)
+        # TODO: if self["allow_rotation"]:
+        bpy.ops.logic.sensor_add(
+            type="MOUSE",
+            object=self.main_camera.name,
+            name="Look"
+        )
+        self.main_camera.game.sensors[-1].name = "Look"
+        sensor = self.main_camera.game.sensors["Look"]
+        sensor.mouse_event = "MOVEMENT"
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=self.main_camera.name,
+            name="Look")
+        self.main_camera.game.controllers[-1].name = "Look"
+        controller = self.main_camera.game.controllers["Look"]
+        controller.mode = "MODULE"
+        controller.module = "mouse.look"
+        controller.link(sensor=sensor)
+        bpy.ops.logic.actuator_add(
+            type="MOTION",
+            object=self.main_camera.name,
+            name="Look_x"
+        )
+        self.main_camera.game.actuators[-1].name = "Look_x"
+        actuator = self.main_camera.game.actuators["Look_x"]
+        actuator.mode = "OBJECT_NORMAL"
+        actuator.use_local_rotation = True
+        controller.link(actuator=actuator)
 
-            bpy.ops.logic.actuator_add(
-                type="MOTION",
-                object=self.main_camera.name,
-                name="Look_y"
-            )
-            self.main_camera.game.actuators[-1].name = "Look_y"
-            actuator = self.main_camera.game.actuators["Look_y"]
-            actuator.mode = "OBJECT_NORMAL"
-            actuator.use_local_rotation = False
-            controller.link(actuator=actuator)
+        bpy.ops.logic.actuator_add(
+            type="MOTION",
+            object=self.main_camera.name,
+            name="Look_y"
+        )
+        self.main_camera.game.actuators[-1].name = "Look_y"
+        actuator = self.main_camera.game.actuators["Look_y"]
+        actuator.mode = "OBJECT_NORMAL"
+        actuator.use_local_rotation = False
+        controller.link(actuator=actuator)
 
-            controller.link(sensor=sensor)
+        bpy.data.texts.new("mouse.py")
+        script = bpy.data.texts["mouse.py"]
+        script.write(MOUSE_LOOK_SCRIPT)
+
+        self.add_move_toggle()
+
         #TODO: Mouselook script and actuators
         if self["allow_movement"]:
             add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
             add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
             add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
             add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
+
+    def add_move_toggle(self):
+        bpy.context.scene.objects.active = self.main_camera
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=self.main_camera.name,
+            name="move_toggle")
+        self.main_camera.game.controllers[-1].name = "move_toggle"
+        controller = self.main_camera.game.controllers["move_toggle"]
+        controller.mode = "MODULE"
+        controller.module = "move.move_toggle"
+
+        bpy.ops.object.game_property_new(
+            type="BOOL",
+            name="toggle_movement"
+        )
+        self.main_camera.game.properties["toggle_movement"].value = False
+        bpy.ops.logic.sensor_add(
+            type="KEYBOARD",
+            object=self.main_camera.name,
+            name="toggle_movement"
+        )
+        self.main_camera.game.sensors[-1].name = "toggle_movement"
+        sensor = self.main_camera.game.sensors["toggle_movement"]
+        sensor.key = "TAB"
+
+        bpy.data.texts.new("move.py")
+        script = bpy.data.texts["move.py"]
+        script.write(MOVE_TOGGLE_SCRIPT)
+
+        controller.link(sensor=sensor)
 
     def blend(self):
         """Create representation of CaveProject in Blender"""

@@ -2,7 +2,7 @@
 """
 import math
 import warnings
-from pycave.name import generate_blender_object_name
+from pycave.names import generate_blender_object_name
 from .triggers import BlenderTrigger
 try:
     import bpy
