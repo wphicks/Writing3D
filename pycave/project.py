@@ -241,25 +241,25 @@ class CaveProject(CaveFeature):
         for child in object_root.findall("Object"):
             new_project["objects"].append(CaveObject.fromXML(child))
         group_root = project_root.find("GroupRoot")
-        if object_root is None:
+        if group_root is None:
             raise BadCaveXML("Story root has no GroupRoot node")
         for child in group_root.findall("Group"):
-            new_project["objects"].append(CaveGroup.fromXML(child))
+            new_project["groups"].append(CaveGroup.fromXML(child))
         timeline_root = project_root.find("TimelineRoot")
         if object_root is None:
             raise BadCaveXML("Story root has no ObjectRoot node")
         for child in timeline_root.findall("Timeline"):
-            new_project["objects"].append(CaveTimeline.fromXML(child))
+            new_project["timelines"].append(CaveTimeline.fromXML(child))
         sound_root = project_root.find("SoundRoot")
         if object_root is None:
             raise BadCaveXML("Story root has no ObjectRoot node")
         for child in sound_root.findall("Sound"):
-            new_project["objects"].append(CaveSound.fromXML(child))
+            new_project["sounds"].append(CaveSound.fromXML(child))
         trigger_root = project_root.find("EventRoot")
         if object_root is None:
             raise BadCaveXML("Story root has no ObjectRoot node")
         for child in trigger_root.findall("EventTrigger"):
-            new_project["objects"].append(CaveTrigger.fromXML(child))
+            new_project["triggers"].append(CaveTrigger.fromXML(child))
 
         global_root = project_root.find("Global")
         if global_root is None:
@@ -333,8 +333,6 @@ class CaveProject(CaveFeature):
         return xml_string
 
     def save_XML(self, filename):
-        #tree = ET.ElementTree(self.toXML())
-        #tree.write(filename, encoding='utf-8', xml_declaration=True)
         with open(filename, "w") as file_:
             file_.write(self.toprettyxml())
 

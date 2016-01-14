@@ -72,6 +72,7 @@ class CaveGroup(CaveFeature):
                     group["groups"].append(child.attrib["name"])
                 except KeyError:
                     raise BadCaveXML("Groups node has no name attrib")
+        return group
 
     def blend_objects(self):
         """Store data on objects in group in Blender script"""

@@ -173,10 +173,11 @@ class ObjectAction(CaveAction):
         if node is not None:
             new_action["sound_change"] = node.text.strip()
         node = trans_root.find("LinkChange")
-        for key, value in new_action.link_xml_tags:
-            if node.find(value) is not None:
-                new_action["link_change"] = key
-                break
+        if node is not None:
+            for key, value in new_action.link_xml_tags.items():
+                if node.find(value) is not None:
+                    new_action["link_change"] = key
+                    break
 
         return new_action
 
