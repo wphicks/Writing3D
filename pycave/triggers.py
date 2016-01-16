@@ -206,7 +206,7 @@ class HeadPositionTrigger(HeadTrackTrigger):
 
         :param :py:class:xml.etree.ElementTree.Element all_triggers_root
         """
-        trigger_root = self.bare_trigger.toXML(all_triggers_root)
+        trigger_root = self.base_trigger.toXML(all_triggers_root)
         head_node = ET.SubElement(trigger_root, "HeadTrack")
         position_node = ET.SubElement(head_node, "Position")
         if self["box"] is None:

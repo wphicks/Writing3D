@@ -21,6 +21,11 @@ def generate_trigger_name(string):
     return "trigger_{}".format(string)
 
 
+def generate_link_name(string):
+    """Generate name used for Blender trigger"""
+    return "link_{}".format(string)
+
+
 def generate_enabled_name(string):
     """Generate name for enabled properties"""
     return "{}_enabled".format(string)

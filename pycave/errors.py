@@ -25,7 +25,7 @@ class ConsistencyError(Exception):
     a ConsistencyError will be thrown before that action can be written to XML
     or displayed in the Cave."""
     def __init__(self, message):
-        super(InvalidArgument, self).__init__(message)
+        super(ConsistencyError, self).__init__(message)
 
 
 class EBKAC(Exception):
