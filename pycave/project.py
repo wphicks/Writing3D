@@ -28,6 +28,16 @@ def clear_blender_scene():
     bpy.ops.object.delete()
 
 
+def setup_blender_layout():
+    """Put Blender interface in a convenient layout"""
+    bpy.context.window.screen = bpy.data.screens["Game Logic"]
+    #for area in bpy.context.window.screen.areas:
+    #    if area.type == 'VIEW_3D':
+    #        for space in area.spaces:
+    #            space.region_3d.view_perspective = 'CAMERA'
+    #            space.viewport_shade = "TEXTURED"
+
+
 def add_key_movement(
         blender_object, move_name, key, direction, speed):
     """Convenience function for adding keyboard-controlled motion to
@@ -259,7 +269,7 @@ class CaveProject(CaveFeature):
         if object_root is None:
             raise BadCaveXML("Story root has no ObjectRoot node")
         for child in trigger_root.findall("EventTrigger"):
-            new_project["triggers"].append(CaveTrigger.fromXML(child))
+            new_project["trigger_events"].append(CaveTrigger.fromXML(child))
 
         global_root = project_root.find("Global")
         if global_root is None:
@@ -469,17 +479,22 @@ class CaveProject(CaveFeature):
         # Create Activators
         for timeline in self["timelines"]:
             timeline.blend()
-        #for event in self["trigger_events"]:
-        #    event.blend()
+        for trigger in self["trigger_events"]:
+            trigger.blend()
         # Link game engine logic bricks for Activators
         for timeline in self["timelines"]:
             timeline.link_blender_logic()
         for object_ in self["objects"]:
             if object_["link"] is not None:
                 object_["link"].link_blender_logic()
+        for trigger in self["trigger_events"]:
+            trigger.link_blender_logic()
         # Write any necessary game engine logic for Activators
         for timeline in self["timelines"]:
             timeline.write_blender_logic()
         for object_ in self["objects"]:
             if object_["link"] is not None:
                 object_["link"].write_blender_logic()
+        for trigger in self["trigger_events"]:
+            trigger.write_blender_logic()
+        setup_blender_layout()

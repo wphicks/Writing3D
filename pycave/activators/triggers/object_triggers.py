@@ -25,7 +25,7 @@ class BlenderObjectPositionTrigger(BlenderTrigger):
 
     def create_enabled_sensor(self):
         """Add a sensor to fire continuously while trigger is enabled"""
-
+        self.select_base_object()
         bpy.ops.logic.sensor_add(
             type="PROPERTY",
             object=self.name,
@@ -35,8 +35,8 @@ class BlenderObjectPositionTrigger(BlenderTrigger):
         enable_sensor = self.base_object.game.sensors["enabled_sensor"]
         enable_sensor.use_pulse_true_level = True
         enable_sensor.frequency = 1
-        enable_sensor.property = self.name
-        enable_sensor.value = self.enable_immediately
+        enable_sensor.property = "enabled"
+        enable_sensor.value = "True"
         self.enable_sensor = enable_sensor
 
         return enable_sensor
