@@ -3,6 +3,7 @@
 import math
 import warnings
 from pycave.names import generate_blender_object_name
+from pycave.errors import EBKAC
 from .triggers import BlenderTrigger
 try:
     import bpy
@@ -40,7 +41,7 @@ class BlenderLookAtTrigger(BlenderTrigger):
         self.base_object.game.sensors[-1].name = "enabled_sensor"
         enabled_sensor = self.base_object.game.sensors["enabled_sensor"]
         enabled_sensor.property = "enabled"
-        enabled_sensor.evaluation_type = "CHANGED"
+        enabled_sensor.evaluation_type = "PROPCHANGED"
 
         self.select_base_object()
         bpy.ops.logic.controller_add(
@@ -59,7 +60,7 @@ class BlenderLookAtTrigger(BlenderTrigger):
         property_copier = camera_object.game.actuators[self.name]
         property_copier.mode = "COPY"
         property_copier.property = self.name
-        property_copier.object = self.name
+        property_copier.object = self.base_object
         property_copier.object_property = "enabled"
 
         return (enabled_sensor, controller, property_copier)
@@ -75,7 +76,7 @@ class BlenderLookAtTrigger(BlenderTrigger):
         camera_object = self.select_camera()
         # Property on camera to keep track of when trigger is enabled
         bpy.ops.object.game_property_new(
-            type='BOOLEAN',
+            type='BOOL',
             name=self.name
         )
         camera_object.game.properties[
@@ -91,7 +92,8 @@ class BlenderLookAtTrigger(BlenderTrigger):
         camera_enable_sensor.use_pulse_true_level = True
         camera_enable_sensor.frequency = 1
         camera_enable_sensor.property = self.name
-        camera_enable_sensor.value = self.enable_immediately
+        camera_enable_sensor.value = str(self.enable_immediately)
+        self.camera_enable_sensor = camera_enable_sensor
 
         #Create controller to detect trigger events
         camera_object = self.select_camera()
@@ -99,6 +101,7 @@ class BlenderLookAtTrigger(BlenderTrigger):
             type='PYTHON',
             object="CAMERA",
             name=self.name)
+        camera_object.game.controllers[-1].name = self.name
         controller = camera_object.game.controllers[self.name]
         controller.mode = "MODULE"
         controller.module = "{}.detect_event".format(self.name)
@@ -109,7 +112,11 @@ class BlenderLookAtTrigger(BlenderTrigger):
         """Link BGE logic bricks for camera"""
         camera_object = self.select_camera()
         camera_controller = camera_object.game.controllers[self.name]
-        camera_controller.link(sensor=self.name)
+        try:
+            camera_controller.link(sensor=self.camera_enable_sensor)
+        except AttributeError:
+            raise EBKAC(
+                "Enabled sensor must be created on camera before being linked")
 
         enabled_sensor = self.base_object.game.sensors["enabled_sensor"]
         enabled_controller = self.base_object.game.controllers["enable"]
@@ -149,8 +156,14 @@ class BlenderPointTrigger(BlenderLookAtTrigger):
             "    own = cont.owner",
             "    trigger = scene.objects['{}']".format(
                 self.name),
-            "    if (own.pointInsideFrustrum({})".format(
-                tuple(self["point"])),
+            "    # Following is total hack since pointInsideFrustum seems to",
+            "    # give false positive on first frame in certain",
+            "    # circumstances",
+            "    if 'initialized' not in trigger:",
+            "        trigger['initialized'] = True",
+            "        return",
+            "    if (own.pointInsideFrustum({})".format(
+                tuple(self.point)),
             "            and trigger['enabled'] and",
             "            trigger['status'] == 'Stop'):",
             "        trigger['status'] = 'Start'"
@@ -219,7 +232,13 @@ class BlenderLookObjectTrigger(BlenderLookAtTrigger):
                 self.look_at_object),
             "    trigger = scene.objects['{}']".format(
                 self.name),
-            "    if (own.pointInsideFrustrum(position)",
+            "    # Following is total hack since pointInsideFrustum seems to",
+            "    # give false positive on first frame in certain",
+            "    # circumstances",
+            "    if 'initialized' not in trigger:",
+            "        trigger['initialized'] = True",
+            "        return",
+            "    if (own.pointInsideFrustum(position)",
             "            and trigger['enabled']",
             "            and trigger['status'] == 'Stop'):",
             "        trigger['status'] = 'Start'"

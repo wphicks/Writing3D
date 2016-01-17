@@ -249,6 +249,7 @@ class LookAtPoint(HeadTrackTrigger):
 
     :param tuple point: The point to look at
     :param float angle: TODO: clarify (WARNING: currently does nothing)"""
+    # TODO: Do we need to allow localization in box?
 
     argument_validators = {
         "point": IsNumericIterable(required_length=3),
@@ -263,10 +264,11 @@ class LookAtPoint(HeadTrackTrigger):
 
         :param :py:class:xml.etree.ElementTree.Element all_triggers_root
         """
-        trigger_root = self.bare_trigger.toXML(all_triggers_root)
-        node = trigger_root.find("HeadTrack")
-        node = node.find("Direction")
-        node.remove(node.find("None"))
+        trigger_root = self.base_trigger.toXML(all_triggers_root)
+        node = ET.SubElement(trigger_root, "HeadTrack")
+        position_node = ET.SubElement(node, "Position")
+        ET.SubElement(position_node, "Anywhere")
+        node = ET.SubElement(node, "Direction")
         try:
             xml_attrib = {"point": "({}, {}, {})".format(*self["point"])}
         except KeyError:
