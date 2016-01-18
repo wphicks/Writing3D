@@ -215,7 +215,7 @@ class BlenderLookObjectTrigger(BlenderLookAtTrigger):
     def __init__(
             self, name, actions, look_at_object, duration=0,
             enable_immediately=True, remain_enabled=True, angle=30):
-        super(BlenderDirectionTrigger, self).__init__(
+        super(BlenderLookObjectTrigger, self).__init__(
             name, actions, duration=duration,
             enable_immediately=enable_immediately,
             remain_enabled=remain_enabled)
@@ -228,7 +228,7 @@ class BlenderLookObjectTrigger(BlenderLookAtTrigger):
             "\ndef detect_event(cont):",
             "    scene = bge.logic.getCurrentScene()",
             "    own = cont.owner",
-            "    position = scene.objects[{}].position".format(
+            "    position = scene.objects['{}'].position".format(
                 self.look_at_object),
             "    trigger = scene.objects['{}']".format(
                 self.name),
