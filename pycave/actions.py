@@ -4,8 +4,6 @@ Here, actions refer generically to any discrete change in elements of a Cave
 project
 """
 #import warnings
-import mathutils
-import math
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .placement import CavePlacement
@@ -14,13 +12,13 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name
+from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
+    ColorAction
 #try:
 #    import bpy
 #except ImportError:
 #    warnings.warn(
 #        "Module bpy not found. Loading pycave.actions as standalone")
-
-# TODO: Switch linear motion over to same style as angV
 
 
 class CaveAction(CaveFeature):
@@ -78,7 +76,9 @@ class ObjectAction(CaveAction):
         "move_relative": AlwaysValid("Either true or false"),
         "color": IsNumericIterable(required_length=3),
         "scale": IsNumeric(min_value=0),
+        #TODO
         "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
+        #TODO
         "link_change": OptionListValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
         }
@@ -193,265 +193,73 @@ class ObjectAction(CaveAction):
         :param float time_condition: Time at which action should start
         :param int index_condition: Index used to keep track of what actions
         have already been triggered, e.g. in a timeline of multiple actions"""
-        script_text = [self._blender_object_selection()]
+        start_text = [self._blender_object_selection()]
+        cont_text = []
+        end_text = []
 
-        #Specify conditions under which action should proceed
-        start_conditional = []
-        continue_conditional = []
-        end_conditional = []
+        conditions = ActionCondition(offset=0)
         self.end_time = self["duration"] + time_condition
-
-        start_conditional.append("time >= {}".format(time_condition))
-        continue_conditional.append("time >= {} and time < {}".format(
-            time_condition, self.end_time))
-        end_conditional.append("time >= {}".format(self.end_time))
-
+        conditions.add_time_condition(
+            start_time=time_condition, end_time=self.end_time)
         if index_condition is not None:
-            start_conditional.append("index == {}".format(index_condition))
-            continue_conditional.append("index >= {}".format(index_condition))
-
+            conditions.add_index_condition(index_condition)
         if click_condition > 0:
-            start_conditional.append("own['clicks'] == {}".format(
-                click_condition))
+            conditions.add_click_condition(click_condition)
 
-        start_conditional = "if {}:".format(" and ".join(start_conditional))
-        continue_conditional = "if {}:".format(
-            " and ".join(continue_conditional))
-        end_conditional = "if {}:".format(" and ".join(end_conditional))
+        start_text.append(conditions.start_string)
+        cont_text.append(conditions.continue_string)
+        end_text.append(conditions.end_string)
 
-        #Actions to take immediately when condition is first activated
-        script_text.append(start_conditional)
-        script_text.append("    index += 1")
-        if "visible" in self:
-            script_text.append("    blender_object.setVisible(True)")
-        # Is the above line really correct?
-        if "placement" in self and "rotation" in self["placement"]:
-            vector = mathutils.Vector(
-                self["placement"]["rotation"]["rotation_vector"])
-            vector.normalize()
-            if self["move_relative"]:
-                if self["placement"][
-                        "rotation"]["rotation_mode"] == "Axis":
-                    axis = mathutils.Vector(
-                        self["placement"]["rotation"]["rotation_vector"])
-                    axis.normalize()
-                    angle = math.radians(
-                        self["placement"]["rotation"]["rotation_angle"])
-                    script_text.append(
-                        "    rotation = mathutils.Quaternion({}, {})".format(
-                            tuple(vector), -angle))
-                elif self["placement"][
-                        "rotation"]["rotation_mode"] == "Normal":
-                    # TODO: Is this the legacy behavior?
-                    script_text.extend([
-                        "    current_normal = mathutils.Vector((1, 0, 0))",
-                        "    rotation = mathutils.Vector(",
-                        "        {}).rotation_difference(".format(
-                            tuple(vector)),
-                        "        current_normal)"]
-                    )
-                elif self["placement"][
-                        "rotation"]["rotation_mode"] == "LookAt":
-                    script_text.extend([
-                        "    look_direction = (",
-                        "        blender_object.position +",
-                        "        mathutils.Vector({}) -".format(
-                            self["placement"]["position"]),
-                        "        mathutils.Vector({})).normalized()".format(
-                            self["placement"]["rotation"]["rotation_vector"]),
-                        "    up_direction = mathutils.Vector(",
-                        "        {}).normalized()".format(
-                            self["placement"]["rotation"]["up_vector"]),
-                        "    rotation_matrix = mathutils.Matrix.Rotation("
-                        "    0, 4, (0, 0, 1))",
-                        "    frame_y = look_direction",
-                        "    frame_x = frame_y.cross(up_direction)",
-                        "    frame_z = frame_x.cross(frame_y)",
-                        "    rotation_matrix = mathutils.Matrix().to_3x3()",
-                        "    rotation_matrix.col[0] = frame_x",
-                        "    rotation_matrix.col[1] = frame_y",
-                        "    rotation_matrix.col[2] = frame_z",
-                        "    rotation = rotation_matrix.to_quaternion()"]
-                    )
-            else:  # Not move relative
-                script_text.append(
-                    "    orientation ="
-                    "blender_object.orientation.to_quaternion()")
-
-                if self["placement"][
-                        "rotation"]["rotation_mode"] == "Axis":
-                    angle = math.radians(
-                        self["placement"]["rotation"]["rotation_angle"])
-                    script_text.extend([
-                        "    target_orientation = mathutils.Quaternion(",
-                        "        {}, {})".format(tuple(vector), -angle),
-                        "    rotation = (",
-                        "        target_orientation.rotation_difference(",
-                        "            orientation))"]
-                    )
-
-                elif self["placement"][
-                        "rotation"]["rotation_mode"] == "Normal":
-                    script_text.extend([
-                        "    current_normal = mathutils.Vector((1, 0, 0))",
-                        "    current_normal.rotate(",
-                        "        blender_object.orientation)",
-                        "    rotation = mathutils.Vector(",
-                        "        {}).rotation_difference(".format(
-                            tuple(vector)),
-                        "        current_normal)"]
-                    )
-
-                elif self["placement"][
-                        "rotation"]["rotation_mode"] == "LookAt":
-                    script_text.extend([
-                        "    look_direction = (",
-                        "        mathutils.Vector({}) -".format(
-                            self["placement"]["position"]),
-                        "        mathutils.Vector({})).normalized()".format(
-                            self["placement"]["rotation"]["rotation_vector"]),
-                        "    up_direction = mathutils.Vector(",
-                        "        {}).normalized()".format(
-                            self["placement"]["rotation"]["up_vector"]),
-                        "    rotation_matrix = mathutils.Matrix.Rotation("
-                        "    0, 4, (0, 0, 1))",
-                        "    frame_y = look_direction",
-                        "    frame_x = frame_y.cross(up_direction)",
-                        "    frame_z = frame_x.cross(frame_y)",
-                        "    rotation_matrix = mathutils.Matrix().to_3x3()",
-                        "    rotation_matrix.col[0] = frame_x",
-                        "    rotation_matrix.col[1] = frame_y",
-                        "    rotation_matrix.col[2] = frame_z",
-                        "    rotation = rotation_matrix.to_quaternion()"]
-                    )
-
-            script_text.extend([
-                "    blender_object['angV'] = (",
-                "        rotation.angle /",
-                "        {} *".format(
-                    (self["duration"]*30, 1)[self["duration"] == 0]),
-                # Don't know why the factor of 2, but it works
-                "        rotation.axis)"]
-            )
-
-        #Actions to take at each timestep for which action is active
-        script_text.append(continue_conditional)
-        script_text.append("    remaining_time = {} - time".format(
+        start_text.append("{}index += 1".format(
+            "    "*(conditions.offset + 1)))
+        cont_text.append("{}remaining_time = {} - time".format(
+            "    "*(conditions.offset + 1),
             self.end_time)
         )
+
         if "visible" in self:
-            script_text.append(
-                "    remaining_alpha = {} - blender_object.color[3]".format(
-                    int(self["visible"])
-                )
+            action = VisibilityAction(
+                self["visible"], self["duration"],
+                offset=(conditions.offset + 1)
             )
-            script_text.append(
-                "    delta_alpha = remaining_alpha/remaining_time/60"
-            )  # Logic tick rate is 60 Hz
-            script_text.extend([
-                "    new_color = blender_object.color",
-                "    new_color[3] += delta_alpha",
-                "    blender_object.color = new_color"]
-            )
-        if "placement" in self and self["duration"] != 0:
-            if "position" in self["placement"]:
-                if self["move_relative"]:
-                    script_text.append("    delta_pos = {}".format(
-                        [coord/self["duration"]/60. for coord in
-                            self["placement"]["position"]]
-                        )
-                    )
-                else:
-                    script_text.extend([
-                        "    delta_pos = [",
-                        "        ({}[i] - blender_object.position[i]".format(
-                            list(self["placement"]["position"])),
-                        "            )/remaining_time/60",
-                        "        for i in range(3)]",
-                        ]
-                    )
-                script_text.extend([
-                    "    blender_object.position = [",
-                    "        delta_pos[i] + blender_object.position[i]",
-                    "        for i in range(3)]"]
-                )
-            if "rotation" in self["placement"]:
-                script_text.append(
-                    "    delta_rot = blender_object['angV']"
-                )
+            start_text.append(action.start_string)
+            cont_text.append(action.continue_string)
+            end_text.append(action.end_string)
 
-                script_text.append(
-                    "    blender_object.applyRotation(delta_rot)")
+        if "placement" in self:
+            action = MoveAction(
+                self["placement"],
+                self["duration"],
+                self["move_relative"],
+                offset=(conditions.offset + 1)
+            )
+            start_text.append(action.start_string)
+            cont_text.append(action.continue_string)
+            end_text.append(action.end_string)
+
         if "color" in self:
-            script_text.extend([
-                "    delta_color = [",
-                "        ({}[i] -".format(
-                    [channel/255.0 for channel in self["color"]]),
-                "            blender_object.color[i])/remaining_time/60",
-                "        for i in range(3)]",
-                "    delta_color.append(0)",
-                "    blender_object.color = [",
-                "        (blender_object.color[i] + delta_color[i])",
-                "        for i in range(4)]"
-                ]
+            action = ColorAction(
+                self["color"], self["duration"],
+                offset=(conditions.offset + 1)
             )
-        if "scale" in self:
-            script_text.extend([
-                "    delta_scale = [",
-                "        ({}[i] -".format([self["scale"]]*3),
-                "            blender_object.scaling[i])/remaining_time/60",
-                "        for i in range(3)]",
-                "    blender_object.scaling = [",
-                "        (blender_object.scaling[i] + delta_scale[i])",
-                "        for i in range(3)]"
-                ]
-            )
+            start_text.append(action.start_string)
+            cont_text.append(action.continue_string)
+            end_text.append(action.end_string)
 
-        #Actions to take at end of action
-        script_text.append(end_conditional)
-        if "visible" in self:
-            script_text.extend([
-                "    new_color = blender_object.color",
-                "    new_color[3] = {}".format(int(self["visible"])),
-                "    blender_object.color = new_color"]
-            )
-            script_text.append("    blender_object.setVisible({})".format(
-                self["visible"]))
-        if "color" in self:
-            script_text.extend([
-                "    new_color = {}".format(
-                    [channel/255.0 for channel in self["color"]]),
-                "    new_color.append(blender_object.color[3])",
-                "    blender_object.color = new_color"]
-            )
         if "scale" in self:
-            script_text.append(
-                "    blender_object.scaling = {}".format([self["scale"]]*3)
+            action = ColorAction(
+                self["scale"], self["duration"],
+                offset=(conditions.offset + 1)
             )
-        if "placement" in self and self["duration"] == 0:
-            if self["move_relative"]:
-                if "position" in self["placement"]:
-                    script_text.extend([
-                        "    blender_object.position = [",
-                        "        {}[i] + blender_object.position[i]".format(
-                            self["placement"]["position"]),
-                        "        for i in range(3)]"]
-                    )
-            else:
-                if "position" in self["placement"]:
-                    script_text.append(
-                        "    blender_object.position = {}".format(
-                            self["placement"]["position"]
-                        )
-                    )
-                if "rotation" in self["placement"]:
-                    if (self["placement"]["rotation"]["rotation_mode"] ==
-                            "Axis"):
-                        script_text.extend([
-                            "    delta_rot = blender_object['angV']",
-                            "    blender_object.applyRotation(delta_rot)"]
-                        )
+            start_text.append(action.start_string)
+            cont_text.append(action.continue_string)
+            end_text.append(action.end_string)
 
+        script_text = "\n".join([
+            "\n".join(start_text),
+            "\n".join(cont_text),
+            "\n".join(end_text)]
+        )
         return script_text
 
 
