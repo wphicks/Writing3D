@@ -325,10 +325,11 @@ class LookAtDirection(HeadTrackTrigger):
 
         :param :py:class:xml.etree.ElementTree.Element all_triggers_root
         """
-        trigger_root = super(LookAtDirection, self).toXML(all_triggers_root)
-        node = trigger_root.find("HeadTrack")
-        node = node.find("Direction")
-        node.remove(node.find("None"))
+        trigger_root = self.base_trigger.toXML(all_triggers_root)
+        node = ET.SubElement(trigger_root, "HeadTrack")
+        position_node = ET.SubElement(node, "Position")
+        ET.SubElement(position_node, "Anywhere")
+        node = ET.SubElement(node, "Direction")
         try:
             xml_attrib = {
                 "direction": "({}, {}, {})".format(*self["direction"])

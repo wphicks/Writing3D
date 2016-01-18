@@ -191,16 +191,16 @@ class BlenderDirectionTrigger(BlenderLookAtTrigger):
             "\ndef detect_event(cont):",
             "    scene = bge.logic.getCurrentScene()",
             "    own = cont.owner",
-            "    cam_dir = (own.matrix_world.to_quaternion() *",
-            "        mathutils.Vector((0, 1, 0)))",
+            "    cam_dir = (own.getCameraToWorld().to_quaternion() *",
+            "        mathutils.Vector((0, 0, -1)))",
             "    target_dir = mathutils.Vector({})".format(
                 tuple(self.direction)),
-            "    angle = abs(cam_dir.angle(target_dir, 1.571))",
+            "    angle = abs(cam_dir.angle(target_dir, 3.14))",
             "    trigger = scene.objects['{}']".format(
                 self.name),
             "    if (angle < {}".format(math.radians(self.angle)),
-            "            and trigger['enabled'] and"
-            "            trigger['status'] == 'Stop'):"
+            "            and trigger['enabled'] and",
+            "            trigger['status'] == 'Stop'):",
             "        trigger['status'] = 'Start'"
         ]
         detection_logic = "\n".join(detection_logic)
