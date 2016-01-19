@@ -16,7 +16,7 @@ class ColorAction(object):
         script_text = []
         script_text.extend([
             "new_color = {}".format(self.color),
-            "blender_object['colorV'] = ["
+            "blender_object['colorV'] = [",
             "    (new_color[i] - blender_object.color[i])/{}".format(
                 (self.duration*60, 1)[self.duration == 0]),
             "    for i in range(len(new_color))]"]
@@ -46,7 +46,7 @@ class ColorAction(object):
     def end_string(self):
         script_text = [
             "new_color = {}".format(self.color),
-            "if len(new_color) < 4:"
+            "if len(new_color) < 4:",
             "    new_color.append(blender_object.color[3])",
             "blender_object.color = new_color"]
         try:

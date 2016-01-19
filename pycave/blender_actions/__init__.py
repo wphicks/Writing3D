@@ -1,4 +1,5 @@
 from .conditions import ActionCondition
-from .movememnt import MoveAction
+from .movement import MoveAction
 from .visibility import VisibilityAction
 from .color import ColorAction
+from .links import LinkAction

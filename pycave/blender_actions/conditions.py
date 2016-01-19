@@ -14,7 +14,7 @@ class ActionCondition(object):
         start_string = "    "*self.offset
         if len(self.start):
             start_string = "".join((start_string, "if {}:"))
-            start_string.format(" and ".join(self.start))
+            start_string = start_string.format(" and ".join(self.start))
             return start_string
         else:
             return "".join((start_string, "if True:"))
@@ -24,7 +24,7 @@ class ActionCondition(object):
         continue_string = "    "*self.offset
         if len(self.cont):
             continue_string = "".join((continue_string, "if {}:"))
-            continue_string.format(" and ".join(self.cont))
+            continue_string = continue_string.format(" and ".join(self.cont))
             return continue_string
         else:
             return "".join((continue_string, "if True:"))
@@ -34,7 +34,7 @@ class ActionCondition(object):
         end_string = "    "*self.offset
         if len(self.end):
             end_string = "".join((end_string, "if {}:"))
-            end_string.format(" and ".join(self.end))
+            end_string = end_string.format(" and ".join(self.end))
             return end_string
         else:
             return "".join((end_string, "if True:"))
@@ -46,8 +46,8 @@ class ActionCondition(object):
             self.start.append("time >= {}".format(start_time))
             cont.append("time >= {}".format(start_time))
         if end_time is not None:
-            self.start.append("time >= {}".format(end_time))
             cont.append("time < {}".format(end_time))
+            self.end.append("time >= {}".format(end_time))
         cont = " and ".join(cont)
         self.cont.append(cont)
 

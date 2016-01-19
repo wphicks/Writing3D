@@ -19,11 +19,10 @@ class BlenderTrigger(Activator):
         action_index = 0
         for action in self.actions:
             action_logic.extend(
-                ["".join(("        ", line)) for line in
-                    action.generate_blender_logic(
-                        time_condition=0,
-                        index_condition=action_index
-                    )]
+                action.generate_blender_logic(
+                    time_condition=0,
+                    index_condition=action_index,
+                    offset=2)
             )
             action_index += 1
             max_time = max(max_time, action.end_time)

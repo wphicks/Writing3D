@@ -13,7 +13,7 @@ from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name
 from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
-    ColorAction
+    ColorAction, LinkAction
 #try:
 #    import bpy
 #except ImportError:
@@ -52,6 +52,91 @@ class CaveAction(CaveFeature):
                     action_root.tag))
 
 
+def generate_object_action_logic(
+        object_action, offset=0, time_condition=0, index_condition=None,
+        click_condition=-1):
+    """Generate Python logic for implementing action
+
+    :param CaveAction object_action: An ObjectAction or GroupAction
+    :param int offset: A number of tabs (4 spaces) to add before Python logic
+    strings
+    :param float time_condition: Time at which action should start
+    :param int index_condition: Index used to keep track of what actions
+    have already been triggered, e.g. in a timeline of multiple actions"""
+    start_text = [object_action._blender_object_selection(offset=offset)]
+    cont_text = []
+    end_text = []
+
+    conditions = ActionCondition(offset=offset)
+    object_action.end_time = object_action["duration"] + time_condition
+    conditions.add_time_condition(
+        start_time=time_condition, end_time=object_action.end_time)
+    if index_condition is not None:
+        conditions.add_index_condition(index_condition)
+    if click_condition > 0:
+        conditions.add_click_condition(click_condition)
+
+    start_text.append(conditions.start_string)
+    cont_text.append(conditions.continue_string)
+    end_text.append(conditions.end_string)
+
+    start_text.append("{}index += 1".format(
+        "    "*(conditions.offset + 1)))
+    cont_text.append("{}remaining_time = {} - time".format(
+        "    "*(conditions.offset + 1),
+        object_action.end_time)
+    )
+
+    if "visible" in object_action:
+        action = VisibilityAction(
+            object_action["visible"], object_action["duration"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+
+    if "placement" in object_action:
+        action = MoveAction(
+            object_action["placement"],
+            object_action["duration"],
+            object_action["move_relative"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+
+    if "color" in object_action:
+        action = ColorAction(
+            object_action["color"], object_action["duration"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+
+    if "scale" in object_action:
+        action = ColorAction(
+            object_action["scale"], object_action["duration"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+
+    if "link_change" in object_action:
+        action = LinkAction(
+            object_action["name"], object_action["link_change"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+
+    return start_text + cont_text + end_text
+
+
 class ObjectAction(CaveAction):
     """An action causing a change to a CaveObject
 
@@ -78,7 +163,6 @@ class ObjectAction(CaveAction):
         "scale": IsNumeric(min_value=0),
         #TODO
         "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
-        #TODO
         "link_change": OptionListValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
         }
@@ -181,86 +265,18 @@ class ObjectAction(CaveAction):
 
         return new_action
 
-    def _blender_object_selection(self):
+    def _blender_object_selection(self, offset=0):
         blender_object_name = generate_blender_object_name(self["object_name"])
-        return "blender_object = scene.objects['{}']".format(
-            blender_object_name)
+        return "{}blender_object = scene.objects['{}']".format(
+            "    "*offset, blender_object_name)
 
     def generate_blender_logic(
-            self, time_condition=0, index_condition=None, click_condition=-1):
-        """Generate Python logic for implementing action
-
-        :param float time_condition: Time at which action should start
-        :param int index_condition: Index used to keep track of what actions
-        have already been triggered, e.g. in a timeline of multiple actions"""
-        start_text = [self._blender_object_selection()]
-        cont_text = []
-        end_text = []
-
-        conditions = ActionCondition(offset=0)
-        self.end_time = self["duration"] + time_condition
-        conditions.add_time_condition(
-            start_time=time_condition, end_time=self.end_time)
-        if index_condition is not None:
-            conditions.add_index_condition(index_condition)
-        if click_condition > 0:
-            conditions.add_click_condition(click_condition)
-
-        start_text.append(conditions.start_string)
-        cont_text.append(conditions.continue_string)
-        end_text.append(conditions.end_string)
-
-        start_text.append("{}index += 1".format(
-            "    "*(conditions.offset + 1)))
-        cont_text.append("{}remaining_time = {} - time".format(
-            "    "*(conditions.offset + 1),
-            self.end_time)
-        )
-
-        if "visible" in self:
-            action = VisibilityAction(
-                self["visible"], self["duration"],
-                offset=(conditions.offset + 1)
-            )
-            start_text.append(action.start_string)
-            cont_text.append(action.continue_string)
-            end_text.append(action.end_string)
-
-        if "placement" in self:
-            action = MoveAction(
-                self["placement"],
-                self["duration"],
-                self["move_relative"],
-                offset=(conditions.offset + 1)
-            )
-            start_text.append(action.start_string)
-            cont_text.append(action.continue_string)
-            end_text.append(action.end_string)
-
-        if "color" in self:
-            action = ColorAction(
-                self["color"], self["duration"],
-                offset=(conditions.offset + 1)
-            )
-            start_text.append(action.start_string)
-            cont_text.append(action.continue_string)
-            end_text.append(action.end_string)
-
-        if "scale" in self:
-            action = ColorAction(
-                self["scale"], self["duration"],
-                offset=(conditions.offset + 1)
-            )
-            start_text.append(action.start_string)
-            cont_text.append(action.continue_string)
-            end_text.append(action.end_string)
-
-        script_text = "\n".join([
-            "\n".join(start_text),
-            "\n".join(cont_text),
-            "\n".join(end_text)]
-        )
-        return script_text
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        return generate_object_action_logic(
+            self, offset=offset, time_condition=time_condition,
+            index_condition=index_condition,
+            click_condition=click_condition)
 
 
 class GroupAction(CaveAction):
