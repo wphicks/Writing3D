@@ -11,7 +11,7 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
-from .names import generate_blender_object_name
+from .names import generate_blender_object_name, generate_group_name
 from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
     ColorAction, LinkAction, TimelineStarter, TriggerEnabler, SceneReset
 #try:
@@ -63,7 +63,9 @@ def generate_object_action_logic(
     :param float time_condition: Time at which action should start
     :param int index_condition: Index used to keep track of what actions
     have already been triggered, e.g. in a timeline of multiple actions"""
-    start_text = [object_action._blender_object_selection(offset=offset)]
+    start_text = object_action._blender_object_selection(offset=offset)
+    offset += object_action.selection_offset
+    # Yeah... I know. It's kinda ugly.
     cont_text = []
     end_text = []
 
@@ -267,8 +269,9 @@ class ObjectAction(CaveAction):
 
     def _blender_object_selection(self, offset=0):
         blender_object_name = generate_blender_object_name(self["object_name"])
-        return "{}blender_object = scene.objects['{}']".format(
-            "    "*offset, blender_object_name)
+        self.selection_offset = 0
+        return ["{}blender_object = scene.objects['{}']".format(
+            "    "*offset, blender_object_name)]
 
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,
@@ -419,9 +422,23 @@ class GroupAction(CaveAction):
 
         return new_action
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        raise NotImplementedError  # TODO
+    def _blender_object_selection(self, offset=0):
+        blender_group_name = generate_group_name(self["group_name"])
+        script_text = [
+            "{}for object_name in {}:".format(
+                "    "*offset, blender_group_name),
+            "{}    blender_object = scene.objects[object_name]"
+        ]
+        self.selection_offset = 1
+        return script_text
+
+    def generate_blender_logic(
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        return generate_object_action_logic(
+            self, offset=offset, time_condition=time_condition,
+            index_condition=index_condition,
+            click_condition=click_condition)
 
 
 class TimelineAction(CaveAction):
@@ -730,8 +747,9 @@ class MoveCaveAction(CaveAction):
         return new_action
 
     def _blender_object_selection(self, offset=0):
-        return "{}blender_object = scene.objects['CAMERA']".format(
-            "    "*offset)
+        self.selection_offset = 0
+        return ["{}blender_object = scene.objects['CAMERA']".format(
+            "    "*offset)]
 
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,
