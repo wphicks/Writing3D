@@ -13,7 +13,7 @@ from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name
 from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
-    ColorAction, LinkAction
+    ColorAction, LinkAction, TimelineStarter, TriggerEnabler, SceneReset
 #try:
 #    import bpy
 #except ImportError:
@@ -486,13 +486,41 @@ class TimelineAction(CaveAction):
 
         return new_action
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        self.blender_object_name = "_".join(
-            (self["timeline_name"], "timeline"))
-        #self.blender_trigger = BlenderTrigger(self.blender_object_name)
-        #self.blender_action = ActivateTrigger(
-        raise NotImplementedError  # TODO
+    def generate_blender_logic(
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        start_text = []
+        cont_text = []
+        end_text = []
+
+        conditions = ActionCondition(offset=offset)
+        self.end_time = time_condition
+        conditions.add_time_condition(
+            start_time=time_condition, end_time=self.end_time)
+        if index_condition is not None:
+            conditions.add_index_condition(index_condition)
+        if click_condition > 0:
+            conditions.add_click_condition(click_condition)
+
+        start_text.append(conditions.start_string)
+        cont_text.append(conditions.continue_string)
+        end_text.append(conditions.end_string)
+
+        start_text.append("{}index += 1".format(
+            "    "*(conditions.offset + 1)))
+        cont_text.append("{}remaining_time = {} - time".format(
+            "    "*(conditions.offset + 1),
+            self.end_time)
+        )
+
+        action = TimelineStarter(
+            self["timeline_name"], self["change"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+        return start_text + cont_text + end_text
 
 
 class SoundAction(CaveAction):
@@ -594,9 +622,41 @@ class EventTriggerAction(CaveAction):
         except KeyError:
             raise BadCaveXML("Event node must specify enable attribute")
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        raise NotImplementedError  # TODO
+    def generate_blender_logic(
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        start_text = []
+        cont_text = []
+        end_text = []
+
+        conditions = ActionCondition(offset=offset)
+        self.end_time = time_condition
+        conditions.add_time_condition(
+            start_time=time_condition, end_time=self.end_time)
+        if index_condition is not None:
+            conditions.add_index_condition(index_condition)
+        if click_condition > 0:
+            conditions.add_click_condition(click_condition)
+
+        start_text.append(conditions.start_string)
+        cont_text.append(conditions.continue_string)
+        end_text.append(conditions.end_string)
+
+        start_text.append("{}index += 1".format(
+            "    "*(conditions.offset + 1)))
+        cont_text.append("{}remaining_time = {} - time".format(
+            "    "*(conditions.offset + 1),
+            self.end_time)
+        )
+
+        action = TriggerEnabler(
+            self["timeline_name"], self["change"],
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+        return start_text + cont_text + end_text
 
 
 class MoveCaveAction(CaveAction):
@@ -608,7 +668,7 @@ class MoveCaveAction(CaveAction):
     """
 
     argument_validators = {
-        "relative": AlwaysValid("Either true or false"),
+        "move_relative": AlwaysValid("Either true or false"),
         "duration": IsNumeric(min_value=0),
         "placement": AlwaysValid("A CavePlacement object")
         }
@@ -627,7 +687,7 @@ class MoveCaveAction(CaveAction):
         if not self.is_default("duration"):
             action_root.attrib["duration"] = str(self["duration"])
         try:
-            relative = self["relative"]
+            relative = self["move_relative"]
         except KeyError:
             raise ConsistencyError(
                 'MoveCaveAction must specify a value for "relative" key'
@@ -654,9 +714,9 @@ class MoveCaveAction(CaveAction):
         if "duration" in move_cave_root.attrib:
             new_action["duration"] = move_cave_root.attrib["duration"]
         if move_cave_root.find("Relative") is not None:
-            new_action["relative"] = True
+            new_action["move_relative"] = True
         elif move_cave_root.find("Absolute") is not None:
-            new_action["relative"] = False
+            new_action["move_relative"] = False
         else:
             raise BadCaveXML(
                 "MoveCave node must contain either Absolute or Relative child"
@@ -669,9 +729,17 @@ class MoveCaveAction(CaveAction):
         new_action["placement"] = CavePlacement.fromXML(place_node)
         return new_action
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        raise NotImplementedError  # TODO
+    def _blender_object_selection(self, offset=0):
+        return "{}blender_object = scene.objects['CAMERA']".format(
+            "    "*offset)
+
+    def generate_blender_logic(
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        return generate_object_action_logic(
+            self, offset=offset, time_condition=time_condition,
+            index_condition=index_condition,
+            click_condition=click_condition)
 
 
 class CaveResetAction(CaveAction):
@@ -695,6 +763,37 @@ class CaveResetAction(CaveAction):
         """
         return action_class()
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        raise NotImplementedError  # TODO
+    def generate_blender_logic(
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        start_text = []
+        cont_text = []
+        end_text = []
+
+        conditions = ActionCondition(offset=offset)
+        self.end_time = time_condition
+        conditions.add_time_condition(
+            start_time=time_condition, end_time=self.end_time)
+        if index_condition is not None:
+            conditions.add_index_condition(index_condition)
+        if click_condition > 0:
+            conditions.add_click_condition(click_condition)
+
+        start_text.append(conditions.start_string)
+        cont_text.append(conditions.continue_string)
+        end_text.append(conditions.end_string)
+
+        start_text.append("{}index += 1".format(
+            "    "*(conditions.offset + 1)))
+        cont_text.append("{}remaining_time = {} - time".format(
+            "    "*(conditions.offset + 1),
+            self.end_time)
+        )
+
+        action = SceneReset(
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+        return start_text + cont_text + end_text

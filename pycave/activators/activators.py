@@ -57,6 +57,8 @@ def activate(cont):
                     monotonic() - own['offset_time'])
                 own['offset_time'] = 0
         except KeyError:
+            # Should this just switch status to start instead of throwing an
+            # error?
             raise RuntimeError(
                 'Must start activator before continue is used')
         time = monotonic() - own['start_time']
