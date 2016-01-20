@@ -102,7 +102,7 @@ class CaveProject(CaveFeature):
         "objects": AlwaysValid(
             help_string="A list of CaveObjects in the project"),
         "groups": AlwaysValid(
-            help_string="A dictionary mapping names to lists of CaveObjects"),
+            help_string="A list of CaveGroups in the project"),
         "timelines": AlwaysValid(
             help_string="A list of CaveTimelines in the project"),
         "sounds": AlwaysValid(

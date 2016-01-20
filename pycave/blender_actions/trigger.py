@@ -28,11 +28,11 @@ class TriggerEnabler(object):
 
     @property
     def continue_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     @property
     def end_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     def __init__(self, trigger, enable, offset=0):
         self.trigger = generate_trigger_name(trigger)

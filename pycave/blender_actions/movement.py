@@ -18,7 +18,7 @@ class MoveAction(object):
     def start_string(self):
         script_text = []
         # First take care of object rotation...
-        if "rotation" in self.placement:
+        if self.placement["rotation"]["rotation_mode"] != "None":
             vector = mathutils.Vector(
                 self.placement["rotation"]["rotation_vector"])
             vector.normalize()
@@ -121,29 +121,33 @@ class MoveAction(object):
             script_text.extend([
                 "blender_object['angV'] = (",
                 "    rotation.angle /",
-                "    {} *".format(
-                    (self.duration*30, 1)[self.duration == 0]),
-                # Don't know why the factor of 2, but it works
+                "    {}".format(
+                    ("({}*bge.logic.getLogicTicRate())".format(
+                        self.duration), 1)[
+                        self.duration == 0]),
                 "    rotation.axis)"]
             )
         # ...and now take care of object position
         if "position" in self.placement:
             if self.move_relative:
-                script_text.append(
-                    "blender_object['linV'] = {}".format(
-                        [coord/(self.duration*60., 1)[self.duration == 0]
-                            for coord in self.placement["position"]]
-                    )
+                script_text.extend([
+                    "blender_object['linV'] = [",
+                    "    coord/{} for coord in {}]".format(
+                        ("({}*bge.logic.getLogicTicRate())".format(
+                            self.duration), 1)[self.duration == 0],
+                        self.placement["position"]
+                    )]
                 )
             else:
                 script_text.extend([
-                    "target_position = {}".format(
+                    "target_pos = {}".format(
                         list(self.placement["position"])),
                     "delta_pos = [target_pos[i] - blender_object.position[i]",
                     "    for i in range(len(blender_object.position))]",
                     "blender_object['linV'] = [",
                     "    coord/{} for coord in delta_pos]".format(
-                        (self.duration*60., 1)[self.duration == 0])]
+                        ("({}*bge.logic.getLogicTicRate())".format(
+                            self.duration), 1)[self.duration == 0])]
                 )
 
         try:
@@ -155,7 +159,7 @@ class MoveAction(object):
     @property
     def continue_string(self):
         script_text = []
-        if "rotation" in self.placement:
+        if self.placement["rotation"]["rotation_mode"] != "None":
             script_text.append(
                 "delta_rot = blender_object['angV']"
             )
@@ -179,7 +183,7 @@ class MoveAction(object):
     def end_string(self):
         script_text = []
         if not self.duration:
-            if "rotation" in self.placement:
+            if self.placement["rotation"]["rotation_mode"] != "None":
                 script_text.append(
                     "delta_rot = blender_object['angV']"
                 )
@@ -197,7 +201,7 @@ class MoveAction(object):
         try:
             script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
         except IndexError:
-            return ""
+            return "{}pass".format("    "*self.offset)
         return "\n{}".format("    "*self.offset).join(script_text)
 
     def __init__(self, placement, duration, move_relative=False, offset=0):

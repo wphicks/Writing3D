@@ -13,7 +13,8 @@ from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name, generate_group_name
 from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
-    ColorAction, LinkAction, TimelineStarter, TriggerEnabler, SceneReset
+    ColorAction, LinkAction, TimelineStarter, TriggerEnabler, SceneReset,\
+    ScaleAction
 #try:
 #    import bpy
 #except ImportError:
@@ -63,9 +64,7 @@ def generate_object_action_logic(
     :param float time_condition: Time at which action should start
     :param int index_condition: Index used to keep track of what actions
     have already been triggered, e.g. in a timeline of multiple actions"""
-    start_text = object_action._blender_object_selection(offset=offset)
-    offset += object_action.selection_offset
-    # Yeah... I know. It's kinda ugly.
+    start_text = []
     cont_text = []
     end_text = []
 
@@ -78,21 +77,34 @@ def generate_object_action_logic(
     if click_condition > 0:
         conditions.add_click_condition(click_condition)
 
+    offset = conditions.offset + 1
     start_text.append(conditions.start_string)
-    cont_text.append(conditions.continue_string)
-    end_text.append(conditions.end_string)
-
     start_text.append("{}index += 1".format(
-        "    "*(conditions.offset + 1)))
+        "    "*(offset)))
+    start_text.extend(object_action._blender_object_selection(
+        offset=offset)
+    )
+    cont_text.append(conditions.continue_string)
+    cont_text.extend(object_action._blender_object_selection(
+        offset=offset)
+    )
+    end_text.append(conditions.end_string)
+    end_text.extend(object_action._blender_object_selection(
+        offset=offset)
+    )
+
+    offset += object_action.selection_offset
+    # Yeah... I know. It's kinda ugly.
+
     cont_text.append("{}remaining_time = {} - time".format(
-        "    "*(conditions.offset + 1),
+        "    "*(offset),
         object_action.end_time)
     )
 
     if "visible" in object_action:
         action = VisibilityAction(
             object_action["visible"], object_action["duration"],
-            offset=(conditions.offset + 1)
+            offset=(offset)
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
@@ -103,7 +115,7 @@ def generate_object_action_logic(
             object_action["placement"],
             object_action["duration"],
             object_action["move_relative"],
-            offset=(conditions.offset + 1)
+            offset=(offset)
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
@@ -112,16 +124,16 @@ def generate_object_action_logic(
     if "color" in object_action:
         action = ColorAction(
             object_action["color"], object_action["duration"],
-            offset=(conditions.offset + 1)
+            offset=(offset)
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
     if "scale" in object_action:
-        action = ColorAction(
+        action = ScaleAction(
             object_action["scale"], object_action["duration"],
-            offset=(conditions.offset + 1)
+            offset=(offset)
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
@@ -129,12 +141,16 @@ def generate_object_action_logic(
 
     if "link_change" in object_action:
         action = LinkAction(
-            object_action["name"], object_action["link_change"],
-            offset=(conditions.offset + 1)
+            object_action["object_name"], object_action["link_change"],
+            offset=(offset)
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
+
+    end_text.append(
+        "{}own['random_choice'] = None".format("    "*offset)
+    )
 
     return start_text + cont_text + end_text
 
@@ -334,7 +350,8 @@ class GroupAction(CaveAction):
         if not self.is_default("choose_random"):
             change_root.attrib["random"] = bool2text(self["choose_random"])
         trans_root = ET.SubElement(
-            change_root, "Transition", attrib={"duration": self["duration"]})
+            change_root, "Transition", attrib={
+                "duration": str(self["duration"])})
         if "visible" in self:
             node = ET.SubElement(trans_root, "Visible")
             node.text = bool2text(self["visible"])
@@ -424,12 +441,26 @@ class GroupAction(CaveAction):
 
     def _blender_object_selection(self, offset=0):
         blender_group_name = generate_group_name(self["group_name"])
-        script_text = [
-            "{}for object_name in {}:".format(
-                "    "*offset, blender_group_name),
-            "{}    blender_object = scene.objects[object_name]"
-        ]
-        self.selection_offset = 1
+        if self["choose_random"]:
+            script_text = [
+                "{}if (".format("    "*offset),
+                "{}        'random_choice' not in own".format("    "*offset),
+                "{}        or own['random_choice'] is None):".format(
+                    "    "*offset),
+                "{}    own['random_choice'] = random.choice({})".format(
+                    "    "*offset, blender_group_name),
+                "{}blender_object = scene.objects[".format("    "*offset),
+                "{}    own['random_choice']]".format("    "*offset)
+            ]
+            self.selection_offset = 0
+        else:
+            script_text = [
+                "{}for object_name in {}:".format(
+                    "    "*offset, blender_group_name),
+                "{}    blender_object = scene.objects[object_name]".format(
+                    "    "*offset)
+            ]
+            self.selection_offset = 1
         return script_text
 
     def generate_blender_logic(
@@ -614,7 +645,8 @@ class EventTriggerAction(CaveAction):
             action_root = ET.SubElement(
                 parent_root, "Event",
                 attrib={
-                    "name": self["trigger_name"], "enable": self["enable"]
+                    "name": str(self["trigger_name"]),
+                    "enable": str(self["enable"])
                     }
                 )
         except KeyError:
@@ -667,7 +699,7 @@ class EventTriggerAction(CaveAction):
         )
 
         action = TriggerEnabler(
-            self["timeline_name"], self["change"],
+            self["trigger_name"], self["enable"],
             offset=(conditions.offset + 1)
         )
         start_text.append(action.start_string)
@@ -691,6 +723,7 @@ class MoveCaveAction(CaveAction):
         }
 
     default_arguments = {
+        "move_relative": False,
         "duration": 0
         }
 

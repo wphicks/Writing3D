@@ -47,11 +47,11 @@ class TimelineStarter(object):
 
     @property
     def continue_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     @property
     def end_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     def __init__(self, timeline, change, offset=0):
         self.timeline = generate_blender_timeline_name(timeline)

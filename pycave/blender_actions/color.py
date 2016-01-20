@@ -18,7 +18,8 @@ class ColorAction(object):
             "new_color = {}".format(self.color),
             "blender_object['colorV'] = [",
             "    (new_color[i] - blender_object.color[i])/{}".format(
-                (self.duration*60, 1)[self.duration == 0]),
+                ("({}*bge.logic.getLogicTicRate())".format(self.duration), 1)[
+                    self.duration == 0]),
             "    for i in range(len(new_color))]"]
         )
 

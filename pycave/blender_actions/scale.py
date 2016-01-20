@@ -2,7 +2,7 @@
 
 
 class ScaleAction(object):
-    """Generate Python logic for how color should change when action first
+    """Generate Python logic for how scale should change when action first
     starts, as it continues, and when it ends
 
     :param float scale: The scale to transition to
@@ -15,9 +15,10 @@ class ScaleAction(object):
         script_text = []
         script_text.extend([
             "new_scale = {}".format(self.scale),
-            "blender_object['scaleV'] = ["
-            "    (new_scale - blender_object.scaling[i])/{}.".format(
-                (self.duration*60, 1)[self.duration == 0]),
+            "blender_object['scaleV'] = [",
+            "    (new_scale - blender_object.scaling[i])/{}".format(
+                ("({}*bge.logic.getLogicTicRate())".format(self.duration), 1)[
+                    self.duration == 0]),
             "    for i in range(len(blender_object.scaling))]"]
         )
 
@@ -31,7 +32,8 @@ class ScaleAction(object):
     def continue_string(self):
         script_text = [
             "blender_object.scaling = [",
-            "    (blender_object.scaling[i] + blender_object['scaleV'][i]]"
+            "    (blender_object.scaling[i] + blender_object['scaleV'][i])",
+            "    for i in range(len(blender_object.scaling))]"
         ]
         try:
             script_text[0] = "{}{}".format("    "*self.offset, script_text[0])

@@ -7,7 +7,6 @@ try:
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.timeline as standalone")
-#TODO: Add checks on detect_events for if trigger is already started
 
 
 class Activator(object):
@@ -32,13 +31,17 @@ import bge
 from group_defs import *
 import mathutils
 from time import monotonic
+import random
 def activate(cont):
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     status = own['status']
     if status == 'Start':
         own['start_time'] = monotonic()
-        own['action_index'] = 0
+        if ('action_index' not in own
+                or 'clicks' not in own
+                or own['clicks'] == 0):
+            own['action_index'] = 0
         # action_index property is used to ensure that each action is activated
         # exactly once
         own['offset_time'] = 0

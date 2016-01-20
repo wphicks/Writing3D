@@ -3,6 +3,7 @@ projects"""
 
 MOUSE_LOOK_SCRIPT = """
 import bge
+import random
 import mathutils
 def look(cont):
     sensor = cont.sensors["Look"]

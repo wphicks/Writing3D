@@ -52,6 +52,10 @@ class BlenderTrigger(Activator):
         self.script.write("\n".join(script_text))
         return self.script
 
+    def create_enabled_property(self):
+        return super(BlenderTrigger, self).create_enabled_property(
+            self.enable_immediately)
+
     def __init__(
             self, name, actions, duration=0, enable_immediately=True,
             remain_enabled=True):

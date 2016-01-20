@@ -6,3 +6,4 @@ from .links import LinkAction
 from .timeline import TimelineStarter
 from .trigger import TriggerEnabler
 from .reset import SceneReset
+from .scale import ScaleAction

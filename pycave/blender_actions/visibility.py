@@ -13,13 +13,15 @@ class VisibilityAction(object):
     @property
     def start_string(self):
         script_text = []
+        # TODO: Fade out timing appears to be mucked
         script_text.extend([
             "blender_object.color[3] = int(blender_object.visible)",
             "blender_object.setVisible(True)",
             "delta_alpha = {} - blender_object.color[3]".format(
-                int(self.visibility)),
+                int(self.visible)),
             "blender_object['visV'] = delta_alpha/{}".format(
-                (self.duration*60., 1)[self.duration == 0])]
+                ("({}*bge.logic.getLogicTicRate())".format(self.duration), 1)[
+                    self.duration == 0])]
         )
 
         try:
@@ -55,6 +57,6 @@ class VisibilityAction(object):
         return "\n{}".format("    "*self.offset).join(script_text)
 
     def __init__(self, visibility, duration, offset=0):
-        self.visibility = visibility
+        self.visible = visibility
         self.duration = duration
         self.offset = offset

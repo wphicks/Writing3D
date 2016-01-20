@@ -21,11 +21,11 @@ class SceneReset(object):
 
     @property
     def continue_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     @property
     def end_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     def __init__(self, offset=0):
         self.offset = offset

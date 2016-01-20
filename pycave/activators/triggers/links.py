@@ -3,6 +3,7 @@
 import warnings
 from .triggers import BlenderTrigger
 from pycave.errors import EBKAC
+from pycave.names import generate_link_name
 try:
     import bpy
 except ImportError:
@@ -23,6 +24,10 @@ class BlenderClickTrigger(BlenderTrigger):
         click_object = bpy.data.objects[self.object_name]
         bpy.context.scene.objects.active = click_object
         return click_object
+
+    @property
+    def name(self):
+        return generate_link_name(self.name_string)
 
     def create_primed_property(self):
         """Add property to track if mousedown is followed by mouseup"""
@@ -110,10 +115,13 @@ class BlenderClickTrigger(BlenderTrigger):
             "    mouse_over = own.sensors['mouse_over']",
             # TODO: Test the above
             "    trigger = scene.objects['{}']".format(self.name),
-            "    select_color = {}".format(str(self.select_color)),
-            "    enable_color = {}".format(str(self.enable_color)),
+            "    select_color = {}".format(str(
+                [coord/255. for coord in self.select_color])),
+            "    enable_color = {}".format(str(
+                [coord/255. for coord in self.enable_color])),
             "    if mouse_click.positive and mouse_over.positive:",
-            "        own['old_color'] = own.color",
+            "        if 'old_color' not in own or own['old_color'] is None:",
+            "            own['old_color'] = [coord for coord in own.color]",
             "        new_color = own.color",
             "        for i in range(len(select_color)):",
             "            new_color[i] = select_color[i]",
@@ -126,6 +134,7 @@ class BlenderClickTrigger(BlenderTrigger):
             "                trigger['status'] = 'Start'",
             "            trigger['clicks'] += 1",
             "            own.color = own['old_color']",
+            "            own['old_color'] = None",
             "        own['click_primed'] = False"
         ]
         detection_logic = "\n".join(detection_logic)
@@ -145,14 +154,17 @@ class BlenderClickTrigger(BlenderTrigger):
     def generate_action_logic(self):
         action_logic = ["        # ACTION LOGIC BEGINS HERE"]
         max_time = 0
+        action_index = 0
         for clicks, all_actions in self.actions.items():
             for action in all_actions:
                 action_logic.extend(
                     action.generate_blender_logic(
                         click_condition=clicks,
+                        index_condition=action_index,
                         offset=2)
                 )
-            max_time = max(max_time, action.end_time)
+                action_index += 1
+                max_time = max(max_time, action.end_time)
         if self.reset_clicks > 0:
             action_logic.extend([
                 "        if own['clicks'] == {}".format(self.reset_clicks),

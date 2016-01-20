@@ -12,7 +12,7 @@ from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable
 from .names import generate_blender_object_name,\
-    generate_blender_material_name, generate_link_name
+    generate_blender_material_name
 from .activators import BlenderClickTrigger
 import warnings
 try:
@@ -172,7 +172,7 @@ class CaveLink(CaveFeature):
         :param str object_name: The name of the object to which link is
         assigned"""
         self.activator = BlenderClickTrigger(
-            generate_link_name(object_name), self["actions"], object_name,
+            object_name, self["actions"], object_name,
             enable_immediately=self["enabled"],
             remain_enabled=self["remain_enabled"],
             select_color=self["selected_color"],

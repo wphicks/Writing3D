@@ -1,5 +1,5 @@
 """Tools for dynamically changing clickable links in Blender"""
-from pycave.names import generate_link_name
+from pycave.names import generate_link_name, generate_blender_object_name
 from pycave.errors import EBKAC
 
 
@@ -47,13 +47,14 @@ class LinkAction(object):
 
     @property
     def continue_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     @property
     def end_string(self):
-        return ""
+        return "{}pass".format("    "*self.offset)
 
     def __init__(self, object_name, change, offset=0):
-        self.link_name = generate_link_name(object_name)
+        self.link_name = generate_link_name(
+            generate_blender_object_name(object_name))
         self.change = change
         self.offset = offset
