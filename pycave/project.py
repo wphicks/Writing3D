@@ -362,6 +362,7 @@ class CaveProject(CaveFeature):
 
     def setup_camera(self):
         bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
+        bpy.data.cameras[-1].clip_end = self["far_clip"]
         self.main_camera = bpy.context.object
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
@@ -464,6 +465,8 @@ class CaveProject(CaveFeature):
         self.setup_controls()
         self.sort_groups()
         bpy.data.texts.new("group_defs.py")
+        bpy.data.worlds["World"].horizon_color = self["background"]
+        #bpy.data.worlds["World"].ambient_color = self["background"]
 
         # Create Objects
         for group in self["groups"]:
