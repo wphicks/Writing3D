@@ -6,49 +6,45 @@ literature much more quickly than they might otherwise be able to. The goal is
 to get the technical challenges out of the way without preventing users from
 tinkering "under the hood" if they so desire."""
 
+import sys
+import os
+sys.path.append(
+    os.path.abspath(os.path.dirname(__file__))
+)
+from pycave import project
 import tkinter as tk
-
-
-class UndoAction(object):
-    """A discrete change in project values, used to maintain undo stack
-
-    :param attribute: Project attribute to change
-    :param old_value: Old value of attribute
-    :param new_value: New value of attribute"""
-
-    def __init__(self, attribute, old_value, new_value):
-        self.attribute = attribute
-        self.old_value = old_value
-        self.new_value = new_value
-
-        def do(self):
-            #TODO: This is very wrong
-            self.attribute = new_value
-
-        def undo(self):
-            self.attribute = old_value
-
-class UndoAddAction(object):
-    """Record of addition of a feature to project"""
-
-
-class UndoStack(object):
-
-    def __init__(self):
-        self.actions = []
+from tkinter import ttk
+from tkinter import font
 
 
 class CaveWriter(tk.Frame):
     """GUI interface to 3D virtual environments"""
 
     def __init__(self, parent):
-        super(CaveWriter, self).__init__(self, parent, background="white")
+        super(CaveWriter, self).__init__(parent, background="white")
         self.parent = parent
+        self.font = font.Font(family="Helvetica", size=12)
+        self.project = project.CaveProject()
         self.initUI()
 
+    def generate_tabs(self):
+        self.tabs = {}
+        self.tabs["project"] = project.ProjectOptions(self.interface)
+        for category in ["objects", "groups", "timelines", "trigger_events"]:
+            self.tabs[category] = project.CaveProject.argument_validators[
+                category].ui(self.interface, category)
+
     def initUI(self):
-        self.parent.title = "Cave Writer"
+        self.parent.title("Cave Writer")
         self.pack(fill=tk.BOTH, expand=1)
+        self.interface = ttk.Notebook(self)
+        self.generate_tabs()
+        self.interface.add(
+            self.tabs["project"], text=self.tabs["project"].title_string)
+        for category in ["objects", "groups", "timelines", "trigger_events"]:
+            self.interface.add(
+                self.tabs[category], text=self.tabs[category].title_string)
+        self.interface.pack(fill=tk.BOTH, expand=1)
 
 
 def start_editor():

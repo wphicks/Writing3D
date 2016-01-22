@@ -1,5 +1,8 @@
 """Tools for validating options provided to Cave features"""
 
+import tkinter as tk
+from tkinter import ttk
+
 
 class Validator(object):
     """Callable object for validating input"""
@@ -24,6 +27,43 @@ class OptionListValidator(Validator):
 
     def __call__(self, value):
         return value in self.valid_options
+
+
+class NumericUI(tk.Frame):
+    """Tkinter widget for inputting numeric values"""
+
+    def help_bubble(self):
+        top = tk.Toplevel()
+        top.title("Error")
+        error_message = tk.Message(
+            top, text=self.validator.help_string, width=200)
+        error_message.pack()
+        dismiss = tk.Button(top, text="Dismiss", command=top.destroy)
+        dismiss.pack()
+
+    def validate(self, value):
+        try:
+            valid = self.validator(float(value))
+        except:
+            valid = False
+        if not valid:
+            self.help_bubble()
+        return valid
+
+    def __init__(self, parent, title, validator):
+        super(NumericUI, self).__init__(parent)
+        self.parent = parent
+        self.title_string = title
+        self.initUI()
+        self.validator = validator
+
+    def initUI(self):
+        self.label = tk.Label(self, text="{}:".format(self.title_string))
+        self.label.pack(anchor=tk.W, side=tk.LEFT)
+        vcmd = (self.register(self.validate), '%P')
+        self.entry = tk.Entry(
+            self, validate='focusout', validatecommand=vcmd)
+        self.entry.pack(side=tk.LEFT, anchor=tk.W, expand=1)
 
 
 class IsNumeric(Validator):
@@ -58,6 +98,9 @@ class IsNumeric(Validator):
 
         except TypeError:
             return False
+
+    def ui(self, parent, label):
+        return NumericUI(parent, label, self)
 
 
 class IsNumericIterable(Validator):
@@ -119,3 +162,39 @@ class CheckClass(Validator):
 
     def coerce(self, value):
         return self.correct_class(value)
+
+
+class FeatureListUI(ttk.LabelFrame):
+    """Tkinter widget for inputting a list of CaveFeatures"""
+
+    def __init__(self, parent, title):
+        super(FeatureListUI, self).__init__(parent, text=title)
+        self.title_string = title
+        self.parent = parent
+        self.initUI()
+
+    def initUI(self):
+        self.add_button = tk.Button(self, text="Add...")
+        self.add_button.pack(anchor=tk.S, fill=tk.X, expand=1)
+
+
+class FeatureListValidator(Validator):
+    """Check if value is an iterable of CaveFeatures of a particular type"""
+
+    def __init__(self, correct_class, help_string=None):
+        self.correct_class = correct_class
+        if help_string is None:
+            self.help_string = "Value must be an iterable of elements of type "
+            "{}".format(
+                self.correct_class)
+        else:
+            self.help_string = help_string
+
+    def __call__(self, iterable):
+        for item in iterable:
+            if not isinstance(item, self.correct_class):
+                return False
+        return True
+
+    def ui(self, parent, label):
+        return FeatureListUI(parent, label)

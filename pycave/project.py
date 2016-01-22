@@ -6,7 +6,8 @@ import warnings
 import math
 from .features import CaveFeature
 from .placement import CavePlacement, CaveRotation, convert_to_blender_axes
-from .validators import AlwaysValid, IsNumeric, IsNumericIterable
+from .validators import AlwaysValid, IsNumeric, IsNumericIterable,\
+    FeatureListValidator
 from .xml_tools import bool2text, text2tuple, attrib2bool
 from .objects import CaveObject
 from .sounds import CaveSound
@@ -15,11 +16,34 @@ from .groups import CaveGroup
 from .triggers import CaveTrigger
 from .errors import BadCaveXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
+import tkinter as tk
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pycave.objects as standalone")
+
+
+class ProjectOptions(tk.Frame):
+    """A frame for providing global project option input"""
+
+    def __init__(self, parent):
+        super(ProjectOptions, self).__init__(parent)
+        self.parent = parent
+        self.initUI()
+
+    def add_entries(self):
+        self.entries = {}
+        self.entries["far_clip"] = CaveProject.argument_validators[
+            "far_clip"].ui(self, "Camera far clip")
+
+    def initUI(self):
+        self.add_entries()
+        self.title_string = "Global Options"
+        for option in ["far_clip"]:
+            self.entries[option].pack(
+                fill=tk.X, anchor=tk.N, side=tk.TOP, expand=1)
+        self.pack(fill=tk.BOTH, expand=1)
 
 
 def clear_blender_scene():
@@ -99,15 +123,19 @@ class CaveProject(CaveFeature):
     """
 
     argument_validators = {
-        "objects": AlwaysValid(
+        "objects": FeatureListValidator(
+            CaveObject,
             help_string="A list of CaveObjects in the project"),
-        "groups": AlwaysValid(
+        "groups": FeatureListValidator(
+            CaveGroup,
             help_string="A list of CaveGroups in the project"),
-        "timelines": AlwaysValid(
+        "timelines": FeatureListValidator(
+            CaveTimeline,
             help_string="A list of CaveTimelines in the project"),
         "sounds": AlwaysValid(
             help_string="A list of CaveSounds in the project"),
-        "trigger_events": AlwaysValid(
+        "trigger_events": FeatureListValidator(
+            CaveTrigger,
             help_string="A list of CaveTriggers in the project"),
         "camera_placement": AlwaysValid(
             help_string="A CavePlacement object"),
