@@ -54,7 +54,7 @@ class CaveTrigger(CaveFeature):
             "HeadTrack": HeadTrackTrigger,
             "MoveTrack": MovementTrigger
         }
-        for tag, trigger_class in tag_class_dict:
+        for tag, trigger_class in tag_class_dict.items():
             if trigger_root.find(tag) is not None:
                 return trigger_class.fromXML(trigger_root)
         return BareTrigger.fromXML(trigger_root)
@@ -148,11 +148,12 @@ class BareTrigger(CaveFeature):
         except KeyError:
             raise BadCaveXML("EventTrigger must specify name attribute")
         xml_tags = {
-            "enabled": "enabled", "remain_enabled": "remain-enabled",
-            "duration": "duration"}
-        for key, tag in xml_tags:
+            "enabled": "enabled", "remain_enabled": "remain-enabled"}
+        for key, tag in xml_tags.items():
             if tag in trigger_root.attrib:
-                new_trigger[key] = trigger_root.attrib[tag]
+                new_trigger[key] = bool(trigger_root.attrib[tag])
+        if "duration" in trigger_root.attrib:
+            new_trigger["duration"] = float(trigger_root.attrib["duration"])
         action_root = trigger_root.find("Actions")
         if action_root is not None:
             for child in action_root.getchildren():
@@ -587,7 +588,20 @@ class EventBox(CaveFeature):
             except KeyError:
                 raise BadCaveXML(
                     'Box node must specify attribute {}'.format(corner))
-
         if "ignore-y" in box_root.attrib:
             new_box["ignore_y"] = text2bool(box_root.attrib["ignore-y"])
+
+        movement_node = box_root.find("Movement")
+        if movement_node is None:
+            raise BadCaveXML('Box node must contain Movement child')
+        direction_node = movement_node.find("Inside")
+        if direction_node is None:
+            direction_node = movement_node.find("Outside")
+            if direction_node is None:
+                raise BadCaveXML(
+                    'Movement node must contain Inside or Outside child')
+            new_box['direction'] = "Outside"
+        else:
+            new_box['direction'] = "Inside"
+
         return new_box

@@ -83,7 +83,7 @@ class CaveLink(CaveFeature):
     def __init__(self, *args, **kwargs):
         super(CaveLink, self).__init__(*args, **kwargs)
         if "actions" not in self:
-            self["actions"] = defaultdict(list),
+            self["actions"] = defaultdict(list)
         self.num_clicks = 0
 
     def toXML(self, object_root):
@@ -137,10 +137,10 @@ class CaveLink(CaveFeature):
             find_xml_text(link_node, "RemainEnabled"))
         node = link_node.find("EnabledColor")
         if node is not None:
-            link["enabled_color"] = text2tuple(node.text)
+            link["enabled_color"] = text2tuple(node.text, evaluator=int)
         node = link_node.find("SelectedColor")
         if node is not None:
-            link["selected_color"] = text2tuple(node.text)
+            link["selected_color"] = text2tuple(node.text, evaluator=int)
         for actions_node in link_node.findall("Actions"):
             num_clicks = -1
             for child in actions_node:
@@ -191,6 +191,7 @@ class CaveLink(CaveFeature):
 
     def write_blender_logic(self):
         """Write any necessary game engine logic for this CaveTimeline"""
+        self.activator.write_python_logic()
         try:
             self.activator.write_python_logic()
         except AttributeError:
@@ -310,6 +311,9 @@ class CaveObject(CaveFeature):
         node = object_root.find("Placement")
         if node is not None:
             new_object["placement"] = CavePlacement.fromXML(node)
+        node = object_root.find("LinkRoot")
+        if node is not None:
+            new_object["link"] = CaveLink.fromXML(node)
         node = object_root.find("Content")
         if node is not None:
             new_object["content"] = CaveContent.fromXML(node)

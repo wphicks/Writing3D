@@ -432,10 +432,11 @@ class GroupAction(CaveAction):
         if node is not None:
             new_action["sound_change"] = node.text.strip()
         node = trans_root.find("LinkChange")
-        for key, value in new_action.link_xml_tags:
-            if node.find(value) is not None:
-                new_action["link_change"] = key
-                break
+        if node is not None:
+            for key, value in new_action.link_xml_tags.items():
+                if node.find(value) is not None:
+                    new_action["link_change"] = key
+                    break
 
         return new_action
 
@@ -519,13 +520,13 @@ class TimelineAction(CaveAction):
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
-        new_action = action_class
+        new_action = action_class()
         try:
             new_action["timeline_name"] = timer_change_root.attrib["name"]
         except KeyError:
             raise BadCaveXML(
                 "TimerChange node must have name attribute set")
-        for key, value in new_action.change_xml_tags:
+        for key, value in new_action.change_xml_tags.items():
             if timer_change_root.find(value) is not None:
                 new_action["change"] = key
         if "change" not in new_action:
@@ -670,6 +671,7 @@ class EventTriggerAction(CaveAction):
             new_action["enable"] = event_root.attrib["enable"]
         except KeyError:
             raise BadCaveXML("Event node must specify enable attribute")
+        return new_action
 
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,
@@ -762,7 +764,7 @@ class MoveCaveAction(CaveAction):
         """
         new_action = action_class()
         if "duration" in move_cave_root.attrib:
-            new_action["duration"] = move_cave_root.attrib["duration"]
+            new_action["duration"] = float(move_cave_root.attrib["duration"])
         if move_cave_root.find("Relative") is not None:
             new_action["move_relative"] = True
         elif move_cave_root.find("Absolute") is not None:

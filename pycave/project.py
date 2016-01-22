@@ -307,7 +307,7 @@ class CaveProject(CaveFeature):
         if camera_node is None:
             raise BadCaveXML("Global node has no CaveCameraPos child")
         if "far-clip" in camera_node.attrib:
-            new_project["far_clip"] = camera_node.attrib["far-clip"]
+            new_project["far_clip"] = float(camera_node.attrib["far-clip"])
         place_node = camera_node.find("Placement")
         if camera_node is None:
             raise BadCaveXML("CameraPos node has no Placement child")
@@ -318,7 +318,7 @@ class CaveProject(CaveFeature):
         if camera_node is None:
             raise BadCaveXML("Global node has no CameraPos child")
         if "far-clip" in camera_node.attrib:
-            new_project["far_clip"] = camera_node.attrib["far-clip"]
+            new_project["far_clip"] = float(camera_node.attrib["far-clip"])
         place_node = camera_node.find("Placement")
         if camera_node is None:
             raise BadCaveXML("CameraPos node has no Placement child")

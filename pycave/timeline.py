@@ -40,8 +40,14 @@ class SortedList(MutableSequence):
     def add(self, new_item):
         """Add new_item to list, maintaining proper ordering"""
         for index, item in enumerate(self):
-            if self.sort_key(new_item) < self.sort_key(item):
-                self._data.insert(index, new_item)
+            if self.sort_key is None:
+                if new_item < item:
+                    self._data.insert(index, new_item)
+                    return
+            else:
+                if self.sort_key(new_item) < self.sort_key(item):
+                    self._data.insert(index, new_item)
+                    return
         self._data.insert(len(self), new_item)
 
     def sort(self):
