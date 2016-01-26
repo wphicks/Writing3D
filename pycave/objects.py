@@ -238,7 +238,7 @@ class CaveText(CaveContent):
     :param float depth: Depth to extrude each letter
     """
     argument_validators = {
-        "text": AlwaysValid("Value should be a string"),
+        "text": AlwaysValid("Text should be a string"),
         "halign": OptionListValidator(
             "left", "right", "center"),
         "valign": OptionListValidator(
@@ -254,6 +254,8 @@ class CaveText(CaveContent):
 
     blender_scaling = 0.2
     blender_depth_scaling = 0.01
+
+    ui_order = ["text", "halign", "valign", "font", "depth"]
 
     def toXML(self, object_root):
         """Store CaveText as Content node within Object node

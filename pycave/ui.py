@@ -38,7 +38,7 @@ class InputUI(object):
         :param factory: A callable that will return a new sensible default for
         feature"""
         self.none_button = tk.Button(
-            self, text="Add", command=self._clear_none)
+            self, text="Create", command=self._clear_none)
         self.none_button.pack(fill=tk.X)
 
     def create_label(self):
@@ -59,13 +59,14 @@ class InputUI(object):
         """Convert input from TK widget to appropriate type"""
         return self.validator.coerce(value)
 
-    def validate(self, value):
+    def validate(self, value, silent=False):
         try:
             valid = self.validator(self.evaluate(value))
         except:
             valid = False
         if not valid:
-            self.help_bubble()
+            if not silent:
+                self.help_bubble()
         else:
             self.feature[self.feature_key] = self.evaluate(value)
         return valid
@@ -218,6 +219,21 @@ class MultiFeatureUI(InputUI, ttk.LabelFrame):
             parent, title, validator, feature, feature_key)
         self.config(text=self.title_string)
 
+    def create_editor(self, *args):
+        self.base_validator = self.validator.base_validators[
+            self.validator.valid_menu_items.index(
+                self.entry_value.get())]
+        if not self.base_validator(self.feature[self.feature_key]):
+            self.feature[self.feature_key] = self.base_validator.def_value
+        try:
+            self.editor.destroy()
+        except AttributeError:
+            pass
+        self.editor = self.base_validator.ui(
+            self, self.base_validator.correct_class.__name__, self.feature,
+            self.feature_key)
+        self.editor.pack()
+
     def initUI(self):
         try:
             self.entry_value.set(
@@ -229,7 +245,10 @@ class MultiFeatureUI(InputUI, ttk.LabelFrame):
         self.create_label()
         self.class_picker = tk.OptionMenu(
             self, self.entry_value, *self.validator.valid_menu_items)
-        self.class_picker.pack(anchor=tk.W, side=tk.LEFT)
+        self.class_picker.pack(anchor=tk.W)
+        self.create_editor()
+
+        self.entry_value.trace("w", self.create_editor)
 
 
 class BaseUI(InputUI, tk.Frame):
@@ -238,7 +257,7 @@ class BaseUI(InputUI, tk.Frame):
     (e.g. ints, floats, strings, etc.)"""
 
     def destroy(self):
-        self.validate(self.entry_value.get())
+        self.validate(self.entry_value.get(), silent=True)
         super(BaseUI, self).destroy()
 
     def initUI(self):

@@ -37,7 +37,10 @@ class CaveFeature(dict):
         super(CaveFeature, self).__init__()
         self.update(args)
         self.update(kwargs.items())
-        self.ui_order = sorted(self.argument_validators.keys())
+        try:
+            self.ui_order
+        except AttributeError:
+            self.ui_order = sorted(self.argument_validators.keys())
 
     def __setitem__(self, key, value):
         if key not in self.argument_validators:
