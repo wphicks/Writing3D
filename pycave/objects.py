@@ -10,7 +10,8 @@ from .features import CaveFeature
 from .actions import CaveAction
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
-    IsNumericIterable
+    IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
+    MultiFeatureValidator
 from .names import generate_blender_object_name,\
     generate_blender_material_name
 from .activators import BlenderClickTrigger
@@ -61,8 +62,8 @@ class CaveLink(CaveFeature):
     value to never reset)"""
 
     argument_validators = {
-        "enabled": AlwaysValid(help_string="Either true or false"),
-        "remain_enabled": AlwaysValid(help_string="Either true or false"),
+        "enabled": IsBoolean(),
+        "remain_enabled": IsBoolean(),
         "enabled_color": IsNumericIterable(required_length=3),
         "selected_color": IsNumericIterable(required_length=3),
         "actions": AlwaysValid(
@@ -197,187 +198,6 @@ class CaveLink(CaveFeature):
         except AttributeError:
             raise EBKAC(
                 "blend() must be called before write_blender_logic()")
-
-
-class CaveObject(CaveFeature):
-    """Store data on single Cave object
-
-    :param str name: The name of the object
-    :param CavePlacement placement: Position and orientation of object
-    :param CaveLink link: Clickable link for object
-    :param tuple color: Three floats representing RGB color of object
-    :param bool visible: Is object visible?
-    :param bool lighting: Does object respond to scene lighting?
-    :param float scale: Scaling factor for size of object
-    :param bool click_through: Should clicks also pass through object?
-    :param bool around_own_axis: TODO clarify
-    :param str sound: Name of sound element associated with this object
-    :param content: Content of object; one of CaveText, CaveImage,
-    CaveStereoImage, CaveModel, CaveLight, CavePSys
-    """
-
-    argument_validators = {
-        "name": AlwaysValid(
-            help_string="Unique name for this object"),
-        "placement": AlwaysValid(
-            help_string="CavePlacement specifying position and orientation"),
-        "link": AlwaysValid(
-            help_string="CaveLink associated with object"),
-        "color": IsNumericIterable(required_length=3),
-        "visible": AlwaysValid("Either true or false"),
-        "lighting": AlwaysValid("Either true or false"),
-        "scale": IsNumeric(min_value=0),
-        "click_through": AlwaysValid("Either true or false"),
-        "around_own_axis": AlwaysValid("Either true or false"),
-        "sound": AlwaysValid("Name of sound attached to this object"),
-        "content": AlwaysValid("Content of object")}
-
-    default_arguments = {
-        "link": None,
-        "color": (255, 255, 255),
-        "visible": True,
-        "lighting": False,
-        "scale": 1,
-        "click_through": False,
-        "around_own_axis": False,
-        "sound": None
-        }
-
-    def toXML(self, all_objects_root):
-        """Store CaveObject as Object node within ObjectRoot node
-
-        :param :py:class:xml.etree.ElementTree.Element all_objects_root
-        """
-        object_root = ET.SubElement(
-            all_objects_root, "Object", attrib={"name": self["name"]})
-        node = ET.SubElement(object_root, "Visible")
-        node.text = bool2text(self["visible"])
-        node = ET.SubElement(object_root, "Color")
-        node.text = "{},{},{}".format(*self["color"])
-        node = ET.SubElement(object_root, "Lighting")
-        node.text = bool2text(self["lighting"])
-        node = ET.SubElement(object_root, "ClickThrough")
-        node.text = bool2text(self["click_through"])
-        node = ET.SubElement(object_root, "AroundSelfAxis")
-        node.text = bool2text(self["around_own_axis"])
-        node = ET.SubElement(object_root, "Scale")
-        node.text = str(self["scale"] / self["content"].blender_scaling)
-        if self["sound"] is not None:
-            node = ET.SubElement(
-                object_root, "SoundRef", attrib={"name": self["sound"]})
-            node.text = self["sound"]
-        self["placement"].toXML(object_root)
-        if self["link"] is not None:
-            self["link"].toXML(object_root)
-        self["content"].toXML(object_root)
-
-        return object_root
-
-    @classmethod
-    def fromXML(object_class, object_root):
-        """Create CaveObject from Object node
-
-        :param :py:class:xml.etree.ElementTree.Element object_root
-        """
-        new_object = object_class()
-        try:
-            new_object["name"] = object_root.attrib["name"]
-        except KeyError:
-            raise BadCaveXML("All Object nodes must have a name attribute set")
-        node = object_root.find("Visible")
-        if node is not None:
-            new_object["visible"] = text2bool(node.text)
-        node = object_root.find("Color")
-        if node is not None:
-            new_object["color"] = text2tuple(node.text, evaluator=int)
-        node = object_root.find("Lighting")
-        if node is not None:
-            new_object["lighting"] = text2bool(node.text)
-        node = object_root.find("ClickThrough")
-        if node is not None:
-            new_object["click_through"] = text2bool(node.text)
-        node = object_root.find("AroundSelfAxis")
-        if node is not None:
-            new_object["around_own_axis"] = text2bool(node.text)
-        node = object_root.find("Scale")
-        if node is not None:
-            new_object["scale"] = float(node.text)
-        node = object_root.find("SoundRef")
-        if node is not None:
-            try:
-                new_object["sound"] = node.attrib["name"]
-            except KeyError:
-                raise BadCaveXML("SoundRef node must have name attribute set")
-        node = object_root.find("Placement")
-        if node is not None:
-            new_object["placement"] = CavePlacement.fromXML(node)
-        node = object_root.find("LinkRoot")
-        if node is not None:
-            new_object["link"] = CaveLink.fromXML(node)
-        node = object_root.find("Content")
-        if node is not None:
-            new_object["content"] = CaveContent.fromXML(node)
-            new_object["scale"] = (
-                new_object["scale"] * new_object["content"].blender_scaling)
-        return new_object
-
-    def apply_material(self, blender_object):
-        """Apply properties of object to material for Blender object"""
-        if blender_object.active_material is None:
-            blender_object.active_material = bpy.data.materials.new(
-                generate_blender_material_name(self["name"]))
-            if blender_object.active_material is None:
-                # Object cannot have active material
-                return blender_object
-        #blender_object.active_material.diffuse_color = [
-        #    channel/255.0 for channel in self["color"]]
-        #blender_object.active_material.specular_color = (
-        #    blender_object.active_material.diffuse_color)
-        blender_object.active_material.use_shadeless = not self["lighting"]
-        blender_object.active_material.use_transparency = True
-        blender_object.active_material.use_nodes = False
-        blender_object.active_material.use_object_color = True
-        color = [channel/255.0 for channel in self["color"]]
-        color.append(int(self["visible"]))
-        blender_object.color = color
-        return blender_object
-
-    def blend(self):
-        """Create representation of CaveObject in Blender"""
-        blender_object = self["content"].blend()
-        blender_object.name = generate_blender_object_name(self["name"])
-        blender_object.hide_render = not self["visible"]
-        blender_object.scale = [self["scale"], ] * 3
-        if "depth" in self["content"]:
-            # Make extrusion independent of scale
-            blender_object.scale[2] = 1
-
-        self["placement"].place(blender_object)
-        #TODO: Apply link
-        if self["link"] is not None:
-            self["link"].blend(generate_blender_object_name(self["name"]))
-        if self["click_through"]:
-            pass
-            #TODO
-        blender_object.game.physics_type = 'DYNAMIC'
-        blender_object.game.use_ghost = True
-
-        self.apply_material(blender_object)
-        blender_object.layers = [layer == 0 for layer in range(20)]
-
-        #TODO: Add around_own_axis
-        #TODO: Add sound
-
-        return blender_object
-
-    def write_blender_logic(self):
-        """Write Python logic for this object to associated script"""
-        try:
-            return self.blender_trigger.write_to_script()
-        except AttributeError:
-            warnings.warn(
-                "blend() method must be called before write_blender_logic()")
-            return None
 
 
 class CaveContent(CaveFeature):
@@ -791,3 +611,195 @@ class CavePSys(CaveContent):
 
     NOT YET IMPLEMENTED AT ALL"""
     # TODO: everything
+
+
+class CaveObject(CaveFeature):
+    """Store data on single Cave object
+
+    :param str name: The name of the object
+    :param CavePlacement placement: Position and orientation of object
+    :param CaveLink link: Clickable link for object
+    :param tuple color: Three floats representing RGB color of object
+    :param bool visible: Is object visible?
+    :param bool lighting: Does object respond to scene lighting?
+    :param float scale: Scaling factor for size of object
+    :param bool click_through: Should clicks also pass through object?
+    :param bool around_own_axis: TODO clarify
+    :param str sound: Name of sound element associated with this object
+    :param content: Content of object; one of CaveText, CaveImage,
+    CaveStereoImage, CaveModel, CaveLight, CavePSys
+    """
+
+    argument_validators = {
+        "name": ValidPyString(),
+        "placement": FeatureValidator(
+            CavePlacement,
+            help_string="Orientation and position of object"),
+        "link": FeatureValidator(
+            CaveLink,
+            help_string="Clickable link associated with object"),
+        "color": IsNumericIterable(required_length=3),
+        "visible": IsBoolean(),
+        "lighting":  IsBoolean(),
+        "scale": IsNumeric(min_value=0),
+        "click_through":  IsBoolean(),
+        "around_own_axis":  IsBoolean(),
+        "sound": AlwaysValid("Name of sound attached to this object"),
+        "content": MultiFeatureValidator([
+            CaveContent, CaveText, CaveImage, CaveModel, CaveLight])}
+
+    default_arguments = {
+        "link": None,
+        "color": (255, 255, 255),
+        "visible": True,
+        "lighting": False,
+        "scale": 1,
+        "click_through": False,
+        "around_own_axis": False,
+        "sound": None
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(CaveObject, self).__init__(*args, **kwargs)
+        self.ui_order = [
+            "name", "visible", "color", "lighting", "scale", "click_through",
+            "around_own_axis",
+            #"sound",
+            "placement", "link", "content"
+        ]
+
+    def toXML(self, all_objects_root):
+        """Store CaveObject as Object node within ObjectRoot node
+
+        :param :py:class:xml.etree.ElementTree.Element all_objects_root
+        """
+        object_root = ET.SubElement(
+            all_objects_root, "Object", attrib={"name": self["name"]})
+        node = ET.SubElement(object_root, "Visible")
+        node.text = bool2text(self["visible"])
+        node = ET.SubElement(object_root, "Color")
+        node.text = "{},{},{}".format(*self["color"])
+        node = ET.SubElement(object_root, "Lighting")
+        node.text = bool2text(self["lighting"])
+        node = ET.SubElement(object_root, "ClickThrough")
+        node.text = bool2text(self["click_through"])
+        node = ET.SubElement(object_root, "AroundSelfAxis")
+        node.text = bool2text(self["around_own_axis"])
+        node = ET.SubElement(object_root, "Scale")
+        node.text = str(self["scale"] / self["content"].blender_scaling)
+        if self["sound"] is not None:
+            node = ET.SubElement(
+                object_root, "SoundRef", attrib={"name": self["sound"]})
+            node.text = self["sound"]
+        self["placement"].toXML(object_root)
+        if self["link"] is not None:
+            self["link"].toXML(object_root)
+        self["content"].toXML(object_root)
+
+        return object_root
+
+    @classmethod
+    def fromXML(object_class, object_root):
+        """Create CaveObject from Object node
+
+        :param :py:class:xml.etree.ElementTree.Element object_root
+        """
+        new_object = object_class()
+        try:
+            new_object["name"] = object_root.attrib["name"]
+        except KeyError:
+            raise BadCaveXML("All Object nodes must have a name attribute set")
+        node = object_root.find("Visible")
+        if node is not None:
+            new_object["visible"] = text2bool(node.text)
+        node = object_root.find("Color")
+        if node is not None:
+            new_object["color"] = text2tuple(node.text, evaluator=int)
+        node = object_root.find("Lighting")
+        if node is not None:
+            new_object["lighting"] = text2bool(node.text)
+        node = object_root.find("ClickThrough")
+        if node is not None:
+            new_object["click_through"] = text2bool(node.text)
+        node = object_root.find("AroundSelfAxis")
+        if node is not None:
+            new_object["around_own_axis"] = text2bool(node.text)
+        node = object_root.find("Scale")
+        if node is not None:
+            new_object["scale"] = float(node.text)
+        node = object_root.find("SoundRef")
+        if node is not None:
+            try:
+                new_object["sound"] = node.attrib["name"]
+            except KeyError:
+                raise BadCaveXML("SoundRef node must have name attribute set")
+        node = object_root.find("Placement")
+        if node is not None:
+            new_object["placement"] = CavePlacement.fromXML(node)
+        node = object_root.find("LinkRoot")
+        if node is not None:
+            new_object["link"] = CaveLink.fromXML(node)
+        node = object_root.find("Content")
+        if node is not None:
+            new_object["content"] = CaveContent.fromXML(node)
+            new_object["scale"] = (
+                new_object["scale"] * new_object["content"].blender_scaling)
+        return new_object
+
+    def apply_material(self, blender_object):
+        """Apply properties of object to material for Blender object"""
+        if blender_object.active_material is None:
+            blender_object.active_material = bpy.data.materials.new(
+                generate_blender_material_name(self["name"]))
+            if blender_object.active_material is None:
+                # Object cannot have active material
+                return blender_object
+        #blender_object.active_material.diffuse_color = [
+        #    channel/255.0 for channel in self["color"]]
+        #blender_object.active_material.specular_color = (
+        #    blender_object.active_material.diffuse_color)
+        blender_object.active_material.use_shadeless = not self["lighting"]
+        blender_object.active_material.use_transparency = True
+        blender_object.active_material.use_nodes = False
+        blender_object.active_material.use_object_color = True
+        color = [channel/255.0 for channel in self["color"]]
+        color.append(int(self["visible"]))
+        blender_object.color = color
+        return blender_object
+
+    def blend(self):
+        """Create representation of CaveObject in Blender"""
+        blender_object = self["content"].blend()
+        blender_object.name = generate_blender_object_name(self["name"])
+        blender_object.hide_render = not self["visible"]
+        blender_object.scale = [self["scale"], ] * 3
+        if "depth" in self["content"]:
+            # Make extrusion independent of scale
+            blender_object.scale[2] = 1
+
+        self["placement"].place(blender_object)
+        #TODO: Apply link
+        if self["link"] is not None:
+            self["link"].blend(generate_blender_object_name(self["name"]))
+        if self["click_through"]:
+            pass
+            #TODO
+        blender_object.game.physics_type = 'DYNAMIC'
+        blender_object.game.use_ghost = True
+
+        self.apply_material(blender_object)
+        blender_object.layers = [layer == 0 for layer in range(20)]
+
+        #TODO: Add around_own_axis
+        #TODO: Add sound
+
+        return blender_object
+
+    def write_blender_logic(self):
+        """Write Python logic for this object to associated script"""
+        try:
+            return self.blender_trigger.write_to_script()
+        except AttributeError:
+            warnings.warn(
+                "blend() method must be called before write_blender_logic()")
+            return None

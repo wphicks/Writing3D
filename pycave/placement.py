@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import math
 from .features import CaveFeature
 from .validators import OptionListValidator, IsNumericIterable, IsNumeric, \
-    AlwaysValid
+    FeatureValidator
 from .errors import BadCaveXML
 from .xml_tools import text2tuple
 import warnings
@@ -140,7 +140,7 @@ class CavePlacement(CaveFeature):
         "relative_to": OptionListValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
         "position": IsNumericIterable(3),
-        "rotation": AlwaysValid("A CaveRotation")}
+        "rotation": FeatureValidator(CaveRotation)}
     default_arguments = {
         "relative_to": "Center",
         "position": (0, 0, 0),

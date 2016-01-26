@@ -29,10 +29,11 @@ class CaveWriter(tk.Frame):
 
     def generate_tabs(self):
         self.tabs = {}
-        self.tabs["project"] = project.ProjectOptions(self.interface)
+        self.tabs["project"] = project.ProjectOptions(
+            self.interface, self.project)
         for category in ["objects", "groups", "timelines", "trigger_events"]:
             self.tabs[category] = project.CaveProject.argument_validators[
-                category].ui(self.interface, category)
+                category].ui(self.interface, category, self.project, category)
 
     def initUI(self):
         self.parent.title("Cave Writer")

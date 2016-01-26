@@ -7,7 +7,7 @@ import math
 from .features import CaveFeature
 from .placement import CavePlacement, CaveRotation, convert_to_blender_axes
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable,\
-    FeatureListValidator
+    FeatureListValidator, IsBoolean, FeatureValidator
 from .xml_tools import bool2text, text2tuple, attrib2bool
 from .objects import CaveObject
 from .sounds import CaveSound
@@ -27,22 +27,36 @@ except ImportError:
 class ProjectOptions(tk.Frame):
     """A frame for providing global project option input"""
 
-    def __init__(self, parent):
+    def __init__(self, parent, project):
         super(ProjectOptions, self).__init__(parent)
         self.parent = parent
+        self.project = project
         self.initUI()
 
     def add_entries(self):
         self.entries = {}
         self.entries["far_clip"] = CaveProject.argument_validators[
-            "far_clip"].ui(self, "Camera far clip")
+            "far_clip"].ui(self, "Camera far clip", self.project, "far_clip")
+        self.entries["background"] = CaveProject.argument_validators[
+            "background"].ui(
+            self, "Background color", self.project, "background")
+        self.entries["allow_movement"] = CaveProject.argument_validators[
+            "allow_movement"].ui(
+            self, "Allow movement", self.project, "allow_movement")
+        self.entries["allow_rotation"] = CaveProject.argument_validators[
+            "allow_rotation"].ui(
+            self, "Allow rotation", self.project, "allow_movement")
+        self.entries["camera_placement"] = CaveProject.argument_validators[
+            "camera_placement"].ui(
+            self, "Camera placement", self.project, "camera_placement")
 
     def initUI(self):
         self.add_entries()
         self.title_string = "Global Options"
-        for option in ["far_clip"]:
-            self.entries[option].pack(
-                fill=tk.X, anchor=tk.N, side=tk.TOP, expand=1)
+        for option in [
+                "far_clip", "background", "allow_movement", "allow_rotation",
+                "camera_placement"]:
+            self.entries[option].pack(anchor=tk.W)
         self.pack(fill=tk.BOTH, expand=1)
 
 
@@ -137,14 +151,18 @@ class CaveProject(CaveFeature):
         "trigger_events": FeatureListValidator(
             CaveTrigger,
             help_string="A list of CaveTriggers in the project"),
-        "camera_placement": AlwaysValid(
-            help_string="A CavePlacement object"),
-        "desktop_camera_placement": AlwaysValid(
-            help_string="A CavePlacement object"),
+        "camera_placement": FeatureValidator(
+            CavePlacement,
+            help_string="Orientation and position of camera"),
+        "desktop_camera_placement": FeatureValidator(
+            CavePlacement,
+            help_string="Orientation and position of camera in desktop preview"
+            ),
         "far_clip": IsNumeric(),
-        "background": IsNumericIterable(required_length=3),
-        "allow_movement": AlwaysValid("Either true or false"),
-        "allow_rotation": AlwaysValid("Either true or false"),
+        "background": IsNumericIterable(
+            required_length=3, min_value=0, max_value=255),
+        "allow_movement": IsBoolean(),
+        "allow_rotation": IsBoolean(),
         "wall_placements": AlwaysValid(
             "Dictionary mapping wall names to placements")
         }
