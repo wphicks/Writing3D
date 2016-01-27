@@ -165,12 +165,75 @@ class FeatureListUI(InputUI, ttk.LabelFrame):
         self.feature[self.feature_key].append(self.validator.correct_class())
         self.entries.append(self.validator.base_validator.ui(
             self.scroll_area.inside_frame,
-            "Object {}".format(len(self.feature[self.feature_key]) - 1),
+            "Item {}".format(len(self.feature[self.feature_key]) - 1),
             self.feature[self.feature_key],
             len(self.feature[self.feature_key]) - 1,
             pop_out=True)
         )
-        self.entries[-1].pack(anchor=tk.NW)
+        new_entry = self.entries[-1]
+        destroy_button = tk.Button(
+            self.entries[-1], text="Delete",
+            command=lambda: self.remove_feature(new_entry.feature_key)
+        )
+        new_entry.pack(anchor=tk.NW)
+        destroy_button.pack(side=tk.LEFT, fill=tk.X)
+
+    def remove_feature(self, index):
+        removed_entry = self.entries.pop(index)
+        removed_entry.destroy()
+        self.feature[self.feature_key].pop(index)
+        for i in range(len(self.entries)):
+            if i >= index:
+                self.entries[i].feature_key += -1
+            if "name" not in self.entries[
+                    i].feature[self.entries[i].feature_key]:
+                self.entries[i].title_string = "Object {}".format(i)
+            self.entries[i].reset_label()
+
+    def initUI(self):
+        if self.feature[self.feature_key] is None:
+            self.noneUI()
+            return
+        self.entries = []
+        self.scroll_area = ScrollableFrame(self)
+        self.scroll_area.pack(fill=tk.BOTH, expand=1)
+        self.add_button = tk.Button(
+            self, text="Add...", command=self.add_feature)
+        self.add_button.pack(fill=tk.X, expand=0)
+
+
+class MultiFeatureListUI(InputUI, ttk.Frame):
+    """Tkinter widget for inputting a list of CaveFeatures of multiple types"""
+
+    def add_feature(self):
+        self.feature[self.feature_key].append(
+            self.validator.base_validator.def_value)
+        self.entries.append(self.validator.base_validator.ui(
+            self.scroll_area.inside_frame,
+            "Item {}".format(len(self.feature[self.feature_key]) - 1),
+            self.feature[self.feature_key],
+            len(self.feature[self.feature_key]) - 1,
+            pop_out=True)
+        )
+        new_entry = self.entries[-1]
+        destroy_button = tk.Button(
+            self.entries[-1], text="Delete",
+            command=lambda: self.remove_feature(new_entry.feature_key)
+        )
+        new_entry.pack(anchor=tk.NW)
+        destroy_button.pack(side=tk.LEFT, fill=tk.X)
+
+    def remove_feature(self, index):
+        removed_entry = self.entries.pop(index)
+        removed_entry.destroy()
+        self.feature[self.feature_key].pop(index)
+        for i in range(len(self.entries)):
+            if i >= index:
+                self.entries[i].feature_key += -1
+            if "name" not in self.entries[
+                    i].feature[self.entries[i].feature_key]:
+                self.entries[i].title_string = "Object {}".format(i)
+            self.entries[i].reset_label()
 
     def initUI(self):
         if self.feature[self.feature_key] is None:
@@ -208,7 +271,7 @@ class PopOutUI(InputUI, tk.Frame):
     def initUI(self):
         self.create_label()
         self.edit_button = tk.Button(self, text="Edit", command=self.edit)
-        self.edit_button.pack(fill=tk.X)
+        self.edit_button.pack(side=tk.LEFT, fill=tk.X)
 
 
 class MultiFeatureUI(InputUI, ttk.LabelFrame):
@@ -308,3 +371,95 @@ class OptionUI(InputUI, tk.Frame):
         self.entry = tk.OptionMenu(
             self, self.entry_value, *self.validator.valid_menu_items)
         self.entry.pack(anchor=tk.W, side=tk.LEFT)
+
+
+class NonFeatureUI(tk.Frame):
+    """Tkinter widget for input and validation of values that are not
+    associated with a CaveFeature option"""
+
+    def help_bubble(self):
+        top = tk.Toplevel()
+        top.title("Error")
+        error_message = tk.Message(
+            top, text=self.validator.help_string, width=200)
+        error_message.pack()
+        dismiss = tk.Button(top, text="Dismiss", command=top.destroy)
+        dismiss.pack()
+
+    def create_label(self):
+        """Create element to label this widget"""
+        if self.title_string is not None and not hasattr(self, "label"):
+            self.label = tk.Label(self, text="{}:".format(self.title_string))
+            self.label.pack(anchor=tk.W, side=tk.LEFT)
+
+    def evaluate(self):
+        return self.validator.coerce(self.entry_value.get())
+
+    def validate(self, silent=False):
+        try:
+            valid = self.validator(self.evaluate())
+        except:
+            valid = False
+        if not valid:
+            if not silent:
+                self.help_bubble()
+        return valid
+
+    def destroy(self):
+        self.validate(silent=True)
+        super(BaseUI, self).destroy()
+
+    def initUI(self):
+        """Add all elements to build up this widget"""
+        self.create_label()
+        vcmd = (self.register(self.validate), '%P')
+        self.entry = tk.Entry(
+            self, validate='focusout', validatecommand=vcmd,
+            textvariable=self.entry_value)
+
+    def __init__(self, parent, title, validator):
+        self.parent = parent
+        self.title_string = title
+        self.validator = validator
+        self.entry_value = tk.StringVar()
+        super(NonFeatureUI, self).__init__(self.parent)
+        self.initUI()
+
+
+class FeatureDictUI(InputUI, tk.Frame):
+    """Tkinter widget for building a dictionary with lists of CaveFeatures as
+    values"""
+
+    def add_value(self, frame, key):
+        self.validator.value_validator.ui(
+            frame, None, self.feature[self.feature_key], key, pop_out=True)
+
+    def create_destroy_button(self, frame, key):
+        destroy_button = tk.Button(
+            new_entry_frame, text="Delete",
+            command=lambda: pass#self.remove_feature(new_entry.feature_key)
+        )
+
+    def add_key(self):
+        new_entry_frame = tk.Frame(self.scroll_area.inside_frame)
+        key_entry = NonFeatureUI(
+            new_entry_frame, self.key_label, self.validator.key_validator)
+        key_entry.entry_value.trace(
+            'w', lambda: self.add_value(new_entry_frame, key_entry.evaluate()))
+        key_entry.pack()
+        new_entry_frame.pack(anchor=tk.NW)
+        self.create_destroy_button(self,
+
+    def initUI(self):
+        self.create_label()
+        self.key_entries = []
+        self.value_entries = []
+        self.scroll_area = ScrollableFrame(self)
+        self.scroll_area.pack(fill=tk.BOTH, expand=1)
+        self.add_button = tk.Button(
+            self, text="Add...", command=self.add_feature)
+        self.add_button.pack(fill=tk.X, expand=0)
+        if self.validator.key_label is not None:
+            self.key_label = self.validator.key_label
+        else:
+            self.key_label = "Key"

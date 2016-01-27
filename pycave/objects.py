@@ -7,11 +7,12 @@ import math
 from .errors import BadCaveXML, InvalidArgument, EBKAC
 from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from .features import CaveFeature
-from .actions import CaveAction
+from .actions import CaveAction, ObjectAction, GroupAction, TimelineAction,\
+    SoundAction, EventTriggerAction, MoveCaveAction, CaveResetAction
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
-    MultiFeatureValidator
+    MultiFeatureValidator, ValidFeatureDict
 from .names import generate_blender_object_name,\
     generate_blender_material_name
 from .activators import BlenderClickTrigger
@@ -61,12 +62,22 @@ class CaveLink(CaveFeature):
     :param int reset: Number of clicks after which to reset link (negative
     value to never reset)"""
 
+    ui_order = [
+        "enabled", "remain_enabled", "selected_color", "reset", "actions"]
+
     argument_validators = {
         "enabled": IsBoolean(),
         "remain_enabled": IsBoolean(),
         "enabled_color": IsNumericIterable(required_length=3),
         "selected_color": IsNumericIterable(required_length=3),
-        "actions": AlwaysValid(
+        "actions": ValidFeatureDict(
+            [
+                CaveAction, ObjectAction, GroupAction, TimelineAction,
+                SoundAction, EventTriggerAction, MoveCaveAction,
+                CaveResetAction
+            ],
+            key_validator=IsNumeric(),
+            key_label="Clicks",
             help_string="Must be a dictionary mapping integers to lists of "
             "CaveActions"
             ),

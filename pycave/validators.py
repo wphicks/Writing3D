@@ -1,8 +1,9 @@
 """Tools for validating options provided to Cave features"""
 
-from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
-    PopOutUI, MultiFeatureUI
 import re
+from collections import defaultdict
+from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
+    PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI
 
 PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
 
@@ -309,3 +310,84 @@ class FeatureListValidator(Validator):
         if pop_out:
             return PopOutUI(parent, label, self, feature, feature_key)
         return FeatureListUI(parent, label, self, feature, feature_key)
+
+
+class MultiFeatureListValidator(Validator):
+    """Check if value is an iterable of CaveFeatures of several specified
+    types"""
+
+    def __init__(self, class_list, help_string=None):
+        self.class_list = class_list
+        self.valid_menu_items = [
+            class_.__name__ for class_ in self.class_list]
+        self.base_validator = MultiFeatureValidator(self.class_list)
+        if help_string is None:
+            self.help_string = "Value must be an iterable of elements of one"
+            "of the following types {}".format(
+                ", ".join(self.valid_menu_items))
+        else:
+            self.help_string = help_string
+
+    def __call__(self, iterable):
+        for item in iterable:
+            if not self.base_validator(item):
+                return False
+        return True
+
+    def coerce(self, iterable):
+        return [self.base_validator.coerce(item) for item in iterable]
+
+    @property
+    def def_value(self):
+        return []
+
+    def ui(self, parent, label, feature, feature_key, pop_out=False):
+        if pop_out:
+            return PopOutUI(parent, label, self, feature, feature_key)
+        return MultiFeatureListUI(parent, label, self, feature, feature_key)
+
+
+class ValidFeatureDict(Validator):
+    """Check if input is dictionary with lists of CaveFeatures as values
+
+    :param class_list: A list of classes which are acceptable as values in this
+    dictionary
+    :param str key_label: A label indicating what the keys of this dictionary
+    are"""
+
+    def __init__(
+            self, class_list, key_validator=AlwaysValid(), key_label=None,
+            help_string=None):
+        if help_string is None:
+            self.help_string = "Must be a dictionary with lists of"
+            " CaveFeatures as values"
+        else:
+            self.help_string = help_string
+        self.key_validator = key_validator
+        self.key_label = key_label
+        self.value_validator = MultiFeatureListValidator(class_list)
+
+    @property
+    def def_value(self):
+        return defaultdict(list)
+
+    def __call__(self, dictionary):
+        for key, value in dictionary.items():
+            if (
+                    not self.key_validator(key) or
+                    not self.value_validator(value)):
+                return False
+        return True
+
+    def coerce(self, dictionary):
+        new_dict = self.def_value
+        for key, value in dictionary.items():
+            new_dict[
+                self.key_validator.coerce(key)] = self.value_validator.coerce(
+                value)
+        return new_dict
+
+    def ui(self, parent, label, feature, feature_key, pop_out=False):
+        if pop_out:
+            return PopOutUI(parent, label, self, feature, feature_key)
+        return FeatureDictUI(parent, label, self, feature, feature_key)
