@@ -12,7 +12,7 @@ from .actions import CaveAction, ObjectAction, GroupAction, TimelineAction,\
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
-    MultiFeatureValidator, ValidFeatureDict
+    MultiFeatureValidator, ValidFeatureDict, TextValidator, ValidFile
 from .names import generate_blender_object_name,\
     generate_blender_material_name
 from .activators import BlenderClickTrigger
@@ -78,6 +78,7 @@ class CaveLink(CaveFeature):
             ],
             key_validator=IsNumeric(),
             key_label="Clicks",
+            value_label="Action",
             help_string="Must be a dictionary mapping integers to lists of "
             "CaveActions"
             ),
@@ -249,12 +250,12 @@ class CaveText(CaveContent):
     :param float depth: Depth to extrude each letter
     """
     argument_validators = {
-        "text": AlwaysValid("Text should be a string"),
+        "text": TextValidator(),
         "halign": OptionListValidator(
             "left", "right", "center"),
         "valign": OptionListValidator(
             "top", "center", "bottom"),
-        "font": AlwaysValid("Filename of font"),
+        "font": ValidFile("Filename of font"),
         "depth": IsNumeric()}
 
     default_arguments = {

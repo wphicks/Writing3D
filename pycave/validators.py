@@ -1,9 +1,10 @@
 """Tools for validating options provided to Cave features"""
 
 import re
+import os
 from collections import defaultdict
 from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
-    PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI
+    PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI, FileUI
 
 PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
 
@@ -30,6 +31,21 @@ class Validator(object):
         return BaseUI(parent, label, self, feature, feature_key)
 
 
+class TextValidator(Validator):
+    """Callable object for checking if value is valid text"""
+
+    def __init__(self):
+        self.help_string = "Must be text"
+        self.def_value = ""
+
+    def __call__(self, value):
+        return True
+
+    def coerce(self, value):
+        new_value = str(value)
+        return new_value
+
+
 class ValidPyString(Validator):
     """Callable object for checking if string can be used as part of a Python
     variable name"""
@@ -46,6 +62,28 @@ class ValidPyString(Validator):
         new_value = str(value)
         new_value = re.sub(r"[^A-Za-z0-9_]", lambda x: "_", new_value)
         return new_value
+
+
+class ValidFile(Validator):
+
+    def __init__(self, help_string=None):
+        if help_string is None:
+            self.help_string = "Must be an existing file"
+        else:
+            self.help_string = help_string
+        self.def_value = ""
+
+    def __call__(self, value):
+        return os.path.isfile(value)
+
+    def coerce(self, value):
+        # TODO: Think about something clever with os.path here
+        return str(value)
+
+    def ui(self, parent, label, feature, feature_key, pop_out=False):
+        if pop_out:
+            return PopOutUI(parent, label, self, feature, feature_key)
+        return FileUI(parent, label, self, feature, feature_key)
 
 
 class OptionListValidator(Validator):
@@ -316,11 +354,12 @@ class MultiFeatureListValidator(Validator):
     """Check if value is an iterable of CaveFeatures of several specified
     types"""
 
-    def __init__(self, class_list, help_string=None):
+    def __init__(self, class_list, help_string=None, item_label="Item"):
         self.class_list = class_list
         self.valid_menu_items = [
             class_.__name__ for class_ in self.class_list]
         self.base_validator = MultiFeatureValidator(self.class_list)
+        self.item_label = item_label
         if help_string is None:
             self.help_string = "Value must be an iterable of elements of one"
             "of the following types {}".format(
@@ -344,7 +383,9 @@ class MultiFeatureListValidator(Validator):
     def ui(self, parent, label, feature, feature_key, pop_out=False):
         if pop_out:
             return PopOutUI(parent, label, self, feature, feature_key)
-        return MultiFeatureListUI(parent, label, self, feature, feature_key)
+        return MultiFeatureListUI(
+            parent, label, self, feature, feature_key,
+            item_label=self.item_label)
 
 
 class ValidFeatureDict(Validator):
@@ -357,7 +398,7 @@ class ValidFeatureDict(Validator):
 
     def __init__(
             self, class_list, key_validator=AlwaysValid(), key_label=None,
-            help_string=None):
+            help_string=None, value_label="Item"):
         if help_string is None:
             self.help_string = "Must be a dictionary with lists of"
             " CaveFeatures as values"
@@ -365,7 +406,9 @@ class ValidFeatureDict(Validator):
             self.help_string = help_string
         self.key_validator = key_validator
         self.key_label = key_label
-        self.value_validator = MultiFeatureListValidator(class_list)
+        self.value_label = value_label
+        self.value_validator = MultiFeatureListValidator(
+            class_list, item_label=self.value_label)
 
     @property
     def def_value(self):
@@ -390,4 +433,6 @@ class ValidFeatureDict(Validator):
     def ui(self, parent, label, feature, feature_key, pop_out=False):
         if pop_out:
             return PopOutUI(parent, label, self, feature, feature_key)
-        return FeatureDictUI(parent, label, self, feature, feature_key)
+        return FeatureDictUI(
+            parent, label, self, feature, feature_key,
+            item_label=self.value_label)
