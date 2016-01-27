@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from collections import MutableSequence
 from .features import CaveFeature
 from .actions import CaveAction
-from .validators import AlwaysValid
+from .validators import AlwaysValid, IsBoolean, ValidPyString
 from .errors import ConsistencyError, BadCaveXML
 from .xml_tools import bool2text, text2bool
 from .activators import BlenderTimeline
@@ -73,9 +73,8 @@ class CaveTimeline(CaveFeature):
     for action, CaveAction)
     """
     argument_validators = {
-        "name": AlwaysValid(
-            help_string="A string specifying a unique name for this timeline"),
-        "start_immediately": AlwaysValid(help_string="Either true or false"),
+        "name": ValidPyString(),
+        "start_immediately": IsBoolean(),
         "actions": AlwaysValid(
             help_string="A list of (float, CaveAction) tuples")
         }

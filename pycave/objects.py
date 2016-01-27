@@ -337,7 +337,7 @@ class CaveImage(CaveContent):
 
     :param str filename: Filename of image to be displayed"""
     argument_validators = {
-        "filename": AlwaysValid("Value should be a string")}
+        "filename": ValidFile("Value should be a string")}
 
     def toXML(self, object_root):
         """Store CaveImage as Content node within Object node
@@ -398,8 +398,8 @@ class CaveStereoImage(CaveContent):
     :param str right-file: Filename of image to be displayed to right eye
     """
     argument_validators = {
-        "left_file": AlwaysValid("Filename of left-eye image"),
-        "right_file": AlwaysValid("Filename of right-eye image")}
+        "left_file": ValidFile("Filename of left-eye image"),
+        "right_file": ValidFile("Filename of right-eye image")}
 
     def toXML(self, object_root):
         """Store CaveStereoImage as Content node within Object node
@@ -449,8 +449,8 @@ class CaveModel(CaveContent):
     """
     #TODO: Does not seem to play nice with GLSL shader. FIX THIS.
     argument_validators = {
-        "filename": AlwaysValid("Value should be a string"),
-        "check_collisions": AlwaysValid("Value should be a boolean")}
+        "filename": ValidFile("Value should be a string"),
+        "check_collisions": IsBoolean()}
 
     default_arguments = {
         "check_collisions": False
@@ -520,10 +520,11 @@ class CaveLight(CaveContent):
     """
     argument_validators = {
         "light_type": OptionListValidator("Point", "Directional", "Spot"),
-        "diffuse": AlwaysValid("Value should be a boolean"),
-        "specular": AlwaysValid("Value should be a boolean"),
+        "diffuse": IsBoolean(),
+        "specular": IsBoolean(),
         "attenuation": IsNumericIterable(3),
         "angle": IsNumeric()}
+
     default_arguments = {
         "diffuse": True,
         "specular": True,

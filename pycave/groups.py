@@ -1,7 +1,7 @@
 import warnings
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
-from .validators import AlwaysValid
+from .validators import AlwaysValid, ValidPyString
 from .errors import BadCaveXML, ConsistencyError
 from .names import generate_group_name, \
     generate_blender_object_name
@@ -21,7 +21,7 @@ class CaveGroup(CaveFeature):
     """
 
     argument_validators = {
-        "name": AlwaysValid(help_string="Name of this group"),
+        "name": ValidPyString(),
         "objects": AlwaysValid(help_string="A list of names of objects"),
         "groups": AlwaysValid(help_string="A list of names of groups"),
     }

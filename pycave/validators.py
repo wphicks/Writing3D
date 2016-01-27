@@ -93,7 +93,7 @@ class OptionListValidator(Validator):
         self.valid_options = valid_options
         self.valid_menu_items = [
             str(option) for option in self.valid_options]
-        self.help_string = "Value must be one of " + " ,".join(
+        self.help_string = "Value must be one of " + ", ".join(
             self.valid_menu_items)
         try:
             self.def_value = self.valid_options[0]

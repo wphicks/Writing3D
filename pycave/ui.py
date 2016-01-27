@@ -97,7 +97,6 @@ class FileUI(InputUI, tk.Frame):
         return super(FileUI, self).validate(value, silent=True)
 
     def file_dialog(self, event):
-        print("WHOA")
         filename = tk.filedialog.askopenfilename()
         self.entry_value.set(filename)
         self.validate(self.entry_value.get())
@@ -110,7 +109,6 @@ class FileUI(InputUI, tk.Frame):
             textvariable=self.entry_value)
         self.entry.bind('<Button-1>', self.file_dialog)
         self.entry.pack()
-        print("BNBBBBBBBBBBB")
 
 
 class ScrollableFrame(tk.Frame):

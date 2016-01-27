@@ -5,15 +5,17 @@ action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
-from .actions import CaveAction
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
-    OptionListValidator
+    OptionListValidator, IsBoolean, ValidPyString, MultiFeatureListValidator,\
+    FeatureValidator
 from .errors import ConsistencyError, BadCaveXML, InvalidArgument, \
     EBKAC
 from .xml_tools import bool2text, text2tuple, text2bool
 from .activators import BlenderTrigger, BlenderPositionTrigger, \
     BlenderPointTrigger, BlenderDirectionTrigger, BlenderLookObjectTrigger, \
     BlenderObjectPositionTrigger
+from .actions import CaveAction, ObjectAction, GroupAction, TimelineAction,\
+    SoundAction, EventTriggerAction, MoveCaveAction, CaveResetAction
 
 
 class CaveTrigger(CaveFeature):
@@ -96,15 +98,17 @@ class BareTrigger(CaveFeature):
     :param actions: List of CaveActions to be triggered
     """
     argument_validators = {
-        "name": AlwaysValid(
-            help_string="This string should specify a unique name for this"
-            " trigger"),
-        "enabled": AlwaysValid(
-            help_string="Either true or false"),
-        "remain_enabled": AlwaysValid(
-            help_string="Either true or false"),
+        "name": ValidPyString(),
+        "enabled": IsBoolean(),
+        "remain_enabled": IsBoolean(),
         "duration": IsNumeric(min_value=0),
-        "actions": AlwaysValid(help_string="A list of names of CaveActions")
+        "actions": MultiFeatureListValidator(
+            [
+                CaveAction, ObjectAction, GroupAction, TimelineAction,
+                SoundAction, EventTriggerAction, MoveCaveAction,
+                CaveResetAction
+            ],
+            help_string="A list of CaveActions")
         }
 
     default_arguments = {
@@ -186,6 +190,84 @@ class HeadTrackTrigger(CaveTrigger):
                 " DirectionTarget, or ObjectTarget child node")
 
 
+class EventBox(CaveFeature):
+    """For triggers based on movement into or out of box
+
+    :param str direction: One of "Inside" or "Outside" depending on whether
+    trigger occurs for movement into or out of box
+    :param bool ignore_y: Should y-direction be ignored in checking box? In
+    other words, vertical position in Cave doesn't matter when this is set to
+    true.
+    :param tuple corner1: First corner specifiying box location
+    :param tuple corner2: Second corner specifying box location
+    """
+
+    argument_validators = {
+        "direction": OptionListValidator("Inside", "Outside"),
+        "ignore_y": AlwaysValid(
+            help_string="Either true or false"),
+        "corner1": IsNumericIterable(required_length=3),
+        "corner2": IsNumericIterable(required_length=3)}
+
+    default_arguments = {
+        "ignore_y": True
+        }
+
+    def toXML(self, parent_root):
+        """Store EventBox as Box node within one of several possible node types
+
+        :param :py:class:xml.etree.ElementTree.Element parent_root
+        """
+        try:
+            xml_attrib = {
+                "corner1": "({}, {}, {})".format(*self["corner1"]),
+                "corner2": "({}, {}, {})".format(*self["corner2"]),
+                }
+        except KeyError:
+            raise ConsistencyError("EventBox must specify corner1 and corner2")
+        if not self.is_default("ignore_y"):
+            xml_attrib["ignore-y"] = bool2text(self["ignore_y"])
+        box_node = ET.SubElement(parent_root, "Box", attrib=xml_attrib)
+        node = ET.SubElement(box_node, "Movement")
+        try:
+            ET.SubElement(node, self["direction"])
+        except KeyError:
+            raise ConsistencyError("EventBox must specify direction")
+        return box_node
+
+    @classmethod
+    def fromXML(box_class, box_root):
+        """Create EventBox from Box node
+
+        :param :py:class:xml.etree.ElementTree.Element box_root
+        """
+        new_box = box_class()
+        for corner in ("corner1", "corner2"):
+            try:
+                new_box[corner] = text2tuple(
+                    box_root.attrib[corner], evaluator=float)
+            except KeyError:
+                raise BadCaveXML(
+                    'Box node must specify attribute {}'.format(corner))
+        if "ignore-y" in box_root.attrib:
+            new_box["ignore_y"] = text2bool(box_root.attrib["ignore-y"])
+
+        movement_node = box_root.find("Movement")
+        if movement_node is None:
+            raise BadCaveXML('Box node must contain Movement child')
+        direction_node = movement_node.find("Inside")
+        if direction_node is None:
+            direction_node = movement_node.find("Outside")
+            if direction_node is None:
+                raise BadCaveXML(
+                    'Movement node must contain Inside or Outside child')
+            new_box['direction'] = "Outside"
+        else:
+            new_box['direction'] = "Inside"
+
+        return new_box
+
+
 class HeadPositionTrigger(HeadTrackTrigger):
     """For triggers based on position of user in Cave
 
@@ -194,7 +276,8 @@ class HeadPositionTrigger(HeadTrackTrigger):
     """
 
     argument_validators = {
-        "box": AlwaysValid(
+        "box": FeatureValidator(
+            EventBox,
             help_string="Movement into or out of a box to trigger action?")
     }
 
@@ -442,7 +525,8 @@ class MovementTrigger(CaveTrigger):
             "Single Object", "Group(Any)", "Group(All)"),
         "object_name": AlwaysValid(
             help_string="Must be the name of an object or group"),
-        "box": AlwaysValid(
+        "box": FeatureValidator(
+            EventBox,
             help_string="Box used to check position of objects")
     }
 
@@ -527,81 +611,3 @@ class MovementTrigger(CaveTrigger):
             detect_any=detect_any)
         self.activator.create_blender_objects()
         return self.activator.base_object
-
-
-class EventBox(CaveFeature):
-    """For triggers based on movement into or out of box
-
-    :param str direction: One of "Inside" or "Outside" depending on whether
-    trigger occurs for movement into or out of box
-    :param bool ignore_y: Should y-direction be ignored in checking box? In
-    other words, vertical position in Cave doesn't matter when this is set to
-    true.
-    :param tuple corner1: First corner specifiying box location
-    :param tuple corner2: Second corner specifying box location
-    """
-
-    argument_validators = {
-        "direction": OptionListValidator("Inside", "Outside"),
-        "ignore_y": AlwaysValid(
-            help_string="Either true or false"),
-        "corner1": IsNumericIterable(required_length=3),
-        "corner2": IsNumericIterable(required_length=3)}
-
-    default_arguments = {
-        "ignore_y": True
-        }
-
-    def toXML(self, parent_root):
-        """Store EventBox as Box node within one of several possible node types
-
-        :param :py:class:xml.etree.ElementTree.Element parent_root
-        """
-        try:
-            xml_attrib = {
-                "corner1": "({}, {}, {})".format(*self["corner1"]),
-                "corner2": "({}, {}, {})".format(*self["corner2"]),
-                }
-        except KeyError:
-            raise ConsistencyError("EventBox must specify corner1 and corner2")
-        if not self.is_default("ignore_y"):
-            xml_attrib["ignore-y"] = bool2text(self["ignore_y"])
-        box_node = ET.SubElement(parent_root, "Box", attrib=xml_attrib)
-        node = ET.SubElement(box_node, "Movement")
-        try:
-            ET.SubElement(node, self["direction"])
-        except KeyError:
-            raise ConsistencyError("EventBox must specify direction")
-        return box_node
-
-    @classmethod
-    def fromXML(box_class, box_root):
-        """Create EventBox from Box node
-
-        :param :py:class:xml.etree.ElementTree.Element box_root
-        """
-        new_box = box_class()
-        for corner in ("corner1", "corner2"):
-            try:
-                new_box[corner] = text2tuple(
-                    box_root.attrib[corner], evaluator=float)
-            except KeyError:
-                raise BadCaveXML(
-                    'Box node must specify attribute {}'.format(corner))
-        if "ignore-y" in box_root.attrib:
-            new_box["ignore_y"] = text2bool(box_root.attrib["ignore-y"])
-
-        movement_node = box_root.find("Movement")
-        if movement_node is None:
-            raise BadCaveXML('Box node must contain Movement child')
-        direction_node = movement_node.find("Inside")
-        if direction_node is None:
-            direction_node = movement_node.find("Outside")
-            if direction_node is None:
-                raise BadCaveXML(
-                    'Movement node must contain Inside or Outside child')
-            new_box['direction'] = "Outside"
-        else:
-            new_box['direction'] = "Inside"
-
-        return new_box
