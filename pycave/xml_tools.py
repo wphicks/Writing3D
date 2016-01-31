@@ -1,6 +1,6 @@
-"""Convenience tools for working with Cave xml"""
+"""Convenience tools for working with W3D xml"""
 import re
-from .errors import BadCaveXML
+from .errors import BadW3DXML
 
 
 def text2tuple(text, evaluator=str):
@@ -24,19 +24,19 @@ def attrib2bool(root, attrib_name, default=None):
     :param xml.etree.ElementTree.Element root: xml node with given attribute
     :param str attrib_name: Attribute to be evaluated
     :param bool default: Value to be returned if attribute is not found.
-    :raises BadCaveXML: if default is not set and attribute is not found or if
+    :raises BadW3DXML: if default is not set and attribute is not found or if
     attribute does not have value "true" or "false"
     :raises AttributeError: if root is not a valid ElementTree Element
     """
     attrib_value = root.attrib.get(attrib_name, None)
     if attrib_value is None:
         if default is None:
-            raise BadCaveXML("Attribute {} is required for node {}".format(
+            raise BadW3DXML("Attribute {} is required for node {}".format(
                 attrib_name, root.tag))
         return default
     attrib_value = attrib_value.strip()
     if attrib_value not in ("true", "false"):
-        raise BadCaveXML(
+        raise BadW3DXML(
             'Attribute {} in node {} must be one of "true", "false"'.format(
                 attrib_name, root.tag))
     if attrib_value == "true":
@@ -51,7 +51,7 @@ def text2bool(text):
         return True
     if text == "false":
         return False
-    raise BadCaveXML("Boolean value not set to true or false")
+    raise BadW3DXML("Boolean value not set to true or false")
 
 
 def bool2text(boolean):

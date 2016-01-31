@@ -17,14 +17,14 @@ from tkinter import ttk
 from tkinter import font
 
 
-class CaveWriter(tk.Frame):
+class W3DWriter(tk.Frame):
     """GUI interface to 3D virtual environments"""
 
     def __init__(self, parent):
-        super(CaveWriter, self).__init__(parent, background="white")
+        super(W3DWriter, self).__init__(parent, background="white")
         self.parent = parent
         self.font = font.Font(family="Helvetica", size=12)
-        self.project = project.CaveProject()
+        self.project = project.W3DProject()
         self.initUI()
 
     def generate_tabs(self):
@@ -32,11 +32,11 @@ class CaveWriter(tk.Frame):
         self.tabs["project"] = project.ProjectOptions(
             self.interface, self.project)
         for category in ["objects", "groups", "timelines", "trigger_events"]:
-            self.tabs[category] = project.CaveProject.argument_validators[
+            self.tabs[category] = project.W3DProject.argument_validators[
                 category].ui(self.interface, category, self.project, category)
 
     def initUI(self):
-        self.parent.title("Cave Writer")
+        self.parent.title("W3D Writer")
         self.pack(fill=tk.BOTH, expand=1)
         self.interface = ttk.Notebook(self)
         self.generate_tabs()
@@ -53,7 +53,7 @@ def start_editor():
     width = root.winfo_screenwidth()
     height = root.winfo_screenheight()
     root.geometry("{}x{}".format(width, height))
-    CaveWriter(root)
+    W3DWriter(root)
     root.mainloop()
 
 if __name__ == "__main__":

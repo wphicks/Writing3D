@@ -1,24 +1,24 @@
-"""Tools for working with particular Cave events that can trigger actions
+"""Tools for working with particular W3D events that can trigger actions
 
-Here, triggers are any events within the Cave that can be used to start another
+Here, triggers are any events within the W3D that can be used to start another
 action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
 import xml.etree.ElementTree as ET
-from .features import CaveFeature
+from .features import W3DFeature
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
     OptionListValidator, IsBoolean, ValidPyString, MultiFeatureListValidator,\
     FeatureValidator
-from .errors import ConsistencyError, BadCaveXML, InvalidArgument, \
+from .errors import ConsistencyError, BadW3DXML, InvalidArgument, \
     EBKAC
 from .xml_tools import bool2text, text2tuple, text2bool
 from .activators import BlenderTrigger, BlenderPositionTrigger, \
     BlenderPointTrigger, BlenderDirectionTrigger, BlenderLookObjectTrigger, \
     BlenderObjectPositionTrigger
-from .actions import CaveAction, ObjectAction, GroupAction, TimelineAction,\
-    SoundAction, EventTriggerAction, MoveCaveAction, CaveResetAction
+from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
+    SoundAction, EventTriggerAction, MoveW3DAction, W3DResetAction
 
 
-class CaveTrigger(CaveFeature):
+class W3DTrigger(W3DFeature):
     """Store data on a trigger event in the cave
 
     :ivar base_trigger: A trigger object wrapped by this trigger (see
@@ -26,11 +26,11 @@ class CaveTrigger(CaveFeature):
     """
     def __init__(self, *args, **kwargs):
         self.base_trigger = BareTrigger()
-        super(CaveTrigger, self).__init__(*args, **kwargs)
+        super(W3DTrigger, self).__init__(*args, **kwargs)
 
     def __setitem__(self, key, value):
         try:
-            return super(CaveTrigger, self).__setitem__(key, value)
+            return super(W3DTrigger, self).__setitem__(key, value)
         except InvalidArgument as bad_key_error:
             try:
                 self.base_trigger.__setitem__(key, value)
@@ -39,7 +39,7 @@ class CaveTrigger(CaveFeature):
 
     def __getitem__(self, key):
         try:
-            return super(CaveTrigger, self).__getitem__(key)
+            return super(W3DTrigger, self).__getitem__(key)
         except KeyError as not_found_error:
             try:
                 return self.base_trigger.__getitem__(key)
@@ -48,7 +48,7 @@ class CaveTrigger(CaveFeature):
 
     @staticmethod
     def fromXML(trigger_root):
-        """Create CaveTrigger from EventTrigger node
+        """Create W3DTrigger from EventTrigger node
 
         :param :py:class:xml.etree.ElementTree.Element trigger_root
         """
@@ -62,7 +62,7 @@ class CaveTrigger(CaveFeature):
         return BareTrigger.fromXML(trigger_root)
 
     def blend(self):
-        """Create representation of CaveTrigger in Blender"""
+        """Create representation of W3DTrigger in Blender"""
         self.activator = BlenderTrigger(
             self["name"],
             self["actions"],
@@ -72,7 +72,7 @@ class CaveTrigger(CaveFeature):
         return self.activator.base_object
 
     def link_blender_logic(self):
-        """Link BGE logic bricks for this CaveTrigger"""
+        """Link BGE logic bricks for this W3DTrigger"""
         try:
             self.activator.link_logic_bricks()
         except AttributeError:
@@ -87,7 +87,7 @@ class CaveTrigger(CaveFeature):
                 "blend() must be called before write_blender_logic()")
 
 
-class BareTrigger(CaveFeature):
+class BareTrigger(W3DFeature):
     """A trigger specifying only base information common to other triggers
 
     :param str name: Unique name for this trigger
@@ -95,7 +95,7 @@ class BareTrigger(CaveFeature):
     :param bool remain-enabled: Should this remain enabled after it is
     triggered?
     :param float duration: TODO: Clarify
-    :param actions: List of CaveActions to be triggered
+    :param actions: List of W3DActions to be triggered
     """
     argument_validators = {
         "name": ValidPyString(),
@@ -104,11 +104,11 @@ class BareTrigger(CaveFeature):
         "duration": IsNumeric(min_value=0),
         "actions": MultiFeatureListValidator(
             [
-                CaveAction, ObjectAction, GroupAction, TimelineAction,
-                SoundAction, EventTriggerAction, MoveCaveAction,
-                CaveResetAction
+                W3DAction, ObjectAction, GroupAction, TimelineAction,
+                SoundAction, EventTriggerAction, MoveW3DAction,
+                W3DResetAction
             ],
-            help_string="A list of CaveActions")
+            help_string="A list of W3DActions")
         }
 
     default_arguments = {
@@ -130,7 +130,7 @@ class BareTrigger(CaveFeature):
         try:
             xml_attrib = {"name": self["name"]}
         except KeyError:
-            raise ConsistencyError("CaveTrigger must specify name")
+            raise ConsistencyError("W3DTrigger must specify name")
         if not self.is_default("enabled"):
             xml_attrib["enabled"] = bool2text(self["enabled"])
         if not self.is_default("remain_enabled"):
@@ -150,7 +150,7 @@ class BareTrigger(CaveFeature):
         try:
             new_trigger["name"] = trigger_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML("EventTrigger must specify name attribute")
+            raise BadW3DXML("EventTrigger must specify name attribute")
         xml_tags = {
             "enabled": "enabled", "remain_enabled": "remain-enabled"}
         for key, tag in xml_tags.items():
@@ -161,12 +161,12 @@ class BareTrigger(CaveFeature):
         action_root = trigger_root.find("Actions")
         if action_root is not None:
             for child in action_root.getchildren():
-                new_trigger["actions"].append(CaveAction.fromXML(child))
+                new_trigger["actions"].append(W3DAction.fromXML(child))
         return new_trigger
 
 
-class HeadTrackTrigger(CaveTrigger):
-    """For triggers based on head-tracking of Cave user
+class HeadTrackTrigger(W3DTrigger):
+    """For triggers based on head-tracking of W3D user
     """
     @classmethod
     def fromXML(trigger_class, trigger_root):
@@ -185,18 +185,18 @@ class HeadTrackTrigger(CaveTrigger):
         elif direction_node.find("ObjectTarget") is not None:
             return LookAtObject.fromXML(trigger_root)
         else:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "HeadTrack node must contain None, PointTarget,"
                 " DirectionTarget, or ObjectTarget child node")
 
 
-class EventBox(CaveFeature):
+class EventBox(W3DFeature):
     """For triggers based on movement into or out of box
 
     :param str direction: One of "Inside" or "Outside" depending on whether
     trigger occurs for movement into or out of box
     :param bool ignore_y: Should y-direction be ignored in checking box? In
-    other words, vertical position in Cave doesn't matter when this is set to
+    other words, vertical position in W3D doesn't matter when this is set to
     true.
     :param tuple corner1: First corner specifiying box location
     :param tuple corner2: Second corner specifying box location
@@ -247,19 +247,19 @@ class EventBox(CaveFeature):
                 new_box[corner] = text2tuple(
                     box_root.attrib[corner], evaluator=float)
             except KeyError:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     'Box node must specify attribute {}'.format(corner))
         if "ignore-y" in box_root.attrib:
             new_box["ignore_y"] = text2bool(box_root.attrib["ignore-y"])
 
         movement_node = box_root.find("Movement")
         if movement_node is None:
-            raise BadCaveXML('Box node must contain Movement child')
+            raise BadW3DXML('Box node must contain Movement child')
         direction_node = movement_node.find("Inside")
         if direction_node is None:
             direction_node = movement_node.find("Outside")
             if direction_node is None:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     'Movement node must contain Inside or Outside child')
             new_box['direction'] = "Outside"
         else:
@@ -269,10 +269,10 @@ class EventBox(CaveFeature):
 
 
 class HeadPositionTrigger(HeadTrackTrigger):
-    """For triggers based on position of user in Cave
+    """For triggers based on position of user in W3D
 
     :param EventBox box: Used to trigger events when user's head moves into or
-    out of specified box. If None, trigger can occur anywhere in Cave
+    out of specified box. If None, trigger can occur anywhere in W3D
     """
 
     argument_validators = {
@@ -317,7 +317,7 @@ class HeadPositionTrigger(HeadTrackTrigger):
         return new_trigger
 
     def blend(self):
-        """Create representation of CaveTrigger in Blender"""
+        """Create representation of W3DTrigger in Blender"""
         self.activator = BlenderPositionTrigger(
             self["name"],
             self["actions"],
@@ -379,7 +379,7 @@ class LookAtPoint(HeadTrackTrigger):
         return new_trigger
 
     def blend(self):
-        """Create representation of CaveTrigger in Blender"""
+        """Create representation of W3DTrigger in Blender"""
         self.activator = BlenderPointTrigger(
             self["name"],
             self["actions"],
@@ -442,7 +442,7 @@ class LookAtDirection(HeadTrackTrigger):
         return new_trigger
 
     def blend(self):
-        """Create representation of CaveTrigger in Blender"""
+        """Create representation of W3DTrigger in Blender"""
         self.activator = BlenderDirectionTrigger(
             self["name"],
             self["actions"],
@@ -497,7 +497,7 @@ class LookAtObject(HeadTrackTrigger):
         return new_trigger
 
     def blend(self):
-        """Create representation of CaveTrigger in Blender"""
+        """Create representation of W3DTrigger in Blender"""
         self.activator = BlenderLookObjectTrigger(
             self["name"],
             self["actions"],
@@ -508,8 +508,8 @@ class LookAtObject(HeadTrackTrigger):
         return self.activator.base_object
 
 
-class MovementTrigger(CaveTrigger):
-    """For triggers based on movement of Cave objects
+class MovementTrigger(W3DTrigger):
+    """For triggers based on movement of W3D objects
 
     :param str type: One of "Single Object", "Group(Any)", or "Group(All)",
     depending on if action should be triggered based on movements of a single
@@ -580,21 +580,21 @@ class MovementTrigger(CaveTrigger):
                     new_trigger["type"] = "Group ({})".format(
                         node.attrib["objects"])
                 except KeyError:
-                    raise BadCaveXML(
+                    raise BadW3DXML(
                         'GroupObj node must specify "objects" attribute')
         try:
             new_trigger["object_name"] = node.attrib["name"]
         except KeyError:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 'GroupObj or ObjectRef node must specify "name" attribute')
         node = track_node.find("Box")
         if node is None:
-            raise BadCaveXML("Source node must have Box child")
+            raise BadW3DXML("Source node must have Box child")
         new_trigger["box"] = EventBox.fromXML(node)
         return new_trigger
 
     def blend(self):
-        """Create representation of CaveTrigger in Blender"""
+        """Create representation of W3DTrigger in Blender"""
         if self["type"] == "Single Object":
             objects_string = "['{}']".format(self["object_name"])
         else:

@@ -1,4 +1,4 @@
-"""Implementation of Cave-style timeline control in Blender"""
+"""Implementation of W3D-style timeline control in Blender"""
 
 from .blender_trigger import TimedTrigger
 import warnings
@@ -12,7 +12,7 @@ Loading pycave.cave_logic.blender_trigger as standalone")
 class BlenderTimeline(TimedTrigger):
     """A control structure within Blender for implementing timelines
 
-    :param CaveTimeline timeline: The timeline to generate"""
+    :param W3DTimeline timeline: The timeline to generate"""
 
     def get_object(self):
         """Create an empty object for timeline"""

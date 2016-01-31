@@ -1,16 +1,16 @@
-"""Tools for working with actions in the Cave
+"""Tools for working with actions in the W3D
 
-Here, actions refer generically to any discrete change in elements of a Cave
+Here, actions refer generically to any discrete change in elements of a W3D
 project
 """
 #import warnings
 import xml.etree.ElementTree as ET
-from .features import CaveFeature
-from .placement import CavePlacement
+from .features import W3DFeature
+from .placement import W3DPlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable, IsBoolean, FeatureValidator, ProjectOptionValidator,\
     ValidPyString
-from .errors import BadCaveXML, InvalidArgument, ConsistencyError
+from .errors import BadW3DXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name, generate_group_name
 from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
@@ -23,15 +23,15 @@ from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
 #        "Module bpy not found. Loading pycave.actions as standalone")
 
 
-class CaveAction(CaveFeature):
-    """An action causing a change in the Cave
+class W3DAction(W3DFeature):
+    """An action causing a change in the W3D
 
     Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
     appropriate subclasses"""
 
     @staticmethod
     def fromXML(action_root):
-        """Create CaveAction of appropriate subclass given xml root for any
+        """Create W3DAction of appropriate subclass given xml root for any
         action"""
 
         if action_root.tag == "ObjectChange":
@@ -45,11 +45,11 @@ class CaveAction(CaveFeature):
         elif action_root.tag == "Event":
             return EventTriggerAction.fromXML(action_root)
         elif action_root.tag == "MoveCave":
-            return MoveCaveAction.fromXML(action_root)
+            return MoveVRAction.fromXML(action_root)
         elif action_root.tag == "Restart":
-            return CaveResetAction.fromXML(action_root)
+            return W3DResetAction.fromXML(action_root)
         else:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Indicated action {} is not a valid action type".format(
                     action_root.tag))
 
@@ -59,7 +59,7 @@ def generate_object_action_logic(
         click_condition=-1):
     """Generate Python logic for implementing action
 
-    :param CaveAction object_action: An ObjectAction or GroupAction
+    :param W3DAction object_action: An ObjectAction or GroupAction
     :param int offset: A number of tabs (4 spaces) to add before Python logic
     strings
     :param float time_condition: Time at which action should start
@@ -156,13 +156,13 @@ def generate_object_action_logic(
     return start_text + cont_text + end_text
 
 
-class ObjectAction(CaveAction):
-    """An action causing a change to a CaveObject
+class ObjectAction(W3DAction):
+    """An action causing a change to a W3DObject
 
     :param str object_name: Name of object to change
     :param float duration: Duration of transition in seconds
     :param bool visible: If not None, change visibility to this value
-    :param CavePlacement placement: If not None, move based on this placement
+    :param W3DPlacement placement: If not None, move based on this placement
     :param bool move_relative: If True, move relative to original location
     :param tuple color: If not None, transition to this color
     :param float scale: If not None, scale by this factor
@@ -180,7 +180,7 @@ class ObjectAction(CaveAction):
         "duration": IsNumeric(min_value=0),
         "visible": IsBoolean(),
         "placement": FeatureValidator(
-            CavePlacement,
+            W3DPlacement,
             help_string="Orientation and position for movement"),
         "move_relative": IsBoolean(),
         "color": IsNumericIterable(required_length=3),
@@ -245,7 +245,7 @@ class ObjectAction(CaveAction):
         try:
             new_action["object_name"] = action_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML("ObjectChange node must have name attribute set")
+            raise BadW3DXML("ObjectChange node must have name attribute set")
         trans_root = action_root.find("Transition")
         if "duration" in trans_root.attrib:
             new_action["duration"] = float(trans_root.attrib["duration"])
@@ -262,9 +262,9 @@ class ObjectAction(CaveAction):
                 "move_relative", False)
             place_root = node.find("Placement")
             if place_root is None:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "Movement or MoveRel node requires Placement child node")
-            new_action["placement"] = CavePlacement.fromXML(place_root)
+            new_action["placement"] = W3DPlacement.fromXML(place_root)
         node = trans_root.find("Color")
         if node is not None:
             try:
@@ -304,15 +304,15 @@ class ObjectAction(CaveAction):
             click_condition=click_condition)
 
 
-class GroupAction(CaveAction):
-    """An action causing a change to a group of CaveObjects
+class GroupAction(W3DAction):
+    """An action causing a change to a group of W3DObjects
 
     :param str group_name: Name of group to change
     :param bool choose_random: Apply change to one object in group, selected
     randomly?
     :param float duration: Duration of transition in seconds
     :param bool visible: If not None, change visibility to this value
-    :param CavePlacement placement: If not None, move based on this placement
+    :param W3DPlacement placement: If not None, move based on this placement
     :param bool move_relative: If True, move relative to original location
     :param tuple color: If not None, transition to this color
     :param float scale: If not None, scale by this factor
@@ -327,7 +327,7 @@ class GroupAction(CaveAction):
         "choose_random": AlwaysValid("Either true or false"),
         "duration": IsNumeric(min_value=0),
         "visible": AlwaysValid("Either true or false"),
-        "placement": AlwaysValid("A CavePlacement object"),
+        "placement": AlwaysValid("A W3DPlacement object"),
         "move_relative": AlwaysValid("Either true or false"),
         "color": IsNumericIterable(required_length=3),
         "scale": IsNumeric(min_value=0),
@@ -398,7 +398,7 @@ class GroupAction(CaveAction):
         try:
             new_action["group_name"] = action_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML("GroupRef node must have name attribute set")
+            raise BadW3DXML("GroupRef node must have name attribute set")
         try:
             new_action["choose_random"] = action_root.attrib["random"]
         except KeyError:
@@ -419,9 +419,9 @@ class GroupAction(CaveAction):
                 "move_relative", False)
             place_root = node.find("Placement")
             if place_root is None:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "Movement or MoveRel node requires Placement child node")
-            new_action["placement"] = CavePlacement.fromXML(place_root)
+            new_action["placement"] = W3DPlacement.fromXML(place_root)
         node = trans_root.find("Color")
         if node is not None:
             try:
@@ -479,7 +479,7 @@ class GroupAction(CaveAction):
             click_condition=click_condition)
 
 
-class TimelineAction(CaveAction):
+class TimelineAction(W3DAction):
     """Start or stop a timeline
 
     :param str timeline_name: Name of timeline to change
@@ -530,13 +530,13 @@ class TimelineAction(CaveAction):
         try:
             new_action["timeline_name"] = timer_change_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "TimerChange node must have name attribute set")
         for key, value in new_action.change_xml_tags.items():
             if timer_change_root.find(value) is not None:
                 new_action["change"] = key
         if "change" not in new_action:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "TimerChange node must have child specifying timeline change")
 
         return new_action
@@ -578,7 +578,7 @@ class TimelineAction(CaveAction):
         return start_text + cont_text + end_text
 
 
-class SoundAction(CaveAction):
+class SoundAction(W3DAction):
     """Start or stop a sound
 
     :param str sound_name: Name of sound to change
@@ -618,7 +618,7 @@ class SoundAction(CaveAction):
         try:
             new_action["sound_name"] = soundref_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML("SoundRef node must specify name attribute")
+            raise BadW3DXML("SoundRef node must specify name attribute")
         if "action" in soundref_root.attrib:
             new_action["change"] = soundref_root.attrib["action"]
 
@@ -629,7 +629,7 @@ class SoundAction(CaveAction):
         raise NotImplementedError  # TODO
 
 
-class EventTriggerAction(CaveAction):
+class EventTriggerAction(W3DAction):
     """Enable or disable an event trigger
 
     :param str trigger_name: Name of trigger to enable/disable
@@ -672,11 +672,11 @@ class EventTriggerAction(CaveAction):
         try:
             new_action["trigger_name"] = event_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML("Event node must specify name attribute")
+            raise BadW3DXML("Event node must specify name attribute")
         try:
             new_action["enable"] = event_root.attrib["enable"]
         except KeyError:
-            raise BadCaveXML("Event node must specify enable attribute")
+            raise BadW3DXML("Event node must specify enable attribute")
         return new_action
 
     def generate_blender_logic(
@@ -716,18 +716,18 @@ class EventTriggerAction(CaveAction):
         return start_text + cont_text + end_text
 
 
-class MoveCaveAction(CaveAction):
-    """Move entire Cave within virtual space
+class MoveVRAction(W3DAction):
+    """Move entire VR environment within virtual space
 
     :param bool relative: Move relative to current position?
     :param float duration: Duration of transition in seconds
-    :param CavePlacement placement: Where to move (position and orientation)
+    :param W3DPlacement placement: Where to move (position and orientation)
     """
 
     argument_validators = {
         "move_relative": AlwaysValid("Either true or false"),
         "duration": IsNumeric(min_value=0),
-        "placement": AlwaysValid("A CavePlacement object")
+        "placement": AlwaysValid("A W3DPlacement object")
         }
 
     default_arguments = {
@@ -736,7 +736,7 @@ class MoveCaveAction(CaveAction):
         }
 
     def toXML(self, parent_root):
-        """Store MoveCaveAction as MoveCave node within one of several node
+        """Store MoveVRAction as MoveCave node within one of several node
         types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
@@ -748,7 +748,7 @@ class MoveCaveAction(CaveAction):
             relative = self["move_relative"]
         except KeyError:
             raise ConsistencyError(
-                'MoveCaveAction must specify a value for "relative" key'
+                'MoveVRAction must specify a value for "relative" key'
                 )
         if relative:
             ET.SubElement(action_root, "Relative")
@@ -758,13 +758,13 @@ class MoveCaveAction(CaveAction):
             self["placement"].toXML(action_root)
         except KeyError:
             raise ConsistencyError(
-                'MoveCaveAction must specify a value for "placement" key'
+                'MoveVRAction must specify a value for "placement" key'
                 )
         return action_root
 
     @classmethod
     def fromXML(action_class, move_cave_root):
-        """Create MoveCaveAction from MoveCave node
+        """Create MoveVRAction from MoveCave node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """
@@ -776,15 +776,15 @@ class MoveCaveAction(CaveAction):
         elif move_cave_root.find("Absolute") is not None:
             new_action["move_relative"] = False
         else:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "MoveCave node must contain either Absolute or Relative child"
                 )
         place_node = move_cave_root.find("Placement")
         if place_node is None:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "MoveCave node must contain Placement child node"
                 )
-        new_action["placement"] = CavePlacement.fromXML(place_node)
+        new_action["placement"] = W3DPlacement.fromXML(place_node)
         return new_action
 
     def _blender_object_selection(self, offset=0):
@@ -801,12 +801,12 @@ class MoveCaveAction(CaveAction):
             click_condition=click_condition)
 
 
-class CaveResetAction(CaveAction):
-    """Reset Cave to initial state
+class W3DResetAction(W3DAction):
+    """Reset W3D to initial state
     """
 
     def toXML(self, parent_root):
-        """Store CaveResetAction as Restart node within one of several node
+        """Store W3DResetAction as Restart node within one of several node
         types
 
         :param :py:class:xml.etree.ElementTree.Element parent_root
@@ -816,7 +816,7 @@ class CaveResetAction(CaveAction):
 
     @classmethod
     def fromXML(action_class, restart_root):
-        """Create CaveRestartAction from Restart node
+        """Create W3DRestartAction from Restart node
 
         :param :py:class:xml.etree.ElementTree.Element transition_root
         """

@@ -1,10 +1,10 @@
-"""Tools for working with placement of objects within Cave"""
+"""Tools for working with placement of objects within W3D"""
 import xml.etree.ElementTree as ET
 import math
-from .features import CaveFeature
+from .features import W3DFeature
 from .validators import OptionListValidator, IsNumericIterable, IsNumeric, \
     FeatureValidator
-from .errors import BadCaveXML
+from .errors import BadW3DXML
 from .xml_tools import text2tuple
 import warnings
 try:
@@ -42,8 +42,8 @@ def matrix_from_look(look_direction, up_direction=mathutils.Vector((0, 1, 0))):
     return rotation_matrix
 
 
-class CaveRotation(CaveFeature):
-    """Stores data on rotation of objects within Cave"""
+class W3DRotation(W3DFeature):
+    """Stores data on rotation of objects within W3D"""
     argument_validators = {
         "rotation_mode": OptionListValidator(
             "None", "Axis", "LookAt", "Normal"),
@@ -65,7 +65,7 @@ class CaveRotation(CaveFeature):
             return rot_root
         elif not (self.is_default("rotation_vector") and
                   self.is_default("rotation_angle")):
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Attempting to set rotation vector or angle without setting"
                 " rotation mode")
 
@@ -84,7 +84,7 @@ class CaveRotation(CaveFeature):
             try:
                 rotation["rotation_angle"] = float(rotation_angle)
             except TypeError:
-                raise BadCaveXML("Rotation angle must be specified as a float")
+                raise BadW3DXML("Rotation angle must be specified as a float")
         except KeyError:  # No rotation vector specified
             pass
         return rotation
@@ -126,21 +126,21 @@ class CaveRotation(CaveFeature):
         return blender_object
 
 
-class CavePlacement(CaveFeature):
-    """Stores data on placement of objects within Cave
+class W3DPlacement(W3DFeature):
+    """Stores data on placement of objects within W3D
 
-    Specifies both position and rotation of Cave objects
+    Specifies both position and rotation of W3D objects
     :param str relative_to: Position specified relative to what? One of Center,
     FloorWall, LeftWall, RightWall or FloorWall
     :param tuple position: Tuple of three numbers specifying x, y, z position
-    :param py:class:CaveRotation rotation: py:class:CaveRotation object
+    :param py:class:W3DRotation rotation: py:class:W3DRotation object
     specifying rotation
     """
     argument_validators = {
         "relative_to": OptionListValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
         "position": IsNumericIterable(3),
-        "rotation": FeatureValidator(CaveRotation)}
+        "rotation": FeatureValidator(W3DRotation)}
     default_arguments = {
         "relative_to": "Center",
         "position": (0, 0, 0),
@@ -149,13 +149,13 @@ class CavePlacement(CaveFeature):
     """Dictionary mapping names of relative_to options to Blender
     representations
 
-    In default CaveWriting, these are simply the four walls, but this can be
+    In default W3DWriting, these are simply the four walls, but this can be
     overridden to provide additional functionality"""
 
     def __init__(self, *args, **kwargs):
-        super(CavePlacement, self).__init__(*args, **kwargs)
+        super(W3DPlacement, self).__init__(*args, **kwargs)
         if "rotation" not in self:
-            self["rotation"] = CaveRotation()
+            self["rotation"] = W3DRotation()
 
     def toXML(self, parent_root):
         place_root = ET.SubElement(parent_root, "Placement")
@@ -182,7 +182,7 @@ class CavePlacement(CaveFeature):
         for rotation_mode in ["Axis", "LookAt", "Normal"]:
             rot_root = place_root.find(rotation_mode)
             if rot_root is not None:
-                placement["rotation"] = CaveRotation.fromXML(rot_root)
+                placement["rotation"] = W3DRotation.fromXML(rot_root)
                 return placement
         return placement
 

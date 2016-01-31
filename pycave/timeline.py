@@ -1,11 +1,11 @@
-"""Tools for working with timelines in Cave projects
+"""Tools for working with timelines in W3D projects
 """
 import xml.etree.ElementTree as ET
 from collections import MutableSequence
-from .features import CaveFeature
-from .actions import CaveAction
+from .features import W3DFeature
+from .actions import W3DAction
 from .validators import AlwaysValid, IsBoolean, ValidPyString
-from .errors import ConsistencyError, BadCaveXML
+from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
 from .activators import BlenderTimeline
 from .errors import EBKAC
@@ -64,38 +64,38 @@ class SortedList(MutableSequence):
         raise NotImplementedError("Cannot reverse a SortedList")
 
 
-class CaveTimeline(CaveFeature):
-    """Represent timeline for choreography of actions in the Cave
+class W3DTimeline(W3DFeature):
+    """Represent timeline for choreography of actions in the W3D
 
     :param str name: Name of timeline
     :param bool start_immediately: Start timeline when project starts?
     :param list actions: A list of two-element tuples specifying (start time
-    for action, CaveAction)
+    for action, W3DAction)
     """
     argument_validators = {
         "name": ValidPyString(),
         "start_immediately": IsBoolean(),
         "actions": AlwaysValid(
-            help_string="A list of (float, CaveAction) tuples")
+            help_string="A list of (float, W3DAction) tuples")
         }
     default_arguments = {
         "start_immediately": True
         }
 
     def __init__(self, *args, **kwargs):
-        super(CaveTimeline, self).__init__(*args, **kwargs)
+        super(W3DTimeline, self).__init__(*args, **kwargs)
         if "actions" not in self:
             self["actions"] = SortedList()
         else:
             self["actions"] = SortedList(self["actions"])
 
     def toXML(self, all_timelines_root):
-        """Store CaveTimeline as Timeline node within TimelineRoot node
+        """Store W3DTimeline as Timeline node within TimelineRoot node
         """
         try:
             timeline_attribs = {"name": self["name"]}
         except KeyError:
-            raise ConsistencyError("CaveTimeline must specify a name")
+            raise ConsistencyError("W3DTimeline must specify a name")
         if "start_immediately" in self:
             timeline_attribs["start-immediately"] = bool2text(
                 self["start_immediately"])
@@ -111,7 +111,7 @@ class CaveTimeline(CaveFeature):
 
     @classmethod
     def fromXML(timeline_class, timeline_root):
-        """Create CaveTimeline from Timeline node of Cave XML
+        """Create W3DTimeline from Timeline node of W3D XML
 
         :param :py:class:xml.etree.ElementTree.Element timeline_root
         """
@@ -119,7 +119,7 @@ class CaveTimeline(CaveFeature):
         try:
             new_timeline["name"] = timeline_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Timeline node must specify name attribute")
         if "start-immediately" in timeline_root.attrib:
             new_timeline["start_immediately"] = text2bool(timeline_root.attrib[
@@ -128,17 +128,17 @@ class CaveTimeline(CaveFeature):
             try:
                 action_time = float(timed_action.attrib["seconds-time"])
             except (KeyError, ValueError):
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "TimedActions node must specify numeric seconds-time "
                     "attribute")
             for child in timed_action.getchildren():
                 new_timeline["actions"].add(
-                    (action_time, CaveAction.fromXML(child)))
+                    (action_time, W3DAction.fromXML(child)))
 
         return new_timeline
 
     def blend(self):
-        """Create Blender object to implement CaveTimeline"""
+        """Create Blender object to implement W3DTimeline"""
         self.activator = BlenderTimeline(
             self["name"], self["actions"],
             start_immediately=self["start_immediately"])
@@ -146,7 +146,7 @@ class CaveTimeline(CaveFeature):
         return self.activator.base_object
 
     def link_blender_logic(self):
-        """Link BGE logic bricks for this CaveTimeline"""
+        """Link BGE logic bricks for this W3DTimeline"""
         try:
             self.activator.link_logic_bricks()
         except AttributeError:
@@ -154,7 +154,7 @@ class CaveTimeline(CaveFeature):
                 "blend() must be called before link_blender_logic()")
 
     def write_blender_logic(self):
-        """Write any necessary game engine logic for this CaveTimeline"""
+        """Write any necessary game engine logic for this W3DTimeline"""
         try:
             self.activator.write_python_logic()
         except AttributeError:

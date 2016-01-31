@@ -1,14 +1,14 @@
-"""Tools for working with sounds in Cave projects
+"""Tools for working with sounds in W3D projects
 """
 import xml.etree.ElementTree as ET
-from .features import CaveFeature
+from .features import W3DFeature
 from .validators import AlwaysValid, IsNumeric, OptionListValidator
-from .errors import ConsistencyError, BadCaveXML
+from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
 
 
-class CaveSound(CaveFeature):
-    """Store data on a sound to be used in the Cave
+class W3DSound(W3DFeature):
+    """Store data on a sound to be used in the W3D
 
     :param str name: Unique name of this sound object
     :param str filename: File from which to take audio
@@ -44,7 +44,7 @@ class CaveSound(CaveFeature):
         "pan": 0}
 
     def toXML(self, all_sounds_root):
-        """Store CaveSound as Sound node within SoundRoot node
+        """Store W3DSound as Sound node within SoundRoot node
 
         :param :py:class:xml.etree.ElementTree.Element all_sounds_root
         """
@@ -53,12 +53,12 @@ class CaveSound(CaveFeature):
             attrib["name"] = str(self["name"])
         except KeyError:
             raise ConsistencyError(
-                'CaveSound must set a value for "name" key')
+                'W3DSound must set a value for "name" key')
         try:
             attrib["filename"] = str(self["filename"])
         except KeyError:
             raise ConsistencyError(
-                'CaveSound must set a value for "filename" key')
+                'W3DSound must set a value for "filename" key')
         if not self.is_default("autostart"):
             attrib["autostart"] = bool2text(self["autostart"])
         sound_root = ET.SubElement(all_sounds_root, "Sound", attrib=attrib)
@@ -87,7 +87,7 @@ class CaveSound(CaveFeature):
 
     @classmethod
     def fromXML(sound_class, sound_root):
-        """Create CaveSound from Sound node
+        """Create W3DSound from Sound node
 
         :param :py:class:xml.etree.ElementTree.Element sound_root
         """
@@ -95,19 +95,19 @@ class CaveSound(CaveFeature):
         try:
             new_sound["name"] = sound_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Sound node must specify name attribute")
         try:
             new_sound["filename"] = sound_root.attrib["filename"]
         except KeyError:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Sound node must specify filename attribute")
         if "autostart" in sound_root.attrib:
             new_sound["autostart"] = text2bool(sound_root.attrib["autostart"])
 
         movement_node = sound_root.find("Mode")
         if movement_node is None:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Sound node must contain Mode child node")
         for mode in new_sound.argument_validators[
                 "movement_mode"].valid_options:
@@ -115,13 +115,13 @@ class CaveSound(CaveFeature):
                 new_sound["movement_mode"] = mode
                 break
         if "movement_mode" not in new_sound:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Mode node must contain child node specifying a valid mode"
                 )
 
         repeat_node = sound_root.find("Repeat")
         if repeat_node is None:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Sound node must contain Repeat child node")
         if repeat_node.find("NoRepeat") is not None:
             new_sound["repetitions"] = 0
@@ -132,13 +132,13 @@ class CaveSound(CaveFeature):
             try:
                 new_sound["repetitions"] = int(repeat_node.text.strip())
             except AttributeError:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "Repeat node must contain child node specifying"
                     " repetitions")
 
         settings_node = sound_root.find("Settings")
         if settings_node is None:
-            raise BadCaveXML(
+            raise BadW3DXML(
                 "Sound node must have Settings child node")
         xml_map = {
             "freq": "frequency_scale", "volume": "volume_scale", "pan": "pan"}
@@ -149,5 +149,5 @@ class CaveSound(CaveFeature):
         return new_sound
 
     def blend(self):
-        """Create representation of CaveSound in Blender"""
+        """Create representation of W3DSound in Blender"""
         raise NotImplementedError  # TODO

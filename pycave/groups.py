@@ -1,8 +1,8 @@
 import warnings
 import xml.etree.ElementTree as ET
-from .features import CaveFeature
+from .features import W3DFeature
 from .validators import ValidPyString, ListValidator, ProjectOptionValidator
-from .errors import BadCaveXML, ConsistencyError
+from .errors import BadW3DXML, ConsistencyError
 from .names import generate_group_name, \
     generate_blender_object_name
 try:
@@ -12,8 +12,8 @@ except ImportError:
         "Module bpy not found. Loading pycave.actions as standalone")
 
 
-class CaveGroup(CaveFeature):
-    """Organize CaveObjects (or other CaveGroups) into groups
+class W3DGroup(W3DFeature):
+    """Organize W3DObjects (or other W3DGroups) into groups
 
     :param str name: Name of this group
     :param list objects: List of names of objects in this group
@@ -44,7 +44,7 @@ class CaveGroup(CaveFeature):
     ui_order = ["name", "objects", "groups"]
 
     def __init__(self, *args, **kwargs):
-        super(CaveGroup, self).__init__(*args, **kwargs)
+        super(W3DGroup, self).__init__(*args, **kwargs)
         #TODO: It should be possible to initialize with values
         if "objects" not in self:
             self["objects"] = []
@@ -52,7 +52,7 @@ class CaveGroup(CaveFeature):
             self["groups"] = []
 
     def toXML(self, group_root):
-        """Store CaveGroup as Group node within GroupRoot node)
+        """Store W3DGroup as Group node within GroupRoot node)
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -60,7 +60,7 @@ class CaveGroup(CaveFeature):
             group_node = ET.SubElement(
                 group_root, "Group", attrib={"name": self["name"]})
         except KeyError:
-            raise ConsistencyError("CaveGroup must have name attribute set")
+            raise ConsistencyError("W3DGroup must have name attribute set")
         for object_name in self["objects"]:
             ET.SubElement(
                 group_node, "Objects", attrib={"name": object_name})
@@ -74,18 +74,18 @@ class CaveGroup(CaveFeature):
         try:
             group["name"] = group_node.attrib["name"]
         except KeyError:
-            raise BadCaveXML("Group node has no name attrib")
+            raise BadW3DXML("Group node has no name attrib")
         for child in group_node.getchildren():
             if child.tag == "Objects":
                 try:
                     group["objects"].append(child.attrib["name"])
                 except KeyError:
-                    raise BadCaveXML("Objects node has no name attrib")
+                    raise BadW3DXML("Objects node has no name attrib")
             if child.tag == "Groups":
                 try:
                     group["groups"].append(child.attrib["name"])
                 except KeyError:
-                    raise BadCaveXML("Groups node has no name attrib")
+                    raise BadW3DXML("Groups node has no name attrib")
         return group
 
     def blend_objects(self):

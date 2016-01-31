@@ -1,4 +1,4 @@
-"""A module for working with Cave Writing projects
+"""A module for working with W3D Writing projects
 """
 from . import project
 from . import features

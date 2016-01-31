@@ -60,9 +60,9 @@ def generate_project_root():
 class BlenderTrigger(object):
     """A control element used to activate events within Blender
 
-    Note that while this frequently corresponds to a single CaveFeature, it may
-    correspond to part of a CaveFeature or several CaveFeatures. For instance,
-    a CaveTimeline constitutes a single BlenderTrigger, which will trigger
+    Note that while this frequently corresponds to a single W3DFeature, it may
+    correspond to part of a W3DFeature or several W3DFeatures. For instance,
+    a W3DTimeline constitutes a single BlenderTrigger, which will trigger
     multiple events.
 
     :param str blender_object_name: The name of the blender object to which

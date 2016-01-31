@@ -1,15 +1,15 @@
-"""Tools for working with displayable objects in Cave projects
+"""Tools for working with displayable objects in W3D projects
 """
 import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 import math
-from .errors import BadCaveXML, InvalidArgument, EBKAC
+from .errors import BadW3DXML, InvalidArgument, EBKAC
 from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
-from .features import CaveFeature
-from .actions import CaveAction, ObjectAction, GroupAction, TimelineAction,\
-    SoundAction, EventTriggerAction, MoveCaveAction, CaveResetAction
-from .placement import CavePlacement
+from .features import W3DFeature
+from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
+    SoundAction, EventTriggerAction, MoveW3DAction, W3DResetAction
+from .placement import W3DPlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
     MultiFeatureValidator, ValidFeatureDict, TextValidator, ValidFile
@@ -50,14 +50,14 @@ def generate_material_from_image(filename):
     return material
 
 
-class CaveLink(CaveFeature):
+class W3DLink(W3DFeature):
     """Store data on a clickable link
 
     :param bool enabled: Is link enabled?
     :param bool remain_enabled: Should link remain enabled after activation?
     :param tuple enabled_color: RGB color when link is enabled
     :param tuple selected_color: RGB color when link is selected
-    :param actions: Dictionary mapping number of clicks to CaveActions
+    :param actions: Dictionary mapping number of clicks to W3DActions
     (negative for any click)
     :param int reset: Number of clicks after which to reset link (negative
     value to never reset)"""
@@ -72,15 +72,15 @@ class CaveLink(CaveFeature):
         "selected_color": IsNumericIterable(required_length=3),
         "actions": ValidFeatureDict(
             [
-                CaveAction, ObjectAction, GroupAction, TimelineAction,
-                SoundAction, EventTriggerAction, MoveCaveAction,
-                CaveResetAction
+                W3DAction, ObjectAction, GroupAction, TimelineAction,
+                SoundAction, EventTriggerAction, MoveW3DAction,
+                W3DResetAction
             ],
             key_validator=IsNumeric(),
             key_label="Clicks",
             value_label="Action",
             help_string="Must be a dictionary mapping integers to lists of "
-            "CaveActions"
+            "W3DActions"
             ),
         "reset": IsNumeric()
         }
@@ -94,13 +94,13 @@ class CaveLink(CaveFeature):
         }
 
     def __init__(self, *args, **kwargs):
-        super(CaveLink, self).__init__(*args, **kwargs)
+        super(W3DLink, self).__init__(*args, **kwargs)
         if "actions" not in self:
             self["actions"] = defaultdict(list)
         self.num_clicks = 0
 
     def toXML(self, object_root):
-        """Store CaveLink as LinkRoot node within Object node
+        """Store W3DLink as LinkRoot node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -137,14 +137,14 @@ class CaveLink(CaveFeature):
 
     @classmethod
     def fromXML(link_class, link_root):
-        """Create CaveLink from LinkRoot node
+        """Create W3DLink from LinkRoot node
 
         :param :py:class:xml.etree.ElementTree.Element link_root
         """
         link = link_class()
         link_node = link_root.find("Link")
         if link_node is None:
-            raise BadCaveXML("LinkRoot element has no Link subelement")
+            raise BadW3DXML("LinkRoot element has no Link subelement")
         link["enabled"] = text2bool(find_xml_text(link_node, "Enabled"))
         link["remain_enabled"] = text2bool(
             find_xml_text(link_node, "RemainEnabled"))
@@ -163,7 +163,7 @@ class CaveLink(CaveFeature):
                         try:
                             num_clicks = num_clicks_node.attrib["num_clicks"]
                         except KeyError:
-                            raise BadCaveXML(
+                            raise BadW3DXML(
                                 "num_clicks attribute not set in NumClicks"
                                 "node")
                         try:
@@ -175,12 +175,12 @@ class CaveLink(CaveFeature):
                             pass
                 else:
                     link["actions"][num_clicks].append(
-                        CaveAction.fromXML(child))
+                        W3DAction.fromXML(child))
 
         return link
 
     def blend(self, object_name):
-        """Create Blender object to implement CaveLink
+        """Create Blender object to implement W3DLink
 
         :param str object_name: The name of the object to which link is
         assigned"""
@@ -195,7 +195,7 @@ class CaveLink(CaveFeature):
         return self.activator.base_object
 
     def link_blender_logic(self):
-        """Link BGE logic bricks for this CaveLink"""
+        """Link BGE logic bricks for this W3DLink"""
         try:
             self.activator.link_logic_bricks()
         except AttributeError:
@@ -203,7 +203,7 @@ class CaveLink(CaveFeature):
                 "blend() must be called before link_blender_logic()")
 
     def write_blender_logic(self):
-        """Write any necessary game engine logic for this CaveTimeline"""
+        """Write any necessary game engine logic for this W3DTimeline"""
         self.activator.write_python_logic()
         try:
             self.activator.write_python_logic()
@@ -212,8 +212,8 @@ class CaveLink(CaveFeature):
                 "blend() must be called before write_blender_logic()")
 
 
-class CaveContent(CaveFeature):
-    """Represents content of a Cave object"""
+class W3DContent(W3DFeature):
+    """Represents content of a W3D object"""
 
     blender_scaling = 1
 
@@ -224,24 +224,24 @@ class CaveContent(CaveFeature):
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
         if content_root.find("None") is not None:
-            return CaveContent()
+            return W3DContent()
         if content_root.find("Text") is not None:
-            return CaveText.fromXML(content_root)
+            return W3DText.fromXML(content_root)
         if content_root.find("Image") is not None:
-            return CaveImage.fromXML(content_root)
+            return W3DImage.fromXML(content_root)
         if content_root.find("StereoImage") is not None:
-            return CaveStereoImage.fromXML(content_root)
+            return W3DStereoImage.fromXML(content_root)
         if content_root.find("Model") is not None:
-            return CaveModel.fromXML(content_root)
+            return W3DModel.fromXML(content_root)
         if content_root.find("Light") is not None:
-            return CaveLight.fromXML(content_root)
+            return W3DLight.fromXML(content_root)
         if content_root.find("ParticleSystem") is not None:
-            return CavePSys.fromXML(content_root)
-        raise BadCaveXML("No known child node found in Content node")
+            return W3DPSys.fromXML(content_root)
+        raise BadW3DXML("No known child node found in Content node")
 
 
-class CaveText(CaveContent):
-    """Represents text in the Cave
+class W3DText(W3DContent):
+    """Represents text in the W3D
 
     :param str text: String of text to be displayed
     :param str halign: Horizontal alignment of text ("left", "right", "center")
@@ -270,7 +270,7 @@ class CaveText(CaveContent):
     ui_order = ["text", "halign", "valign", "font", "depth"]
 
     def toXML(self, object_root):
-        """Store CaveText as Content node within Object node
+        """Store W3DText as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -291,7 +291,7 @@ class CaveText(CaveContent):
 
     @classmethod
     def fromXML(text_class, content_root):
-        """Create CaveText object from Content node
+        """Create W3DText object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
@@ -311,10 +311,10 @@ class CaveText(CaveContent):
             new_text["text"] = text_root.text
             return new_text
         raise InvalidArgument(
-            "Content node must contain Text node to create CaveText object")
+            "Content node must contain Text node to create W3DText object")
 
     def blend(self):
-        """Create representation of CaveText in Blender"""
+        """Create representation of W3DText in Blender"""
         bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
@@ -332,15 +332,15 @@ class CaveText(CaveContent):
         return new_text_object
 
 
-class CaveImage(CaveContent):
-    """Represent a flat image in the Cave
+class W3DImage(W3DContent):
+    """Represent a flat image in the W3D
 
     :param str filename: Filename of image to be displayed"""
     argument_validators = {
         "filename": ValidFile("Value should be a string")}
 
     def toXML(self, object_root):
-        """Store CaveImage as Content node within Object node
+        """Store W3DImage as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -354,7 +354,7 @@ class CaveImage(CaveContent):
 
     @classmethod
     def fromXML(image_class, content_root):
-        """Create CaveImage object from Content node
+        """Create W3DImage object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
@@ -364,13 +364,13 @@ class CaveImage(CaveContent):
             try:
                 new_image["filename"] = image_root.attrib["filename"]
             except KeyError:
-                raise BadCaveXML("Image node must have filename attribute set")
+                raise BadW3DXML("Image node must have filename attribute set")
             return new_image
         raise InvalidArgument(
-            "Content node must contain Image node to create CaveImage object")
+            "Content node must contain Image node to create W3DImage object")
 
     def blend(self):
-        """Create representation of CaveImage in Blender"""
+        """Create representation of W3DImage in Blender"""
         bpy.ops.mesh.primitive_plane_add(rotation=(math.pi/2, 0, 0))
         bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
@@ -391,7 +391,7 @@ class CaveImage(CaveContent):
         return new_image_object
 
 
-class CaveStereoImage(CaveContent):
+class W3DStereoImage(W3DContent):
     """Represents different images in left and right eye
 
     :param str left-file: Filename of image to be displayed to left eye
@@ -402,7 +402,7 @@ class CaveStereoImage(CaveContent):
         "right_file": ValidFile("Filename of right-eye image")}
 
     def toXML(self, object_root):
-        """Store CaveStereoImage as Content node within Object node
+        """Store W3DStereoImage as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -417,7 +417,7 @@ class CaveStereoImage(CaveContent):
 
     @classmethod
     def fromXML(image_class, content_root):
-        """Create CaveStereoImage object from Content node
+        """Create W3DStereoImage object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
@@ -428,21 +428,21 @@ class CaveStereoImage(CaveContent):
                 new_image["left_file"] = image_root.attrib["left-image"]
                 new_image["right_file"] = image_root.attrib["right-image"]
             except KeyError:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "StereoImage node must have left-image and right-image "
                     "attributes set")
             return new_image
         raise InvalidArgument(
             "Content node must contain StereoImage node to create "
-            "CaveStereoImage object")
+            "W3DStereoImage object")
 
     def blend(self):
-        """Create representation of CaveStereoImage in Blender"""
+        """Create representation of W3DStereoImage in Blender"""
         raise NotImplementedError  # TODO
 
 
-class CaveModel(CaveContent):
-    """Represents a 3d model in the Cave
+class W3DModel(W3DContent):
+    """Represents a 3d model in the W3D
 
     :param str filename: Filename of model to be displayed
     :param bool check_collisions: TODO Clarify what this does
@@ -457,7 +457,7 @@ class CaveModel(CaveContent):
         }
 
     def toXML(self, object_root):
-        """Store CaveModel as Content node within Object node
+        """Store W3DModel as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -472,7 +472,7 @@ class CaveModel(CaveContent):
 
     @classmethod
     def fromXML(model_class, content_root):
-        """Create CaveModel object from Content node
+        """Create W3DModel object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
@@ -482,7 +482,7 @@ class CaveModel(CaveContent):
             try:
                 new_model["filename"] = model_root.attrib["filename"]
             except KeyError:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "StereoImage node must have filename attribute set")
             if "check-collisions" in model_root.attrib:
                 new_model["check_collisions"] = text2bool(
@@ -490,10 +490,10 @@ class CaveModel(CaveContent):
             return new_model
         raise InvalidArgument(
             "Content node must contain Model node to create "
-            "CaveModel object")
+            "W3DModel object")
 
     def blend(self):
-        """Create representation of CaveModel in Blender"""
+        """Create representation of W3DModel in Blender"""
         #TODO: Get proper directory
         bpy.ops.import_scene.obj(filepath=self["filename"])
         model_pieces = bpy.context.selected_objects
@@ -505,8 +505,8 @@ class CaveModel(CaveContent):
         return new_model
 
 
-class CaveLight(CaveContent):
-    """Represents a light source in the Cave
+class W3DLight(W3DContent):
+    """Represents a light source in the W3D
 
     :param str light_type: Type of source, one of "Point", "Directional",
     "Spot"
@@ -532,7 +532,7 @@ class CaveLight(CaveContent):
         "angle": 30}
 
     def toXML(self, object_root):
-        """Store CaveLight as Content node within Object node
+        """Store W3DLight as Content node within Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -557,7 +557,7 @@ class CaveLight(CaveContent):
 
     @classmethod
     def fromXML(light_class, content_root):
-        """Create CaveLight object from Content node
+        """Create W3DLight object from Content node
 
         :param :py:class:xml.etree.ElementTree.Element content_root
         """
@@ -576,7 +576,7 @@ class CaveLight(CaveContent):
                     new_light["attenuation"][index] = text2bool(
                         light_root.attrib[factor])
             new_light["attenuation"] = tuple(new_light["attenuation"])
-            for light_type in CaveLight.argument_validators[
+            for light_type in W3DLight.argument_validators[
                     "light_type"].valid_options:
                 type_root = light_root.find(light_type)
                 if type_root is not None:
@@ -586,10 +586,10 @@ class CaveLight(CaveContent):
                     break
             return new_light
         raise InvalidArgument(
-            "Content node must contain Light node to create CaveLight object")
+            "Content node must contain Light node to create W3DLight object")
 
     def blend(self):
-        """Create representation of CaveLight in Blender"""
+        """Create representation of W3DLight in Blender"""
         #TODO: Check default direction of lights in legacy
         light_type_conversion = {
             "Point": "POINT", "Directional": "SUN", "Spot": "SPOT"
@@ -621,19 +621,19 @@ class CaveLight(CaveContent):
         return new_light_object
 
 
-class CavePSys(CaveContent):
-    """Represents a particle system in the Cave
+class W3DPSys(W3DContent):
+    """Represents a particle system in the W3D
 
     NOT YET IMPLEMENTED AT ALL"""
     # TODO: everything
 
 
-class CaveObject(CaveFeature):
-    """Store data on single Cave object
+class W3DObject(W3DFeature):
+    """Store data on single W3D object
 
     :param str name: The name of the object
-    :param CavePlacement placement: Position and orientation of object
-    :param CaveLink link: Clickable link for object
+    :param W3DPlacement placement: Position and orientation of object
+    :param W3DLink link: Clickable link for object
     :param tuple color: Three floats representing RGB color of object
     :param bool visible: Is object visible?
     :param bool lighting: Does object respond to scene lighting?
@@ -641,17 +641,17 @@ class CaveObject(CaveFeature):
     :param bool click_through: Should clicks also pass through object?
     :param bool around_own_axis: TODO clarify
     :param str sound: Name of sound element associated with this object
-    :param content: Content of object; one of CaveText, CaveImage,
-    CaveStereoImage, CaveModel, CaveLight, CavePSys
+    :param content: Content of object; one of W3DText, W3DImage,
+    W3DStereoImage, W3DModel, W3DLight, W3DPSys
     """
 
     argument_validators = {
         "name": ValidPyString(),
         "placement": FeatureValidator(
-            CavePlacement,
+            W3DPlacement,
             help_string="Orientation and position of object"),
         "link": FeatureValidator(
-            CaveLink,
+            W3DLink,
             help_string="Clickable link associated with object"),
         "color": IsNumericIterable(required_length=3),
         "visible": IsBoolean(),
@@ -661,7 +661,7 @@ class CaveObject(CaveFeature):
         "around_own_axis":  IsBoolean(),
         "sound": AlwaysValid("Name of sound attached to this object"),
         "content": MultiFeatureValidator([
-            CaveContent, CaveText, CaveImage, CaveModel, CaveLight])}
+            W3DContent, W3DText, W3DImage, W3DModel, W3DLight])}
 
     default_arguments = {
         "link": None,
@@ -675,7 +675,7 @@ class CaveObject(CaveFeature):
         }
 
     def __init__(self, *args, **kwargs):
-        super(CaveObject, self).__init__(*args, **kwargs)
+        super(W3DObject, self).__init__(*args, **kwargs)
         self.ui_order = [
             "name", "visible", "color", "lighting", "scale", "click_through",
             "around_own_axis",
@@ -684,7 +684,7 @@ class CaveObject(CaveFeature):
         ]
 
     def toXML(self, all_objects_root):
-        """Store CaveObject as Object node within ObjectRoot node
+        """Store W3DObject as Object node within ObjectRoot node
 
         :param :py:class:xml.etree.ElementTree.Element all_objects_root
         """
@@ -715,7 +715,7 @@ class CaveObject(CaveFeature):
 
     @classmethod
     def fromXML(object_class, object_root):
-        """Create CaveObject from Object node
+        """Create W3DObject from Object node
 
         :param :py:class:xml.etree.ElementTree.Element object_root
         """
@@ -723,7 +723,7 @@ class CaveObject(CaveFeature):
         try:
             new_object["name"] = object_root.attrib["name"]
         except KeyError:
-            raise BadCaveXML("All Object nodes must have a name attribute set")
+            raise BadW3DXML("All Object nodes must have a name attribute set")
         node = object_root.find("Visible")
         if node is not None:
             new_object["visible"] = text2bool(node.text)
@@ -747,16 +747,16 @@ class CaveObject(CaveFeature):
             try:
                 new_object["sound"] = node.attrib["name"]
             except KeyError:
-                raise BadCaveXML("SoundRef node must have name attribute set")
+                raise BadW3DXML("SoundRef node must have name attribute set")
         node = object_root.find("Placement")
         if node is not None:
-            new_object["placement"] = CavePlacement.fromXML(node)
+            new_object["placement"] = W3DPlacement.fromXML(node)
         node = object_root.find("LinkRoot")
         if node is not None:
-            new_object["link"] = CaveLink.fromXML(node)
+            new_object["link"] = W3DLink.fromXML(node)
         node = object_root.find("Content")
         if node is not None:
-            new_object["content"] = CaveContent.fromXML(node)
+            new_object["content"] = W3DContent.fromXML(node)
             new_object["scale"] = (
                 new_object["scale"] * new_object["content"].blender_scaling)
         return new_object
@@ -783,7 +783,7 @@ class CaveObject(CaveFeature):
         return blender_object
 
     def blend(self):
-        """Create representation of CaveObject in Blender"""
+        """Create representation of W3DObject in Blender"""
         blender_object = self["content"].blend()
         blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]

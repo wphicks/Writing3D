@@ -7,7 +7,7 @@ class MoveAction(object):
     """Generate Python logic for how object should move when action first
     starts, as it continues, and when it ends
 
-    :param placement: A CavePlacement object specifying movement
+    :param placement: A W3DPlacement object specifying movement
     :param bool move_relative: Whether motion is specified relative to current
     location
     :param float duration: Time for action to complete in seconds

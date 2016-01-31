@@ -1,7 +1,7 @@
-"""Tools for working with Cave project features
+"""Tools for working with W3D project features
 
 This module contains tools to help store data related to nearly any feature of
-a Cave project. Here, feature refers generically to any complex structure that
+a W3D project. Here, feature refers generically to any complex structure that
 may appear in such a project. This may be as sophisticated as a "Timeline" or
 as simple as a "Placement" for an object (since Placement features define
 position, and potentially multiple kinds of rotation).
@@ -9,8 +9,8 @@ position, and potentially multiple kinds of rotation).
 from .errors import InvalidArgument
 
 
-class CaveFeature(dict):
-    """Base class for all Cave features
+class W3DFeature(dict):
+    """Base class for all W3D features
 
     By overriding argument_validators and default_arguments, subclasses can
     easily validate input and provide sensible default arguments.
@@ -24,7 +24,7 @@ class CaveFeature(dict):
     when reading in an XML file. It is not intended to do type-checking or
     consistency-checking across features. e.g. Validators might check if
     reasonable values have been passed in to specify an RGB color, but they
-    would not be used to confirm that everything in a list of CaveProject
+    would not be used to confirm that everything in a list of W3DProject
     objects is actually an object. For such higher-level things, we depend on
     duck-typing."""
     default_arguments = {}
@@ -34,7 +34,7 @@ class CaveFeature(dict):
     units"""
 
     def __init__(self, *args, **kwargs):
-        super(CaveFeature, self).__init__()
+        super(W3DFeature, self).__init__()
         self.update(args)
         self.update(kwargs.items())
         try:
@@ -45,11 +45,11 @@ class CaveFeature(dict):
     def __setitem__(self, key, value):
         if key not in self.argument_validators:
             raise InvalidArgument(
-                "{} not a valid option for this Cave feature".format(key))
+                "{} not a valid option for this W3D feature".format(key))
         if not self.argument_validators[key](value):
             raise InvalidArgument(
                 "{} is not a valid value for option {}".format(value, key))
-        super(CaveFeature, self).__setitem__(key, value)
+        super(W3DFeature, self).__setitem__(key, value)
 
     def __missing__(self, key):
         return self.default_arguments[key]
@@ -59,19 +59,19 @@ class CaveFeature(dict):
             self.__setitem__(key, value)
 
     def toXML(self, parent_root):
-        """Store data in Cave XML format within parent_root
+        """Store data in W3D XML format within parent_root
         :param :py:class:xml.etree.ElementTree.Element parent_root
 
-        Since this differs for every Cave feature, subclasses MUST override
+        Since this differs for every W3D feature, subclasses MUST override
         this function.
         """
         raise NotImplementedError("toXML not defined for this feature")
 
     @classmethod
     def fromXML(feature_class, xml_root):
-        """Create CaveFeature object from xml node for such a feature
+        """Create W3DFeature object from xml node for such a feature
 
-        Since this differs for every Cave feature, subclasses MUST override
+        Since this differs for every W3D feature, subclasses MUST override
         this function.
         :param :py:class:xml.etree.ElementTree.Element xml_root: xml node for
         this feature

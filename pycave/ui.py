@@ -11,7 +11,7 @@ class InputUI(object):
     Classes that inherit from InputUI should also inherit from a TK widget
     :param parent: The parent widget for this widget
     :param str title: A title to label this widget,
-    :param CaveFeature feature: The feature whose options are being modified
+    :param W3DFeature feature: The feature whose options are being modified
     :param feature_key: The key for the particular option being modified"""
 
     def help_bubble(self):
@@ -187,7 +187,7 @@ class ScrollableFrame(tk.Frame):
 
 
 class FeatureUI(InputUI, ttk.LabelFrame):
-    """Tkinter widget for creating a CaveFeature"""
+    """Tkinter widget for creating a W3DFeature"""
 
     def __init__(self, parent, title, validator, feature, feature_key):
         super(FeatureUI, self).__init__(
@@ -211,7 +211,7 @@ class FeatureUI(InputUI, ttk.LabelFrame):
 
 
 class FeatureListUI(InputUI, ttk.LabelFrame):
-    """Tkinter widget for inputting a list of CaveFeatures"""
+    """Tkinter widget for inputting a list of W3DFeatures"""
 
     def __init__(
             self, parent, title, validator, feature, feature_key,
@@ -274,7 +274,7 @@ class FeatureListUI(InputUI, ttk.LabelFrame):
 
 
 class MultiFeatureListUI(InputUI, tk.Frame):
-    """Tkinter widget for inputting a list of CaveFeatures of multiple types"""
+    """Tkinter widget for inputting a list of W3DFeatures of multiple types"""
 
     def __init__(
             self, parent, title, validator, feature, feature_key,
@@ -365,7 +365,7 @@ class PopOutUI(InputUI, tk.Frame):
 
 
 class MultiFeatureUI(InputUI, ttk.LabelFrame):
-    """Tkinter widget for creating one of several subclasses of CaveFeature"""
+    """Tkinter widget for creating one of several subclasses of W3DFeature"""
 
     def __init__(self, parent, title, validator, feature, feature_key):
         super(MultiFeatureUI, self).__init__(
@@ -507,7 +507,7 @@ class UpdateOptionUI(InputUI, tk.Frame):
 
 class NonFeatureUI(tk.Frame):
     """Tkinter widget for input and validation of values that are not
-    associated with a CaveFeature option"""
+    associated with a W3DFeature option"""
 
     def help_bubble(self):
         top = tk.Toplevel()
@@ -606,7 +606,7 @@ class DictEntryUI(tk.Frame):
 
 
 class FeatureDictUI(InputUI, tk.Frame):
-    """Tkinter widget for building a dictionary with lists of CaveFeatures as
+    """Tkinter widget for building a dictionary with lists of W3DFeatures as
     values"""
 
     def __init__(

@@ -10,7 +10,7 @@ except ImportError:
 
 
 class Activator(object):
-    """An object used to create BGE logic for triggering CaveActions
+    """An object used to create BGE logic for triggering W3DActions
 
     :param str name_string: A string which is used to generate the name of the
     object associated with this activator (e.g. the user-assigned name of a
@@ -106,7 +106,7 @@ def activate(cont):
         """Creates a property called "enabled" which defines whether or not
         activator can currently be activated
 
-        .. warn: This property should be checked when a CaveAction attempts to
+        .. warn: This property should be checked when a W3DAction attempts to
         start an activator. It is NOT checked by the activator itself. This is
         to allow the activator to be immediately disabled after activation but
         still process the remainder of its actions"""
@@ -232,7 +232,7 @@ def activate(cont):
 
     def generate_action_logic(self):
         """Returns a string to be written into Python control script for
-        activating CaveActions
+        activating W3DActions
 
         .. note: This method is responsible for writing the max_time for
         execution of actions into the script_footer. Failure to do this will

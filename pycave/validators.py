@@ -1,4 +1,4 @@
-"""Tools for validating options provided to Cave features"""
+"""Tools for validating options provided to W3D features"""
 
 import re
 import os
@@ -19,7 +19,7 @@ PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
 class Validator(object):
     """Callable object for validating input
 
-    :param CaveProject project: The project this validator is being used for.
+    :param W3DProject project: The project this validator is being used for.
     If specified, this allows for consistency checks between related elements
     of the project."""
 
@@ -165,13 +165,13 @@ class ListValidator(Validator):
 
 
 class ProjectOptionValidator(Validator):
-    """OptionListValidator populated with options specified in a CaveProject
+    """OptionListValidator populated with options specified in a W3DProject
 
     For example, this validator could be used to select from the objects in a
     particular project
     :param Validator fallback_validator: A fallback validator used in case
     project has not been set for this validator
-    :param project_option_selector: A callable that takes a CaveProject as
+    :param project_option_selector: A callable that takes a W3DProject as
     input and returns a list of strings representing valid options"""
 
     def __init__(
@@ -350,7 +350,7 @@ class CheckClass(Validator):
 
 
 class FeatureValidator(Validator):
-    """Check if value is a CaveFeature of specified type"""
+    """Check if value is a W3DFeature of specified type"""
 
     def __init__(self, correct_class, help_string=None):
         self.correct_class = correct_class
@@ -377,7 +377,7 @@ class FeatureValidator(Validator):
 
 
 class MultiFeatureValidator(Validator):
-    """Check if value is a CaveFeature of several specified types
+    """Check if value is a W3DFeature of several specified types
     """
 
     def __init__(self, class_list, help_string=None):
@@ -416,7 +416,7 @@ class MultiFeatureValidator(Validator):
 
 
 class FeatureListValidator(Validator):
-    """Check if value is an iterable of CaveFeatures of a particular type"""
+    """Check if value is an iterable of W3DFeatures of a particular type"""
 
     def __init__(self, correct_class, help_string=None):
         self.correct_class = correct_class
@@ -445,7 +445,7 @@ class FeatureListValidator(Validator):
 
 
 class MultiFeatureListValidator(Validator):
-    """Check if value is an iterable of CaveFeatures of several specified
+    """Check if value is an iterable of W3DFeatures of several specified
     types"""
 
     def __init__(self, class_list, help_string=None, item_label="Item"):
@@ -483,7 +483,7 @@ class MultiFeatureListValidator(Validator):
 
 
 class ValidFeatureDict(Validator):
-    """Check if input is dictionary with lists of CaveFeatures as values
+    """Check if input is dictionary with lists of W3DFeatures as values
 
     :param class_list: A list of classes which are acceptable as values in this
     dictionary
@@ -495,7 +495,7 @@ class ValidFeatureDict(Validator):
             help_string=None, value_label="Item"):
         if help_string is None:
             self.help_string = "Must be a dictionary with lists of"
-            " CaveFeatures as values"
+            " W3DFeatures as values"
         else:
             self.help_string = help_string
         self.key_validator = key_validator

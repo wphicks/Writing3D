@@ -210,7 +210,7 @@ class BlenderDirectionTrigger(BlenderLookAtTrigger):
 class BlenderLookObjectTrigger(BlenderLookAtTrigger):
     """Trigger based on user looking at an object in virtual space
 
-    :param str look_at_object: Name of the CaveObject to be looked at"""
+    :param str look_at_object: Name of the W3DObject to be looked at"""
 
     def __init__(
             self, name, actions, look_at_object, duration=0,

@@ -1,20 +1,20 @@
-"""Tools for working with Cave projects
+"""Tools for working with W3D projects
 """
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 import warnings
 import math
-from .features import CaveFeature
-from .placement import CavePlacement, CaveRotation, convert_to_blender_axes
+from .features import W3DFeature
+from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable,\
     FeatureListValidator, IsBoolean, FeatureValidator
 from .xml_tools import bool2text, text2tuple, attrib2bool
-from .objects import CaveObject
-from .sounds import CaveSound
-from .timeline import CaveTimeline
-from .groups import CaveGroup
-from .triggers import CaveTrigger
-from .errors import BadCaveXML
+from .objects import W3DObject
+from .sounds import W3DSound
+from .timeline import W3DTimeline
+from .groups import W3DGroup
+from .triggers import W3DTrigger
+from .errors import BadW3DXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
 import tkinter as tk
 try:
@@ -35,18 +35,18 @@ class ProjectOptions(tk.Frame):
 
     def add_entries(self):
         self.entries = {}
-        self.entries["far_clip"] = CaveProject.argument_validators[
+        self.entries["far_clip"] = W3DProject.argument_validators[
             "far_clip"].ui(self, "Camera far clip", self.project, "far_clip")
-        self.entries["background"] = CaveProject.argument_validators[
+        self.entries["background"] = W3DProject.argument_validators[
             "background"].ui(
             self, "Background color", self.project, "background")
-        self.entries["allow_movement"] = CaveProject.argument_validators[
+        self.entries["allow_movement"] = W3DProject.argument_validators[
             "allow_movement"].ui(
             self, "Allow movement", self.project, "allow_movement")
-        self.entries["allow_rotation"] = CaveProject.argument_validators[
+        self.entries["allow_rotation"] = W3DProject.argument_validators[
             "allow_rotation"].ui(
             self, "Allow rotation", self.project, "allow_movement")
-        self.entries["camera_placement"] = CaveProject.argument_validators[
+        self.entries["camera_placement"] = W3DProject.argument_validators[
             "camera_placement"].ui(
             self, "Camera placement", self.project, "camera_placement")
 
@@ -116,46 +116,46 @@ def add_key_movement(
     controller.link(sensor=sensor)
 
 
-class CaveProject(CaveFeature):
-    """Represent entire project for display in Cave
+class W3DProject(W3DFeature):
+    """Represent entire project for display in W3D
 
-    :param list objects: List of CaveObjects to be displayed
-    :param list groups: Maps names of groups to lists of CaveObjects
-    :param list timelines: List of CaveTimelines within project
-    :param list sounds: List of CaveSounds within project
-    :param list trigger_events: List of CaveEvents within project
-    :param CavePlacement camera_placement: Initial placement of camera
-    :param CavePlacement desktop_camera_placement: Initial placement of camera
-    if project is run outside an actual Cave environment
+    :param list objects: List of W3DObjects to be displayed
+    :param list groups: Maps names of groups to lists of W3DObjects
+    :param list timelines: List of W3DTimelines within project
+    :param list sounds: List of W3DSounds within project
+    :param list trigger_events: List of W3DEvents within project
+    :param W3DPlacement camera_placement: Initial placement of camera
+    :param W3DPlacement desktop_camera_placement: Initial placement of camera
+    if project is run outside an actual W3D environment
     :param float far_clip: Far clip for camera (how far away from camera
     objects remain visible)
     :param tuple background: Color of background as an RGB tuple of 3 ints
     :param bool allow_movement: Allow user to navigate within project?
     :param bool allow_rotation: Allow user to rotate withing project?
     :param dict wall_placements: Dictionary mapping names of walls to
-    CavePlacements specifying their position and orientation
+    W3DPlacements specifying their position and orientation
     """
 
     argument_validators = {
         "objects": FeatureListValidator(
-            CaveObject,
-            help_string="A list of CaveObjects in the project"),
+            W3DObject,
+            help_string="A list of W3DObjects in the project"),
         "groups": FeatureListValidator(
-            CaveGroup,
-            help_string="A list of CaveGroups in the project"),
+            W3DGroup,
+            help_string="A list of W3DGroups in the project"),
         "timelines": FeatureListValidator(
-            CaveTimeline,
-            help_string="A list of CaveTimelines in the project"),
+            W3DTimeline,
+            help_string="A list of W3DTimelines in the project"),
         "sounds": AlwaysValid(
-            help_string="A list of CaveSounds in the project"),
+            help_string="A list of W3DSounds in the project"),
         "trigger_events": FeatureListValidator(
-            CaveTrigger,
-            help_string="A list of CaveTriggers in the project"),
+            W3DTrigger,
+            help_string="A list of W3DTriggers in the project"),
         "camera_placement": FeatureValidator(
-            CavePlacement,
+            W3DPlacement,
             help_string="Orientation and position of camera"),
         "desktop_camera_placement": FeatureValidator(
-            CavePlacement,
+            W3DPlacement,
             help_string="Orientation and position of camera in desktop preview"
             ),
         "far_clip": IsNumeric(),
@@ -175,7 +175,7 @@ class CaveProject(CaveFeature):
         }
 
     def __init__(self, *args, **kwargs):
-        super(CaveProject, self).__init__(*args, **kwargs)
+        super(W3DProject, self).__init__(*args, **kwargs)
         if "objects" not in self:
             self["objects"] = []
         if "groups" not in self:
@@ -187,51 +187,51 @@ class CaveProject(CaveFeature):
         if "trigger_events" not in self:
             self["trigger_events"] = []
         if "camera_placement" not in self:
-            self["camera_placement"] = CavePlacement(
+            self["camera_placement"] = W3DPlacement(
                 position=convert_to_blender_axes((0, 0, 6)))
         if "desktop_camera_placement" not in self:
-            self["desktop_camera_placement"] = CavePlacement(
+            self["desktop_camera_placement"] = W3DPlacement(
                 position=convert_to_blender_axes((0, 0, 0)))
         # Note: Center position shift will not be used right now. This has
         # never been used to my knowledge and probably shouldn't be. Changing
         # initial camera position should be preferred.
         if "wall_placements" not in self:
             self["wall_placements"] = {
-                "Center": CavePlacement(
+                "Center": W3DPlacement(
                     position=convert_to_blender_axes((0, 0, 0)),
-                    rotation=CaveRotation(
+                    rotation=W3DRotation(
                         rotation_mode="Axis",
                         rotation_vector=convert_to_blender_axes((0, 1, 0)),
                         rotation_angle=0
                     )
                 ),
-                "FrontWall": CavePlacement(
+                "FrontWall": W3DPlacement(
                     position=convert_to_blender_axes((0, 0, -4)),
-                    rotation=CaveRotation(
+                    rotation=W3DRotation(
                         rotation_mode="LookAt",
                         rotation_vector=convert_to_blender_axes((0, 0, 0)),
                         up_vector=convert_to_blender_axes((0, 1, 0))
                     )
                 ),
-                "LeftWall": CavePlacement(
+                "LeftWall": W3DPlacement(
                     position=convert_to_blender_axes((-4, 0, 0)),
-                    rotation=CaveRotation(
+                    rotation=W3DRotation(
                         rotation_mode="LookAt",
                         rotation_vector=convert_to_blender_axes((0, 0, 0)),
                         up_vector=convert_to_blender_axes((0, 1, 0))
                     )
                 ),
-                "RightWall": CavePlacement(
+                "RightWall": W3DPlacement(
                     position=convert_to_blender_axes((4, 0, 0)),
-                    rotation=CaveRotation(
+                    rotation=W3DRotation(
                         rotation_mode="LookAt",
                         rotation_vector=convert_to_blender_axes((0, 0, 0)),
                         up_vector=convert_to_blender_axes((0, 1, 0))
                     )
                 ),
-                "FloorWall": CavePlacement(
+                "FloorWall": W3DPlacement(
                     position=convert_to_blender_axes((0, -4, 0)),
-                    rotation=CaveRotation(
+                    rotation=W3DRotation(
                         rotation_mode="LookAt",
                         rotation_vector=convert_to_blender_axes((0, 0, 0)),
                         up_vector=convert_to_blender_axes((0, 1, 0))
@@ -240,7 +240,7 @@ class CaveProject(CaveFeature):
             }
 
     def toXML(self):
-        """Store CaveProject as Cave XML tree
+        """Store W3DProject as W3D XML tree
         """
         project_root = ET.Element("Story")
         object_root = ET.SubElement(project_root, "ObjectRoot")
@@ -286,65 +286,65 @@ class CaveProject(CaveFeature):
 
     @classmethod
     def fromXML(project_class, project_root):
-        """Create CaveProject from Story node of Cave XML
+        """Create W3DProject from Story node of W3D XML
 
         :param :py:class:xml.etree.ElementTree.Element project_root
         """
         new_project = project_class()
         object_root = project_root.find("ObjectRoot")
         if object_root is None:
-            raise BadCaveXML("Story root has no ObjectRoot node")
+            raise BadW3DXML("Story root has no ObjectRoot node")
         for child in object_root.findall("Object"):
-            new_project["objects"].append(CaveObject.fromXML(child))
+            new_project["objects"].append(W3DObject.fromXML(child))
         group_root = project_root.find("GroupRoot")
         if group_root is None:
-            raise BadCaveXML("Story root has no GroupRoot node")
+            raise BadW3DXML("Story root has no GroupRoot node")
         for child in group_root.findall("Group"):
-            new_project["groups"].append(CaveGroup.fromXML(child))
+            new_project["groups"].append(W3DGroup.fromXML(child))
         timeline_root = project_root.find("TimelineRoot")
         if object_root is None:
-            raise BadCaveXML("Story root has no ObjectRoot node")
+            raise BadW3DXML("Story root has no ObjectRoot node")
         for child in timeline_root.findall("Timeline"):
-            new_project["timelines"].append(CaveTimeline.fromXML(child))
+            new_project["timelines"].append(W3DTimeline.fromXML(child))
         sound_root = project_root.find("SoundRoot")
         if object_root is None:
-            raise BadCaveXML("Story root has no ObjectRoot node")
+            raise BadW3DXML("Story root has no ObjectRoot node")
         for child in sound_root.findall("Sound"):
-            new_project["sounds"].append(CaveSound.fromXML(child))
+            new_project["sounds"].append(W3DSound.fromXML(child))
         trigger_root = project_root.find("EventRoot")
         if object_root is None:
-            raise BadCaveXML("Story root has no ObjectRoot node")
+            raise BadW3DXML("Story root has no ObjectRoot node")
         for child in trigger_root.findall("EventTrigger"):
-            new_project["trigger_events"].append(CaveTrigger.fromXML(child))
+            new_project["trigger_events"].append(W3DTrigger.fromXML(child))
 
         global_root = project_root.find("Global")
         if global_root is None:
-            raise BadCaveXML("Story root has no Global node")
+            raise BadW3DXML("Story root has no Global node")
 
         camera_node = global_root.find("CaveCameraPos")
         if camera_node is None:
-            raise BadCaveXML("Global node has no CaveCameraPos child")
+            raise BadW3DXML("Global node has no CaveCameraPos child")
         if "far-clip" in camera_node.attrib:
             new_project["far_clip"] = float(camera_node.attrib["far-clip"])
         place_node = camera_node.find("Placement")
         if camera_node is None:
-            raise BadCaveXML("CameraPos node has no Placement child")
-        new_project["desktop_camera_placement"] = CavePlacement.fromXML(
+            raise BadW3DXML("CameraPos node has no Placement child")
+        new_project["desktop_camera_placement"] = W3DPlacement.fromXML(
             place_node)
 
         camera_node = global_root.find("CameraPos")
         if camera_node is None:
-            raise BadCaveXML("Global node has no CameraPos child")
+            raise BadW3DXML("Global node has no CameraPos child")
         if "far-clip" in camera_node.attrib:
             new_project["far_clip"] = float(camera_node.attrib["far-clip"])
         place_node = camera_node.find("Placement")
         if camera_node is None:
-            raise BadCaveXML("CameraPos node has no Placement child")
-        new_project["camera_placement"] = CavePlacement.fromXML(place_node)
+            raise BadW3DXML("CameraPos node has no Placement child")
+        new_project["camera_placement"] = W3DPlacement.fromXML(place_node)
 
         bg_node = global_root.find("Background")
         if bg_node is None:
-            raise BadCaveXML("Global node has no Background child")
+            raise BadW3DXML("Global node has no Background child")
         if "color" in bg_node.attrib:
             new_project["background"] = text2tuple(
                 bg_node.attrib["color"],
@@ -353,7 +353,7 @@ class CaveProject(CaveFeature):
 
         wand_node = global_root.find("WandNavigation")
         if wand_node is None:
-            raise BadCaveXML("Global node has no WandNavigation child")
+            raise BadW3DXML("Global node has no WandNavigation child")
         new_project["allow_rotation"] = attrib2bool(
             wand_node, "allow-rotation", default=False)
         new_project["allow_movement"] = attrib2bool(
@@ -364,15 +364,15 @@ class CaveProject(CaveFeature):
             try:
                 wall_name = placement.attrib["name"]
             except KeyError:
-                raise BadCaveXML(
+                raise BadW3DXML(
                     "Placements within PlacementRoot must specify name")
             new_project["wall_placements"][
-                wall_name] = CavePlacement.fromXML(placement)
+                wall_name] = W3DPlacement.fromXML(placement)
         return new_project
 
     @classmethod
     def fromXML_file(project_class, filename):
-        """Create CaveProject from XML file of given filename
+        """Create W3DProject from XML file of given filename
 
         :param str filename: Filename of XML file for project
         """
@@ -501,7 +501,7 @@ class CaveProject(CaveFeature):
         controller.link(sensor=sensor)
 
     def blend(self):
-        """Create representation of CaveProject in Blender"""
+        """Create representation of W3DProject in Blender"""
         clear_blender_scene()
         bpy.data.scenes["Scene"].game_settings.physics_gravity = 0
         bpy.data.scenes["Scene"].game_settings.material_mode = "GLSL"

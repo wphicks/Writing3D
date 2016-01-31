@@ -10,8 +10,8 @@ except ImportError:
 class BlenderAction(object):
     """A single unit of action within Blender
 
-    Note that this may correspond to part of a CaveAction or several
-    CaveActions
+    Note that this may correspond to part of a W3DAction or several
+    W3DActions
     :param BlenderTrigger trigger: The trigger used to activate this action"""
 
     def create_on_script(self):
@@ -114,7 +114,7 @@ class ActivateTrigger(BlenderAction):
 class LinearMovement(BlenderAction):
     """Used to execute a linear movement of a Blender object
 
-    :param CavePlacement target_placement: Target destination and orientation
+    :param W3DPlacement target_placement: Target destination and orientation
     of object"""
 
     def create_movement_actuator(self):
