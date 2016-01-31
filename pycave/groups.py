@@ -1,7 +1,7 @@
 import warnings
 import xml.etree.ElementTree as ET
 from .features import CaveFeature
-from .validators import AlwaysValid, ValidPyString
+from .validators import ValidPyString, ListValidator, ProjectOptionValidator
 from .errors import BadCaveXML, ConsistencyError
 from .names import generate_group_name, \
     generate_blender_object_name
@@ -22,12 +22,26 @@ class CaveGroup(CaveFeature):
 
     argument_validators = {
         "name": ValidPyString(),
-        "objects": AlwaysValid(help_string="A list of names of objects"),
-        "groups": AlwaysValid(help_string="A list of names of groups"),
+        "objects": ListValidator(
+            ProjectOptionValidator(
+                ValidPyString(),
+                lambda proj: [obj["name"] for obj in proj["objects"]],
+                help_string="Must be the name of an object"),
+            item_label="Object",
+            help_string="A list of names of objects"),
+        "groups": ListValidator(
+            ProjectOptionValidator(
+                ValidPyString(),
+                lambda proj: [obj["name"] for obj in proj["groups"]],
+                help_string="Must be the name of a group"),
+            item_label="Group",
+            help_string="A list of names of groups")
     }
 
     default_arguments = {
     }
+
+    ui_order = ["name", "objects", "groups"]
 
     def __init__(self, *args, **kwargs):
         super(CaveGroup, self).__init__(*args, **kwargs)

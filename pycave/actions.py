@@ -8,7 +8,8 @@ import xml.etree.ElementTree as ET
 from .features import CaveFeature
 from .placement import CavePlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
-    IsNumericIterable
+    IsNumericIterable, IsBoolean, FeatureValidator, ProjectOptionValidator,\
+    ValidPyString
 from .errors import BadCaveXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name, generate_group_name
@@ -172,11 +173,16 @@ class ObjectAction(CaveAction):
     """
 
     argument_validators = {
-        "object_name": AlwaysValid("Name of an object"),
+        "object_name": ProjectOptionValidator(
+            ValidPyString(),
+            lambda proj: [obj["name"] for obj in proj["objects"]],
+            help_string="Must be the name of an object"),
         "duration": IsNumeric(min_value=0),
-        "visible": AlwaysValid("Either true or false"),
-        "placement": AlwaysValid("A CavePlacement object"),
-        "move_relative": AlwaysValid("Either true or false"),
+        "visible": IsBoolean(),
+        "placement": FeatureValidator(
+            CavePlacement,
+            help_string="Orientation and position for movement"),
+        "move_relative": IsBoolean(),
         "color": IsNumericIterable(required_length=3),
         "scale": IsNumeric(min_value=0),
         #TODO

@@ -29,6 +29,7 @@ class InputUI(object):
 
     def _clear_none(self):
         """Set value to new (non-None) default and re-initialize UI"""
+        self.none_flag = False
         self.feature[self.feature_key] = self.validator.def_value
         self.none_button.destroy()
         self.initUI()
@@ -38,6 +39,7 @@ class InputUI(object):
 
         :param factory: A callable that will return a new sensible default for
         feature"""
+        self.none_flag = True
         self.none_button = tk.Button(
             self, text="Create", command=self._clear_none)
         self.none_button.pack(fill=tk.X)
@@ -61,6 +63,8 @@ class InputUI(object):
         return self.validator.coerce(value)
 
     def validate(self, value, silent=False):
+        if self.none_flag:
+            return True
         try:
             valid = self.validator(self.evaluate(value))
         except:
@@ -79,6 +83,7 @@ class InputUI(object):
         self.entry_value = tk.StringVar()
         self.feature = feature
         self.feature_key = feature_key
+        self.none_flag = False
         try:
             cur_value = self.feature[self.feature_key]
         except KeyError:
@@ -89,6 +94,37 @@ class InputUI(object):
             self.entry_value.set("")
         self.initTK()
         self.initUI()
+
+
+class TextUI(InputUI, tk.Frame):
+
+    def destroy(self):
+        self.validate(silent=True)
+        super(TextUI, self).destroy()
+
+    def validate(self, silent=False):
+        if self.none_flag:
+            return True
+        value = self.editor.get("1.0", tk.END)
+        try:
+            valid = self.validator(self.evaluate(value))
+        except:
+            valid = False
+        if not valid:
+            if not silent:
+                self.help_bubble()
+        else:
+            self.feature[self.feature_key] = self.evaluate(value)
+        return valid
+
+    def initUI(self):
+        self.editor = tk.Text(self)
+        try:
+            self.editor.insert(tk.END, self.feature[self.feature_key])
+        except KeyError:
+            pass
+        self.editor.bind("<FocusOut>", self.validate)
+        self.editor.pack(fill=tk.BOTH, expand=1)
 
 
 class FileUI(InputUI, tk.Frame):
@@ -160,10 +196,10 @@ class FeatureUI(InputUI, ttk.LabelFrame):
 
     def initUI(self):
         try:
-            self.feature[self.feature_key]
+            if self.feature[self.feature_key] is None:
+                self.noneUI()
+                return
         except KeyError:
-            self.feature[self.feature_key] = self.validator.def_value
-        if self.feature[self.feature_key] is None:
             self.noneUI()
             return
         self.entries = {}
@@ -308,14 +344,15 @@ class PopOutUI(InputUI, tk.Frame):
         self.edit_window.protocol("WM_DELETE_WINDOW", self.exit_editor)
         self.editor = self.validator.ui(
             self.edit_window, self.title_string, self.feature,
-            self.feature_key)
+            self.feature_key, pop_out=False)
         self.editor.pack(fill=tk.BOTH)
 
     def exit_editor(self):
         # TODO: Make sure last-edited value gets saved when window is destroyed
         self.edit_window.destroy()
         try:
-            if "name" in self.feature[self.feature_key]:
+            if ("name" in self.feature[self.feature_key] and
+                    self.featre[self.feature_key]["name"] != ""):
                 self.title_string = self.feature[self.feature_key]["name"]
                 self.reset_label()
         except:
@@ -389,17 +426,23 @@ class IterableUI(InputUI, tk.Frame):
     """Tkinter widget for inputting several of the same type of value"""
 
     def __init__(self, parent, title, validator, feature, feature_key):
-        if feature[feature_key] is not None:
-            try:
-                feature[feature_key][0] = feature[feature_key][0]
-            except (TypeError, IndexError):
-                feature[feature_key] = list(feature[feature_key])
         super(IterableUI, self).__init__(
             parent, title, validator, feature, feature_key)
 
     def initUI(self):
         self.create_label()
-        if self.feature[self.feature_key] is None:
+        try:  # Test for item assignment
+            self.feature[
+                self.feature_key][0] = self.feature[self.feature_key][0]
+        except TypeError:  # Item assignment unavailable
+            try:
+                self.feature[self.feature_key] = list(
+                    self.feature[self.feature_key])
+            except TypeError:  # Feature value is None
+                self.noneUI()
+                return
+        except (KeyError, IndexError):  # feature_key not yet assigned or len 0
+                                        # iterable
             self.noneUI()
             return
         self.entry = []
@@ -421,9 +464,45 @@ class OptionUI(InputUI, tk.Frame):
 
     def initUI(self):
         self.create_label()
+        try:
+            if self.feature[self.feature_key] is None:
+                self.noneUI()
+                return
+        except KeyError:
+            self.noneUI()
+            return
         self.entry = tk.OptionMenu(
             self, self.entry_value, *self.validator.valid_menu_items)
         self.entry.pack(anchor=tk.W, side=tk.LEFT)
+
+
+class UpdateOptionUI(InputUI, tk.Frame):
+    """Tkinter widget for selecting from an updateable list of options"""
+
+    def destroy(self):
+        self.validate(self.entry_value.get())
+        super(UpdateOptionUI, self).destroy()
+
+    def create_entry(self):
+        try:
+            self.entry.destroy()
+        except AttributeError:
+            pass
+        self.entry = tk.OptionMenu(
+            self, self.entry_value, *self.validator.valid_options)
+        self.entry.bind("<FocusIn>", self.create_entry)
+        self.entry.pack(anchor=tk.W, side=tk.LEFT)
+
+    def initUI(self):
+        self.create_label()
+        try:
+            if self.feature[self.feature_key] is None:
+                self.noneUI()
+                return
+        except KeyError:
+            self.noneUI()
+            return
+        self.create_entry()
 
 
 class NonFeatureUI(tk.Frame):
@@ -569,3 +648,68 @@ class FeatureDictUI(InputUI, tk.Frame):
             self.key_label = self.validator.key_label
         else:
             self.key_label = "Key"
+
+
+class ListUI(InputUI, ttk.LabelFrame):
+
+    def __init__(
+            self, parent, title, validator, feature, feature_key,
+            item_label="Item", pop_out=False):
+        self.add_label = "Add {}...".format(item_label)
+        self.item_label = item_label
+        super(ListUI, self).__init__(
+            parent, title, validator, feature, feature_key)
+        self.config(text=self.title_string)
+        self.pop_out = pop_out
+
+    def create_add_button(self):
+        try:
+            self.add_button.destroy()
+        except AttributeError:
+            pass
+        self.add_button = tk.Button(
+            self.scroll_area.inside_frame, text=self.add_label,
+            command=self.add_item)
+        self.add_button.pack(fill=tk.X, expand=0)
+
+    def add_item(self):
+        self.feature[self.feature_key].append(
+            self.validator.base_validator.def_value)
+        self.entries.append(self.validator.base_validator.ui(
+            self.scroll_area.inside_frame,
+            "{} {}".format(
+                self.item_label, len(self.feature[self.feature_key]) - 1),
+            self.feature[self.feature_key],
+            len(self.feature[self.feature_key]) - 1,
+            pop_out=self.pop_out)
+        )
+        new_entry = self.entries[-1]
+        destroy_button = tk.Button(
+            self.entries[-1], text="Delete",
+            command=lambda: self.remove_feature(new_entry.feature_key)
+        )
+        new_entry.pack(anchor=tk.NW)
+        destroy_button.pack(side=tk.LEFT, fill=tk.X)
+        self.create_add_button()
+
+    def remove_feature(self, index):
+        removed_entry = self.entries.pop(index)
+        removed_entry.destroy()
+        self.feature[self.feature_key].pop(index)
+        for i in range(len(self.entries)):
+            if i >= index:
+                self.entries[i].feature_key += -1
+            if "name" not in self.entries[
+                    i].feature[self.entries[i].feature_key]:
+                self.entries[i].title_string = "{} {}".format(
+                    self.item_label, i)
+            self.entries[i].reset_label()
+
+    def initUI(self):
+        if self.feature[self.feature_key] is None:
+            self.noneUI()
+            return
+        self.entries = []
+        self.scroll_area = ScrollableFrame(self)
+        self.scroll_area.pack(fill=tk.BOTH, expand=1)
+        self.create_add_button()

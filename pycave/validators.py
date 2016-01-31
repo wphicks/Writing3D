@@ -2,25 +2,40 @@
 
 import re
 import os
+import warnings
 from collections import defaultdict
-from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
-    PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI, FileUI
+try:
+    from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
+        PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI, FileUI,\
+        TextUI, UpdateOptionUI, ListUI
+except ImportError:
+    warnings.warn(
+        "Could not load tkinter; GUI editor will not be available")
+
 
 PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
 
 
 class Validator(object):
-    """Callable object for validating input"""
+    """Callable object for validating input
 
-    def __init__(self):
+    :param CaveProject project: The project this validator is being used for.
+    If specified, this allows for consistency checks between related elements
+    of the project."""
+
+    def __init__(self, project=None):
         self.help_string = "No help available for this option"
         # def_value is an attribute used to provide some guidance on a
         # reasonable value to default to when first creating an instance of
         # this option in a GUI environment
         self.def_value = ""
+        self.project = project
 
     def __call__(self, value):
         return False
+
+    def set_project(self, project):
+        self.project = project
 
     def help(self):
         return self.help_string
@@ -45,6 +60,11 @@ class TextValidator(Validator):
         new_value = str(value)
         return new_value
 
+    def ui(self, parent, label, feature, feature_key, pop_out=True):
+        if pop_out:
+            return PopOutUI(parent, label, self, feature, feature_key)
+        return TextUI(parent, label, self, feature, feature_key)
+
 
 class ValidPyString(Validator):
     """Callable object for checking if string can be used as part of a Python
@@ -56,7 +76,7 @@ class ValidPyString(Validator):
         self.def_value = ""
 
     def __call__(self, value):
-        return bool(PY_ID_REGEX.match(str(value)))
+        return bool(PY_ID_REGEX.match(str(value))) or not len(str(value))
 
     def coerce(self, value):
         new_value = str(value)
@@ -113,6 +133,80 @@ class OptionListValidator(Validator):
         if pop_out:
             return PopOutUI(parent, label, self, feature, feature_key)
         return OptionUI(parent, label, self, feature, feature_key)
+
+
+class ListValidator(Validator):
+    """Used to validate an option which takes a list of values
+
+    :param Validator base_validator: Used to validate each item in list"""
+
+    def __init__(self, base_validator, item_label="Item", help_string=None):
+        self.base_validator = base_validator
+        self.item_label = item_label
+        if help_string is None:
+            self.help_string = "No help available for this option"
+        else:
+            self.help_string = help_string
+
+    @property
+    def def_value(self):
+        return []
+
+    def __call__(self, iterable):
+        for value in iterable:
+            if not self.base_validator(value):
+                return False
+        return True
+
+    def ui(self, parent, label, feature, feature_key, pop_out=False):
+        return ListUI(
+            parent, label, self, feature, feature_key,
+            item_label=self.item_label, pop_out=pop_out)
+
+
+class ProjectOptionValidator(Validator):
+    """OptionListValidator populated with options specified in a CaveProject
+
+    For example, this validator could be used to select from the objects in a
+    particular project
+    :param Validator fallback_validator: A fallback validator used in case
+    project has not been set for this validator
+    :param project_option_selector: A callable that takes a CaveProject as
+    input and returns a list of strings representing valid options"""
+
+    def __init__(
+            self, fallback_validator, project_option_selector, project=None,
+            help_string=None):
+        self.project = project
+        if help_string is None:
+            self.help_string = "No help available for this option"
+        else:
+            self.help_string = help_string
+        self.fallback_validator = fallback_validator
+        self.def_value = self.fallback_validator.def_value
+        self.project_option_selector = project_option_selector
+        self._valid_options = []
+
+    def __call__(self, value):
+        if self.project is None:
+            return self.fallback_validator(value)
+        return value in self.valid_options
+
+    @property
+    def valid_options(self):
+        for option in self.project_option_selector(self.project):
+            if option not in self._valid_options:
+                self._valid_options.append(option)
+        self._valid_options.sort()
+        return self._valid_options
+
+    def ui(self, parent, label, feature, feature_key, pop_out=False):
+        if pop_out:
+            return PopOutUI(parent, label, self, feature, feature_key)
+        if self.project is None:
+            return self.fallback_validator.ui(
+                parent, label, feature, feature_key, pop_out=False)
+        return UpdateOptionUI(parent, label, self, feature, feature_key)
 
 
 class IsBoolean(OptionListValidator):
