@@ -20,7 +20,7 @@
 Here, actions refer generically to any discrete change in elements of a W3D
 project
 """
-#import warnings
+import warnings
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .placement import W3DPlacement
@@ -30,14 +30,15 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
 from .errors import BadW3DXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name, generate_group_name
-from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
-    ColorAction, LinkAction, TimelineStarter, TriggerEnabler, SceneReset,\
-    ScaleAction
-#try:
-#    import bpy
-#except ImportError:
-#    warnings.warn(
-#        "Module bpy not found. Loading pyw3d.actions as standalone")
+try:
+    from .blender_actions import ActionCondition, VisibilityAction,\
+        MoveAction, ColorAction, LinkAction, TimelineStarter, TriggerEnabler,\
+        SceneReset, ScaleAction
+except ImportError:
+    warnings.warn(
+        "Could not import from blender_actions submodule. Loading"
+        "pyw3d.actions as standalone."
+    )
 
 
 class W3DAction(W3DFeature):

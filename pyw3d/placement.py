@@ -46,8 +46,10 @@ def convert_to_legacy_axes(vector):
     return tuple((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
 
 
-def matrix_from_look(look_direction, up_direction=mathutils.Vector((0, 1, 0))):
+def matrix_from_look(look_direction, up_direction=None):
     """Create rotation_matrix from look-at direction"""
+    if up_direction is None:  # Gracefully handle no mathutils module
+        up_direction = mathutils.Vector((0, 1, 0))
     rotation_matrix = mathutils.Matrix.Rotation(0, 4, (0, 0, 1))
     frame_y = look_direction
     frame_x = frame_y.cross(up_direction)
