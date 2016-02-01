@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for enabling/disabling triggers in Blender"""
-from pycave.names import generate_trigger_name
+from pyw3d.names import generate_trigger_name
 
 
 class TriggerEnabler(object):

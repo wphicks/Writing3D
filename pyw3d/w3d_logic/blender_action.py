@@ -21,7 +21,7 @@ try:
     import bpy
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.objects as standalone")
+        "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
 class BlenderAction(object):

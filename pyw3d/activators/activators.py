@@ -18,12 +18,12 @@
 """Classes used to initiate actions in Blender
 """
 import warnings
-from pycave.errors import EBKAC
+from pyw3d.errors import EBKAC
 try:
     import bpy
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.timeline as standalone")
+        "Module bpy not found. Loading pyw3d.timeline as standalone")
 
 
 class Activator(object):

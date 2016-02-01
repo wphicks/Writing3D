@@ -26,7 +26,7 @@ try:
     import bpy
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.actions as standalone")
+        "Module bpy not found. Loading pyw3d.actions as standalone")
 
 
 class W3DGroup(W3DFeature):

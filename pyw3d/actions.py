@@ -37,7 +37,7 @@ from .blender_actions import ActionCondition, VisibilityAction, MoveAction,\
 #    import bpy
 #except ImportError:
 #    warnings.warn(
-#        "Module bpy not found. Loading pycave.actions as standalone")
+#        "Module bpy not found. Loading pyw3d.actions as standalone")
 
 
 class W3DAction(W3DFeature):

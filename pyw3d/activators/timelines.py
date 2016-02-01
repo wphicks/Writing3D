@@ -17,7 +17,7 @@
 
 """A Blender-based timeline implementation
 """
-from pycave.names import generate_blender_timeline_name
+from pyw3d.names import generate_blender_timeline_name
 from .activators import Activator
 
 

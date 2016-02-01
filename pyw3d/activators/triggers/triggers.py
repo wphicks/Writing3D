@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """A Blender-based implementation of event triggers"""
-from pycave.names import generate_trigger_name
-from pycave.activators import Activator
+from pyw3d.names import generate_trigger_name
+from pyw3d.activators import Activator
 
 
 class BlenderTrigger(Activator):

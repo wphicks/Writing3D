@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for starting, pausing, etc. timelines in Blender"""
-from pycave.names import generate_blender_timeline_name
-from pycave.errors import EBKAC
+from pyw3d.names import generate_blender_timeline_name
+from pyw3d.errors import EBKAC
 
 
 class TimelineStarter(object):

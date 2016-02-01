@@ -23,7 +23,7 @@ try:
 except ImportError:
     warnings.warn(
         "Module bpy not found. \
-Loading pycave.cave_logic.blender_trigger as standalone")
+Loading pyw3d.cave_logic.blender_trigger as standalone")
 
 
 def generate_project_root():

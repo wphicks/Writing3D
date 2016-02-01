@@ -28,7 +28,7 @@ import os
 sys.path.append(
     os.path.abspath(os.path.dirname(__file__))
 )
-from pycave import project
+from pyw3d import project
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font

@@ -29,7 +29,7 @@ try:
     import mathutils
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.objects as standalone")
+        "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
 def convert_to_blender_axes(vector):

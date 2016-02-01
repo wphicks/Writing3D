@@ -19,13 +19,13 @@
 """
 import warnings
 from .triggers import BlenderTrigger
-from pycave.errors import EBKAC
-from pycave.names import generate_link_name
+from pyw3d.errors import EBKAC
+from pyw3d.names import generate_link_name
 try:
     import bpy
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.timeline as standalone")
+        "Module bpy not found. Loading pyw3d.timeline as standalone")
 
 
 class BlenderClickTrigger(BlenderTrigger):

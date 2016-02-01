@@ -19,15 +19,15 @@
 """
 import math
 import warnings
-from pycave.names import generate_blender_object_name
-from pycave.errors import EBKAC
+from pyw3d.names import generate_blender_object_name
+from pyw3d.errors import EBKAC
 from .triggers import BlenderTrigger
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading "
-        "pycave.activators.triggers.look_triggers as standalone")
+        "pyw3d.activators.triggers.look_triggers as standalone")
 
 
 class BlenderLookAtTrigger(BlenderTrigger):

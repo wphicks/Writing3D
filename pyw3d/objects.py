@@ -25,7 +25,7 @@ from .errors import BadW3DXML, InvalidArgument, EBKAC
 from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from .features import W3DFeature
 from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
-    SoundAction, EventTriggerAction, MoveW3DAction, W3DResetAction
+    SoundAction, EventTriggerAction, MoveVRAction, W3DResetAction
 from .placement import W3DPlacement
 from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
@@ -38,7 +38,7 @@ try:
     import bpy
 except ImportError:
     warnings.warn(
-        "Module bpy not found. Loading pycave.objects as standalone")
+        "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
 def generate_material_from_image(filename):
@@ -90,7 +90,7 @@ class W3DLink(W3DFeature):
         "actions": ValidFeatureDict(
             [
                 W3DAction, ObjectAction, GroupAction, TimelineAction,
-                SoundAction, EventTriggerAction, MoveW3DAction,
+                SoundAction, EventTriggerAction, MoveVRAction,
                 W3DResetAction
             ],
             key_validator=IsNumeric(),

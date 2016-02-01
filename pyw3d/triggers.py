@@ -32,7 +32,7 @@ from .activators import BlenderTrigger, BlenderPositionTrigger, \
     BlenderPointTrigger, BlenderDirectionTrigger, BlenderLookObjectTrigger, \
     BlenderObjectPositionTrigger
 from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
-    SoundAction, EventTriggerAction, MoveW3DAction, W3DResetAction
+    SoundAction, EventTriggerAction, MoveVRAction, W3DResetAction
 
 
 class W3DTrigger(W3DFeature):
@@ -122,7 +122,7 @@ class BareTrigger(W3DFeature):
         "actions": MultiFeatureListValidator(
             [
                 W3DAction, ObjectAction, GroupAction, TimelineAction,
-                SoundAction, EventTriggerAction, MoveW3DAction,
+                SoundAction, EventTriggerAction, MoveVRAction,
                 W3DResetAction
             ],
             help_string="A list of W3DActions")

@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for dynamically changing clickable links in Blender"""
-from pycave.names import generate_link_name, generate_blender_object_name
-from pycave.errors import EBKAC
+from pyw3d.names import generate_link_name, generate_blender_object_name
+from pyw3d.errors import EBKAC
 
 
 class LinkAction(object):

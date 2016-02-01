@@ -19,14 +19,14 @@
 virtual space
 """
 import warnings
-from pycave.errors import EBKAC
+from pyw3d.errors import EBKAC
 from .triggers import BlenderTrigger
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading "
-        "pycave.activators.triggers.object_triggers as standalone")
+        "pyw3d.activators.triggers.object_triggers as standalone")
 
 # TODO: There's some code reuse happening between this and object_triggers
 

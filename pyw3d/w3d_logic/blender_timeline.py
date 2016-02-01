@@ -24,7 +24,7 @@ try:
 except ImportError:
     warnings.warn(
         "Module bpy not found. \
-Loading pycave.cave_logic.blender_trigger as standalone")
+Loading pyw3d.cave_logic.blender_trigger as standalone")
 
 class BlenderTimeline(TimedTrigger):
     """A control structure within Blender for implementing timelines
