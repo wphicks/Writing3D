@@ -202,16 +202,17 @@ class Installer(tk.Frame):
                 for line in writer_script:
                     if "BLENDEREXECSUBTAG" in line:
                         new_writer_script.write(
-                            "BLENDER_EXEC = {}  # BLENDEREXECSUBTAG\n".format(
+                            "BLENDER_EXEC = '{}'".format(
                                 os.path.join(
                                     self.blender_directory,
                                     BLENDER_EXECS[CURRENT_OS][0]
                                 )
                             )
                         )
+                        new_writer_script.write("  # BLENDEREXECSUBTAG\n")
                     elif "BLENDERPLAYERSUBTAG" in line:
                         new_writer_script.write(
-                            "BLENDER_PLAY = {}".format(
+                            "BLENDER_PLAY = '{}'".format(
                                 os.path.join(
                                     self.blender_directory,
                                     BLENDER_EXECS[CURRENT_OS][1]
