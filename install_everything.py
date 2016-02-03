@@ -118,7 +118,7 @@ def warn(message):
     dismiss.pack()
 
 
-class InstallerGUI(tk.Frame):
+class Installer(tk.Frame):
     """GUI installer for Writing3D"""
 
     def choose_install_directory(self):
@@ -161,27 +161,27 @@ class InstallerGUI(tk.Frame):
         if self.blender_directory is not None:
             self.next_button.config(state=tk.NORMAL)
 
-    def check_blender_queue(self):
-        pass
-
     def install_blender(self):
-        progress = ttk.Progressbar(
+        self.progress = ttk.Progressbar(
             self.interior, orient="horizontal", mode="indeterminate"
         )
-        progress.pack(expand=1, fill=tk.X, side=tk.BOTTOM)
-        progress.start(50)
+        self.progress.pack(expand=1, fill=tk.X, side=tk.BOTTOM)
+        self.progress.start(50)
+        #TODO: Make download threaded
 
-        self.queue = Queue.Queue()
-
-        self.blender_installer = BlenderInstaller(
-            DOWNLOAD_URLS[CURRENT_OS][IS_64_BIT],
-            self.install_directory)
-
+        os.chdir(self.install_directory)
+        filename = urlretrieve(DOWNLOAD_URLS[CURRENT_OS][IS_64_BIT])[0]
+        if CURRENT_OS in ("Linux", "Other"):
+            with tarfile.TarFile(filename) as install_file:
+                install_file.extractall(path="blender")
+        else:
+            with zipfile.ZipFile(filename) as install_file:
+                install_file.extractall(path="blender")
         self.blender_directory = os.path.join(
             self.install_directory, "blender")
         if self.blender_directory is not None:
             self.next_button.config(state=tk.NORMAL)
-        progress.destroy()
+        self.progress.destroy()
         self.next_slide()
 
     def install_w3d(self):
@@ -378,39 +378,12 @@ on your system configuration.""".format(self.writer_script_location),
         self.initUI()
 
 
-class BlenderInstaller(object):
-
-    def __init__(self, url, directory):
-        self.url = url
-        self.directory = directory
-
-    def __call__(self):
-        os.chdir(self.directory)
-        filename = urlretrieve(self.url)[0]
-        if CURRENT_OS in ("Linux", "Other"):
-            with tarfile.TarFile(filename) as install_file:
-                install_file.extractall(path="blender")
-        else:
-            with zipfile.ZipFile(filename) as install_file:
-                install_file.extractall(path="blender")
-
-
-class ThreadedInstaller(object):
-
-    def install_blender(self):
-
-    def __init__(self, parent):
-        self.parent = parent
-        self.queue = Queue.Queue()
-        self.gui = InstallerGUI(self.parent)
-
-
 def start_installer():
     root = tk.Tk()
     #width = root.winfo_screenwidth()
     #height = root.winfo_screenheight()
     #root.geometry("{}x{}".format(width, height))
-    ThreadedInstaller(root)
+    Installer(root)
     root.mainloop()
 
 if __name__ == "__main__":
