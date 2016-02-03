@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (C) 2016 William Hicks
 #
 # This file is part of Writing3D.
@@ -32,6 +33,9 @@ from pyw3d import project
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
+
+BLENDER_EXEC = "blender"  # BLENDEREXECSUBTAG
+BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
 
 
 class W3DWriter(tk.Frame):

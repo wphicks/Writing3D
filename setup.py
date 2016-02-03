@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-from setuptools import setup
+import warnings
+try:
+    from setuptools import setup
+    warnings.warn("setuptools not found. Using distutils for install")
+except ImportError:
+    from distutils import setup
 
 setup(
     name="Writing3D",
@@ -10,6 +15,7 @@ setup(
     license="GPL",
     keywords="virtual modeling art literature",
     url="https://github.com/wphicks/Writing3D",
+    scripts=['w3d_writer.py'],
     packages=[
         "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
         "pyw3d.w3d_logic", "pyw3d.activators.triggers"
