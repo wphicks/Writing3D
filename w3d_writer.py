@@ -29,7 +29,7 @@ import os
 sys.path.append(
     os.path.abspath(os.path.dirname(__file__))
 )
-from pyw3d import project
+from pyw3d import ui, project
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
@@ -45,12 +45,12 @@ class W3DWriter(tk.Frame):
         super(W3DWriter, self).__init__(parent, background="white")
         self.parent = parent
         self.font = font.Font(family="Helvetica", size=12)
-        self.project = project.W3DProject()
+        self.project = ui.W3DProject()
         self.initUI()
 
     def generate_tabs(self):
         self.tabs = {}
-        self.tabs["project"] = project.ProjectOptions(
+        self.tabs["project"] = ui.ProjectOptions(
             self.interface, self.project)
         for category in ["objects", "groups", "timelines", "trigger_events"]:
             self.tabs[category] = project.W3DProject.argument_validators[

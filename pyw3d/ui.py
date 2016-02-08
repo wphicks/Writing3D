@@ -20,6 +20,43 @@
 import tkinter as tk
 import tkinter.filedialog
 from tkinter import ttk
+from .project import W3DProject
+
+
+class ProjectOptions(tk.Frame):
+    """A frame for providing global project option input"""
+
+    def __init__(self, parent, project):
+        super(ProjectOptions, self).__init__(parent)
+        self.parent = parent
+        self.project = project
+        self.initUI()
+
+    def add_entries(self):
+        self.entries = {}
+        self.entries["far_clip"] = W3DProject.argument_validators[
+            "far_clip"].ui(self, "Camera far clip", self.project, "far_clip")
+        self.entries["background"] = W3DProject.argument_validators[
+            "background"].ui(
+            self, "Background color", self.project, "background")
+        self.entries["allow_movement"] = W3DProject.argument_validators[
+            "allow_movement"].ui(
+            self, "Allow movement", self.project, "allow_movement")
+        self.entries["allow_rotation"] = W3DProject.argument_validators[
+            "allow_rotation"].ui(
+            self, "Allow rotation", self.project, "allow_movement")
+        self.entries["camera_placement"] = W3DProject.argument_validators[
+            "camera_placement"].ui(
+            self, "Camera placement", self.project, "camera_placement")
+
+    def initUI(self):
+        self.add_entries()
+        self.title_string = "Global Options"
+        for option in [
+                "far_clip", "background", "allow_movement", "allow_rotation",
+                "camera_placement"]:
+            self.entries[option].pack(anchor=tk.W)
+        self.pack(fill=tk.BOTH, expand=1)
 
 
 class InputUI(object):
@@ -30,6 +67,14 @@ class InputUI(object):
     :param str title: A title to label this widget,
     :param W3DFeature feature: The feature whose options are being modified
     :param feature_key: The key for the particular option being modified"""
+
+    def set_project(self, project):
+        """Set the current W3DProject for this UI widget
+
+        :param W3DProject project: The project for this widget"""
+        self.validator.set_project(project)
+        self.destroy()
+        self.initUI()
 
     def help_bubble(self):
         top = tk.Toplevel()
@@ -73,6 +118,10 @@ class InputUI(object):
 
     def initUI(self):
         """Add all elements to build up this widget"""
+        try:
+            self.entry_value.set(str(self.feature[self.feature_key]))
+        except (KeyError, IndexError):
+            pass
         self.create_label()
 
     def evaluate(self, value):
@@ -138,7 +187,7 @@ class TextUI(InputUI, tk.Frame):
         self.editor = tk.Text(self)
         try:
             self.editor.insert(tk.END, self.feature[self.feature_key])
-        except KeyError:
+        except (KeyError, IndexError):
             pass
         self.editor.bind("<FocusOut>", self.validate)
         self.editor.pack(fill=tk.BOTH, expand=1)
@@ -157,6 +206,10 @@ class FileUI(InputUI, tk.Frame):
     def initUI(self):
         self.create_label()
         vcmd = (self.register(self.validate), '%P')
+        try:
+            self.entry_value.set(str(self.feature[self.feature_key]))
+        except (KeyError, IndexError):
+            pass
         self.entry = tk.Entry(
             self, validate='focusout', validatecommand=vcmd,
             textvariable=self.entry_value)
@@ -433,6 +486,10 @@ class BaseUI(InputUI, tk.Frame):
     def initUI(self):
         self.create_label()
         vcmd = (self.register(self.validate), '%P')
+        try:
+            self.entry_value.set(str(self.feature[self.feature_key]))
+        except (KeyError, IndexError):
+            pass
         self.entry = tk.Entry(
             self, validate='focusout', validatecommand=vcmd,
             textvariable=self.entry_value)
@@ -488,6 +545,10 @@ class OptionUI(InputUI, tk.Frame):
         except KeyError:
             self.noneUI()
             return
+        try:
+            self.entry_value.set(str(self.feature[self.feature_key]))
+        except (KeyError, IndexError):
+            pass
         self.entry = tk.OptionMenu(
             self, self.entry_value, *self.validator.valid_menu_items)
         self.entry.pack(anchor=tk.W, side=tk.LEFT)
@@ -519,6 +580,10 @@ class UpdateOptionUI(InputUI, tk.Frame):
         except KeyError:
             self.noneUI()
             return
+        try:
+            self.entry_value.set(str(self.feature[self.feature_key]))
+        except (KeyError, IndexError):
+            pass
         self.create_entry()
 
 
