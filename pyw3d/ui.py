@@ -632,11 +632,13 @@ class NonFeatureUI(tk.Frame):
             textvariable=self.entry_value)
         self.entry.pack(side=tk.LEFT, anchor=tk.NW, fill=tk.X, expand=1)
 
-    def __init__(self, parent, title, validator):
+    def __init__(self, parent, title, validator, default_value=None):
         self.parent = parent
         self.title_string = title
         self.validator = validator
         self.entry_value = tk.StringVar()
+        if default_value is not None:
+            self.entry_value.set(str(default_value))
         super(NonFeatureUI, self).__init__(self.parent)
         self.initUI()
 
