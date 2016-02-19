@@ -24,7 +24,7 @@ import os
 import zipfile
 import tarfile
 import subprocess
-from urllib.request import urlretrieve  # TODO: Deprecated
+from urllib.request import urlopen
 
 CURRENT_OS = platform.system()
 if CURRENT_OS in ['Darwin']:
@@ -161,24 +161,49 @@ class Installer(tk.Frame):
         if self.blender_directory is not None:
             self.next_button.config(state=tk.NORMAL)
 
-    def install_blender(self):
+    def download_blender(self):
+        chunk = self.url_response.read(16*1024)
+        if chunk:
+            self.download_file.write(chunk)
+            self.progress.step(16/1024.)
+            self.after(1, self.download_blender)
+        else:
+            self.download_file.close()
+            self.install_blender()
+
+    def start_blender_install(self):
+        self.next_button.config(state=tk.DISABLED)
         self.progress = ttk.Progressbar(
             self.interior, orient="horizontal", mode="indeterminate"
         )
         self.progress.pack(expand=1, fill=tk.X, side=tk.BOTTOM)
-        self.progress.start(50)
-        #TODO: Make download threaded
-
         os.chdir(self.install_directory)
-        filename = urlretrieve(DOWNLOAD_URLS[CURRENT_OS][IS_64_BIT])[0]
+        #TODO: This is ugly
+        self.downloading = True
+        self.url_response = urlopen(DOWNLOAD_URLS[CURRENT_OS][IS_64_BIT])
         if CURRENT_OS in ("Linux", "Other"):
-            with tarfile.TarFile(filename) as install_file:
+            self.download_filename = os.path.join(
+                self.install_directory, "blender.tar.bz2")
+        else:
+            self.download_filename = os.path.join(
+                self.install_directory, "blender.zip")
+        self.download_file = open(self.download_filename, 'wb')
+        self.after(1, self.download_blender)
+
+    def install_blender(self):
+        filename = self.download_filename
+        if CURRENT_OS in ("Linux", "Other"):
+            with tarfile.open(filename, "r:bz2") as install_file:
+                self.blender_directory = os.path.join(
+                    self.install_directory, "blender",
+                    install_file.next().name)
                 install_file.extractall(path="blender")
         else:
-            with zipfile.ZipFile(filename) as install_file:
+            with zipfile.open(filename) as install_file:
+                self.blender_directory = os.path.join(
+                    self.install_directory, "blender",
+                    install_file.next().name)
                 install_file.extractall(path="blender")
-        self.blender_directory = os.path.join(
-            self.install_directory, "blender")
         if self.blender_directory is not None:
             self.next_button.config(state=tk.NORMAL)
         self.progress.destroy()
@@ -279,8 +304,8 @@ installed and would like to use the previously-installed
 version, please click "Use Installed Version" Otherwise,
 select "Install Blender Now."
 
-Note: If you install Blender, this installer will hang for
-several minutes. Just wait, and it should proceed.
+Note: It may take several minutes to download and install
+Blender, depending on your network connection. Please wait.
 
 Please click the Next button to begin the install process.""",
                 font=self.font,
@@ -291,7 +316,7 @@ Please click the Next button to begin the install process.""",
                 command=self.use_old_blender)
             self.install_blender_button = tk.Button(
                 self.interior, text="Install Blender Now",
-                command=self.install_blender)
+                command=self.start_blender_install)
             self.use_old_button.pack(fill=tk.X, expand=1)
             self.install_blender_button.pack(fill=tk.X, expand=1)
             return
@@ -375,6 +400,7 @@ on your system configuration.""".format(self.writer_script_location),
         self.total_slides = 5
         self.install_directory = None
         self.blender_directory = None
+        self.downloading = True
         self.font = font.Font(family="Helvetica", size=14)
         self.initUI()
 
