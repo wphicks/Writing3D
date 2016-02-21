@@ -21,10 +21,11 @@ import re
 import os
 import warnings
 from collections import defaultdict
+from .structs import SortedList
 try:
     from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
         PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI, FileUI,\
-        TextUI, UpdateOptionUI, ListUI
+        TextUI, UpdateOptionUI, ListUI, ActionListUI
 except ImportError:
     warnings.warn(
         "Could not load tkinter; GUI editor will not be available")
@@ -545,5 +546,56 @@ class ValidFeatureDict(Validator):
         if pop_out:
             return PopOutUI(parent, label, self, feature, feature_key)
         return FeatureDictUI(
+            parent, label, self, feature, feature_key,
+            item_label=self.value_label)
+
+
+class ValidActionList(Validator):
+    """Check if input is SortedList of float, W3DAction tuples
+
+    :param class_list: A list of classes which are acceptable as values in this
+    dictionary
+    :param str key_label: A label indicating what the keys of this dictionary
+    are"""
+
+    def __init__(
+            self, class_list, key_label=None, help_string=None,
+            value_label="Item"):
+        if help_string is None:
+            self.help_string = "Must be a SortedList with float, W3DAction"
+            " tuples as elements"
+        else:
+            self.help_string = help_string
+
+        self.key_validator = IsNumeric()
+        self.key_label = key_label
+        self.value_label = value_label
+        self.value_validator = MultiFeatureValidator(
+            class_list, item_label=self.value_label)
+
+    @property
+    def def_value(self):
+        return SortedList()
+
+    def __call__(self, iterable):
+        for key, value in iterable:
+            if (
+                    not self.key_validator(key) or
+                    not self.value_validator(value)):
+                return False
+        return True
+
+    def coerce(self, dictionary):
+        new_dict = self.def_value
+        for key, value in dictionary.items():
+            new_dict[
+                self.key_validator.coerce(key)] = self.value_validator.coerce(
+                value)
+        return new_dict
+
+    def ui(self, parent, label, feature, feature_key, pop_out=False):
+        if pop_out:
+            return PopOutUI(parent, label, self, feature, feature_key)
+        return ActionListUI(
             parent, label, self, feature, feature_key,
             item_label=self.value_label)

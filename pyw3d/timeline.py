@@ -18,7 +18,6 @@
 """Tools for working with timelines in W3D projects
 """
 import xml.etree.ElementTree as ET
-from collections import MutableSequence
 from .features import W3DFeature
 from .actions import W3DAction
 from .validators import AlwaysValid, IsBoolean, ValidPyString
@@ -26,59 +25,7 @@ from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
 from .activators import BlenderTimeline
 from .errors import EBKAC
-
-
-class SortedList(MutableSequence):
-    """A list that is guaranteed to remain sorted
-
-    :param init_list: Initial list of elements (not necessarily sorted)
-    :param sort_key: Key function for sorting"""
-    def __init__(self, init_list=[], sort_key=None):
-        self.sort_key = sort_key
-        self._data = init_list
-        self.sort()
-
-    def __setitem__(self, index, value):
-        self._data.__setitem__(index, value)
-        self.sort()
-
-    def __delitem__(self, index):
-        del self._data[index]
-
-    def __len__(self):
-        return len(self._data)
-
-    def __getitem__(self, index):
-        return self._data[index]
-
-    def insert(self, index, new_item):
-        self._data.insert(index, new_item)
-
-    def add(self, new_item):
-        """Add new_item to list, maintaining proper ordering"""
-        for index, item in enumerate(self):
-            if self.sort_key is None:
-                if new_item < item:
-                    self._data.insert(index, new_item)
-                    return
-            else:
-                if self.sort_key(new_item) < self.sort_key(item):
-                    self._data.insert(index, new_item)
-                    return
-        self._data.insert(len(self), new_item)
-
-    def sort(self):
-        self._data.sort(key=self.sort_key)
-
-    def append(self, value):
-        self.add(value)
-
-    def extend(self, value_list):
-        for value in value_list:
-            self.add(value)
-
-    def reverse(self):
-        raise NotImplementedError("Cannot reverse a SortedList")
+from .structs import SortedList
 
 
 class W3DTimeline(W3DFeature):
