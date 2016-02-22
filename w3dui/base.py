@@ -30,6 +30,12 @@ def help_bubble(message):
     dismiss.pack()
 
 
+class InvalidInput(Exception):
+    """Exception thrown when invalid input value is given"""
+    def __init__(self, message):
+        super(InvalidInput, self).__init__(message)
+
+
 class InputUI(object):
     """Base class for building Tkinter input widgets
 
@@ -57,7 +63,9 @@ class InputUI(object):
         return True
 
     def get_input_value(self):
-        """Returns the current input value for this widget"""
+        """Returns the current input value for this widget
+
+        :raise InvalidInput: if input value can't be read as a valid value"""
         return None
 
     def set_input_value(self, value):
@@ -103,7 +111,10 @@ class W3DValidatorInput(InputUI):
     :param Validator validator: A W3D-style validator"""
 
     def validate_input(self):
-        return self.validator(self.get_input_value())
+        return (
+            self.validator(self.get_input_value()) and
+            super(W3DValidatorInput, self).validate_input()
+        )
 
     def __init__(
             self, parent, validator, initial_value=None,
@@ -111,46 +122,3 @@ class W3DValidatorInput(InputUI):
         self.validator = validator
         super(W3DValidatorInput, self).__init__(
             parent, initial_value=initial_value, error_message=error_message)
-
-
-class TextBlockInput(W3DValidatorInput, tk.Frame):
-    """Widget for inputting a formatted block of text"""
-
-    def get_input_value(self):
-        return self.entries[0].get("1.0", tk.END)
-
-    def set_input_value(self, value):
-        self.editor.insert(tk.END, str(value))
-
-    def _pack_entry_widgets(self):
-        super(TextBlockInput, self)._pack_entry_widgets(
-            pack_arguments={"fill": tk.BOTH, "expand": 1}
-        )
-
-    def initUI(self, initial_value=None):
-        self.entry_widgets.append(tk.Text(self))
-        super(TextBlockInput, self).initUI(initial_value=initial_value)
-
-
-class StringInput(W3DValidatorInput, tk.Frame):
-
-    def get_input_value(self):
-        return self.entry_value.get()
-
-    def set_input_value(self, value):
-        self.entry_value.set(value)
-
-    def initUI(self, initial_value=None):
-        self.entry_widgets.append(tk.Entry(
-            self, textvariable=self.entry_value))
-        super(StringInput, self).initUI(initial_value=initial_value)
-
-    def __init__(self, parent, validator, initial_value=None):
-        self.entry_value = tk.stringVar()
-        super(StringInput, self).__init__(
-            parent, validator, initial_value=None,
-            error_message="Invalid input")
-
-
-class FileInput(W3DValidatorInput, tk.Frame):
-    """Widget for inputting a filename"""
