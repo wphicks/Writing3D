@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""Tk widgets for inputting text-based W3D options"""
+"""Tk widgets for inputting numeric W3D options"""
 
 import tkinter as tk
 from .base import InputUI, InvalidInput
