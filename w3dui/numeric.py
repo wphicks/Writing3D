@@ -37,7 +37,7 @@ class NumericInput(InputUI, tk.Frame):
 
     def initUI(self, initial_value=None):
         self.entry_widgets.append(tk.Entry(
-            self, textvariable=self.entry_value))
+            self.target_frame, textvariable=self.entry_value))
         super(NumericInput, self).initUI(initial_value=initial_value)
 
     def __init__(self, parent, validator, initial_value=None):
@@ -51,7 +51,7 @@ ValidatedNumericInput = ValidatedWidget(NumericInput)
 """Widget for inputting a number with W3D-style validation"""
 
 
-class IntInput(InputUI, tk.Frame):
+class IntInput(NumericInput, tk.Frame):
     """Widget for inputting integer values"""
 
     def get_input_value(self):

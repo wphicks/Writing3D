@@ -32,6 +32,7 @@ from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
     MultiFeatureValidator, ValidFeatureDict, TextValidator, ValidFile
 from .names import generate_blender_object_name,\
     generate_blender_material_name
+from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
 import warnings
 try:
@@ -229,7 +230,7 @@ class W3DLink(W3DFeature):
                 "blend() must be called before write_blender_logic()")
 
 
-class W3DContent(W3DFeature):
+class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
     """Represents content of a W3D object"""
 
     blender_scaling = 1

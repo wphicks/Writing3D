@@ -17,7 +17,7 @@
 
 """Factories for creating modified versions of TK input widgets"""
 
-from .base import InputUI, W3DValidatorInput
+from .base import InputUI, W3DValidatorInput, ProjectInput
 
 
 def ValidatedWidget(
@@ -38,6 +38,32 @@ def ValidatedWidget(
     )
     return type(
         "".join(("Validated", base_widget.__name__)),
+        new_base_classes,
+        dict(base_widget.__dict__)
+    )
+
+
+def ProjectWidget(
+        base_widget, replacements={}):
+    """Create a version of a base input widget with an associated W3DProject
+    to store data to
+
+    :param class base_widget: A widget inheriting from InputUI
+    :param dict replacements: A dictionary mapping classes to validated
+    replacement classes"""
+    if InputUI not in replacements:
+        replacements[InputUI] = ProjectInput
+    if W3DValidatorInput not in replacements:
+        replacements[W3DValidatorInput] = ProjectInput
+    old_base_classes = base_widget.__bases__
+    new_base_classes = tuple(
+        [
+            (base, replacements[base])[base in replacements] for base in
+            old_base_classes
+        ]
+    )
+    return type(
+        "".join(("Project", base_widget.__name__)),
         new_base_classes,
         dict(base_widget.__dict__)
     )

@@ -39,7 +39,7 @@ class TextBlock(InputUI, tk.Frame):
         )
 
     def initUI(self, initial_value=None):
-        self.entry_widgets.append(tk.Text(self))
+        self.entry_widgets.append(tk.Text(self.target_frame))
         super(TextBlock, self).initUI(initial_value=initial_value)
 
 
@@ -63,7 +63,7 @@ class StringInput(InputUI, tk.Frame):
 
     def initUI(self, initial_value=None):
         self.entry_widgets.append(tk.Entry(
-            self, textvariable=self.entry_value))
+            self.target_frame, textvariable=self.entry_value))
         super(StringInput, self).initUI(initial_value=initial_value)
 
     def __init__(self, parent, validator, initial_value=None):

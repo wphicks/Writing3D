@@ -42,6 +42,11 @@ class InputUI(object):
     Classes that inherit from InputUI should also inherit from a TK widget like
     tk.Frame or ttk.LabelFrame
     :param parent: The parent widget for this widget
+    :param initial_value: The initial value for this input option
+    :param str error_message: An error message to be displayed if this option
+    received invalid input
+    :ivar target_frame: The widget that should act as a parent for child
+    widgets. This is usually self but need not necessarily be so
     """
 
     def destroy(self):
@@ -88,21 +93,22 @@ class InputUI(object):
             self.entry_widgets.pack(**pack_arguments)
 
     def initUI(self, initial_value=None):
-        """Set up all necessary children
-
-        This can safely be called multiple times to reset the UI, e.g. when a
-        new project is loaded"""
+        """Set up all necessary child widgets
+        """
         self.set_input_value(initial_value)
         self._pack_entry_widgets()
-        for entry in self.entry_widgets:
-            entry.bind("<FocusOut>", self._process_input)
+        self.bind("<FocusOut>", self._process_input)
 
     def __init__(
             self, parent, initial_value=None, error_message="Invalid input"):
-        super(InputUI, self).__init__(parent)  # Base TK widget __init__
+        try:  # Base TK widget __init__
+            super(InputUI, self).__init__(parent.target_frame)
+        except AttributeError:
+            super(InputUI, self).__init__(parent)
         self.entry_widgets = []
         self.error_message = error_message
         self.initUI(initial_value=initial_value)
+        self.target_frame = self
 
 
 class W3DValidatorInput(InputUI):
@@ -118,7 +124,35 @@ class W3DValidatorInput(InputUI):
 
     def __init__(
             self, parent, validator, initial_value=None,
-            error_message="Invalid input"):
+            error_message=None):
         self.validator = validator
+        if error_message is None:
+            error_message = self.validator.help_string
+        if initial_value is None:
+            initial_value = self.validator.def_value
         super(W3DValidatorInput, self).__init__(
             parent, initial_value=initial_value, error_message=error_message)
+
+
+class ProjectInput(W3DValidatorInput):
+    """TK widget for validating and storing options for a W3D-style project
+
+    This widget overrides methods from InputUI for storing and retrieving
+    W3DFeature options conveniently
+
+    :param ProjectPath project_path: Specifies the option associated with this
+    input widget"""
+
+    def get_stored_value(self):
+        return self.project_path.get_element()
+
+    def store_value(self):
+        self.project_path.set_element(self.get_input_value())
+
+    def __init__(
+            self, parent, validator, project_path, initial_value=None,
+            error_message=None):
+        self.project_path = project_path
+        super(ProjectInput, self).__init__(
+            parent, validator, initial_value=initial_value,
+            error_message=error_message)
