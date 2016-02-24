@@ -21,6 +21,7 @@ import tkinter as tk
 from tkinter import ttk
 from .base import ProjectInput
 from .widget_factories import widget_creator
+from pyw3d.path import UnsetValueError
 
 
 UI_ORDER_DICT = {
@@ -28,6 +29,31 @@ UI_ORDER_DICT = {
 
 
 class FeatureInput(ProjectInput, tk.Frame):
+    """Widget for editing an entire W3DFeature"""
+
+    def get_input_value(self):
+        try:
+            feature = self.get_stored_value()
+        except UnsetValueError:
+            feature = self.validator.def_value
+        for widget in self.entry_widgets:
+            try:
+                option_name = widget.project_path.get_specifier()
+            except AttributeError:
+                continue
+            feature[option_name] = widget.get_input_value()
+        return feature
+
+    def set_input_value(self, value):
+        for widget in self.entry_widgets:
+            try:
+                option_name = widget.project_path.get_specifier()
+            except AttributeError:
+                continue
+            try:
+                widget.set_input_value(value[option_name])
+            except KeyError:
+                widget.set_input_value(widget.validator.def_value)
 
     def _create_editor(self):
         """Generate widget for editing feature options"""

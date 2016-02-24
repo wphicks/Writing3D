@@ -18,13 +18,22 @@
 """Tk widgets for inputting entire W3D features"""
 
 from .base import ProjectInput, W3DValidatorInput
-from .text import ValidatedTextBlock, ValidatedStringInput, ValidatedFileInput
+from .text import ProjectTextBlock, ProjectStringInput, ProjectFileInput
+from .options import ProjectOptionInput, ReferenceInput
+from .collections import ListInput
+from .numeric import ProjectNumericInput
 
 
 VAL_UI_DICT = {
-    "TextValidator": ValidatedTextBlock,
-    "ValidPyString": ValidatedStringInput,
-    "ValidFile": ValidatedFileInput
+    "TextValidator": ProjectTextBlock,
+    "ValidPyString": ProjectStringInput,
+    "ValidFile": ProjectFileInput,
+    "OptionValidator": ProjectOptionInput,
+    "ListValidator": ListInput,
+    "ReferenceValidator": ReferenceInput,
+    "IsBoolean": ProjectOptionInput,
+    "IsNumeric": ProjectNumericInput,
+    "IsNumericIterable": ListInput
 }
 
 

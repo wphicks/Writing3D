@@ -19,7 +19,7 @@
 """
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
-from .validators import AlwaysValid, IsNumeric, OptionListValidator
+from .validators import AlwaysValid, IsNumeric, OptionValidator
 from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
 
@@ -46,7 +46,7 @@ class W3DSound(W3DFeature):
         "filename": AlwaysValid(
             help_string="This should be a string specifying the audio file"),
         "autostart": AlwaysValid(help_string="Either true or false"),
-        "movement_mode": OptionListValidator("Positional", "Fixed"),
+        "movement_mode": OptionValidator("Positional", "Fixed"),
         "repetitions": IsNumeric(),
         "frequency_scale": IsNumeric(min_value=0),
         "volume_scale": IsNumeric(min_value=0, max_value=1),

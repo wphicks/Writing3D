@@ -23,7 +23,7 @@ can be started."""
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
-    OptionListValidator, IsBoolean, ValidPyString, MultiFeatureListValidator,\
+    OptionValidator, IsBoolean, ValidPyString, MultiFeatureListValidator,\
     FeatureValidator
 from .errors import ConsistencyError, BadW3DXML, InvalidArgument, \
     EBKAC
@@ -220,7 +220,7 @@ class EventBox(W3DFeature):
     """
 
     argument_validators = {
-        "direction": OptionListValidator("Inside", "Outside"),
+        "direction": OptionValidator("Inside", "Outside"),
         "ignore_y": AlwaysValid(
             help_string="Either true or false"),
         "corner1": IsNumericIterable(required_length=3),
@@ -538,7 +538,7 @@ class MovementTrigger(W3DTrigger):
     of specified box
     """
     argument_validators = {
-        "type": OptionListValidator(
+        "type": OptionValidator(
             "Single Object", "Group(Any)", "Group(All)"),
         "object_name": AlwaysValid(
             help_string="Must be the name of an object or group"),

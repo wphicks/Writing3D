@@ -27,7 +27,7 @@ from .features import W3DFeature
 from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
     SoundAction, EventTriggerAction, MoveVRAction, W3DResetAction
 from .placement import W3DPlacement
-from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
+from .validators import OptionValidator, IsNumeric,  AlwaysValid,\
     IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
     MultiFeatureValidator, ValidFeatureDict, TextValidator, ValidFile
 from .names import generate_blender_object_name,\
@@ -269,9 +269,9 @@ class W3DText(W3DContent):
     """
     argument_validators = {
         "text": TextValidator(),
-        "halign": OptionListValidator(
+        "halign": OptionValidator(
             "left", "right", "center"),
-        "valign": OptionListValidator(
+        "valign": OptionValidator(
             "top", "center", "bottom"),
         "font": ValidFile("Filename of font"),
         "depth": IsNumeric()}
@@ -537,7 +537,7 @@ class W3DLight(W3DContent):
     source
     """
     argument_validators = {
-        "light_type": OptionListValidator("Point", "Directional", "Spot"),
+        "light_type": OptionValidator("Point", "Directional", "Spot"),
         "diffuse": IsBoolean(),
         "specular": IsBoolean(),
         "attenuation": IsNumericIterable(3),

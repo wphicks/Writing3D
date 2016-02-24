@@ -20,7 +20,7 @@
 import tkinter as tk
 import os
 from .base import InputUI, help_bubble
-from .factories import ValidatedWidget
+from .class_factories import ValidatedWidget, ProjectWidget
 
 
 class TextBlock(InputUI, tk.Frame):
@@ -45,6 +45,10 @@ class TextBlock(InputUI, tk.Frame):
 
 ValidatedTextBlock = ValidatedWidget(TextBlock)
 """Widget for inputting a text block with W3D-style validation"""
+
+
+ProjectTextBlock = ProjectWidget(TextBlock)
+"""Widget for inputting a text block as an element in a W3DProject"""
 
 
 class StringInput(InputUI, tk.Frame):
@@ -75,6 +79,10 @@ class StringInput(InputUI, tk.Frame):
 
 ValidatedStringInput = ValidatedWidget(StringInput)
 """Widget for inputting a string with W3D-style validation"""
+
+
+ProjectStringInput = ProjectWidget(StringInput)
+"""Widget for inputting a string as an element in a W3DProject"""
 
 
 class FileInput(StringInput, tk.Frame):
@@ -109,3 +117,7 @@ ValidatedFileInput = ValidatedWidget(
     FileInput, replacements={StringInput: ValidatedStringInput}
 )
 """Widget for inputting a filename with W3D-style validation"""
+
+
+ProjectFileInput = ProjectWidget(FileInput)
+"""Widget for inputting a filename as an element in a W3DProject"""

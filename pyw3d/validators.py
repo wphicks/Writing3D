@@ -22,6 +22,7 @@ import os
 import warnings
 from collections import defaultdict
 from .structs import SortedList
+from .path import ProjectPath
 try:
     from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
         PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI, FileUI,\
@@ -57,11 +58,6 @@ class Validator(object):
 
     def help(self):
         return self.help_string
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return BaseUI(parent, label, self, feature, feature_key)
 
 
 class TextValidator(Validator):
@@ -124,8 +120,9 @@ class ValidFile(Validator):
         return FileUI(parent, label, self, feature, feature_key)
 
 
-class OptionListValidator(Validator):
-    """Callable object that returns true if value is in given list"""
+class OptionValidator(Validator):
+    """Callable object that returns true if value is in given list of options
+    """
 
     def __init__(self, *valid_options):
         self.valid_options = valid_options
@@ -146,11 +143,6 @@ class OptionListValidator(Validator):
             return value
         return self.valid_options[
             self.valid_menu_items.index(str(value))]
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return OptionUI(parent, label, self, feature, feature_key)
 
 
 class ListValidator(Validator):
@@ -176,58 +168,61 @@ class ListValidator(Validator):
                 return False
         return True
 
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        return ListUI(
-            parent, label, self, feature, feature_key,
-            item_label=self.item_label, pop_out=pop_out)
 
-
-class ProjectOptionValidator(Validator):
-    """OptionListValidator populated with options specified in a W3DProject
+class ReferenceValidator(Validator):
+    """OptionValidator populated with options specified in a W3DProject
 
     For example, this validator could be used to select from the objects in a
     particular project
     :param Validator fallback_validator: A fallback validator used in case
     project has not been set for this validator
-    :param project_option_selector: A callable that takes a W3DProject as
-    input and returns a list of strings representing valid options"""
+    :param ProjectPath reference_path: The path to the project element that
+    will populate the available options
+    """
 
     def __init__(
-            self, fallback_validator, project_option_selector, project=None,
-            help_string=None):
-        self.project = project
+            self, fallback_validator, reference_path, help_string=None):
         if help_string is None:
             self.help_string = "No help available for this option"
         else:
             self.help_string = help_string
         self.fallback_validator = fallback_validator
         self.def_value = self.fallback_validator.def_value
-        self.project_option_selector = project_option_selector
-        self._valid_options = []
+        self.ref_path = reference_path
 
     def __call__(self, value):
-        if self.project is None:
+        if self.ref_path is None:
             return self.fallback_validator(value)
         return value in self.valid_options
 
+    def coerce(self, value):
+        if value in self.valid_options:
+            return value
+        else:
+            return self.valid_options[
+                self.valid_menu_items.index(value)]
+
+    @property
+    def valid_menu_items(self):
+        menu = []
+        project_element = self.path.get_element()
+        for option in self.valid_options:
+            try:
+                menu.append(project_element[option]["name"])
+            except KeyError:
+                menu.append(str(project_element[option]))
+
     @property
     def valid_options(self):
-        for option in self.project_option_selector(self.project):
-            if option not in self._valid_options:
-                self._valid_options.append(option)
-        self._valid_options.sort()
-        return self._valid_options
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        if self.project is None:
-            return self.fallback_validator.ui(
-                parent, label, feature, feature_key, pop_out=False)
-        return UpdateOptionUI(parent, label, self, feature, feature_key)
+        _valid_options = []
+        for option in self.ref_path.get_element():
+            if option not in _valid_options:
+                _valid_options.append(option)
+        _valid_options.sort()
+        return _valid_options
 
 
-class IsBoolean(OptionListValidator):
+class IsBoolean(OptionValidator):
     """Callable object that returns true if value is valid Boolean
 
     Since all Python objects can be evaluated as a Boolean, this always

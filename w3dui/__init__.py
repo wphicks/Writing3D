@@ -15,16 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""A module for working with W3D Writing projects
+"""A module for creating W3D Writing project GUIs
 """
-from . import project
-from . import features
-from . import objects
-from . import timeline
-from . import placement
-from . import errors
-from . import validators
-from . import xml_tools
-from . import ui
-from . import structs
-from . import path
+from . import base
+from . import class_factories
+from . import collections
+from . import feature
+from . import numeric
+from . import struct_widgets
+from . import text
+from . import widget_factories

@@ -24,8 +24,8 @@ import warnings
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .placement import W3DPlacement
-from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
-    IsNumericIterable, IsBoolean, FeatureValidator, ProjectOptionValidator,\
+from .validators import OptionValidator, IsNumeric,  AlwaysValid,\
+    IsNumericIterable, IsBoolean, FeatureValidator, ReferenceValidator,\
     ValidPyString
 from .errors import BadW3DXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
@@ -192,7 +192,7 @@ class ObjectAction(W3DAction):
     """
 
     argument_validators = {
-        "object_name": ProjectOptionValidator(
+        "object_name": ReferenceValidator(
             ValidPyString(),
             lambda proj: [obj["name"] for obj in proj["objects"]],
             help_string="Must be the name of an object"),
@@ -205,8 +205,8 @@ class ObjectAction(W3DAction):
         "color": IsNumericIterable(required_length=3),
         "scale": IsNumeric(min_value=0),
         #TODO
-        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
-        "link_change": OptionListValidator(
+        "sound_change": OptionValidator("Play Sound", "Stop Sound"),
+        "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
         }
 
@@ -350,8 +350,8 @@ class GroupAction(W3DAction):
         "move_relative": AlwaysValid("Either true or false"),
         "color": IsNumericIterable(required_length=3),
         "scale": IsNumeric(min_value=0),
-        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
-        "link_change": OptionListValidator(
+        "sound_change": OptionValidator("Play Sound", "Stop Sound"),
+        "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
         }
 
@@ -508,7 +508,7 @@ class TimelineAction(W3DAction):
 
     argument_validators = {
         "timeline_name": AlwaysValid("Name of a timeline"),
-        "change": OptionListValidator(
+        "change": OptionValidator(
             "Start", "Stop", "Continue", "Start if not started")
         }
 
@@ -605,7 +605,7 @@ class SoundAction(W3DAction):
 
     argument_validators = {
         "sound_name": AlwaysValid("Name of a sound"),
-        "change": OptionListValidator("Start", "Stop")
+        "change": OptionValidator("Start", "Stop")
         }
 
     default_arguments = {

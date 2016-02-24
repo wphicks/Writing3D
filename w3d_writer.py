@@ -30,6 +30,7 @@ sys.path.append(
     os.path.abspath(os.path.dirname(__file__))
 )
 from pyw3d import project
+import w3dui
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
@@ -41,11 +42,15 @@ BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
 class W3DWriter(tk.Frame):
     """GUI interface to 3D virtual environments"""
 
+    def get_input_value(self):
+        return self.project
+
     def __init__(self, parent):
         super(W3DWriter, self).__init__(parent, background="white")
         self.parent = parent
         self.font = font.Font(family="Helvetica", size=12)
         self.project = project.W3DProject()
+        self.project_path = w3dui.path.ProjectPath(self.project)
         self.initUI()
 
     def generate_tabs(self):
@@ -53,8 +58,9 @@ class W3DWriter(tk.Frame):
         self.tabs["project"] = project.ProjectOptions(
             self.interface, self.project)
         for category in ["objects", "groups", "timelines", "trigger_events"]:
-            self.tabs[category] = project.W3DProject.argument_validators[
-                category].ui(self.interface, category, self.project, category)
+            self.tabs[category] = w3dui.widget_factories.widget_creator(
+                input_parent=self, frame=self.interface, option_name=category,
+                project_path=self.project_path)
 
     def initUI(self):
         self.parent.title("W3D Writer")

@@ -30,12 +30,13 @@ def ValidatedWidget(
     if InputUI not in replacements:
         replacements[InputUI] = W3DValidatorInput
     old_base_classes = base_widget.__bases__
-    new_base_classes = tuple(
-        [
-            (base, replacements[base])[base in replacements] for base in
-            old_base_classes
-        ]
-    )
+    new_base_classes = []
+    for base in old_base_classes:
+        if base in replacements:
+            new_base_classes.append(replacements[base])
+        else:
+            new_base_classes.append(base)
+    new_base_classes = tuple(new_base_classes)
     return type(
         "".join(("Validated", base_widget.__name__)),
         new_base_classes,
@@ -56,12 +57,13 @@ def ProjectWidget(
     if W3DValidatorInput not in replacements:
         replacements[W3DValidatorInput] = ProjectInput
     old_base_classes = base_widget.__bases__
-    new_base_classes = tuple(
-        [
-            (base, replacements[base])[base in replacements] for base in
-            old_base_classes
-        ]
-    )
+    new_base_classes = []
+    for base in old_base_classes:
+        if base in replacements:
+            new_base_classes.append(replacements[base])
+        else:
+            new_base_classes.append(base)
+    new_base_classes = tuple(new_base_classes)
     return type(
         "".join(("Project", base_widget.__name__)),
         new_base_classes,

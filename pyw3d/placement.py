@@ -19,7 +19,7 @@
 import xml.etree.ElementTree as ET
 import math
 from .features import W3DFeature
-from .validators import OptionListValidator, IsNumericIterable, IsNumeric, \
+from .validators import OptionValidator, IsNumericIterable, IsNumeric, \
     FeatureValidator
 from .errors import BadW3DXML
 from .xml_tools import text2tuple
@@ -64,7 +64,7 @@ def matrix_from_look(look_direction, up_direction=None):
 class W3DRotation(W3DFeature):
     """Stores data on rotation of objects within W3D"""
     argument_validators = {
-        "rotation_mode": OptionListValidator(
+        "rotation_mode": OptionValidator(
             "None", "Axis", "LookAt", "Normal"),
         "rotation_vector": IsNumericIterable(3),
         "up_vector": IsNumericIterable(3),
@@ -156,7 +156,7 @@ class W3DPlacement(W3DFeature):
     specifying rotation
     """
     argument_validators = {
-        "relative_to": OptionListValidator(
+        "relative_to": OptionValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
         "position": IsNumericIterable(3),
         "rotation": FeatureValidator(W3DRotation)}

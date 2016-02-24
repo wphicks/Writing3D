@@ -18,7 +18,7 @@
 import warnings
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
-from .validators import ValidPyString, ListValidator, ProjectOptionValidator
+from .validators import ValidPyString, ListValidator, ReferenceValidator
 from .errors import BadW3DXML, ConsistencyError
 from .names import generate_group_name, \
     generate_blender_object_name
@@ -40,14 +40,14 @@ class W3DGroup(W3DFeature):
     argument_validators = {
         "name": ValidPyString(),
         "objects": ListValidator(
-            ProjectOptionValidator(
+            ReferenceValidator(
                 ValidPyString(),
                 lambda proj: [obj["name"] for obj in proj["objects"]],
                 help_string="Must be the name of an object"),
             item_label="Object",
             help_string="A list of names of objects"),
         "groups": ListValidator(
-            ProjectOptionValidator(
+            ReferenceValidator(
                 ValidPyString(),
                 lambda proj: [obj["name"] for obj in proj["groups"]],
                 help_string="Must be the name of a group"),

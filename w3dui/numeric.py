@@ -19,7 +19,7 @@
 
 import tkinter as tk
 from .base import InputUI, InvalidInput
-from .factories import ValidatedWidget
+from .class_factories import ValidatedWidget, ProjectWidget
 
 
 class NumericInput(InputUI, tk.Frame):
@@ -51,6 +51,10 @@ ValidatedNumericInput = ValidatedWidget(NumericInput)
 """Widget for inputting a number with W3D-style validation"""
 
 
+ProjectNumericInput = ProjectWidget(NumericInput)
+"""Widget for inputting a float as an element in a W3DProject"""
+
+
 class IntInput(NumericInput, tk.Frame):
     """Widget for inputting integer values"""
 
@@ -75,4 +79,9 @@ class IntInput(NumericInput, tk.Frame):
 
 ValidatedIntInput = ValidatedWidget(
     IntInput, replacements={NumericInput: ValidatedNumericInput})
-"""Widget for inputting a number with W3D-style validation"""
+"""Widget for inputting an int with W3D-style validation"""
+
+
+ProjectIntInput = ProjectWidget(
+    IntInput, replacements={NumericInput: ProjectNumericInput})
+"""Widget for inputting an int as an element in a W3DProject"""
