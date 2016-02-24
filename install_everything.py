@@ -199,7 +199,7 @@ class Installer(tk.Frame):
                     install_file.next().name)
                 install_file.extractall(path="blender")
         else:
-            with zipfile.open(filename) as install_file:
+            with zipfile.Zipfile(filename) as install_file:
                 self.blender_directory = os.path.join(
                     self.install_directory, "blender",
                     install_file.next().name)
