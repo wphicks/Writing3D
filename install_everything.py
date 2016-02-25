@@ -199,10 +199,10 @@ class Installer(tk.Frame):
                     install_file.next().name)
                 install_file.extractall(path="blender")
         else:
-            with zipfile.Zipfile(filename) as install_file:
+            with zipfile.ZipFile(filename) as install_file:
                 self.blender_directory = os.path.join(
                     self.install_directory, "blender",
-                    install_file.next().name)
+                    install_file.namelist()[0])
                 install_file.extractall(path="blender")
         if self.blender_directory is not None:
             self.next_button.config(state=tk.NORMAL)
@@ -210,7 +210,6 @@ class Installer(tk.Frame):
         self.next_slide()
 
     def install_w3d(self):
-        #TODO: URGENT Make download happen in a separate thread
         progress = ttk.Progressbar(
             self.interior, orient="horizontal", mode="indeterminate"
         )
