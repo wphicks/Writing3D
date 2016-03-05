@@ -18,34 +18,45 @@
 """Tk widgets for inputting entire W3D features"""
 
 from .base import ProjectInput, W3DValidatorInput
-from .text import ProjectTextBlock, ProjectStringInput, ProjectFileInput
-from .options import ProjectOptionInput, ReferenceInput
-from .collections import ListInput
-from .numeric import ProjectNumericInput
-
-
-VAL_UI_DICT = {
-    "TextValidator": ProjectTextBlock,
-    "ValidPyString": ProjectStringInput,
-    "ValidFile": ProjectFileInput,
-    "OptionValidator": ProjectOptionInput,
-    "ListValidator": ListInput,
-    "ReferenceValidator": ReferenceInput,
-    "IsBoolean": ProjectOptionInput,
-    "IsNumeric": ProjectNumericInput,
-    "IsNumericIterable": ListInput
-}
 
 
 class WidgetCreationError(Exception):
-    """Exception thrown when invalid input value is given"""
+    """Exception thrown when invalid input is given to widget_creator helper
+    function"""
     def __init__(self, message):
         super(WidgetCreationError, self).__init__(message)
 
 
+def class_chooser(validator, project_widget=True):
+    """Choose what widget class to create given a validator
+
+    :param str validator_name: The class name of the validator
+    :param bool project_widget: True if this widget should directly input to a
+    project option"""
+    if project_widget:
+        from .validator_widgets import P_VAL_UI_DICT as ui_dict
+        # TODO: This is ugly...
+    else:
+        from .validator_widgets import VAL_UI_DICT as ui_dict
+    try:
+        entry_class = ui_dict[type(validator).__name__]
+    except KeyError:
+        raise WidgetCreationError(
+            "Cannot choose widget for validator with given options")
+    try:
+        if (
+                entry_class.__name__ == "ListInput" and
+                validator.required_length is not None):
+            entry_class = ui_dict["FixedListAlt"]
+    except AttributeError:
+        pass
+    return entry_class
+
+
 def widget_creator(
         validator=None, input_parent=None, frame=None, option_name=None,
-        project_path=None, initial_value=None, error_message="Invalid input"):
+        project_path=None, initial_value=None, error_message="Invalid input",
+        project_widget=True):
     """Create a widget with the given information, if possible
 
     :param Validator validator: The validator for this widget
@@ -74,7 +85,7 @@ def widget_creator(
                 "No valid parent widget specified")
         frame = input_parent
 
-    entry_class = VAL_UI_DICT[type(validator).__name__]
+    entry_class = class_chooser(validator, project_widget=project_widget)
     entry_args = [frame]
     entry_kwargs = {}
     if initial_value is None:
@@ -96,4 +107,6 @@ def widget_creator(
             input_parent.project_path.create_child_path(option_name)
         )
 
-    return entry_class(*entry_args, **entry_kwargs)
+    new_widget = entry_class(*entry_args, **entry_kwargs)
+
+    return new_widget

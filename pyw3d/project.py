@@ -23,8 +23,8 @@ import warnings
 import math
 from .features import W3DFeature
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
-from .validators import AlwaysValid, IsNumeric, IsNumericIterable,\
-    FeatureListValidator, IsBoolean, FeatureValidator
+from .validators import ListValidator, IsNumeric, OptionValidator,\
+    IsBoolean, FeatureValidator, IsInteger, DictValidator
 from .xml_tools import bool2text, text2tuple, attrib2bool
 from .objects import W3DObject
 from .sounds import W3DSound
@@ -153,35 +153,51 @@ class W3DProject(W3DFeature):
     W3DPlacements specifying their position and orientation
     """
 
+    ui_order = [
+        "camera_placement", "desktop_camera_placement", "far_clip",
+        "allow_movement", "allow_rotation", "background"
+    ]
+
     argument_validators = {
-        "objects": FeatureListValidator(
-            W3DObject,
-            help_string="A list of W3DObjects in the project"),
-        "groups": FeatureListValidator(
-            W3DGroup,
-            help_string="A list of W3DGroups in the project"),
-        "timelines": FeatureListValidator(
-            W3DTimeline,
+        "objects": ListValidator(
+            FeatureValidator(W3DObject),
+            help_string="A list of W3DObjects in the project"
+        ),
+        "groups": ListValidator(
+            FeatureValidator(W3DGroup),
+            help_string="A list of W3DObjects in the project"
+        ),
+        "timelines": ListValidator(
+            FeatureValidator(W3DTimeline),
             help_string="A list of W3DTimelines in the project"),
-        "sounds": AlwaysValid(
-            help_string="A list of W3DSounds in the project"),
-        "trigger_events": FeatureListValidator(
-            W3DTrigger,
-            help_string="A list of W3DTriggers in the project"),
+        "sounds": ListValidator(
+            FeatureValidator(W3DSound),
+            help_string="A list of W3DSounds in the project"
+        ),
+        "trigger_events": ListValidator(
+            FeatureValidator(W3DTrigger),
+            help_string="A list of W3DTriggers in the project"
+        ),
         "camera_placement": FeatureValidator(
             W3DPlacement,
-            help_string="Orientation and position of camera"),
+            help_string="Orientation and position of camera"
+        ),
         "desktop_camera_placement": FeatureValidator(
             W3DPlacement,
             help_string="Orientation and position of camera in desktop preview"
             ),
-        "far_clip": IsNumeric(),
-        "background": IsNumericIterable(
-            required_length=3, min_value=0, max_value=255),
+        "far_clip": IsNumeric(min_value=0),
+        "background": ListValidator(
+            IsInteger(min_value=0, max_value=255),
+            required_length=3,
+            help_string="Red, Green, Blue values"),
         "allow_movement": IsBoolean(),
         "allow_rotation": IsBoolean(),
-        "wall_placements": AlwaysValid(
-            "Dictionary mapping wall names to placements")
+        "wall_placements": DictValidator(
+            OptionValidator(
+                "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
+            FeatureValidator(W3DPlacement),
+            help_string="Dictionary mapping wall names to placements")
         }
 
     default_arguments = {

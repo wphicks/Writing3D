@@ -24,10 +24,6 @@ from .widget_factories import widget_creator
 from pyw3d.path import UnsetValueError
 
 
-UI_ORDER_DICT = {
-}
-
-
 class FeatureInput(ProjectInput, tk.Frame):
     """Widget for editing an entire W3DFeature"""
 
@@ -64,7 +60,7 @@ class FeatureInput(ProjectInput, tk.Frame):
             target = tk.TopLevel()
             target.title("Edit")
         self.entry_widgets.append(target)
-        for option in UI_ORDER_DICT[self.class_selection.get()]:
+        for option in self.class_selection.get().ui_order:
             self.entry_widgets.append(
                 tk.Label(target, text="{}:".format(option))
             )
@@ -94,14 +90,11 @@ class FeatureInput(ProjectInput, tk.Frame):
     def __init__(
             self, parent, validator, project_path, initial_value=None,
             error_message="Invalid input"):
-        super(FeatureInput, self).__init__(
-            parent, validator, project_path, initial_value=initial_value,
-            error_message=error_message)
-        self.classes = [self.validator.correct_class]
+        self.classes = [validator.correct_class]
         try:
             self.classes.extend(
                 sorted(
-                    self.validator.correct_class._subclass_registry.values()
+                    validator.correct_class._subclass_registry.values()
                 )
             )
         except AttributeError:
@@ -109,3 +102,6 @@ class FeatureInput(ProjectInput, tk.Frame):
         self.class_selection = tk.StringVar()
         self.class_selection.set(
             self.classes[0].__name__)
+        super(FeatureInput, self).__init__(
+            parent, validator, project_path, initial_value=initial_value,
+            error_message=error_message)

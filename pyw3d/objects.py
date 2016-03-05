@@ -27,9 +27,9 @@ from .features import W3DFeature
 from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
     SoundAction, EventTriggerAction, MoveVRAction, W3DResetAction
 from .placement import W3DPlacement
-from .validators import OptionValidator, IsNumeric,  AlwaysValid,\
-    IsNumericIterable, ValidPyString, IsBoolean, FeatureValidator,\
-    MultiFeatureValidator, ValidFeatureDict, TextValidator, ValidFile
+from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
+    ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
+    TextValidator, ValidFile
 from .names import generate_blender_object_name,\
     generate_blender_material_name
 from .metaclasses import SubRegisteredClass
@@ -86,21 +86,16 @@ class W3DLink(W3DFeature):
     argument_validators = {
         "enabled": IsBoolean(),
         "remain_enabled": IsBoolean(),
-        "enabled_color": IsNumericIterable(required_length=3),
-        "selected_color": IsNumericIterable(required_length=3),
-        "actions": ValidFeatureDict(
-            [
-                W3DAction, ObjectAction, GroupAction, TimelineAction,
-                SoundAction, EventTriggerAction, MoveVRAction,
-                W3DResetAction
-            ],
-            key_validator=IsNumeric(),
-            key_label="Clicks",
-            value_label="Action",
+        "enabled_color": ListValidator(
+            IsInteger(min_value=0, max_value=255), required_length=3),
+        "selected_color": ListValidator(
+            IsInteger(min_value=0, max_value=255), required_length=3),
+        "actions": DictValidator(
+            IsInteger(), FeatureValidator(W3DAction),
             help_string="Must be a dictionary mapping integers to lists of "
             "W3DActions"
-            ),
-        "reset": IsNumeric()
+        ),
+        "reset": IsInteger()
         }
 
     default_arguments = {
@@ -355,7 +350,7 @@ class W3DImage(W3DContent):
 
     :param str filename: Filename of image to be displayed"""
     argument_validators = {
-        "filename": ValidFile("Value should be a string")}
+        "filename": ValidFile()}
 
     def toXML(self, object_root):
         """Store W3DImage as Content node within Object node
@@ -416,8 +411,8 @@ class W3DStereoImage(W3DContent):
     :param str right-file: Filename of image to be displayed to right eye
     """
     argument_validators = {
-        "left_file": ValidFile("Filename of left-eye image"),
-        "right_file": ValidFile("Filename of right-eye image")}
+        "left_file": ValidFile(help_string="Filename of left-eye image"),
+        "right_file": ValidFile(help_string="Filename of right-eye image")}
 
     def toXML(self, object_root):
         """Store W3DStereoImage as Content node within Object node
@@ -467,7 +462,7 @@ class W3DModel(W3DContent):
     """
     #TODO: Does not seem to play nice with GLSL shader. FIX THIS.
     argument_validators = {
-        "filename": ValidFile("Value should be a string"),
+        "filename": ValidFile(),
         "check_collisions": IsBoolean()}
 
     default_arguments = {
@@ -540,7 +535,8 @@ class W3DLight(W3DContent):
         "light_type": OptionValidator("Point", "Directional", "Spot"),
         "diffuse": IsBoolean(),
         "specular": IsBoolean(),
-        "attenuation": IsNumericIterable(3),
+        "attenuation": ListValidator(
+            IsNumeric(), required_length=3),
         "angle": IsNumeric()}
 
     default_arguments = {
@@ -671,15 +667,15 @@ class W3DObject(W3DFeature):
         "link": FeatureValidator(
             W3DLink,
             help_string="Clickable link associated with object"),
-        "color": IsNumericIterable(required_length=3),
+        "color": ListValidator(
+            IsInteger(min_value=0, max_value=255), required_length=3),
         "visible": IsBoolean(),
         "lighting":  IsBoolean(),
         "scale": IsNumeric(min_value=0),
         "click_through":  IsBoolean(),
         "around_own_axis":  IsBoolean(),
-        "sound": AlwaysValid("Name of sound attached to this object"),
-        "content": MultiFeatureValidator([
-            W3DContent, W3DText, W3DImage, W3DModel, W3DLight])}
+        "sound": TextValidator(),  #TODO: FIX THIS
+        "content": FeatureValidator(W3DContent)}
 
     default_arguments = {
         "link": None,

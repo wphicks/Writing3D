@@ -19,7 +19,7 @@
 import xml.etree.ElementTree as ET
 import math
 from .features import W3DFeature
-from .validators import OptionValidator, IsNumericIterable, IsNumeric, \
+from .validators import OptionValidator, ListValidator, IsNumeric, \
     FeatureValidator
 from .errors import BadW3DXML
 from .xml_tools import text2tuple
@@ -66,8 +66,8 @@ class W3DRotation(W3DFeature):
     argument_validators = {
         "rotation_mode": OptionValidator(
             "None", "Axis", "LookAt", "Normal"),
-        "rotation_vector": IsNumericIterable(3),
-        "up_vector": IsNumericIterable(3),
+        "rotation_vector": ListValidator(IsNumeric(), required_length=3),
+        "up_vector": ListValidator(IsNumeric(), required_length=3),
         "rotation_angle": IsNumeric()}
     default_arguments = {
         "rotation_mode": "None",
@@ -158,7 +158,8 @@ class W3DPlacement(W3DFeature):
     argument_validators = {
         "relative_to": OptionValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
-        "position": IsNumericIterable(3),
+        "position": ListValidator(
+            IsNumeric, required_length=3),
         "rotation": FeatureValidator(W3DRotation)}
     default_arguments = {
         "relative_to": "Center",

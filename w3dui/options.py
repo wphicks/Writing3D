@@ -18,11 +18,11 @@
 """Tk widgets for inputting text-based W3D options"""
 
 import tkinter as tk
-from .base import W3DValidatorUI
-from .w3dui import ProjectWidget
+from .base import W3DValidatorInput
+from .class_factories import ProjectWidget
 
 
-class OptionInput(W3DValidatorUI, tk.Frame):
+class OptionInput(W3DValidatorInput, tk.Frame):
     """Widget for choosing from a pre-determined set of options"""
 
     def get_input_value(self):
@@ -65,5 +65,6 @@ class ReferenceInput(ProjectOptionInput):
             )
 
     def initUI(self, initial_value=None):
+        self.validator.set_project(self.project_path.get_project())
         super(ReferenceInput, self).initUI(initial_value=initial_value)
         self.entry_widgets[-1].bind("<FocusIn>", self._reset_menu)

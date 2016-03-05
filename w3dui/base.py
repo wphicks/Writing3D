@@ -107,8 +107,8 @@ class InputUI(object):
             super(InputUI, self).__init__(parent)
         self.entry_widgets = []
         self.error_message = error_message
-        self.initUI(initial_value=initial_value)
         self.target_frame = self
+        self.initUI(initial_value=initial_value)
 
 
 class W3DValidatorInput(InputUI):

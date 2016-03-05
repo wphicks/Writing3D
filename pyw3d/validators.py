@@ -19,17 +19,7 @@
 
 import re
 import os
-import warnings
-from collections import defaultdict
-from .structs import SortedList
 from .path import ProjectPath
-try:
-    from .ui import BaseUI, FeatureListUI, IterableUI, OptionUI, FeatureUI,\
-        PopOutUI, MultiFeatureUI, MultiFeatureListUI, FeatureDictUI, FileUI,\
-        TextUI, UpdateOptionUI, ListUI, ActionListUI
-except ImportError:
-    warnings.warn(
-        "Could not load tkinter; GUI editor will not be available")
 
 
 PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
@@ -42,19 +32,15 @@ class Validator(object):
     If specified, this allows for consistency checks between related elements
     of the project."""
 
-    def __init__(self, project=None):
+    def __init__(self):
         self.help_string = "No help available for this option"
         # def_value is an attribute used to provide some guidance on a
         # reasonable value to default to when first creating an instance of
-        # this option in a GUI environment
+        # this option for editing
         self.def_value = ""
-        self.project = project
 
     def __call__(self, value):
         return False
-
-    def set_project(self, project):
-        self.project = project
 
     def help(self):
         return self.help_string
@@ -73,11 +59,6 @@ class TextValidator(Validator):
     def coerce(self, value):
         new_value = str(value)
         return new_value
-
-    def ui(self, parent, label, feature, feature_key, pop_out=True):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return TextUI(parent, label, self, feature, feature_key)
 
 
 class ValidPyString(Validator):
@@ -114,11 +95,6 @@ class ValidFile(Validator):
         # TODO: Think about something clever with os.path here
         return str(value)
 
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return FileUI(parent, label, self, feature, feature_key)
-
 
 class OptionValidator(Validator):
     """Callable object that returns true if value is in given list of options
@@ -148,11 +124,70 @@ class OptionValidator(Validator):
 class ListValidator(Validator):
     """Used to validate an option which takes a list of values
 
-    :param Validator base_validator: Used to validate each item in list"""
+    :param base_validators: Either a single Validator or list of Validators
+    which will be used to validate each value in list. If a list of validators
+    is provided and there are more values than validators, the validation
+    process will "wrap around" to the beginning of the list of values.
+    :param str item_label: A label denoting what each item in the list is
+    :param int required_length: If the list of values must be of a particular
+    length, this parameter should be set to an integer. Otherwise, this should
+    be None."""
 
-    def __init__(self, base_validator, item_label="Item", help_string=None):
-        self.base_validator = base_validator
+    def __init__(
+            self, base_validators, item_label="Item", help_string=None,
+            required_length=None):
+        try:
+            self.base_validators = list(base_validators)
+        except TypeError:
+            self.base_validators = [base_validators]
         self.item_label = item_label
+        if help_string is None:
+            self.help_string = "No help available for this option"
+        else:
+            self.help_string = help_string
+        self.required_length = required_length
+
+    def get_base_validator(self, index):
+        """Get the validator associated with the given index
+
+        :param int index: The validator index"""
+        return self.base_validators[index % len(self.base_validators)]
+
+    @property
+    def def_value(self):
+        return []
+
+    def __call__(self, iterable):
+        for i in range(len(iterable)):
+            if not self.get_base_validator(i)(iterable[i]):
+                return False
+        return True
+
+
+class SortedListValidator(ListValidator):
+    """Check if input is sorted iterable"""
+
+    def __call__(self, iterable):
+        for i in range(len(iterable)):
+            if not self.get_base_validator(i)(iterable[i]):
+                return False
+            if i > 0 and iterable[i] > iterable[i-1]:
+                return False
+        return True
+
+
+class DictValidator(Validator):
+    """Used to validate an option which takes a dictionary of values
+
+    :param Validator key_validator: A validator used to validate the keys of
+    the dictionary
+    :param Validator value_validator: A validator used to validate the values
+    of the dictionary"""
+
+    def __init__(
+            self, key_validator, value_validator, help_string=None):
+        self.key_validator = key_validator
+        self.value_validator = value_validator
         if help_string is None:
             self.help_string = "No help available for this option"
         else:
@@ -160,11 +195,13 @@ class ListValidator(Validator):
 
     @property
     def def_value(self):
-        return []
+        return {}
 
-    def __call__(self, iterable):
-        for value in iterable:
-            if not self.base_validator(value):
+    def __call__(self, dictionary):
+        for key, value in dictionary.items():
+            if (
+                    not self.key_validator(key)
+                    or not self.value_validator(value)):
                 return False
         return True
 
@@ -176,22 +213,23 @@ class ReferenceValidator(Validator):
     particular project
     :param Validator fallback_validator: A fallback validator used in case
     project has not been set for this validator
-    :param ProjectPath reference_path: The path to the project element that
-    will populate the available options
+    :param list reference_path: A list of specifiers used to construct a
+    ProjectPath pointing to the element used to populate available options
     """
 
     def __init__(
-            self, fallback_validator, reference_path, help_string=None):
+            self, fallback_validator, reference_path, project=None,
+            help_string=None):
         if help_string is None:
             self.help_string = "No help available for this option"
         else:
             self.help_string = help_string
         self.fallback_validator = fallback_validator
         self.def_value = self.fallback_validator.def_value
-        self.ref_path = reference_path
+        self.ref_path = ProjectPath(project=project, path=reference_path)
 
     def __call__(self, value):
-        if self.ref_path is None:
+        if self.ref_path.project is None:
             return self.fallback_validator(value)
         return value in self.valid_options
 
@@ -201,6 +239,10 @@ class ReferenceValidator(Validator):
         else:
             return self.valid_options[
                 self.valid_menu_items.index(value)]
+
+    def set_project(self, project):
+        """Set project to given value"""
+        self.ref_path.project = project
 
     @property
     def valid_menu_items(self):
@@ -262,6 +304,8 @@ class IsNumeric(Validator):
             self.help_string = " ".join(
                 (self.help_string,  "and <= {}".format(
                     self.max_value)))
+            if self.def_value > self.max_value:
+                self.def_value = self.max_value
 
     def __call__(self, value):
         try:
@@ -282,84 +326,13 @@ class IsNumeric(Validator):
         return float(value)
 
 
-class IsNumericIterable(Validator):
-    """Callable object that returns true if value is a numeric iterable
-
-    :param required_length: Optionally sets required length for iterable. If
-    this attribute is set to None, length is not checked."""
-
-    def __init__(self, required_length=None, min_value=None, max_value=None):
-        self.required_length = required_length
-        if self.required_length is not None:
-            self.help_sting = \
-                "Value must be a sequence of {} numeric values".format(
-                    self.required_length)
-        else:
-            self.help_string = "Value must be a sequence of numeric values"
-        self.base_validator = IsNumeric(
-            min_value=min_value, max_value=max_value)
-
-    def __call__(self, iterable):
-        try:
-            for value in iterable:
-                if not self.base_validator(value):
-                    return False  # Non-numeric
-            return (self.required_length is None or len(iterable) ==
-                    self.required_length)
-        except TypeError:
-            return False  # Non-iterable
-
-    @property
-    def def_value(self):
-        if self.required_length is not None:
-            return [
-                self.base_validator.def_value for i in
-                range(self.required_length)
-            ]
-        return []
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return IterableUI(parent, label, self, feature, feature_key)
-
-    def coerce(self, iterable):
-        return [self.base_validator.coerce(value) for value in iterable]
-
-
-class AlwaysValid(Validator):
-    """Always returns True"""
-
-    def __init__(self,
-                 help_string="All Python objects are valid for this option"):
-        self.help_string = help_string
+class IsInteger(IsNumeric):
+    """Check if value is an integer"""
 
     def __call__(self, value):
-        return True
-
-
-class CheckClass(Validator):
-    """Returns True if value is of given class
-
-    Also offers the "coerce" method, which will attempt to create object of
-    specified class from value.
-    Note: While this is not an especially Pythonic check, it is used sparsely
-    and avoids the hassle of building up individual validators for input
-    purposes."""
-
-    def __init__(self, correct_class=bool, help_string=None):
-        self.correct_class = correct_class
-        if help_string is None:
-            self.help_string = "Value must be of type {}".format(
-                self.correct_class)
-        else:
-            self.help_string = help_string
-
-    def __call__(self, value):
-        return isinstance(value, self.correct_class)
-
-    def coerce(self, value):
-        return self.correct_class(value)
+        if not super(IsInteger, self).__call__(value):
+            return False
+        return value == int(value)
 
 
 class FeatureValidator(Validator):
@@ -382,215 +355,3 @@ class FeatureValidator(Validator):
     @property
     def def_value(self):
         return self.correct_class()
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return FeatureUI(parent, label, self, feature, feature_key)
-
-
-class MultiFeatureValidator(Validator):
-    """Check if value is a W3DFeature of several specified types
-    """
-
-    def __init__(self, class_list, help_string=None):
-        self.class_list = class_list
-        self.valid_menu_items = [
-            class_.__name__ for class_ in self.class_list]
-        self.base_validators = [
-            FeatureValidator(class_) for class_ in self.class_list]
-        if help_string is None:
-            self.help_string = "Value must be one of {}".format(
-                ", ".join(self.valid_menu_items))
-        else:
-            self.help_string = help_string
-
-    def __call__(self, value):
-        for validator in self.base_validators:
-            if validator(value):
-                return True
-        return False
-
-    def coerce(self, value):
-        for validator in self.base_validators:
-            try:
-                return validator.coerce(value)
-            except:
-                pass
-
-    @property
-    def def_value(self):
-        return self.class_list[0]()
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return MultiFeatureUI(parent, label, self, feature, feature_key)
-
-
-class FeatureListValidator(Validator):
-    """Check if value is an iterable of W3DFeatures of a particular type"""
-
-    def __init__(self, correct_class, help_string=None):
-        self.correct_class = correct_class
-        if help_string is None:
-            self.help_string = "Value must be an iterable of elements of type "
-            "{}".format(
-                self.correct_class)
-        else:
-            self.help_string = help_string
-        self.base_validator = FeatureValidator(self.correct_class)
-
-    def __call__(self, iterable):
-        for item in iterable:
-            if not self.base_validator(item):
-                return False
-        return True
-
-    @property
-    def def_value(self):
-        return []
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return FeatureListUI(parent, label, self, feature, feature_key)
-
-
-class MultiFeatureListValidator(Validator):
-    """Check if value is an iterable of W3DFeatures of several specified
-    types"""
-
-    def __init__(self, class_list, help_string=None, item_label="Item"):
-        self.class_list = class_list
-        self.valid_menu_items = [
-            class_.__name__ for class_ in self.class_list]
-        self.base_validator = MultiFeatureValidator(self.class_list)
-        self.item_label = item_label
-        if help_string is None:
-            self.help_string = "Value must be an iterable of elements of one"
-            "of the following types {}".format(
-                ", ".join(self.valid_menu_items))
-        else:
-            self.help_string = help_string
-
-    def __call__(self, iterable):
-        for item in iterable:
-            if not self.base_validator(item):
-                return False
-        return True
-
-    def coerce(self, iterable):
-        return [self.base_validator.coerce(item) for item in iterable]
-
-    @property
-    def def_value(self):
-        return []
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return MultiFeatureListUI(
-            parent, label, self, feature, feature_key,
-            item_label=self.item_label)
-
-
-class ValidFeatureDict(Validator):
-    """Check if input is dictionary with lists of W3DFeatures as values
-
-    :param class_list: A list of classes which are acceptable as values in this
-    dictionary
-    :param str key_label: A label indicating what the keys of this dictionary
-    are"""
-
-    def __init__(
-            self, class_list, key_validator=AlwaysValid(), key_label=None,
-            help_string=None, value_label="Item"):
-        if help_string is None:
-            self.help_string = "Must be a dictionary with lists of"
-            " W3DFeatures as values"
-        else:
-            self.help_string = help_string
-        self.key_validator = key_validator
-        self.key_label = key_label
-        self.value_label = value_label
-        self.value_validator = MultiFeatureListValidator(
-            class_list, item_label=self.value_label)
-
-    @property
-    def def_value(self):
-        return defaultdict(list)
-
-    def __call__(self, dictionary):
-        for key, value in dictionary.items():
-            if (
-                    not self.key_validator(key) or
-                    not self.value_validator(value)):
-                return False
-        return True
-
-    def coerce(self, dictionary):
-        new_dict = self.def_value
-        for key, value in dictionary.items():
-            new_dict[
-                self.key_validator.coerce(key)] = self.value_validator.coerce(
-                value)
-        return new_dict
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return FeatureDictUI(
-            parent, label, self, feature, feature_key,
-            item_label=self.value_label)
-
-
-class ValidActionList(Validator):
-    """Check if input is SortedList of float, W3DAction tuples
-
-    :param class_list: A list of classes which are acceptable as values in this
-    dictionary
-    :param str key_label: A label indicating what the keys of this dictionary
-    are"""
-
-    def __init__(
-            self, class_list, key_label=None, help_string=None,
-            value_label="Item"):
-        if help_string is None:
-            self.help_string = "Must be a SortedList with float, W3DAction"
-            " tuples as elements"
-        else:
-            self.help_string = help_string
-
-        self.key_validator = IsNumeric()
-        self.key_label = key_label
-        self.value_label = value_label
-        self.value_validator = MultiFeatureValidator(
-            class_list, item_label=self.value_label)
-
-    @property
-    def def_value(self):
-        return SortedList()
-
-    def __call__(self, iterable):
-        for key, value in iterable:
-            if (
-                    not self.key_validator(key) or
-                    not self.value_validator(value)):
-                return False
-        return True
-
-    def coerce(self, dictionary):
-        new_dict = self.def_value
-        for key, value in dictionary.items():
-            new_dict[
-                self.key_validator.coerce(key)] = self.value_validator.coerce(
-                value)
-        return new_dict
-
-    def ui(self, parent, label, feature, feature_key, pop_out=False):
-        if pop_out:
-            return PopOutUI(parent, label, self, feature, feature_key)
-        return ActionListUI(
-            parent, label, self, feature, feature_key,
-            item_label=self.value_label)

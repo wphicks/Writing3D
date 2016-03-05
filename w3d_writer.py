@@ -29,6 +29,7 @@ import os
 sys.path.append(
     os.path.abspath(os.path.dirname(__file__))
 )
+import pyw3d
 from pyw3d import project
 import w3dui
 import tkinter as tk
@@ -42,6 +43,9 @@ BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
 class W3DWriter(tk.Frame):
     """GUI interface to 3D virtual environments"""
 
+    def get_stored_value(self):
+        return self.project
+
     def get_input_value(self):
         return self.project
 
@@ -50,13 +54,18 @@ class W3DWriter(tk.Frame):
         self.parent = parent
         self.font = font.Font(family="Helvetica", size=12)
         self.project = project.W3DProject()
-        self.project_path = w3dui.path.ProjectPath(self.project)
+        self.project_path = pyw3d.path.ProjectPath(self.project)
+        self.global_entries = []
         self.initUI()
 
     def generate_tabs(self):
         self.tabs = {}
-        self.tabs["project"] = project.ProjectOptions(
-            self.interface, self.project)
+        self.tabs["globals"] = tk.Frame(self.interface)
+        for option in self.project.ui_order:
+            self.global_entries.append(w3dui.widget_factories.widget_creator(
+                input_parent=self, frame=self.tabs["globals"],
+                option_name=option, project_path=self.project_path)
+            )
         for category in ["objects", "groups", "timelines", "trigger_events"]:
             self.tabs[category] = w3dui.widget_factories.widget_creator(
                 input_parent=self, frame=self.interface, option_name=category,

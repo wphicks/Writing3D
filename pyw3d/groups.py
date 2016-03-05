@@ -42,14 +42,14 @@ class W3DGroup(W3DFeature):
         "objects": ListValidator(
             ReferenceValidator(
                 ValidPyString(),
-                lambda proj: [obj["name"] for obj in proj["objects"]],
+                ["objects"],
                 help_string="Must be the name of an object"),
             item_label="Object",
             help_string="A list of names of objects"),
         "groups": ListValidator(
             ReferenceValidator(
                 ValidPyString(),
-                lambda proj: [obj["name"] for obj in proj["groups"]],
+                ["groups"],
                 help_string="Must be the name of a group"),
             item_label="Group",
             help_string="A list of names of groups")

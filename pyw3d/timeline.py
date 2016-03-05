@@ -20,7 +20,8 @@
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .actions import W3DAction
-from .validators import AlwaysValid, IsBoolean, ValidPyString
+from .validators import ListValidator, IsNumeric, IsBoolean, ValidPyString, \
+    FeatureValidator
 from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
 from .activators import BlenderTimeline
@@ -39,7 +40,13 @@ class W3DTimeline(W3DFeature):
     argument_validators = {
         "name": ValidPyString(),
         "start_immediately": IsBoolean(),
-        "actions": AlwaysValid(
+        "actions": ListValidator(
+            ListValidator(
+                [IsNumeric(min_value=0), FeatureValidator(W3DAction)],
+                item_label="Start Time(s), Action",
+                required_length=2,
+                help_string="Start time in seconds, action to perform"
+            ),
             help_string="A list of (float, W3DAction) tuples")
         }
     default_arguments = {
