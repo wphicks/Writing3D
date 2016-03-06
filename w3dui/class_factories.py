@@ -37,10 +37,15 @@ def ValidatedWidget(
         else:
             new_base_classes.append(base)
     new_base_classes = tuple(new_base_classes)
+    new_attr = dict(base_widget.__dict__)
+    if "__rep_dict__" not in new_attr:
+        new_attr["__rep_dict__"] = {}
+    for key, val in replacements.items():
+        new_attr["__rep_dict__"][key.__name__] = val
     return type(
         "".join(("Validated", base_widget.__name__)),
         new_base_classes,
-        dict(base_widget.__dict__)
+        new_attr
     )
 
 
@@ -64,8 +69,13 @@ def ProjectWidget(
         else:
             new_base_classes.append(base)
     new_base_classes = tuple(new_base_classes)
+    new_attr = dict(base_widget.__dict__)
+    if "__rep_dict__" not in new_attr:
+        new_attr["__rep_dict__"] = {}
+    for key, val in replacements.items():
+        new_attr["__rep_dict__"][key.__name__] = val
     return type(
         "".join(("Project", base_widget.__name__)),
         new_base_classes,
-        dict(base_widget.__dict__)
+        new_attr
     )

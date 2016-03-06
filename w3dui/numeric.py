@@ -36,15 +36,17 @@ class NumericInput(InputUI, tk.Frame):
             self.entry_value.set("{:.5f}".format(value))
 
     def initUI(self, initial_value=None):
+        self.entry_value = tk.StringVar()
         self.entry_widgets.append(tk.Entry(
             self.target_frame, textvariable=self.entry_value))
-        super(NumericInput, self).initUI(initial_value=initial_value)
-
-    def __init__(self, parent, validator, initial_value=None):
-        self.entry_value = tk.stringVar()
-        super(NumericInput, self).__init__(
-            parent, validator, initial_value=initial_value,
-            error_message="Invalid input")
+        try:
+            print(self.__rep_dict__)
+            super(
+                self.__rep_dict__["NumericInput"], self).initUI(
+                initial_value=initial_value)
+        except AttributeError:
+            super(NumericInput, self).initUI(
+                initial_value=initial_value)
 
 
 ValidatedNumericInput = ValidatedWidget(NumericInput)
@@ -69,12 +71,6 @@ class IntInput(NumericInput, tk.Frame):
     def set_input_value(self, value):
         if value is not None:
             self.entry_value.set(str(value))
-
-    def __init__(self, parent, validator, initial_value=None):
-        self.entry_value = tk.stringVar()
-        super(NumericInput, self).__init__(
-            parent, validator, initial_value=initial_value,
-            error_message="Invalid input")
 
 
 ValidatedIntInput = ValidatedWidget(

@@ -19,7 +19,7 @@
 
 import tkinter as tk
 from tkinter import ttk
-from .base import ProjectInput
+from .base import ProjectInput, InvalidInput
 from .widget_factories import widget_creator
 from pyw3d.path import UnsetValueError
 
@@ -51,6 +51,16 @@ class FeatureInput(ProjectInput, tk.Frame):
             except KeyError:
                 widget.set_input_value(widget.validator.def_value)
 
+    def _get_chosen_class(self):
+        """Return selected class for this widget
+
+        :raises InvalidInput: if invalid class name is given"""
+        class_name = self.class_selection.get()
+        for class_ in self.classes:
+            if class_.__name__ == class_name:
+                return class_
+        raise InvalidInput("Given class name is invalid")
+
     def _create_editor(self):
         """Generate widget for editing feature options"""
         if len(self.classes) == 1:
@@ -60,7 +70,7 @@ class FeatureInput(ProjectInput, tk.Frame):
             target = tk.TopLevel()
             target.title("Edit")
         self.entry_widgets.append(target)
-        for option in self.class_selection.get().ui_order:
+        for option in self._get_chosen_class().ui_order:
             self.entry_widgets.append(
                 tk.Label(target, text="{}:".format(option))
             )

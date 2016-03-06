@@ -63,6 +63,8 @@ def matrix_from_look(look_direction, up_direction=None):
 
 class W3DRotation(W3DFeature):
     """Stores data on rotation of objects within W3D"""
+    ui_order = [
+        "rotation_mode", "rotation_vector", "up_vector", "rotation_angle"]
     argument_validators = {
         "rotation_mode": OptionValidator(
             "None", "Axis", "LookAt", "Normal"),
@@ -155,11 +157,12 @@ class W3DPlacement(W3DFeature):
     :param py:class:W3DRotation rotation: py:class:W3DRotation object
     specifying rotation
     """
+    ui_order = ["position", "relative_to", "rotation"]
     argument_validators = {
         "relative_to": OptionValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
         "position": ListValidator(
-            IsNumeric, required_length=3),
+            IsNumeric(), required_length=3),
         "rotation": FeatureValidator(W3DRotation)}
     default_arguments = {
         "relative_to": "Center",

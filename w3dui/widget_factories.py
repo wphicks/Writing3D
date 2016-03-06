@@ -91,7 +91,7 @@ def widget_creator(
     if initial_value is None:
         if input_parent is not None and option_name is not None:
             try:
-                initial_value = input_parent.get_stored_value()[option_name]
+                initial_value = input_parent.get_input_value()[option_name]
             except (KeyError, IndexError):
                 pass
     if initial_value is not None:
@@ -107,6 +107,7 @@ def widget_creator(
             input_parent.project_path.create_child_path(option_name)
         )
 
+    print(entry_class)
     new_widget = entry_class(*entry_args, **entry_kwargs)
 
     return new_widget

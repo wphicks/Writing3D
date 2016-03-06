@@ -155,6 +155,10 @@ class ListValidator(Validator):
 
     @property
     def def_value(self):
+        if self.required_length is not None:
+            return [
+                self.get_base_validator(i).def_value for i in
+                range(self.required_length)]
         return []
 
     def __call__(self, iterable):

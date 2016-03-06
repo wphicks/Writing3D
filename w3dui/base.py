@@ -90,7 +90,7 @@ class InputUI(object):
         :param dict pack_arguments: A dictionary of keyword arguments used to
         pack the entry_widgets"""
         for entry in self.entry_widgets:
-            self.entry_widgets.pack(**pack_arguments)
+            entry.pack(**pack_arguments)
 
     def initUI(self, initial_value=None):
         """Set up all necessary child widgets

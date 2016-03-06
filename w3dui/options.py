@@ -33,17 +33,17 @@ class OptionInput(W3DValidatorInput, tk.Frame):
             self.entry_value.set(str(value))
 
     def _pack_entry_widgets(self):
-        super(OptionInput, self)._pack_entry_widgets(
+        super(self.__class__, self)._pack_entry_widgets(
             pack_arguments={"anchor": tk.W}
         )
 
     def initUI(self, initial_value=None):
-        self.entry_value = tk.stringVar()
+        self.entry_value = tk.StringVar()
         self.entry_widgets.append(tk.OptionMenu(
             self.target_frame, self.entry_value,
             *self.validator.valid_menu_items)
         )
-        super(OptionInput, self).initUI(initial_value=initial_value)
+        super(self.__class__, self).initUI(initial_value=initial_value)
 
 
 ProjectOptionInput = ProjectWidget(OptionInput)
