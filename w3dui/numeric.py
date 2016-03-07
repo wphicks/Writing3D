@@ -18,8 +18,7 @@
 """Tk widgets for inputting numeric W3D options"""
 
 import tkinter as tk
-from .base import InputUI, InvalidInput
-from .class_factories import ValidatedWidget, ProjectWidget
+from .base import InputUI, InvalidInput, W3DValidatorInput, ProjectInput
 
 
 class NumericInput(InputUI, tk.Frame):
@@ -39,22 +38,15 @@ class NumericInput(InputUI, tk.Frame):
         self.entry_value = tk.StringVar()
         self.entry_widgets.append(tk.Entry(
             self.target_frame, textvariable=self.entry_value))
-        try:
-            print(self.__rep_dict__)
-            super(
-                self.__rep_dict__["NumericInput"], self).initUI(
-                initial_value=initial_value)
-        except AttributeError:
-            super(NumericInput, self).initUI(
-                initial_value=initial_value)
+        super(NumericInput, self).initUI(initial_value=initial_value)
 
 
-ValidatedNumericInput = ValidatedWidget(NumericInput)
-"""Widget for inputting a number with W3D-style validation"""
+class ValidatedNumericInput(NumericInput, W3DValidatorInput):
+    """Widget for inputting a number with W3D-style validation"""
 
 
-ProjectNumericInput = ProjectWidget(NumericInput)
-"""Widget for inputting a float as an element in a W3DProject"""
+class ProjectNumericInput(NumericInput, ProjectInput):
+    """Widget for inputting a float as an element in a W3DProject"""
 
 
 class IntInput(NumericInput, tk.Frame):
@@ -73,11 +65,9 @@ class IntInput(NumericInput, tk.Frame):
             self.entry_value.set(str(value))
 
 
-ValidatedIntInput = ValidatedWidget(
-    IntInput, replacements={NumericInput: ValidatedNumericInput})
-"""Widget for inputting an int with W3D-style validation"""
+class ValidatedIntInput(IntInput, W3DValidatorInput):
+    """Widget for inputting an int with W3D-style validation"""
 
 
-ProjectIntInput = ProjectWidget(
-    IntInput, replacements={NumericInput: ProjectNumericInput})
-"""Widget for inputting an int as an element in a W3DProject"""
+class ProjectIntInput(IntInput, ProjectInput):
+    """Widget for inputting an int as an element in a W3DProject"""

@@ -18,7 +18,6 @@
 """A module for creating W3D Writing project GUIs
 """
 from . import base
-from . import class_factories
 from . import collections
 from . import feature
 from . import numeric

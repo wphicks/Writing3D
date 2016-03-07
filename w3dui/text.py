@@ -19,8 +19,7 @@
 
 import tkinter as tk
 import os
-from .base import InputUI, help_bubble
-from .class_factories import ValidatedWidget, ProjectWidget
+from .base import InputUI, help_bubble, W3DValidatorInput, ProjectInput
 
 
 class TextBlock(InputUI, tk.Frame):
@@ -43,12 +42,12 @@ class TextBlock(InputUI, tk.Frame):
         super(TextBlock, self).initUI(initial_value=initial_value)
 
 
-ValidatedTextBlock = ValidatedWidget(TextBlock)
-"""Widget for inputting a text block with W3D-style validation"""
+class ValidatedTextBlock(TextBlock, W3DValidatorInput):
+    """Widget for inputting a text block with W3D-style validation"""
 
 
-ProjectTextBlock = ProjectWidget(TextBlock)
-"""Widget for inputting a text block as an element in a W3DProject"""
+class ProjectTextBlock(TextBlock, ProjectInput):
+    """Widget for inputting a text block as an element in a W3DProject"""
 
 
 class StringInput(InputUI, tk.Frame):
@@ -77,12 +76,12 @@ class StringInput(InputUI, tk.Frame):
             error_message="Invalid input")
 
 
-ValidatedStringInput = ValidatedWidget(StringInput)
-"""Widget for inputting a string with W3D-style validation"""
+class ValidatedStringInput(StringInput, W3DValidatorInput):
+    """Widget for inputting a string with W3D-style validation"""
 
 
-ProjectStringInput = ProjectWidget(StringInput)
-"""Widget for inputting a string as an element in a W3DProject"""
+class ProjectStringInput(StringInput, ProjectInput):
+    """Widget for inputting a string as an element in a W3DProject"""
 
 
 class FileInput(StringInput, tk.Frame):
@@ -113,11 +112,9 @@ class FileInput(StringInput, tk.Frame):
             error_message="Invalid filename")
 
 
-ValidatedFileInput = ValidatedWidget(
-    FileInput, replacements={StringInput: ValidatedStringInput}
-)
-"""Widget for inputting a filename with W3D-style validation"""
+class ValidatedFileInput(FileInput, W3DValidatorInput):
+    """Widget for inputting a filename with W3D-style validation"""
 
 
-ProjectFileInput = ProjectWidget(FileInput)
-"""Widget for inputting a filename as an element in a W3DProject"""
+class ProjectFileInput(FileInput, W3DValidatorInput):
+    """Widget for inputting a filename as an element in a W3DProject"""

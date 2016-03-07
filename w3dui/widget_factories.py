@@ -107,7 +107,6 @@ def widget_creator(
             input_parent.project_path.create_child_path(option_name)
         )
 
-    print(entry_class)
     new_widget = entry_class(*entry_args, **entry_kwargs)
 
     return new_widget

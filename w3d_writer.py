@@ -76,11 +76,10 @@ class W3DWriter(tk.Frame):
         self.pack(fill=tk.BOTH, expand=1)
         self.interface = ttk.Notebook(self)
         self.generate_tabs()
-        self.interface.add(
-            self.tabs["project"], text=self.tabs["project"].title_string)
+        self.interface.add(self.tabs["globals"], text="globals")
         for category in ["objects", "groups", "timelines", "trigger_events"]:
             self.interface.add(
-                self.tabs[category], text=self.tabs[category].title_string)
+                self.tabs[category], text=category)
         self.interface.pack(fill=tk.BOTH, expand=1)
 
 

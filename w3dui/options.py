@@ -18,8 +18,7 @@
 """Tk widgets for inputting text-based W3D options"""
 
 import tkinter as tk
-from .base import W3DValidatorInput
-from .class_factories import ProjectWidget
+from .base import W3DValidatorInput, ProjectInput
 
 
 class OptionInput(W3DValidatorInput, tk.Frame):
@@ -33,7 +32,7 @@ class OptionInput(W3DValidatorInput, tk.Frame):
             self.entry_value.set(str(value))
 
     def _pack_entry_widgets(self):
-        super(self.__class__, self)._pack_entry_widgets(
+        super(OptionInput, self)._pack_entry_widgets(
             pack_arguments={"anchor": tk.W}
         )
 
@@ -43,12 +42,12 @@ class OptionInput(W3DValidatorInput, tk.Frame):
             self.target_frame, self.entry_value,
             *self.validator.valid_menu_items)
         )
-        super(self.__class__, self).initUI(initial_value=initial_value)
+        super(OptionInput, self).initUI(initial_value=initial_value)
 
 
-ProjectOptionInput = ProjectWidget(OptionInput)
-"""Widget for validating a project element that takes one of a set number of
-values"""
+class ProjectOptionInput(OptionInput, ProjectInput):
+    """Widget for validating a project element that takes one of a set number
+    of values"""
 
 
 class ReferenceInput(ProjectOptionInput):
