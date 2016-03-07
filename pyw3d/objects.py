@@ -659,6 +659,8 @@ class W3DObject(W3DFeature):
     W3DStereoImage, W3DModel, W3DLight, W3DPSys
     """
 
+    ui_order = ["name", "placement", "scale", "visible", "lighting", "color",
+            "click_through", "around_own_axis", "sound", "content"]
     argument_validators = {
         "name": ValidPyString(),
         "placement": FeatureValidator(

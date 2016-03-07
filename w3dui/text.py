@@ -60,20 +60,15 @@ class StringInput(InputUI, tk.Frame):
             self.entry_value.set(value)
 
     def _pack_entry_widgets(self):
-        super(TextBlock, self)._pack_entry_widgets(
+        super(StringInput, self)._pack_entry_widgets(
             pack_arguments={"fill": tk.X, "expand": 1}
         )
 
     def initUI(self, initial_value=None):
+        self.entry_value = tk.StringVar()
         self.entry_widgets.append(tk.Entry(
             self.target_frame, textvariable=self.entry_value))
         super(StringInput, self).initUI(initial_value=initial_value)
-
-    def __init__(self, parent, validator, initial_value=None):
-        self.entry_value = tk.stringVar()
-        super(StringInput, self).__init__(
-            parent, validator, initial_value=initial_value,
-            error_message="Invalid input")
 
 
 class ValidatedStringInput(StringInput, W3DValidatorInput):

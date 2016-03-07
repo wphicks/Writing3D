@@ -37,6 +37,7 @@ class ListInput(ProjectInput, ScrollableFrame):
         del self.entry_elements[index]
 
     def _add_element(self, initial_value=None):
+        self.project_path.get_element().append(self.validator.def_value)
         self.entry_widgets.append(tk.Frame(self.entry_widgets[0]))
         self.entry_widgets[-1].pack(fill=tk.X, expand=1)
         creator_kwargs = {
@@ -61,7 +62,7 @@ class ListInput(ProjectInput, ScrollableFrame):
 
     def _pack_entry_widgets(self):
         super(ListInput, self)._pack_entry_widgets(
-            pack_arguments={"fill": tk.X, "expand": 1}
+            pack_arguments={"fill": tk.X, "anchor": tk.NW, "expand": 1}
         )
 
     def initUI(self, initial_value=None):
@@ -74,11 +75,11 @@ class ListInput(ProjectInput, ScrollableFrame):
     def __init__(
             self, parent, validator, project_path, initial_value=None,
             error_message=None):
+        self.entry_elements = []
         super(ListInput, self).__init__(
             parent, validator, project_path, initial_value=initial_value,
             error_message=error_message)
         self.target_frame = self.inside_frame
-        self.entry_elements = []
 
 
 class SortedListInput(ListInput, tk.Frame):

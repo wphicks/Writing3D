@@ -77,7 +77,7 @@ class InputUI(object):
         """Sets the displayed input value to given value"""
         pass
 
-    def _process_input(self):
+    def _process_input(self, event):
         """Store input if valid; otherwise display error message"""
         if self.validate_input():
             self.store_value()
@@ -156,3 +156,4 @@ class ProjectInput(W3DValidatorInput):
         super(ProjectInput, self).__init__(
             parent, validator, initial_value=initial_value,
             error_message=error_message)
+        self.project_path.set_element(self.get_input_value())
