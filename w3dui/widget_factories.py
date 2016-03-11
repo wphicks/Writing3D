@@ -74,11 +74,17 @@ def widget_creator(
             raise WidgetCreationError(
                 "Insufficient information to determine widget type")
         try:
-            validator = input_parent.get_input_value(
-                ).argument_validators[option_name]
-        except KeyError:
-            raise WidgetCreationError(
-                "Validator must be specified for this widget")
+            widget_path = input_parent.project_path.create_child_path(
+                option_name)
+            validator = widget_path.get_validator()
+        except AttributeError as e:
+            raise e
+            try:
+                validator = input_parent.get_input_value(
+                    ).argument_validators[option_name]
+            except KeyError:
+                raise WidgetCreationError(
+                    "Validator must be specified for this widget")
     if frame is None:
         if input_parent is None:
             raise WidgetCreationError(

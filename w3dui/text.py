@@ -26,11 +26,11 @@ class TextBlock(InputUI, tk.Frame):
     """Widget for inputting a formatted block of text"""
 
     def get_input_value(self):
-        return self.entries[0].get("1.0", tk.END)
+        return self.entry_widgets[0].get("1.0", tk.END)
 
     def set_input_value(self, value):
         if value is not None:
-            self.editor.insert(tk.END, str(value))
+            self.entry_widgets[0].insert(tk.END, str(value))
 
     def _pack_entry_widgets(self):
         super(TextBlock, self)._pack_entry_widgets(

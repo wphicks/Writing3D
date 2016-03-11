@@ -188,6 +188,10 @@ class DictValidator(Validator):
     :param Validator value_validator: A validator used to validate the values
     of the dictionary"""
 
+    def get_base_validator(self, key):
+        """Return validator for dictionary values"""
+        return self.value_validator
+
     def __init__(
             self, key_validator, value_validator, help_string=None):
         self.key_validator = key_validator

@@ -589,7 +589,6 @@ class W3DLight(W3DContent):
                 if factor in light_root.attrib:
                     new_light["attenuation"][index] = text2bool(
                         light_root.attrib[factor])
-            new_light["attenuation"] = tuple(new_light["attenuation"])
             for light_type in W3DLight.argument_validators[
                     "light_type"].valid_options:
                 type_root = light_root.find(light_type)

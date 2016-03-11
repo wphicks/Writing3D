@@ -70,6 +70,12 @@ class FeatureInput(ProjectInput, tk.Frame):
             target = tk.TopLevel()
             target.title("Edit")
         self.entry_widgets.append(target)
+        try:
+            value = self.get_stored_value()
+        except UnsetValueError:
+            value = None
+        if type(value) != self._get_chosen_class():
+            self.store_value(self._get_chosen_class()())
         for option in self._get_chosen_class().ui_order:
             self.entry_widgets.append(
                 tk.Label(target, text="{}:".format(option))
@@ -89,12 +95,28 @@ class FeatureInput(ProjectInput, tk.Frame):
         self.entry_widgets.append(tk.Button(
             self, text="Edit", command=self._create_editor)
         )
+        self.entry_widgets[-1].pack(fill=tk.X)
 
-    def initUI(self, initial_value=None):
+    def _create_input_ui(self):
+        """Create interface for editing this feature"""
+        for widget in self.entry_widgets:
+            widget.destroy()
         if len(self.classes) == 1:
             self._create_editor()
         else:
             self._create_class_picker()
+
+    def initUI(self, initial_value=None):
+        try:
+            value = self.get_stored_value()
+        except UnsetValueError:
+            value = None
+        if value is None:
+            self.entry_widgets.append(tk.Button(
+                self.target_frame, text="Add", command=self._create_input_ui)
+            )
+        else:
+            self._create_input_ui()
         super(FeatureInput, self).initUI(initial_value=initial_value)
 
     def __init__(
@@ -104,7 +126,8 @@ class FeatureInput(ProjectInput, tk.Frame):
         try:
             self.classes.extend(
                 sorted(
-                    validator.correct_class._subclass_registry.values()
+                    validator.correct_class._subclass_registry.values(),
+                    key=lambda x: x.__name__
                 )
             )
         except AttributeError:

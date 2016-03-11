@@ -36,14 +36,14 @@ def convert_to_blender_axes(vector):
     """Convert from legacy axis orientation and scale to Blender
 
     In Blender, positive z-axis points up"""
-    return tuple((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
+    return list((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
 
 
 def convert_to_legacy_axes(vector):
     """Convert from Blender axis orientation and scale to legacy
 
     In Blender, positive z-axis points up"""
-    return tuple((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
+    return list((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
 
 
 def matrix_from_look(look_direction, up_direction=None):

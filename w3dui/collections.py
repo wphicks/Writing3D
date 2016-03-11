@@ -37,7 +37,11 @@ class ListInput(ProjectInput, ScrollableFrame):
         del self.entry_elements[index]
 
     def _add_element(self, initial_value=None):
-        self.project_path.get_element().append(self.validator.def_value)
+        self.project_path.get_element().append(
+            self.validator.get_base_validator(
+                len(self.project_path.get_element())
+            ).def_value
+        )
         self.entry_widgets.append(tk.Frame(self.entry_widgets[0]))
         self.entry_widgets[-1].pack(fill=tk.X, expand=1)
         creator_kwargs = {
