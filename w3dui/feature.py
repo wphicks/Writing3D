@@ -77,13 +77,15 @@ class FeatureInput(ProjectInput, tk.Frame):
         if type(value) != self._get_chosen_class():
             self.store_value(self._get_chosen_class()())
         for option in self._get_chosen_class().ui_order:
+            cur_frame = tk.Frame(target)
+            cur_frame.pack(anchor=tk.NW)
             self.entry_widgets.append(
-                tk.Label(target, text="{}:".format(option))
+                tk.Label(cur_frame, text="{}:".format(option))
             )
             self.entry_widgets[-1].pack(anchor=tk.W, side=tk.LEFT)
 
             self.entry_widgets.append(widget_creator(
-                input_parent=self, option_name=option))
+                frame=cur_frame, input_parent=self, option_name=option))
             self.entry_widgets[-1].pack(anchor=tk.W, side=tk.LEFT, fill=tk.X)
 
     def _create_class_picker(self):

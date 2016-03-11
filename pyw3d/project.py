@@ -153,10 +153,11 @@ class W3DProject(W3DFeature):
     W3DPlacements specifying their position and orientation
     """
 
-    ui_order = [
-        "camera_placement", "desktop_camera_placement", "far_clip",
-        "allow_movement", "allow_rotation", "background"
-    ]
+    #ui_order = [
+    #    "camera_placement", "desktop_camera_placement", "far_clip",
+    #    "allow_movement", "allow_rotation", "background"
+    #]
+    ui_order = ["camera_placement"]
 
     argument_validators = {
         "objects": ListValidator(
