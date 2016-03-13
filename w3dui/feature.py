@@ -51,6 +51,9 @@ class FeatureInput(ProjectInput, tk.Frame):
             except KeyError:
                 widget.set_input_value(widget.validator.def_value)
 
+    def _process_input(self, event, silent=False):
+        super()._process_input(event, silent=True)
+
     def _get_chosen_class(self):
         """Return selected class for this widget
 

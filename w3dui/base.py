@@ -18,6 +18,7 @@
 """Tk widgets for inputting W3DProject options"""
 
 import tkinter as tk
+import warnings
 
 
 def help_bubble(message):
@@ -50,8 +51,17 @@ class InputUI(object):
     """
 
     def destroy(self):
-        if self.validate_input():
-            self.store_value()
+        try:
+            if self.validate_input():
+                self.store_value()
+            else:
+                warnings.warn(
+                    "Error processing input on exit!"
+                )
+        except Exception as proc_error:
+            warnings.warn(
+                "Error processing input on exit:\n{}".format(str(proc_error))
+            )
         super(InputUI, self).destroy()
 
     def get_stored_value(self):
@@ -77,7 +87,7 @@ class InputUI(object):
         """Sets the displayed input value to given value"""
         pass
 
-    def _process_input(self, event):
+    def _process_input(self, event, silent=False):
         """Store input if valid; otherwise display error message"""
         try:
             if self.validate_input():
@@ -85,13 +95,14 @@ class InputUI(object):
             else:
                 help_bubble(self.error_message)
         except Exception as proc_error:
-            help_bubble("\n\n".join(
-                (
-                    self.error_message,
-                    "Error during processing:",
-                    proc_error.message
-                )
-            ))
+            if not silent:
+                help_bubble("\n".join(
+                    (
+                        self.error_message,
+                        "\nError during processing:",
+                        str(proc_error)
+                    )
+                ))
 
     def _pack_entry_widgets(self, pack_arguments={}):
         """Pack all entry widgets in self

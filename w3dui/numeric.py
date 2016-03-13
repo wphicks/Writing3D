@@ -58,7 +58,7 @@ class IntInput(NumericInput, tk.Frame):
         try:
             if value is None:
                 value = int(self.entry_value.get())
-        except TypeError:
+        except ValueError:
             raise InvalidInput("Must be an integer value")
         value = super().get_input_value(value=value)
         self.set_input_value(value)

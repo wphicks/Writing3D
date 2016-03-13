@@ -30,6 +30,9 @@ class ListInput(ProjectInput, ScrollableFrame):
     def get_input_value(self):
         return [widget.get_input_value() for widget in self.entry_elements]
 
+    def _process_input(self, event, silent=False):
+        super()._process_input(event, silent=True)
+
     def _remove_index(self, index):
         """Remove element at given index from project"""
         self.entry_widgets[index + 2].destroy()
@@ -92,6 +95,9 @@ class SortedListInput(ListInput, tk.Frame):
     def get_input_value(self):
         return SortedList(super(SortedListInput, self).get_input_value())
 
+    def _process_input(self, event, silent=False):
+        super()._process_input(event, silent=True)
+
 
 class FixedListInput(ProjectInput, tk.Frame):
     """Widget for inputting a list of fixed size as a project option"""
@@ -102,6 +108,9 @@ class FixedListInput(ProjectInput, tk.Frame):
     def set_input_value(self, iterable):
         for widget, value in zip(self.entry_widgets, iterable):
             widget.set_input_value(value)
+
+    def _process_input(self, event, silent=False):
+        super()._process_input(event, silent=True)
 
     def _pack_entry_widgets(self):
         super(FixedListInput, self)._pack_entry_widgets(
