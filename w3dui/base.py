@@ -79,10 +79,19 @@ class InputUI(object):
 
     def _process_input(self, event):
         """Store input if valid; otherwise display error message"""
-        if self.validate_input():
-            self.store_value()
-        else:
-            help_bubble(self.error_message)
+        try:
+            if self.validate_input():
+                self.store_value()
+            else:
+                help_bubble(self.error_message)
+        except Exception as proc_error:
+            help_bubble("\n\n".join(
+                (
+                    self.error_message,
+                    "Error during processing:",
+                    proc_error.message
+                )
+            ))
 
     def _pack_entry_widgets(self, pack_arguments={}):
         """Pack all entry widgets in self
@@ -115,6 +124,9 @@ class W3DValidatorInput(InputUI):
     """TK widget for getting input and validating with a W3D-style validator
 
     :param Validator validator: A W3D-style validator"""
+
+    def get_input_value(self):
+        return self.validator.coerce(self._get_raw_input())
 
     def validate_input(self):
         return (

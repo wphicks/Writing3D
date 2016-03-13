@@ -659,7 +659,8 @@ class W3DObject(W3DFeature):
     """
 
     ui_order = ["name", "placement", "scale", "visible", "lighting", "color",
-            "click_through", "around_own_axis", "sound", "content"]
+            "click_through", "around_own_axis", "content"]
+    #TODO: Add sound
     argument_validators = {
         "name": ValidPyString(),
         "placement": FeatureValidator(

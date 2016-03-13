@@ -67,7 +67,7 @@ class FeatureInput(ProjectInput, tk.Frame):
             target = ttk.LabelFrame(self.target_frame)
             target.pack(fill=tk.X)
         else:
-            target = tk.TopLevel()
+            target = tk.Toplevel()
             target.title("Edit")
         self.entry_widgets.append(target)
         try:
