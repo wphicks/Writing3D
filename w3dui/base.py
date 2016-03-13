@@ -67,11 +67,11 @@ class InputUI(object):
         """Return true if input is valid for this option"""
         return True
 
-    def get_input_value(self):
+    def get_input_value(self, value=None):
         """Returns the current input value for this widget
 
         :raise InvalidInput: if input value can't be read as a valid value"""
-        return None
+        return value
 
     def set_input_value(self, value):
         """Sets the displayed input value to given value"""
@@ -125,8 +125,8 @@ class W3DValidatorInput(InputUI):
 
     :param Validator validator: A W3D-style validator"""
 
-    def get_input_value(self):
-        return self.validator.coerce(self._get_raw_input())
+    def get_input_value(self, value=None):
+        return super().get_input_value(value=self.validator.coerce(value))
 
     def validate_input(self):
         return (

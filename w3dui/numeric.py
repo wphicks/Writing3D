@@ -24,9 +24,11 @@ from .base import InputUI, InvalidInput, W3DValidatorInput, ProjectInput
 class NumericInput(InputUI, tk.Frame):
     """Widget for inputting numeric values"""
 
-    def get_input_value(self):
+    def get_input_value(self, value=None):
         try:
-            return float(self.entry_value.get())
+            if value is None:
+                value = float(self.entry_value.get())
+            return super().get_input_value(value=value)
         except TypeError:
             raise InvalidInput("Must be a numeric value")
 
@@ -52,13 +54,15 @@ class ProjectNumericInput(NumericInput, ProjectInput):
 class IntInput(NumericInput, tk.Frame):
     """Widget for inputting integer values"""
 
-    def get_input_value(self):
+    def get_input_value(self, value=None):
         try:
-            new_value = int(self.entry_value.get())
+            if value is None:
+                value = int(self.entry_value.get())
         except TypeError:
             raise InvalidInput("Must be an integer value")
-        self.set_input_value(new_value)
-        return new_value
+        value = super().get_input_value(value=value)
+        self.set_input_value(value)
+        return value
 
     def set_input_value(self, value):
         if value is not None:
