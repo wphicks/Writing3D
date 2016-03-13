@@ -66,6 +66,7 @@ class W3DWriter(tk.Frame):
                 input_parent=self, frame=self.tabs["globals"],
                 option_name=option, project_path=self.project_path)
             )
+            self.global_entries[-1].config(text=option)
             self.global_entries[-1].pack(side=tk.LEFT, anchor=tk.NW)
         for category in ["objects", "groups", "timelines", "trigger_events"]:
             self.tabs[category] = w3dui.widget_factories.widget_creator(

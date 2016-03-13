@@ -24,7 +24,7 @@ from .widget_factories import widget_creator
 from pyw3d.path import UnsetValueError
 
 
-class FeatureInput(ProjectInput, tk.Frame):
+class FeatureInput(ProjectInput, ttk.LabelFrame):
     """Widget for editing an entire W3DFeature"""
 
     def get_input_value(self):
@@ -67,7 +67,7 @@ class FeatureInput(ProjectInput, tk.Frame):
     def _create_editor(self):
         """Generate widget for editing feature options"""
         if len(self.classes) == 1:
-            target = ttk.LabelFrame(self.target_frame)
+            target = ttk.Frame(self.target_frame)
             target.pack(fill=tk.X)
         else:
             target = tk.Toplevel()
@@ -82,13 +82,17 @@ class FeatureInput(ProjectInput, tk.Frame):
         for option in self._get_chosen_class().ui_order:
             cur_frame = tk.Frame(target)
             cur_frame.pack(anchor=tk.NW)
-            self.entry_widgets.append(
-                tk.Label(cur_frame, text="{}:".format(option))
-            )
-            self.entry_widgets[-1].pack(anchor=tk.W, side=tk.LEFT)
+            new_widget = widget_creator(
+                frame=cur_frame, input_parent=self, option_name=option)
+            try:
+                new_widget.config(text=option)
+            except tk.TclError:
+                self.entry_widgets.append(
+                    tk.Label(cur_frame, text="{}:".format(option))
+                )
+                self.entry_widgets[-1].pack(anchor=tk.W, side=tk.LEFT)
 
-            self.entry_widgets.append(widget_creator(
-                frame=cur_frame, input_parent=self, option_name=option))
+            self.entry_widgets.append(new_widget)
             self.entry_widgets[-1].pack(anchor=tk.W, side=tk.LEFT, fill=tk.X)
 
     def _create_class_picker(self):
