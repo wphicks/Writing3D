@@ -71,7 +71,6 @@ class ProjectPath(object):
 
     def get_validator(self):
         """Get the validator for this element"""
-        print(self.path)
         parent_path = self.create_parent_path()
         parent = self.get_element_parent()
         try:

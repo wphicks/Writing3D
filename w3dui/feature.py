@@ -66,12 +66,14 @@ class FeatureInput(ProjectInput, ttk.LabelFrame):
 
     def _create_editor(self):
         """Generate widget for editing feature options"""
-        if len(self.classes) == 1:
-            target = ttk.Frame(self.target_frame)
-            target.pack(fill=tk.X)
-        else:
-            target = tk.Toplevel()
-            target.title("Edit")
+        while len(self.entry_widgets) > int(len(self.classes) != 1):
+            self.entry_widgets.pop().destroy()
+        #if len(self.classes) == 1:
+        target = ttk.Frame(self.target_frame)
+        target.pack(fill=tk.X)
+        #else:
+        #    target = tk.Toplevel()
+        #    target.title("Edit")
         self.entry_widgets.append(target)
         try:
             value = self.get_stored_value()
@@ -94,6 +96,10 @@ class FeatureInput(ProjectInput, ttk.LabelFrame):
 
             self.entry_widgets.append(new_widget)
             self.entry_widgets[-1].pack(anchor=tk.W, side=tk.LEFT, fill=tk.X)
+        self.editor = target
+
+    def _clear_editor(self, *args, **kwargs):
+        self._create_editor()
 
     def _create_class_picker(self):
         """Generate widget for choosing feature class"""
@@ -101,16 +107,18 @@ class FeatureInput(ProjectInput, ttk.LabelFrame):
             self, self.class_selection,
             *[cls.__name__ for cls in self.classes])
         )
+        self.class_selection.trace("w", self._clear_editor)
         self.entry_widgets[-1].pack(side=tk.LEFT)
-        self.entry_widgets.append(tk.Button(
-            self, text="Edit", command=self._create_editor)
-        )
-        self.entry_widgets[-1].pack(fill=tk.X)
+        #self.entry_widgets.append(tk.Button(
+        #    self, text="Edit", command=self._create_editor)
+        #)
+        #self.entry_widgets[-1].pack(fill=tk.X)
 
     def _create_input_ui(self):
         """Create interface for editing this feature"""
         for widget in self.entry_widgets:
             widget.destroy()
+        self.entry_widgets = []
         if len(self.classes) == 1:
             self._create_editor()
         else:
@@ -132,6 +140,7 @@ class FeatureInput(ProjectInput, ttk.LabelFrame):
     def __init__(
             self, parent, validator, project_path, initial_value=None,
             error_message="Invalid input"):
+        self.editor = None
         self.classes = [validator.correct_class]
         try:
             self.classes.extend(

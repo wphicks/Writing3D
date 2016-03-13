@@ -410,10 +410,10 @@ class W3DImage(W3DContent):
 class W3DStereoImage(W3DContent):
     """Represents different images in left and right eye
 
-    :param str left-file: Filename of image to be displayed to left eye
-    :param str right-file: Filename of image to be displayed to right eye
+    :param str left_file: Filename of image to be displayed to left eye
+    :param str right_file: Filename of image to be displayed to right eye
     """
-    ui_order=["left-file", "right-file"]
+    ui_order=["left_file", "right_file"]
     argument_validators = {
         "left_file": ValidFile(help_string="Filename of left-eye image"),
         "right_file": ValidFile(help_string="Filename of right-eye image")}
