@@ -78,7 +78,7 @@ class FeatureInput(ProjectInput, ttk.LabelFrame):
         except UnsetValueError:
             value = None
         if type(value) != self._get_chosen_class():
-            self.store_value(self._get_chosen_class()())
+            self.store_value(value=self._get_chosen_class()())
         for option in self._get_chosen_class().ui_order:
             cur_frame = tk.Frame(target)
             cur_frame.pack(anchor=tk.NW)
@@ -101,6 +101,7 @@ class FeatureInput(ProjectInput, ttk.LabelFrame):
             self, self.class_selection,
             *[cls.__name__ for cls in self.classes])
         )
+        self.entry_widgets[-1].pack(side=tk.LEFT)
         self.entry_widgets.append(tk.Button(
             self, text="Edit", command=self._create_editor)
         )

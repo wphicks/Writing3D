@@ -69,7 +69,7 @@ class InputUI(object):
         W3DProject"""
         pass
 
-    def store_value(self):
+    def store_value(self, value=None):
         """Stores the current input value in a W3DProject"""
         pass
 
@@ -169,8 +169,11 @@ class ProjectInput(W3DValidatorInput):
     def get_stored_value(self):
         return self.project_path.get_element()
 
-    def store_value(self):
-        self.project_path.set_element(self.get_input_value())
+    def store_value(self, value=None):
+        if value is None:
+            self.project_path.set_element(self.get_input_value())
+        else:
+            self.project_path.set_element(value)
 
     def __init__(
             self, parent, validator, project_path, initial_value=None,

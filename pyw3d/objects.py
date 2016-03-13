@@ -229,6 +229,7 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
     """Represents content of a W3D object"""
 
     blender_scaling = 1
+    ui_order = []
 
     @staticmethod
     def fromXML(content_root):
@@ -262,6 +263,7 @@ class W3DText(W3DContent):
     :param str font: Name of font to be used
     :param float depth: Depth to extrude each letter
     """
+    ui_order = ["text", "halign", "depth", "font"]
     argument_validators = {
         "text": TextValidator(),
         "halign": OptionValidator(
@@ -349,6 +351,7 @@ class W3DImage(W3DContent):
     """Represent a flat image in the W3D
 
     :param str filename: Filename of image to be displayed"""
+    ui_order=["filename"]
     argument_validators = {
         "filename": ValidFile()}
 
@@ -410,6 +413,7 @@ class W3DStereoImage(W3DContent):
     :param str left-file: Filename of image to be displayed to left eye
     :param str right-file: Filename of image to be displayed to right eye
     """
+    ui_order=["left-file", "right-file"]
     argument_validators = {
         "left_file": ValidFile(help_string="Filename of left-eye image"),
         "right_file": ValidFile(help_string="Filename of right-eye image")}
@@ -461,6 +465,7 @@ class W3DModel(W3DContent):
     :param bool check_collisions: TODO Clarify what this does
     """
     #TODO: Does not seem to play nice with GLSL shader. FIX THIS.
+    ui_order=["filename"]
     argument_validators = {
         "filename": ValidFile(),
         "check_collisions": IsBoolean()}
@@ -531,6 +536,7 @@ class W3DLight(W3DContent):
     :param float angle: Angle in degrees specifying spread of spot light
     source
     """
+    ui_order = ["light_type", "diffuse", "specular", "angle", "attenuation"]
     argument_validators = {
         "light_type": OptionValidator("Point", "Directional", "Spot"),
         "diffuse": IsBoolean(),
