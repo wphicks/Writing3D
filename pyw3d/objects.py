@@ -91,7 +91,7 @@ class W3DLink(W3DFeature):
         "selected_color": ListValidator(
             IsInteger(min_value=0, max_value=255), required_length=3),
         "actions": DictValidator(
-            IsInteger(), FeatureValidator(W3DAction),
+            IsInteger(), ListValidator(FeatureValidator(W3DAction)),
             help_string="Must be a dictionary mapping integers to lists of "
             "W3DActions"
         ),
@@ -217,7 +217,6 @@ class W3DLink(W3DFeature):
 
     def write_blender_logic(self):
         """Write any necessary game engine logic for this W3DTimeline"""
-        self.activator.write_python_logic()
         try:
             self.activator.write_python_logic()
         except AttributeError:

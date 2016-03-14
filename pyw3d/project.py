@@ -581,3 +581,8 @@ class W3DProject(W3DFeature):
         for trigger in self["trigger_events"]:
             trigger.write_blender_logic()
         setup_blender_layout()
+
+    def export(self, filename):
+        """Save project as .blend file of given name"""
+        self.blend()
+        bpy.ops.wm.save_as_mainfile(filepath=filename)
