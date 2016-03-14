@@ -45,9 +45,9 @@ class ProjectPath(object):
     def remove_index_element(self, index):
         """Removes an element from a list within W3DProject tree"""
         del self.get_element()[index]
-        for i in range(index, len(self.get_element())):
+        for i in range(len(self.get_element())):
             try:
-                self.get_element()[i].project_path.set_specifier(i-1)
+                self.get_element()[i].project_path.set_specifier(i)
             except AttributeError:
                 pass
 

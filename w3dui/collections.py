@@ -28,6 +28,7 @@ class ListInput(ProjectInput, ScrollableFrame):
     """Widget for entering lists of project elements"""
 
     def get_input_value(self):
+        print(self.entry_elements)
         return [widget.get_input_value() for widget in self.entry_elements]
 
     def _process_input(self, event, silent=False):
@@ -36,15 +37,21 @@ class ListInput(ProjectInput, ScrollableFrame):
     def _remove_index(self, index):
         """Remove element at given index from project"""
         self.entry_widgets[index + 2].destroy()
+        self.project_path.remove_index_element(index)
         del self.entry_widgets[index + 2]
         del self.entry_elements[index]
 
     def _add_element(self, initial_value=None):
-        self.project_path.get_element().append(
-            self.validator.get_base_validator(
-                len(self.project_path.get_element())
-            ).def_value
-        )
+        if initial_value is None:
+            initial_value = self.validator.get_base_validator(
+                len(self.project_path.get_element())).def_value
+            try:
+                if "name" in initial_value.argument_validators:
+                    initial_value["name"] = "elem{}".format(self._elem_count)
+                    self._elem_count += 1
+            except AttributeError:
+                pass
+        self.project_path.get_element().append(initial_value)
         self.entry_widgets.append(tk.Frame(self.entry_widgets[0]))
         self.entry_widgets[-1].pack(fill=tk.X, expand=1)
         creator_kwargs = {
@@ -82,6 +89,7 @@ class ListInput(ProjectInput, ScrollableFrame):
     def __init__(
             self, parent, validator, project_path, initial_value=None,
             error_message=None):
+        self._elem_count = 0
         self.entry_elements = []
         super(ListInput, self).__init__(
             parent, validator, project_path, initial_value=initial_value,
@@ -106,8 +114,9 @@ class FixedListInput(ProjectInput, tk.Frame):
         return [widget.get_input_value() for widget in self.entry_widgets]
 
     def set_input_value(self, iterable):
-        for widget, value in zip(self.entry_widgets, iterable):
-            widget.set_input_value(value)
+        if iterable is not None:
+            for widget, value in zip(self.entry_widgets, iterable):
+                widget.set_input_value(value)
 
     def _process_input(self, event, silent=False):
         super()._process_input(event, silent=True)

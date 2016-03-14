@@ -85,14 +85,14 @@ class FileInput(StringInput, tk.Frame):
     def validate_input(self):
         return (
             super(FileInput, self).validate_input() and
-            os.path.exists(self.get_input_value)
+            os.path.exists(self.get_input_value())
         )  # Should we do isfile instead here?
 
-    def open_file_dialog(self):
+    def open_file_dialog(self, *args, **kwargs):
         """Open GUI dialog for obtaining filename"""
         filename = tk.filedialog.askopenfilename()
         old_value = self.get_input_value()
-        self.set_input_value(self, filename)
+        self.set_input_value(filename)
         if not self.validate_input():
             help_bubble(self.error_message)
             self.set_input_value(self, old_value)
