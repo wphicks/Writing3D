@@ -19,7 +19,7 @@
 import xml.etree.ElementTree as ET
 import math
 from .features import W3DFeature
-from .validators import OptionListValidator, IsNumericIterable, IsNumeric, \
+from .validators import OptionValidator, ListValidator, IsNumeric, \
     FeatureValidator
 from .errors import BadW3DXML
 from .xml_tools import text2tuple
@@ -36,14 +36,14 @@ def convert_to_blender_axes(vector):
     """Convert from legacy axis orientation and scale to Blender
 
     In Blender, positive z-axis points up"""
-    return tuple((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
+    return list((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
 
 
 def convert_to_legacy_axes(vector):
     """Convert from Blender axis orientation and scale to legacy
 
     In Blender, positive z-axis points up"""
-    return tuple((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
+    return list((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
 
 
 def matrix_from_look(look_direction, up_direction=None):
@@ -63,11 +63,13 @@ def matrix_from_look(look_direction, up_direction=None):
 
 class W3DRotation(W3DFeature):
     """Stores data on rotation of objects within W3D"""
+    ui_order = [
+        "rotation_mode", "rotation_vector", "up_vector", "rotation_angle"]
     argument_validators = {
-        "rotation_mode": OptionListValidator(
+        "rotation_mode": OptionValidator(
             "None", "Axis", "LookAt", "Normal"),
-        "rotation_vector": IsNumericIterable(3),
-        "up_vector": IsNumericIterable(3),
+        "rotation_vector": ListValidator(IsNumeric(), required_length=3),
+        "up_vector": ListValidator(IsNumeric(), required_length=3),
         "rotation_angle": IsNumeric()}
     default_arguments = {
         "rotation_mode": "None",
@@ -155,10 +157,12 @@ class W3DPlacement(W3DFeature):
     :param py:class:W3DRotation rotation: py:class:W3DRotation object
     specifying rotation
     """
+    ui_order = ["position", "relative_to", "rotation"]
     argument_validators = {
-        "relative_to": OptionListValidator(
+        "relative_to": OptionValidator(
             "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
-        "position": IsNumericIterable(3),
+        "position": ListValidator(
+            IsNumeric(), required_length=3),
         "rotation": FeatureValidator(W3DRotation)}
     default_arguments = {
         "relative_to": "Center",

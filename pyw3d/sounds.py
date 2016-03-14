@@ -19,7 +19,8 @@
 """
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
-from .validators import AlwaysValid, IsNumeric, OptionListValidator
+from .validators import IsNumeric, OptionValidator, ValidPyString, IsBoolean,\
+    ValidFile
 from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
 
@@ -40,13 +41,10 @@ class W3DSound(W3DFeature):
     :param float pan: Stereo panning left to right (-1.0 to 1.0)
     """
     argument_validators = {
-        "name": AlwaysValid(
-            help_string="This should be a string specifying a unique name for"
-            " this sound"),
-        "filename": AlwaysValid(
-            help_string="This should be a string specifying the audio file"),
-        "autostart": AlwaysValid(help_string="Either true or false"),
-        "movement_mode": OptionListValidator("Positional", "Fixed"),
+        "name": ValidPyString(),
+        "filename": ValidFile(),
+        "autostart": IsBoolean(),
+        "movement_mode": OptionValidator("Positional", "Fixed"),
         "repetitions": IsNumeric(),
         "frequency_scale": IsNumeric(min_value=0),
         "volume_scale": IsNumeric(min_value=0, max_value=1),

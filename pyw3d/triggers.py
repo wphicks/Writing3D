@@ -22,17 +22,16 @@ action. For example, when the viewer reaches a particular location, a timeline
 can be started."""
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
-from .validators import AlwaysValid, IsNumeric, IsNumericIterable, \
-    OptionListValidator, IsBoolean, ValidPyString, MultiFeatureListValidator,\
-    FeatureValidator
+from .validators import IsNumeric, ListValidator, \
+    OptionValidator, IsBoolean, ValidPyString, \
+    FeatureValidator, ReferenceValidator
 from .errors import ConsistencyError, BadW3DXML, InvalidArgument, \
     EBKAC
 from .xml_tools import bool2text, text2tuple, text2bool
 from .activators import BlenderTrigger, BlenderPositionTrigger, \
     BlenderPointTrigger, BlenderDirectionTrigger, BlenderLookObjectTrigger, \
     BlenderObjectPositionTrigger
-from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
-    SoundAction, EventTriggerAction, MoveVRAction, W3DResetAction
+from .actions import W3DAction
 
 
 class W3DTrigger(W3DFeature):
@@ -119,14 +118,10 @@ class BareTrigger(W3DFeature):
         "enabled": IsBoolean(),
         "remain_enabled": IsBoolean(),
         "duration": IsNumeric(min_value=0),
-        "actions": MultiFeatureListValidator(
-            [
-                W3DAction, ObjectAction, GroupAction, TimelineAction,
-                SoundAction, EventTriggerAction, MoveVRAction,
-                W3DResetAction
-            ],
-            help_string="A list of W3DActions")
-        }
+        "actions": ListValidator(
+            FeatureValidator(W3DAction),
+            help_string="A list of W3DActions"
+        )}
 
     default_arguments = {
         "enabled": True,
@@ -220,11 +215,18 @@ class EventBox(W3DFeature):
     """
 
     argument_validators = {
-        "direction": OptionListValidator("Inside", "Outside"),
-        "ignore_y": AlwaysValid(
-            help_string="Either true or false"),
-        "corner1": IsNumericIterable(required_length=3),
-        "corner2": IsNumericIterable(required_length=3)}
+        "direction": OptionValidator("Inside", "Outside"),
+        "ignore_y": IsBoolean(),
+        "corner1": ListValidator(
+            IsNumeric(),
+            required_length=3,
+            help_string="Coordinates of box corner"
+        ),
+        "corner2": ListValidator(
+            IsNumeric(),
+            required_length=3,
+            help_string="Coordinates of box corner"
+        )}
 
     default_arguments = {
         "ignore_y": True
@@ -353,7 +355,9 @@ class LookAtPoint(HeadTrackTrigger):
     # TODO: Do we need to allow localization in box?
 
     argument_validators = {
-        "point": IsNumericIterable(required_length=3),
+        "point": ListValidator(
+            IsNumeric(), required_length=3,
+            help_string="Coordinates of point to look at"),
         "angle": IsNumeric()
     }
     default_arguments = {
@@ -414,7 +418,10 @@ class LookAtDirection(HeadTrackTrigger):
     :param float angle: Look direction must be within this angle of target"""
 
     argument_validators = {
-        "direction": IsNumericIterable(required_length=3),
+        "direction": ListValidator(
+            IsNumeric(),
+            help_string="Vector specifying look direction"
+        ),
         "angle": IsNumeric()
     }
     default_arguments = {
@@ -477,7 +484,12 @@ class LookAtObject(HeadTrackTrigger):
     :param float angle: TODO: clarify (WARNING: currently does nothing)"""
 
     argument_validators = {
-        "object": AlwaysValid("The name of the object to look at"),
+        "object": ReferenceValidator(
+            ValidPyString(),
+            ["objects"],
+            help_string="Must be an existing object"
+        ),
+        "angle": IsNumeric()
     }
 
     def toXML(self, all_triggers_root):
@@ -538,10 +550,9 @@ class MovementTrigger(W3DTrigger):
     of specified box
     """
     argument_validators = {
-        "type": OptionListValidator(
+        "type": OptionValidator(
             "Single Object", "Group(Any)", "Group(All)"),
-        "object_name": AlwaysValid(
-            help_string="Must be the name of an object or group"),
+        "object_name": ValidPyString(),
         "box": FeatureValidator(
             EventBox,
             help_string="Box used to check position of objects")

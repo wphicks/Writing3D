@@ -24,12 +24,13 @@ import warnings
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .placement import W3DPlacement
-from .validators import OptionListValidator, IsNumeric,  AlwaysValid,\
-    IsNumericIterable, IsBoolean, FeatureValidator, ProjectOptionValidator,\
-    ValidPyString
+from .validators import OptionValidator, IsNumeric,\
+    ListValidator, IsBoolean, FeatureValidator, ReferenceValidator,\
+    ValidPyString, IsInteger
 from .errors import BadW3DXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name, generate_group_name
+from .metaclasses import SubRegisteredClass
 try:
     from .blender_actions import ActionCondition, VisibilityAction,\
         MoveAction, ColorAction, LinkAction, TimelineStarter, TriggerEnabler,\
@@ -41,7 +42,7 @@ except ImportError:
     )
 
 
-class W3DAction(W3DFeature):
+class W3DAction(W3DFeature, metaclass=SubRegisteredClass):
     """An action causing a change in the W3D
 
     Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
@@ -191,9 +192,9 @@ class ObjectAction(W3DAction):
     """
 
     argument_validators = {
-        "object_name": ProjectOptionValidator(
+        "object_name": ReferenceValidator(
             ValidPyString(),
-            lambda proj: [obj["name"] for obj in proj["objects"]],
+            ["objects"],
             help_string="Must be the name of an object"),
         "duration": IsNumeric(min_value=0),
         "visible": IsBoolean(),
@@ -201,11 +202,14 @@ class ObjectAction(W3DAction):
             W3DPlacement,
             help_string="Orientation and position for movement"),
         "move_relative": IsBoolean(),
-        "color": IsNumericIterable(required_length=3),
+        "color": ListValidator( 
+            IsInteger(min_value=0, max_value=255),
+            required_length=3,
+            help_string="Red, Green, Blue values"),
         "scale": IsNumeric(min_value=0),
         #TODO
-        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
-        "link_change": OptionListValidator(
+        "sound_change": OptionValidator("Play Sound", "Stop Sound"),
+        "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
         }
 
@@ -341,16 +345,22 @@ class GroupAction(W3DAction):
     """
 
     argument_validators = {
-        "group_name": AlwaysValid("Name of a group"),
-        "choose_random": AlwaysValid("Either true or false"),
+        "group_name": ReferenceValidator(
+            ValidPyString(),
+            ["groups"],
+            help_string="Must be the name of a group"),
+        "choose_random": IsBoolean(),
         "duration": IsNumeric(min_value=0),
-        "visible": AlwaysValid("Either true or false"),
-        "placement": AlwaysValid("A W3DPlacement object"),
-        "move_relative": AlwaysValid("Either true or false"),
-        "color": IsNumericIterable(required_length=3),
+        "visible": IsBoolean(),
+        "placement": IsBoolean(),
+        "move_relative": IsBoolean(),
+        "color": ListValidator(
+            IsInteger(min_value=0, max_value=255),
+            required_length=3,
+            help_string="Red, Green, Blue values"),
         "scale": IsNumeric(min_value=0),
-        "sound_change": OptionListValidator("Play Sound", "Stop Sound"),
-        "link_change": OptionListValidator(
+        "sound_change": OptionValidator("Play Sound", "Stop Sound"),
+        "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
         }
 
@@ -506,8 +516,11 @@ class TimelineAction(W3DAction):
     """
 
     argument_validators = {
-        "timeline_name": AlwaysValid("Name of a timeline"),
-        "change": OptionListValidator(
+        "timeline_name": ReferenceValidator(
+            ValidPyString(),
+            ["timelines"],
+            help_string="Must be the name of a timeline"),
+        "change": OptionValidator(
             "Start", "Stop", "Continue", "Start if not started")
         }
 
@@ -603,8 +616,11 @@ class SoundAction(W3DAction):
     :param str change: One of Start or Stop"""
 
     argument_validators = {
-        "sound_name": AlwaysValid("Name of a sound"),
-        "change": OptionListValidator("Start", "Stop")
+        "sound_name": ReferenceValidator(
+            ValidPyString(),
+            ["sounds"],
+            help_string="Must be the name of a sound"),
+        "change": OptionValidator("Start", "Stop")
         }
 
     default_arguments = {
@@ -654,8 +670,12 @@ class EventTriggerAction(W3DAction):
     :param bool enable: Enable trigger?"""
 
     argument_validators = {
-        "trigger_name": AlwaysValid("Name of a trigger"),
-        "enable": AlwaysValid("Either true or false")
+        "trigger_name": ReferenceValidator(
+            ValidPyString(),
+            ["triggers"],
+            help_string="Must be the name of a trigger"
+        ),
+        "enable": IsBoolean()
         }
 
     default_arguments = {}
@@ -743,9 +763,9 @@ class MoveVRAction(W3DAction):
     """
 
     argument_validators = {
-        "move_relative": AlwaysValid("Either true or false"),
+        "move_relative": IsBoolean(),
         "duration": IsNumeric(min_value=0),
-        "placement": AlwaysValid("A W3DPlacement object")
+        "placement": FeatureValidator(W3DPlacement)
         }
 
     default_arguments = {

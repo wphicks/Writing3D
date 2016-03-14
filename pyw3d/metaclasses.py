@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""A module for working with W3D Writing projects
+"""Metaclasses for use with W3D features
 """
-from . import project
-from . import features
-from . import objects
-from . import timeline
-from . import placement
-from . import errors
-from . import validators
-from . import xml_tools
-from . import ui
-from . import structs
-from . import path
+
+
+class SubRegisteredClass(type):
+    """Metaclass for keeping track of subclasses"""
+
+    def __init__(cls, name, bases, attributes):
+        if not hasattr(cls, "_subclass_registry"):
+            cls._subclass_registry = {}
+        else:
+            cls._subclass_registry[name] = cls
+        super(SubRegisteredClass, cls).__init__(name, bases, attributes)
