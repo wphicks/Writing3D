@@ -326,30 +326,25 @@ class W3DProject(W3DFeature):
         """
         new_project = project_class()
         object_root = project_root.find("ObjectRoot")
-        if object_root is None:
-            raise BadW3DXML("Story root has no ObjectRoot node")
-        for child in object_root.findall("Object"):
-            new_project["objects"].append(W3DObject.fromXML(child))
+        if object_root is not None:
+            for child in object_root.findall("Object"):
+                new_project["objects"].append(W3DObject.fromXML(child))
         group_root = project_root.find("GroupRoot")
-        if group_root is None:
-            raise BadW3DXML("Story root has no GroupRoot node")
-        for child in group_root.findall("Group"):
-            new_project["groups"].append(W3DGroup.fromXML(child))
+        if group_root is not None:
+            for child in group_root.findall("Group"):
+                new_project["groups"].append(W3DGroup.fromXML(child))
         timeline_root = project_root.find("TimelineRoot")
-        if object_root is None:
-            raise BadW3DXML("Story root has no ObjectRoot node")
-        for child in timeline_root.findall("Timeline"):
-            new_project["timelines"].append(W3DTimeline.fromXML(child))
+        if timeline_root is not None:
+            for child in timeline_root.findall("Timeline"):
+                new_project["timelines"].append(W3DTimeline.fromXML(child))
         sound_root = project_root.find("SoundRoot")
-        if object_root is None:
-            raise BadW3DXML("Story root has no ObjectRoot node")
-        for child in sound_root.findall("Sound"):
-            new_project["sounds"].append(W3DSound.fromXML(child))
+        if sound_root is not None:
+            for child in sound_root.findall("Sound"):
+                new_project["sounds"].append(W3DSound.fromXML(child))
         trigger_root = project_root.find("EventRoot")
-        if object_root is None:
-            raise BadW3DXML("Story root has no ObjectRoot node")
-        for child in trigger_root.findall("EventTrigger"):
-            new_project["trigger_events"].append(W3DTrigger.fromXML(child))
+        if trigger_root is not None:
+            for child in trigger_root.findall("EventTrigger"):
+                new_project["trigger_events"].append(W3DTrigger.fromXML(child))
 
         global_root = project_root.find("Global")
         if global_root is None:

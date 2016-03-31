@@ -36,6 +36,8 @@ def convert_to_blender_axes(vector):
     """Convert from legacy axis orientation and scale to Blender
 
     In Blender, positive z-axis points up"""
+    if vector is None:
+        return None
     return list((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
 
 
@@ -43,6 +45,8 @@ def convert_to_legacy_axes(vector):
     """Convert from Blender axis orientation and scale to legacy
 
     In Blender, positive z-axis points up"""
+    if vector is None:
+        return None
     return list((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
 
 
@@ -80,8 +84,9 @@ class W3DRotation(W3DFeature):
     def toXML(self, parent_root):
         if not self.is_default("rotation_mode"):
             rot_root = ET.SubElement(parent_root, self["rotation_mode"])
-            rot_root.attrib["rotation"] = str(convert_to_legacy_axes(
-                self["rotation_vector"]))
+            if self["rotation_vector"] is not None:
+                rot_root.attrib["rotation"] = str(tuple(convert_to_legacy_axes(
+                    self["rotation_vector"])))
             rot_root.attrib["angle"] = str(self["rotation_angle"])
             return rot_root
         elif not (self.is_default("rotation_vector") and
@@ -187,7 +192,8 @@ class W3DPlacement(W3DFeature):
             rel_root.text = self["relative_to"]
         if not self.is_default("position"):
             pos_root = ET.SubElement(place_root, "Position")
-            pos_root.text = str(convert_to_legacy_axes(self["position"]))
+            pos_root.text = str(tuple(
+                convert_to_legacy_axes(self["position"])))
         if not self.is_default("rotation"):
             self["rotation"].toXML(place_root)
         return place_root
