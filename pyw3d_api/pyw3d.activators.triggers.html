@@ -1,0 +1,466 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.activators.triggers package &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyw3d-activators-triggers-package">
+<h1>pyw3d.activators.triggers package<a class="headerlink" href="#pyw3d-activators-triggers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyw3d.activators.triggers.links">
+<span id="pyw3d-activators-triggers-links-module"></span><h2>pyw3d.activators.triggers.links module<a class="headerlink" href="#module-pyw3d.activators.triggers.links" title="Permalink to this headline">¶</a></h2>
+<p>Blender implementation of clickable object links in virtual space</p>
+<dl class="class">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.links.</code><code class="descname">BlenderClickTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>object_name</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em>, <em>select_color=(255</em>, <em>0</em>, <em>0)</em>, <em>enable_color=(0</em>, <em>128</em>, <em>255)</em>, <em>reset_clicks=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.triggers.BlenderTrigger" title="pyw3d.activators.triggers.triggers.BlenderTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.triggers.BlenderTrigger</span></code></a></p>
+<p>Activator based on mouseclick on objects in virtual space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the clickable object</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.create_blender_objects">
+<code class="descname">create_blender_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.create_blender_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.create_click_property">
+<code class="descname">create_click_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.create_click_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add property to keep track of how many times link has been
+clicked</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.create_detection_controller">
+<code class="descname">create_detection_controller</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.create_detection_controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add controller for detecting mouseclick and mouseover</p>
+<p>This controller also changes the color of the selected object on
+mouse-down events.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.create_detection_sensors">
+<code class="descname">create_detection_sensors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.create_detection_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add mouseclick and mouseover sensors to clickable object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.create_primed_property">
+<code class="descname">create_primed_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.create_primed_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add property to track if mousedown is followed by mouseup</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.generate_action_logic">
+<code class="descname">generate_action_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.generate_action_logic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function to Python control script to handle mouse click events</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.link_detection_bricks">
+<code class="descname">link_detection_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.link_detection_bricks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link necessary logic bricks for click detections</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>EBKAC</strong> &#8211; if necessary controller and sensors do not</td>
+</tr>
+</tbody>
+</table>
+<p>exist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.link_logic_bricks">
+<code class="descname">link_logic_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.link_logic_bricks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.name">
+<code class="descname">name</code><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.links.BlenderClickTrigger.select_target_object">
+<code class="descname">select_target_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.links.BlenderClickTrigger.select_target_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the clickable object for modification</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.activators.triggers.look_triggers">
+<span id="pyw3d-activators-triggers-look-triggers-module"></span><h2>pyw3d.activators.triggers.look_triggers module<a class="headerlink" href="#module-pyw3d.activators.triggers.look_triggers" title="Permalink to this headline">¶</a></h2>
+<p>Blender-based implementation of triggers based on the user&#8217;s field of view</p>
+<dl class="class">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderDirectionTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.look_triggers.</code><code class="descname">BlenderDirectionTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>direction</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em>, <em>angle=30</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderDirectionTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger" title="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger</span></code></a></p>
+<p>Trigger based on user looking in a direction in virtual space</p>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderDirectionTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderDirectionTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function to Python control script to detect user position</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.look_triggers.</code><code class="descname">BlenderLookAtTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.triggers.BlenderTrigger" title="pyw3d.activators.triggers.triggers.BlenderTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.triggers.BlenderTrigger</span></code></a></p>
+<p>Activator based on where user is looking</p>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.create_blender_objects">
+<code class="descname">create_blender_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.create_blender_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.create_enabled_copier">
+<code class="descname">create_enabled_copier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.create_enabled_copier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create system to copy enabled value to camera property</p>
+<p>Adds a sensor to detect when &#8220;enabled&#8221; property is changed on
+base_object, a trivial &#8220;and&#8221; controller, and an actuator to copy the
+&#8220;enabled&#8221; property to the camera property of the same name as this
+trigger.This allows camera to only go through costly detection actions
+when the trigger is enabled.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.link_camera_bricks">
+<code class="descname">link_camera_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.link_camera_bricks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link BGE logic bricks for camera</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.link_logic_bricks">
+<code class="descname">link_logic_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.link_logic_bricks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.select_camera">
+<code class="descname">select_camera</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.select_camera" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the main camera for modifications</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.setup_camera">
+<code class="descname">setup_camera</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger.setup_camera" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a property, property sensor, and Python controller on the
+main camera for keeping track of if this trigger is enabled</p>
+<p>This setup is used for efficiency. By having the camera know when this
+trigger is enabled, we can have it only perform (expensive) checks
+related to the trigger when it is in fact enabled.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookObjectTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.look_triggers.</code><code class="descname">BlenderLookObjectTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>look_at_object</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em>, <em>angle=30</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookObjectTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger" title="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger</span></code></a></p>
+<p>Trigger based on user looking at an object in virtual space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>look_at_object</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of the W3DObject to be looked at</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderLookObjectTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderLookObjectTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function to Python control script to detect user position</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderPointTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.look_triggers.</code><code class="descname">BlenderPointTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>point</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderPointTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger" title="pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.look_triggers.BlenderLookAtTrigger</span></code></a></p>
+<p>Trigger based on user looking at a point in virtual space</p>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.look_triggers.BlenderPointTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.look_triggers.BlenderPointTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function to Python control script to detect user position</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.activators.triggers.object_triggers">
+<span id="pyw3d-activators-triggers-object-triggers-module"></span><h2>pyw3d.activators.triggers.object_triggers module<a class="headerlink" href="#module-pyw3d.activators.triggers.object_triggers" title="Permalink to this headline">¶</a></h2>
+<p>A Blender implementation of triggers based on the state of objects in
+virtual space</p>
+<dl class="class">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.object_triggers.</code><code class="descname">BlenderObjectPositionTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>box</em>, <em>objects_string</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em>, <em>detect_any=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.triggers.BlenderTrigger" title="pyw3d.activators.triggers.triggers.BlenderTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.triggers.BlenderTrigger</span></code></a></p>
+<p>Activator based on position of objects in virtual space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>objects_string</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; A string containing either a</td>
+</tr>
+</tbody>
+</table>
+<p>Python-formatted list of names of Blender objects or a single valid
+group name (e.g. &#8220;[&#8216;object_myobj1&#8217;, &#8216;object_myobj2&#8217;]&#8221; or &#8220;group_mygrp&#8221;
+:param bool detect_any: True if trigger should activate when any
+specified object passes the box&#8217;s boundaries as specified, False if
+trigger should activate when ALL specified objects have done so</p>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_blender_objects">
+<code class="descname">create_blender_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_blender_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_detection_controller">
+<code class="descname">create_detection_controller</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_detection_controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a controller for detecting specified event</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_enabled_sensor">
+<code class="descname">create_enabled_sensor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_enabled_sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a sensor to fire continuously while trigger is enabled</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function to Python control script to detect user position</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.link_detection_bricks">
+<code class="descname">link_detection_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.link_detection_bricks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link necessary logic bricks for event detection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>EBKAC</strong> &#8211; if controller or sensor does not exist</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.link_logic_bricks">
+<code class="descname">link_logic_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.link_logic_bricks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.activators.triggers.triggers">
+<span id="pyw3d-activators-triggers-triggers-module"></span><h2>pyw3d.activators.triggers.triggers module<a class="headerlink" href="#module-pyw3d.activators.triggers.triggers" title="Permalink to this headline">¶</a></h2>
+<p>A Blender-based implementation of event triggers</p>
+<dl class="class">
+<dt id="pyw3d.activators.triggers.triggers.BlenderTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.triggers.</code><code class="descname">BlenderTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.triggers.BlenderTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d.activators.html#pyw3d.activators.activators.Activator" title="pyw3d.activators.activators.Activator"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.activators.Activator</span></code></a></p>
+<p>Activator based on detection of events in virtual space</p>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.triggers.BlenderTrigger.create_enabled_property">
+<code class="descname">create_enabled_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.triggers.BlenderTrigger.create_enabled_property" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.triggers.BlenderTrigger.generate_action_logic">
+<code class="descname">generate_action_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.triggers.BlenderTrigger.generate_action_logic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.triggers.BlenderTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.triggers.BlenderTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create logic for detecting triggering event</p>
+<p>Dummy method intended to be overridden by subclasses</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.activators.triggers.triggers.BlenderTrigger.name">
+<code class="descname">name</code><a class="headerlink" href="#pyw3d.activators.triggers.triggers.BlenderTrigger.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.triggers.BlenderTrigger.write_python_logic">
+<code class="descname">write_python_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.triggers.BlenderTrigger.write_python_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write any necessary Python controller scripts for this activator</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.activators.triggers.user_triggers">
+<span id="pyw3d-activators-triggers-user-triggers-module"></span><h2>pyw3d.activators.triggers.user_triggers module<a class="headerlink" href="#module-pyw3d.activators.triggers.user_triggers" title="Permalink to this headline">¶</a></h2>
+<p>A Blender-based implementation of triggers based on the state of the user in
+virtual space</p>
+<dl class="class">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.activators.triggers.user_triggers.</code><code class="descname">BlenderPositionTrigger</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>box</em>, <em>duration=0</em>, <em>enable_immediately=True</em>, <em>remain_enabled=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.triggers.triggers.BlenderTrigger" title="pyw3d.activators.triggers.triggers.BlenderTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.triggers.triggers.BlenderTrigger</span></code></a></p>
+<p>Activator based on position of user in virtual space</p>
+<dl class="method">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.create_blender_objects">
+<code class="descname">create_blender_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.create_blender_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.create_detection_controller">
+<code class="descname">create_detection_controller</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.create_detection_controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a controller for detecting specified event</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.create_enabled_sensor">
+<code class="descname">create_enabled_sensor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.create_enabled_sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a sensor to fire continuously while trigger is enabled</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.generate_detection_logic">
+<code class="descname">generate_detection_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.generate_detection_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function to Python control script to detect user position</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.link_detection_bricks">
+<code class="descname">link_detection_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.link_detection_bricks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link necessary logic bricks for event detection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>EBKAC</strong> &#8211; if controller or sensor does not exist</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.link_logic_bricks">
+<code class="descname">link_logic_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.activators.triggers.user_triggers.BlenderPositionTrigger.link_logic_bricks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.activators.triggers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyw3d.activators.triggers" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyw3d.activators.triggers package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pyw3d.activators.triggers.links">pyw3d.activators.triggers.links module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.activators.triggers.look_triggers">pyw3d.activators.triggers.look_triggers module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.activators.triggers.object_triggers">pyw3d.activators.triggers.object_triggers module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.activators.triggers.triggers">pyw3d.activators.triggers.triggers module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.activators.triggers.user_triggers">pyw3d.activators.triggers.user_triggers module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.activators.triggers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pyw3d_api/pyw3d.activators.triggers.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="../_sources/pyw3d_api/pyw3d.activators.triggers.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

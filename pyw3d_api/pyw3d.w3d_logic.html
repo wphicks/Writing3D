@@ -1,0 +1,421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.w3d_logic package &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyw3d-w3d-logic-package">
+<h1>pyw3d.w3d_logic package<a class="headerlink" href="#pyw3d-w3d-logic-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyw3d.w3d_logic.blender_action">
+<span id="pyw3d-w3d-logic-blender-action-module"></span><h2>pyw3d.w3d_logic.blender_action module<a class="headerlink" href="#module-pyw3d.w3d_logic.blender_action" title="Permalink to this headline">¶</a></h2>
+<p>Tools for implementing changes to Blender objects</p>
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_action.ActivateTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_action.</code><code class="descname">ActivateTrigger</code><span class="sig-paren">(</span><em>trigger</em>, <em>other_trigger</em>, <em>action='Start'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.ActivateTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.w3d_logic.blender_action.BlenderAction" title="pyw3d.w3d_logic.blender_action.BlenderAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.w3d_logic.blender_action.BlenderAction</span></code></a></p>
+<p>Used to activate or pause a BlenderTrigger</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other_trigger</strong> (<a class="reference internal" href="#pyw3d.w3d_logic.blender_action.BlenderAction" title="pyw3d.w3d_logic.blender_action.BlenderAction"><em>BlenderAction</em></a>) &#8211; The trigger to activate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_action.BlenderAction">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_action.</code><code class="descname">BlenderAction</code><span class="sig-paren">(</span><em>trigger</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.BlenderAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>A single unit of action within Blender</p>
+<p>Note that this may correspond to part of a W3DAction or several
+W3DActions
+:param BlenderTrigger trigger: The trigger used to activate this action</p>
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.BlenderAction.create_off_script">
+<code class="descname">create_off_script</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.BlenderAction.create_off_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create section of Blender Python controller script to deactivate
+this action</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.BlenderAction.create_on_script">
+<code class="descname">create_on_script</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.BlenderAction.create_on_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create section of Blender Python controller script to activate this
+action</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_action.LinearMovement">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_action.</code><code class="descname">LinearMovement</code><span class="sig-paren">(</span><em>trigger</em>, <em>target_placement</em>, <em>relative=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.LinearMovement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.w3d_logic.blender_action.BlenderAction" title="pyw3d.w3d_logic.blender_action.BlenderAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.w3d_logic.blender_action.BlenderAction</span></code></a></p>
+<p>Used to execute a linear movement of a Blender object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target_placement</strong> (<a class="reference internal" href="pyw3d.html#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; Target destination and orientation</td>
+</tr>
+</tbody>
+</table>
+<p>of object</p>
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.LinearMovement.create_movement_actuator">
+<code class="descname">create_movement_actuator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.LinearMovement.create_movement_actuator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a motion actuator for object if it does not exist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.LinearMovement.create_position_logic">
+<code class="descname">create_position_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.LinearMovement.create_position_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add positional movement logic to trigger script</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.LinearMovement.create_rotation_logic">
+<code class="descname">create_rotation_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.LinearMovement.create_rotation_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add rotation logic to trigger script</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_action.VisibilityChange">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_action.</code><code class="descname">VisibilityChange</code><span class="sig-paren">(</span><em>trigger</em>, <em>visibility</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.VisibilityChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.w3d_logic.blender_action.BlenderAction" title="pyw3d.w3d_logic.blender_action.BlenderAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.w3d_logic.blender_action.BlenderAction</span></code></a></p>
+<p>Used to change the visibility of a Blender object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>visibility</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether object should be visible after action has</td>
+</tr>
+</tbody>
+</table>
+<p>been executed</p>
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.VisibilityChange.create_visibility_actuator">
+<code class="descname">create_visibility_actuator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.VisibilityChange.create_visibility_actuator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_action.VisibilityChange.create_visibility_logic">
+<code class="descname">create_visibility_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_action.VisibilityChange.create_visibility_logic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.w3d_logic.blender_timeline">
+<span id="pyw3d-w3d-logic-blender-timeline-module"></span><h2>pyw3d.w3d_logic.blender_timeline module<a class="headerlink" href="#module-pyw3d.w3d_logic.blender_timeline" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of W3D-style timeline control in Blender</p>
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_timeline.BlenderTimeline">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_timeline.</code><code class="descname">BlenderTimeline</code><span class="sig-paren">(</span><em>timeline</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_timeline.BlenderTimeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.w3d_logic.blender_trigger.TimedTrigger" title="pyw3d.w3d_logic.blender_trigger.TimedTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.w3d_logic.blender_trigger.TimedTrigger</span></code></a></p>
+<p>A control structure within Blender for implementing timelines</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeline</strong> (<a class="reference internal" href="pyw3d.html#pyw3d.timeline.W3DTimeline" title="pyw3d.timeline.W3DTimeline"><em>W3DTimeline</em></a>) &#8211; The timeline to generate</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_timeline.BlenderTimeline.get_object">
+<code class="descname">get_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_timeline.BlenderTimeline.get_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an empty object for timeline</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.w3d_logic.blender_trigger">
+<span id="pyw3d-w3d-logic-blender-trigger-module"></span><h2>pyw3d.w3d_logic.blender_trigger module<a class="headerlink" href="#module-pyw3d.w3d_logic.blender_trigger" title="Permalink to this headline">¶</a></h2>
+<p>Tools for activating an event in Blender</p>
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_trigger.</code><code class="descname">BlenderTrigger</code><span class="sig-paren">(</span><em>blender_object_name</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>A control element used to activate events within Blender</p>
+<p>Note that while this frequently corresponds to a single W3DFeature, it may
+correspond to part of a W3DFeature or several W3DFeatures. For instance,
+a W3DTimeline constitutes a single BlenderTrigger, which will trigger
+multiple events.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>blender_object_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the blender object to which</td>
+</tr>
+</tbody>
+</table>
+<p>trigger is attached
+:ivar blender_object: The blender object to which this trigger is attached
+:ivar name: A unique (to the associated object) name for this trigger</p>
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.add_to_script_body">
+<code class="descname">add_to_script_body</code><span class="sig-paren">(</span><em>script_string</em>, <em>section=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.add_to_script_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append to body of script (after header but before footer)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_actuator">
+<code class="descname">create_actuator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_actuator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an actuator that will set control property to desired
+value</p>
+<p>This actuator will have the same name as the trigger itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_change_sensor">
+<code class="descname">create_change_sensor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_change_sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sensor to detect when control property is changed</p>
+<p>This sensor will be named [NAME]_change where [NAME] is the name of the
+trigger.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_control_property">
+<code class="descname">create_control_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_control_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a boolean property to control this trigger</p>
+<p>Iff this property is set to True, the trigger will be activated.
+Triggers should not change anything within Blender unless this property
+is True.  This property will have the same name as the trigger itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_control_sensor">
+<code class="descname">create_control_sensor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_control_sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sensor to detect when control property is set to True</p>
+<p>This sensor will have the same name as the trigger itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_controller">
+<code class="descname">create_controller</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Python controller for this trigger</p>
+<p>This controller will have the same name as the trigger itself</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_index_property">
+<code class="descname">create_index_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_index_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a property that keeps track of how many actions have been
+triggered by this trigger</p>
+<p>This index should increment with each action associated with this
+trigger in order to keep track of which actions have already been
+triggered. This is mostly useful for preventing timed actions from
+being repeatedly triggered but may be used for other cases in which a
+sensor remains active after the associated action has already occurred.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_pause_index_property">
+<code class="descname">create_pause_index_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_pause_index_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a property which will keep track of timer value when last
+stopped</p>
+<p>This property is used to facilitate pausing of an action or series of
+actions. For instance, when a timeline is stopped, the current action
+index is stored. If the timeline is then told to continue, the action
+index will be set to the stored index, allowing execution to continue
+from that point.  This property will have a name specified by the
+pause_index_name attribute of this object. See also the
+create_pause_time_property method for TimedTrigger objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.get_object">
+<code class="descname">get_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.get_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Blender object associated with this trigger</p>
+<p>:note Subclasses may create the object if necessary but should check to
+see if the object already exists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.get_script_template_values">
+<code class="descname">get_script_template_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.get_script_template_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary used to fill in templates which will create
+the control script for this trigger</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.make_object_active">
+<code class="descname">make_object_active</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.make_object_active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this trigger&#8217;s object the currently active object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.start_immediately">
+<code class="descname">start_immediately</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.start_immediately" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes trigger to start immediately when project starts</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.BlenderTrigger.write_to_script">
+<code class="descname">write_to_script</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.write_to_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write this trigger to the Python script associated with its
+object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.w3d_logic.blender_trigger.TimedTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.w3d_logic.blender_trigger.</code><code class="descname">TimedTrigger</code><span class="sig-paren">(</span><em>blender_object_name</em>, <em>duration</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.TimedTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.w3d_logic.blender_trigger.BlenderTrigger" title="pyw3d.w3d_logic.blender_trigger.BlenderTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.w3d_logic.blender_trigger.BlenderTrigger</span></code></a></p>
+<p>A Blender trigger which turns itself off after a specified duration</p>
+<p>TimedTriggers also create an associated Timer property in Blender which
+keeps track of how long they have been active</p>
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_pause_time_property">
+<code class="descname">create_pause_time_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_pause_time_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a property which will keep track of timer value when last
+stopped</p>
+<p>This property is used to facilitate pausing of an action or series of
+actions. For instance, when a timeline is stopped, the current time is
+stored. If the timeline is then told to continue, the timer will be set
+to the stored time, allowing execution to continue from that point.
+This property will have a name specified by the pause_time_name
+attribute of this object. See also the create_pause_index_property
+method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_time_sensor">
+<code class="descname">create_time_sensor</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_time_sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sensor which will register True when the specified time is
+exceeded by the timer property</p>
+<p>The sensor will have a unique name of the form [TIMER_NAME]_#, where
+[TIMER_NAME] is specified by the timer_name attribute of this object,
+and # is a unique number</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_timer_property">
+<code class="descname">create_timer_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_timer_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a property which will keep track of time since activation</p>
+<p>This property will have a name specified by the timer_name attribute of
+this object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.w3d_logic.blender_trigger.TimedTrigger.get_script_template_values">
+<code class="descname">get_script_template_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.TimedTrigger.get_script_template_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pyw3d.w3d_logic.blender_trigger.generate_project_root">
+<code class="descclassname">pyw3d.w3d_logic.blender_trigger.</code><code class="descname">generate_project_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.w3d_logic.blender_trigger.generate_project_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a &#8220;ROOT&#8221; object which is used to activate initial actions</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.w3d_logic">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyw3d.w3d_logic" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyw3d.w3d_logic package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pyw3d.w3d_logic.blender_action">pyw3d.w3d_logic.blender_action module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.w3d_logic.blender_timeline">pyw3d.w3d_logic.blender_timeline module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.w3d_logic.blender_trigger">pyw3d.w3d_logic.blender_trigger module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.w3d_logic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pyw3d_api/pyw3d.w3d_logic.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="../_sources/pyw3d_api/pyw3d.w3d_logic.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

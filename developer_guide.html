@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developer’s Guide &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
+    <link rel="up" title="Getting Involved" href="getting_involved.html" />
+    <link rel="prev" title="Getting Involved" href="getting_involved.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="developer-s-guide">
+<span id="developer-guide"></span><h1>Developer&#8217;s Guide<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is <em>very much</em> still a work in progress, but please don&#8217;t let that
+keep you from contributing. The maintainer is happy to sort out any style
+issues or workflow problems that are not addressed by this guide.</p>
+</div>
+<div class="section" id="style-guide">
+<h2>Style Guide<a class="headerlink" href="#style-guide" title="Permalink to this headline">¶</a></h2>
+<p>Writing3D code should be <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a>
+compliant. This ensures both maintainability and extensibility (through
+readability), two of the major goals of this project. It should also contain
+docstrings for <a class="reference external" href="http://www.sphinx-doc.org/en/stable/index.html">Sphinx</a>-style
+<a class="reference external" href="https://pythonhosted.org/an_example_pypi_project/sphinx.html">autodocing</a>.
+If you are absolutely unable to follow PEP 8 or document your code, you can
+submit a pull request anyway, but it may be some time before the maintainer can
+revise your code and integrate it into the main codebase.</p>
+<p>Features which introduce new Writing3D functionality should in general inherit
+from the W3DFeature class and <em>must</em> implement fromXML and toXML methods for
+creating an archival XML format.</p>
+<p>TODO: Describe W3DFeature structure in detail</p>
+</div>
+<div class="section" id="git-workflow">
+<h2>Git Workflow<a class="headerlink" href="#git-workflow" title="Permalink to this headline">¶</a></h2>
+<p>Writing3D uses a <a class="reference external" href="https://stackoverflow.com/questions/11582995/what-is-the-fork-pull-model-in-github">fork &amp; pull model</a>
+for contributions. In general, you should make changes off of the develop
+branch, and they will eventually be pulled into master in the main repo.</p>
+<p>TODO: Give more detail on workflow</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developer&#8217;s Guide</a><ul>
+<li><a class="reference internal" href="#style-guide">Style Guide</a></li>
+<li><a class="reference internal" href="#git-workflow">Git Workflow</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="getting_involved.html">Getting Involved</a><ul>
+      <li>Previous: <a href="getting_involved.html" title="previous chapter">Getting Involved</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/developer_guide.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/developer_guide.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

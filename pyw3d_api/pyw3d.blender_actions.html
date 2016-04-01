@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.blender_actions package &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyw3d-blender-actions-package">
+<h1>pyw3d.blender_actions package<a class="headerlink" href="#pyw3d-blender-actions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyw3d.blender_actions.color">
+<span id="pyw3d-blender-actions-color-module"></span><h2>pyw3d.blender_actions.color module<a class="headerlink" href="#module-pyw3d.blender_actions.color" title="Permalink to this headline">¶</a></h2>
+<p>Tools for changing the color of a Blender object</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.color.ColorAction">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.color.</code><code class="descname">ColorAction</code><span class="sig-paren">(</span><em>color</em>, <em>duration</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.color.ColorAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how color should change when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; The color to transition to (specified as a 3-element</td>
+</tr>
+</tbody>
+</table>
+<p>list of integers between 0 and 255
+:param float duration: Time for action to complete in seconds
+:param int offset: A number of tabs (4 spaces) to add before Python logic
+strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.color.ColorAction.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.color.ColorAction.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.color.ColorAction.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.color.ColorAction.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.color.ColorAction.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.color.ColorAction.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.conditions">
+<span id="pyw3d-blender-actions-conditions-module"></span><h2>pyw3d.blender_actions.conditions module<a class="headerlink" href="#module-pyw3d.blender_actions.conditions" title="Permalink to this headline">¶</a></h2>
+<p>Tools for establishing conditions under which an action in Blender should
+precede</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.conditions.</code><code class="descname">ActionCondition</code><span class="sig-paren">(</span><em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic specifying when action should, start, continue,
+and end</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; A number of tabs (4 spaces) to add before condition</td>
+</tr>
+</tbody>
+</table>
+<p>strings</p>
+<dl class="method">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition.add_click_condition">
+<code class="descname">add_click_condition</code><span class="sig-paren">(</span><em>click_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition.add_click_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add condition based on how many times object is clicked</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition.add_index_condition">
+<code class="descname">add_index_condition</code><span class="sig-paren">(</span><em>index_value</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition.add_index_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add condition based on how many sub-actions have been completed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition.add_time_condition">
+<code class="descname">add_time_condition</code><span class="sig-paren">(</span><em>start_time=None</em>, <em>end_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition.add_time_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add condition based on time since activation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.conditions.ActionCondition.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.conditions.ActionCondition.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.links">
+<span id="pyw3d-blender-actions-links-module"></span><h2>pyw3d.blender_actions.links module<a class="headerlink" href="#module-pyw3d.blender_actions.links" title="Permalink to this headline">¶</a></h2>
+<p>Tools for dynamically changing clickable links in Blender</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.links.LinkAction">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.links.</code><code class="descname">LinkAction</code><span class="sig-paren">(</span><em>object_name</em>, <em>change</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.links.LinkAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how link should change when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>change</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The change to be performed (one of &#8220;Enable&#8221;, &#8220;Disable&#8221;,</td>
+</tr>
+</tbody>
+</table>
+<p>&#8220;Activate&#8221;, or &#8220;Activate if enabled&#8221;)
+:param int offset: A number of tabs (4 spaces) to add before Python logic
+strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.links.LinkAction.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.links.LinkAction.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.links.LinkAction.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.links.LinkAction.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.links.LinkAction.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.links.LinkAction.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.movement">
+<span id="pyw3d-blender-actions-movement-module"></span><h2>pyw3d.blender_actions.movement module<a class="headerlink" href="#module-pyw3d.blender_actions.movement" title="Permalink to this headline">¶</a></h2>
+<p>Tools for moving a Blender object in virtual space</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.movement.MoveAction">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.movement.</code><code class="descname">MoveAction</code><span class="sig-paren">(</span><em>placement</em>, <em>duration</em>, <em>move_relative=False</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.movement.MoveAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how object should move when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>placement</strong> &#8211; A W3DPlacement object specifying movement</li>
+<li><strong>move_relative</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether motion is specified relative to current</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>location
+:param float duration: Time for action to complete in seconds
+:param int offset: A number of tabs (4 spaces) to add before Python logic
+strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.movement.MoveAction.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.movement.MoveAction.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.movement.MoveAction.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.movement.MoveAction.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.movement.MoveAction.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.movement.MoveAction.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.reset">
+<span id="pyw3d-blender-actions-reset-module"></span><h2>pyw3d.blender_actions.reset module<a class="headerlink" href="#module-pyw3d.blender_actions.reset" title="Permalink to this headline">¶</a></h2>
+<p>Tools for starting, pausing, etc. timelines in Blender</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.reset.SceneReset">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.reset.</code><code class="descname">SceneReset</code><span class="sig-paren">(</span><em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.reset.SceneReset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for resetting scene</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; A number of tabs (4 spaces) to add before Python logic</td>
+</tr>
+</tbody>
+</table>
+<p>strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.reset.SceneReset.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.reset.SceneReset.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.reset.SceneReset.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.reset.SceneReset.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.reset.SceneReset.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.reset.SceneReset.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.scale">
+<span id="pyw3d-blender-actions-scale-module"></span><h2>pyw3d.blender_actions.scale module<a class="headerlink" href="#module-pyw3d.blender_actions.scale" title="Permalink to this headline">¶</a></h2>
+<p>Tools for scaling Blender objects</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.scale.ScaleAction">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.scale.</code><code class="descname">ScaleAction</code><span class="sig-paren">(</span><em>scale</em>, <em>duration</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.scale.ScaleAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how scale should change when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The scale to transition to</li>
+<li><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Time for action to complete in seconds</li>
+<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; A number of tabs (4 spaces) to add before Python logic</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.scale.ScaleAction.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.scale.ScaleAction.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.scale.ScaleAction.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.scale.ScaleAction.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.scale.ScaleAction.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.scale.ScaleAction.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.timeline">
+<span id="pyw3d-blender-actions-timeline-module"></span><h2>pyw3d.blender_actions.timeline module<a class="headerlink" href="#module-pyw3d.blender_actions.timeline" title="Permalink to this headline">¶</a></h2>
+<p>Tools for starting, pausing, etc. timelines in Blender</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.timeline.TimelineStarter">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.timeline.</code><code class="descname">TimelineStarter</code><span class="sig-paren">(</span><em>timeline</em>, <em>change</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.timeline.TimelineStarter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how link should change when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>change</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The change to be performed (one of &#8220;Start&#8221;, &#8220;Stop&#8221;,</td>
+</tr>
+</tbody>
+</table>
+<p>&#8220;Continue&#8221;, or &#8220;Start if not started&#8221;)
+:param int offset: A number of tabs (4 spaces) to add before Python logic
+strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.timeline.TimelineStarter.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.timeline.TimelineStarter.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.timeline.TimelineStarter.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.timeline.TimelineStarter.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.timeline.TimelineStarter.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.timeline.TimelineStarter.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.trigger">
+<span id="pyw3d-blender-actions-trigger-module"></span><h2>pyw3d.blender_actions.trigger module<a class="headerlink" href="#module-pyw3d.blender_actions.trigger" title="Permalink to this headline">¶</a></h2>
+<p>Tools for enabling/disabling triggers in Blender</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.trigger.TriggerEnabler">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.trigger.</code><code class="descname">TriggerEnabler</code><span class="sig-paren">(</span><em>trigger</em>, <em>enable</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.trigger.TriggerEnabler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how link should change when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>change</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The change to be performed (one of &#8220;Start&#8221;, &#8220;Stop&#8221;,</td>
+</tr>
+</tbody>
+</table>
+<p>&#8220;Continue&#8221;, or &#8220;Start if not started&#8221;)
+:param int offset: A number of tabs (4 spaces) to add before Python logic
+strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.trigger.TriggerEnabler.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.trigger.TriggerEnabler.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.trigger.TriggerEnabler.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.trigger.TriggerEnabler.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.trigger.TriggerEnabler.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.trigger.TriggerEnabler.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions.visibility">
+<span id="pyw3d-blender-actions-visibility-module"></span><h2>pyw3d.blender_actions.visibility module<a class="headerlink" href="#module-pyw3d.blender_actions.visibility" title="Permalink to this headline">¶</a></h2>
+<p>Tools for changing the visibility of a Blender object</p>
+<dl class="class">
+<dt id="pyw3d.blender_actions.visibility.VisibilityAction">
+<em class="property">class </em><code class="descclassname">pyw3d.blender_actions.visibility.</code><code class="descname">VisibilityAction</code><span class="sig-paren">(</span><em>visibility</em>, <em>duration</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.blender_actions.visibility.VisibilityAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Generate Python logic for how visibility should change when action first
+starts, as it continues, and when it ends</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>visibility</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; The visibility to transition to</li>
+<li><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Time for action to complete in seconds</li>
+<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; A number of tabs (4 spaces) to add before Python logic</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>strings</p>
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.visibility.VisibilityAction.continue_string">
+<code class="descname">continue_string</code><a class="headerlink" href="#pyw3d.blender_actions.visibility.VisibilityAction.continue_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.visibility.VisibilityAction.end_string">
+<code class="descname">end_string</code><a class="headerlink" href="#pyw3d.blender_actions.visibility.VisibilityAction.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.blender_actions.visibility.VisibilityAction.start_string">
+<code class="descname">start_string</code><a class="headerlink" href="#pyw3d.blender_actions.visibility.VisibilityAction.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyw3d.blender_actions">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyw3d.blender_actions" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyw3d.blender_actions package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.color">pyw3d.blender_actions.color module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.conditions">pyw3d.blender_actions.conditions module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.links">pyw3d.blender_actions.links module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.movement">pyw3d.blender_actions.movement module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.reset">pyw3d.blender_actions.reset module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.scale">pyw3d.blender_actions.scale module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.timeline">pyw3d.blender_actions.timeline module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.trigger">pyw3d.blender_actions.trigger module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions.visibility">pyw3d.blender_actions.visibility module</a></li>
+<li><a class="reference internal" href="#module-pyw3d.blender_actions">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pyw3d_api/pyw3d.blender_actions.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="../_sources/pyw3d_api/pyw3d.blender_actions.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

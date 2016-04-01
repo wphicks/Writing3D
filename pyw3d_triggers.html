@@ -1,0 +1,382 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Event Triggers &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="event-triggers">
+<span id="pyw3d-docs-triggers"></span><h1>Event Triggers<a class="headerlink" href="#event-triggers" title="Permalink to this headline">¶</a></h1>
+<p>To enhance the interactivity of a VR experience, it is useful to use event
+triggers. These allow you to trigger <a class="reference internal" href="pyw3d_actions.html#pyw3d-docs-actions"><span class="std std-ref">W3DActions</span></a>
+when particular events take place in virtual space. For instance, you might
+make an object appear only when the user is standing in particular spot in 3D
+space or make an object move around whenever the user tries to look directly at
+it.</p>
+<p>TODO: Sample</p>
+<dl class="class">
+<dt id="pyw3d.W3DTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DTrigger</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
+<p>Store data on a trigger event in the cave</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>base_trigger</strong> &#8211; A trigger object wrapped by this trigger (see</td>
+</tr>
+</tbody>
+</table>
+<p>__setitem__ and __getitem__ implementation for details)</p>
+<dl class="method">
+<dt id="pyw3d.W3DTrigger.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DTrigger.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DTrigger in Blender</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyw3d.W3DTrigger.fromXML">
+<em class="property">static </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DTrigger.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create W3DTrigger from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element trigger_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.W3DTrigger.link_blender_logic">
+<code class="descname">link_blender_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DTrigger.link_blender_logic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Link BGE logic bricks for this W3DTrigger</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.HeadTrackTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">HeadTrackTrigger</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.HeadTrackTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.triggers.W3DTrigger" title="pyw3d.triggers.W3DTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.triggers.W3DTrigger</span></code></a></p>
+<p>For triggers based on head-tracking of W3D user</p>
+<dl class="classmethod">
+<dt id="pyw3d.HeadTrackTrigger.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_class</em>, <em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.HeadTrackTrigger.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create HeadTrackTrigger from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element trigger_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.HeadPositionTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">HeadPositionTrigger</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.HeadPositionTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.triggers.HeadTrackTrigger" title="pyw3d.triggers.HeadTrackTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.triggers.HeadTrackTrigger</span></code></a></p>
+<p>For triggers based on position of user in W3D</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>box</strong> (<a class="reference internal" href="#pyw3d.EventBox" title="pyw3d.EventBox"><em>EventBox</em></a>) &#8211; Used to trigger events when user&#8217;s head moves into or</td>
+</tr>
+</tbody>
+</table>
+<p>out of specified box. If None, trigger can occur anywhere in W3D</p>
+<dl class="method">
+<dt id="pyw3d.HeadPositionTrigger.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.HeadPositionTrigger.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DTrigger in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.HeadPositionTrigger.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_class</em>, <em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.HeadPositionTrigger.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create HeadPositionTrigger from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element trigger_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.HeadPositionTrigger.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_triggers_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.HeadPositionTrigger.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store HeadPositionTrigger as EventTrigger node within EventRoot node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element all_triggers_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.LookAtPoint">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">LookAtPoint</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.triggers.HeadTrackTrigger" title="pyw3d.triggers.HeadTrackTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.triggers.HeadTrackTrigger</span></code></a></p>
+<p>For event triggers based on user looking at a point</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>point</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; The point to look at</li>
+<li><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; TODO: clarify (WARNING: currently does nothing)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.LookAtPoint.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtPoint.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DTrigger in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.LookAtPoint.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_class</em>, <em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtPoint.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create LookAtPoint from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element target_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.LookAtPoint.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_triggers_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtPoint.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store LookAtPoint as EventTrigger node within EventRoot node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element all_triggers_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.LookAtDirection">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">LookAtDirection</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtDirection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.triggers.HeadTrackTrigger" title="pyw3d.triggers.HeadTrackTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.triggers.HeadTrackTrigger</span></code></a></p>
+<p>For event triggers based on user looking in a direction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; Direction in which to look</li>
+<li><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Look direction must be within this angle of target</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.LookAtDirection.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtDirection.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DTrigger in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.LookAtDirection.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_class</em>, <em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtDirection.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create LookAtDirection from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element target_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.LookAtDirection.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_triggers_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtDirection.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store LookAtDirection as EventTrigger node within EventRoot node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element all_triggers_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.LookAtObject">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">LookAtObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.triggers.HeadTrackTrigger" title="pyw3d.triggers.HeadTrackTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.triggers.HeadTrackTrigger</span></code></a></p>
+<p>For event triggers based on user looking at an object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>object</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of the object to look at</li>
+<li><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; TODO: clarify (WARNING: currently does nothing)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.LookAtObject.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtObject.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DTrigger in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.LookAtObject.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_class</em>, <em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtObject.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create LookAtObject from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element target_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.LookAtObject.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_triggers_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.LookAtObject.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store LookAtObject as EventTrigger node within EventRoot node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element all_triggers_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.MovementTrigger">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">MovementTrigger</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MovementTrigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.triggers.W3DTrigger" title="pyw3d.triggers.W3DTrigger"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.triggers.W3DTrigger</span></code></a></p>
+<p>For triggers based on movement of W3D objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of &#8220;Single Object&#8221;, &#8220;Group(Any)&#8221;, or &#8220;Group(All)&#8221;,</td>
+</tr>
+</tbody>
+</table>
+<p>depending on if action should be triggered based on movements of a single
+object, any object in group, or all objects in group. That is, should
+trigger occur when any object in the group moves into specified region or
+once all objects have moved into the region?
+:param str name: The name of the object or group to track
+:param EventBox box: Used to trigger events when objects move into or out
+of specified box</p>
+<dl class="method">
+<dt id="pyw3d.MovementTrigger.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MovementTrigger.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DTrigger in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.MovementTrigger.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>trigger_class</em>, <em>trigger_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MovementTrigger.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create MovementTrigger from EventTrigger node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element movement_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.MovementTrigger.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_triggers_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MovementTrigger.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store MovementTrigger as EventTrigger node within EventRoot node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element trigger_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.EventBox">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">EventBox</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.EventBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
+<p>For triggers based on movement into or out of box</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of &#8220;Inside&#8221; or &#8220;Outside&#8221; depending on whether</td>
+</tr>
+</tbody>
+</table>
+<p>trigger occurs for movement into or out of box
+:param bool ignore_y: Should y-direction be ignored in checking box? In
+other words, vertical position in W3D doesn&#8217;t matter when this is set to
+true.
+:param tuple corner1: First corner specifiying box location
+:param tuple corner2: Second corner specifying box location</p>
+<dl class="classmethod">
+<dt id="pyw3d.EventBox.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>box_class</em>, <em>box_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.EventBox.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create EventBox from Box node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element box_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.EventBox.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.EventBox.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store EventBox as Box node within one of several possible node types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pyw3d_triggers.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/pyw3d_triggers.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

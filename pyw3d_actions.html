@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Making Things Happen &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="making-things-happen">
+<span id="pyw3d-docs-actions"></span><h1>Making Things Happen<a class="headerlink" href="#making-things-happen" title="Permalink to this headline">¶</a></h1>
+<p>In order to animate objects and cause interactive changes in virtual space, you
+will need to use the W3DAction class and its subclasses. W3D actions may be
+triggered in one of three ways:</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="pyw3d_objects.html#pyw3d-docs-links"><span class="std std-ref">Links</span></a></li>
+<li><a class="reference internal" href="pyw3d_timelines.html#pyw3d-docs-timelines"><span class="std std-ref">Timelines</span></a></li>
+<li><a class="reference internal" href="pyw3d_triggers.html#pyw3d-docs-triggers"><span class="std std-ref">Event Triggers</span></a></li>
+</ol>
+<p>TODO: Sample</p>
+<dl class="class">
+<dt id="pyw3d.W3DAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
+<p>An action causing a change in virtual space</p>
+<p>Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
+appropriate subclasses</p>
+<dl class="staticmethod">
+<dt id="pyw3d.W3DAction.fromXML">
+<em class="property">static </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create W3DAction of appropriate subclass given xml root for any
+action</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.ObjectAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">ObjectAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.ObjectAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>An action causing a change to a W3DObject</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>object_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of object to change</li>
+<li><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Duration of transition in seconds</li>
+<li><strong>visible</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; If not None, change visibility to this value</li>
+<li><strong>placement</strong> (<a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; If not None, move based on this placement</li>
+<li><strong>move_relative</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; If True, move relative to original location</li>
+<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; If not None, transition to this color</li>
+<li><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; If not None, scale by this factor</li>
+<li><strong>sound_change</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of &#8220;Play Sound&#8221; or &#8220;Stop Sound&#8221;, which will</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>play or stop sound associated with this object
+:param str link_change: One of &#8220;Enable&#8221;, &#8220;Disable&#8221;, &#8220;Activate&#8221;, &#8220;Activate
+if enabled&#8221;, which will affect this object&#8217;s link</p>
+<dl class="classmethod">
+<dt id="pyw3d.ObjectAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>action_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.ObjectAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create ObjectAction from ObjectChange node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element action_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.ObjectAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.ObjectAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store ObjectAction as ObjectChange node within one of several node
+types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.GroupAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">GroupAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.GroupAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>An action causing a change to a group of W3DObjects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>group_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of group to change</li>
+<li><strong>choose_random</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Apply change to one object in group, selected</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>randomly?
+:param float duration: Duration of transition in seconds
+:param bool visible: If not None, change visibility to this value
+:param W3DPlacement placement: If not None, move based on this placement
+:param bool move_relative: If True, move relative to original location
+:param tuple color: If not None, transition to this color
+:param float scale: If not None, scale by this factor
+:param str sound_change: One of &#8220;Play Sound&#8221; or &#8220;Stop Sound&#8221;, which will
+play or stop sound associated with this group
+:param str link_change: One of &#8220;Enable&#8221;, &#8220;Disable&#8221;, &#8220;Activate&#8221;, &#8220;Activate
+if enabled&#8221;, which will affect this object&#8217;s link</p>
+<dl class="classmethod">
+<dt id="pyw3d.GroupAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>action_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.GroupAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create GroupAction from GroupRef node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element transition_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.GroupAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.GroupAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store GroupAction as GroupRef node within one of several node types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.SoundAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">SoundAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.SoundAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>Start or stop a sound</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sound_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of sound to change</li>
+<li><strong>change</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of Start or Stop</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyw3d.SoundAction.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.SoundAction.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of change in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.SoundAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>soundref_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.SoundAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create SoundAction from SoundRef node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element soundref_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.SoundAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.SoundAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store SoundAction as SoundRef node within one of several node
+types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.MoveVRAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">MoveVRAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MoveVRAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>Move entire VR environment within virtual space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relative</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Move relative to current position?</li>
+<li><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Duration of transition in seconds</li>
+<li><strong>placement</strong> (<a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; Where to move (position and orientation)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="pyw3d.MoveVRAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>move_cave_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MoveVRAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create MoveVRAction from MoveCave node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element transition_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.MoveVRAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.MoveVRAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store MoveVRAction as MoveCave node within one of several node
+types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.TimelineAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">TimelineAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.TimelineAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>Start or stop a timeline</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeline_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of timeline to change</li>
+<li><strong>change</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of &#8220;Start&#8221;, &#8220;Stop&#8221;, &#8220;Continue&#8221;, &#8220;Start if not</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>started&#8221;</p>
+<dl class="classmethod">
+<dt id="pyw3d.TimelineAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>timer_change_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.TimelineAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create TimelineAction from TimerChange node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element transition_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.TimelineAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.TimelineAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store TimelineChange as TimerChange node within one of several node
+types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.EventTriggerAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">EventTriggerAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.EventTriggerAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>Enable or disable an event trigger</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>trigger_name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of trigger to enable/disable</li>
+<li><strong>enable</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Enable trigger?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="pyw3d.EventTriggerAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>event_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.EventTriggerAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create EventTriggerAction from Event node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element event_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.EventTriggerAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.EventTriggerAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store EventTriggerAction as Event node within one of several node
+types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.W3DResetAction">
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DResetAction</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DResetAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.actions.W3DAction</span></code></a></p>
+<p>Reset W3D to initial state</p>
+<dl class="classmethod">
+<dt id="pyw3d.W3DResetAction.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>action_class</em>, <em>restart_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DResetAction.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create W3DRestartAction from Restart node</p>
+<p>:param :py:class:xml.etree.ElementTree.Element transition_root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.W3DResetAction.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DResetAction.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store W3DResetAction as Restart node within one of several node
+types</p>
+<p>:param :py:class:xml.etree.ElementTree.Element parent_root</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pyw3d_actions.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/pyw3d_actions.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
