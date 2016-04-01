@@ -19,10 +19,9 @@
 """An example showcasing a basic W3DObject with a link
 
 
-To run this script, use the following command:
-blender --background --python link_sample.py
+To run this script, use the following command::
 
-where blender is your blender executable.
+    $ python3 link_sample.py
 """
 
 from pyw3d import project, objects, placement, actions, export_to_blender

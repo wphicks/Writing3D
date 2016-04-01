@@ -42,7 +42,7 @@ except ImportError:
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
-def generate_material_from_image(filename):
+def generate_material_from_image(filename, double_sided=True):
     """Generate Blender material from image for texturing"""
     material_name = bpy.path.display_name_from_filepath(filename)
     material = bpy.data.materials.new(name=material_name)
@@ -64,6 +64,7 @@ def generate_material_from_image(filename):
     #material.specular_alpha = 0.0
     #texture_slot.use_map_alpha
     #material.use_transparency = True
+    material.game_settings.use_backface_culling = not double_sided
 
     return material
 
@@ -404,7 +405,6 @@ class W3DImage(W3DContent):
         new_image_object.data.uv_textures.new()
         new_image_object.data.materials.append(material)
         new_image_object.data.uv_textures[0].data[0].image = image
-        material.game_settings.use_backface_culling = False
         material.game_settings.alpha_blend = 'ALPHA'
 
         return new_image_object
@@ -657,6 +657,7 @@ class W3DObject(W3DFeature):
     :param W3DPlacement placement: Position and orientation of object
     :param W3DLink link: Clickable link for object
     :param tuple color: Three floats representing RGB color of object
+    :param bool double_sided: Is object visible from both sides?
     :param bool visible: Is object visible?
     :param bool lighting: Does object respond to scene lighting?
     :param float scale: Scaling factor for size of object
@@ -680,6 +681,7 @@ class W3DObject(W3DFeature):
             help_string="Clickable link associated with object"),
         "color": ListValidator(
             IsInteger(min_value=0, max_value=255), required_length=3),
+        "double_sided": IsBoolean(),
         "visible": IsBoolean(),
         "lighting":  IsBoolean(),
         "scale": IsNumeric(min_value=0),
@@ -696,7 +698,8 @@ class W3DObject(W3DFeature):
         "scale": 1,
         "click_through": False,
         "around_own_axis": False,
-        "sound": None
+        "sound": None,
+        "double_sided": True
         }
 
     def __init__(self, *args, **kwargs):
@@ -717,6 +720,8 @@ class W3DObject(W3DFeature):
             all_objects_root, "Object", attrib={"name": self["name"]})
         node = ET.SubElement(object_root, "Visible")
         node.text = bool2text(self["visible"])
+        node = ET.SubElement(object_root, "DoubleSided")
+        node.text = bool2text(self["double_sided"])
         node = ET.SubElement(object_root, "Color")
         node.text = "{},{},{}".format(*self["color"])
         node = ET.SubElement(object_root, "Lighting")
@@ -752,6 +757,9 @@ class W3DObject(W3DFeature):
         node = object_root.find("Visible")
         if node is not None:
             new_object["visible"] = text2bool(node.text)
+        node = object_root.find("DoubleSided")
+        if node is not None:
+            new_object["double_sided"] = text2bool(node.text)
         node = object_root.find("Color")
         if node is not None:
             new_object["color"] = text2tuple(node.text, evaluator=int)
@@ -802,6 +810,8 @@ class W3DObject(W3DFeature):
         blender_object.active_material.use_transparency = True
         blender_object.active_material.use_nodes = False
         blender_object.active_material.use_object_color = True
+        blender_object.active_material.game_settings.use_backface_culling = (
+            not self["double_sided"])
         color = [channel/255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
         blender_object.color = color
