@@ -87,6 +87,7 @@ class W3DWriter(tk.Frame):
 
 def start_editor():
     root = tk.Tk()
+    root.lift()
     width = root.winfo_screenwidth()
     height = root.winfo_screenheight()
     root.geometry("{}x{}".format(width, height))
