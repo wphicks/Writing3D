@@ -110,6 +110,7 @@ instance), please do the following after installing Python3:
         BLENDER_EXEC = "blender"  # BLENDEREXECSUBTAG
         BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
 
+
     with the paths to your blender and blenderplayer executables respectively.
     Note that this may not be necessary on all systems.
 3. Run the following in terminal from the root Writing3D directory::
