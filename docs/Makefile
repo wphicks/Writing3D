@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx3-build
 PAPER         =
-BUILDDIR      = build
+BUILDDIR      = ../../Writing3D-docs
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -57,6 +57,13 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+.PHONY: commit
+commit: html
+
+	cd $(BUILDDIR)/html; git add . ; git commit -m "Rebuilt docs"; git push origin gh-pages
+	@echo
+	@echo "Updated docs posted to github-pages"
 
 .PHONY: dirhtml
 dirhtml:

@@ -15,7 +15,8 @@ setup(
     license="GPL",
     keywords="virtual modeling art literature",
     url="https://github.com/wphicks/Writing3D",
-    scripts=['w3d_writer.py', "install_everything.py"],
+    scripts=[
+        'w3d_writer.py', "pyw3d/w3d_export_tools.py"],
     packages=[
         "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
         "pyw3d.w3d_logic", "pyw3d.activators.triggers", "w3dui"

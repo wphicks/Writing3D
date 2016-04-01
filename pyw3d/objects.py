@@ -322,7 +322,11 @@ class W3DText(W3DContent):
                 new_text["depth"] = (
                     float(text_root.attrib["depth"]) *
                     text_class.blender_depth_scaling)
-            new_text["text"] = text_root.text
+            text_root = text_root.find("text")
+            if text_root is not None:
+                new_text["text"] = text_root.text
+            else:
+                raise BadW3DXML("Text node must contain text node")
             return new_text
         raise InvalidArgument(
             "Content node must contain Text node to create W3DText object")

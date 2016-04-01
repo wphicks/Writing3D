@@ -25,7 +25,7 @@ blender --background --python link_sample.py
 where blender is your blender executable.
 """
 
-from pyw3d import project, objects, placement, actions
+from pyw3d import project, objects, placement, actions, export_to_blender
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
@@ -63,4 +63,4 @@ my_project["objects"].append(my_object)
 
 #Finally, we render the whole thing using Blender, export it, and display the
 #result
-my_project.export("link_sample.blend", display=True)
+export_to_blender(my_project, filename="link_sample.blend", display=True)

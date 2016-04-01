@@ -48,4 +48,5 @@ from .actions import W3DAction, ObjectAction, GroupAction, SoundAction, \
     MoveVRAction, TimelineAction, EventTriggerAction, W3DResetAction
 from .groups import W3DGroup
 from .sounds import W3DSound
+from .w3d_export_tools import export_to_blender
 

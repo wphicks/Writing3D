@@ -21,7 +21,6 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 import warnings
 import math
-import subprocess
 from .features import W3DFeature
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
 from .validators import ListValidator, IsNumeric, OptionValidator,\
@@ -34,7 +33,6 @@ from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
-from pyw3d import BLENDER_PLAY
 import tkinter as tk
 try:
     import bpy
@@ -580,14 +578,3 @@ class W3DProject(W3DFeature):
             trigger.write_blender_logic()
         setup_blender_layout()
         bpy.ops.file.pack_all()
-        #bpy.ops.object.bake_image()
-
-    def export(self, filename, display=False):
-        """Save project as .blend file of given name
-
-        :param bool display: Display project in standalone player after
-            export?"""
-        self.blend()
-        bpy.ops.wm.save_as_mainfile(filepath=filename)
-        if display:
-            subprocess.call([BLENDER_PLAY, filename])
