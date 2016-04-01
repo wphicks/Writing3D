@@ -3,11 +3,14 @@
 Writing3D
 =========
 Writing3D is a set of tools designed to lower the barrier-of-entry (and speed
-up development time) for producing VR games, literature, and artwork.
+up development time) for producing VR games, literature, and artwork. Click
+`here <https://wphicks.github.io/Writing3D/>`_ to view the complete
+documentation website.
 
 Quickstart Guide
 ----------------
-We strongly encourage you to read the complete :ref:`getting_started` guide,
+We strongly encourage you to read the complete `Getting Started
+<https://wphicks.github.io/Writing3D/getting_started.html#getting-started>`_ guide,
 but for the impatient, the following should get you up and running. 
 
 To quickly get started with Writing3D, you may download it as a `zip file
@@ -82,8 +85,11 @@ available on new hardware platforms like Google Cardboard and the Oculus Rift.
 
 More Information
 ----------------
-For more information, check out our :ref:`faq` page or dive in with the
-:ref:`getting_started` guide.
+For more information, check out our `FAQ
+<https://wphicks.github.io/Writing3D/faq.html>`_ page or dive in with the
+`Getting Started
+<https://wphicks.github.io/Writing3D/getting_started.html#getting-started>`_
+guide.
 
 .. _development_status:
 
@@ -105,7 +111,8 @@ Writing3D, and you can begin using it immediately to create basic interactive
 VR experiences.
 
 If you are interested in Writing3D and would like to see its core feature set
-completed sooner, please see the :ref:`getting_involved` page.
+completed sooner, please see the
+`Getting Involved <https://wphicks.github.io/Writing3D/getting_involved.html>`_ page.
 
 Contact
 -------
