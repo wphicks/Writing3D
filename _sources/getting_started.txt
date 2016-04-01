@@ -125,6 +125,26 @@ Using w3d_writer: The Writing3D GUI
 Unfortunately, w3d_writer is not yet ready for primetime. Check back soon for
 updates.
 
+In the meantime, you might be interested in CWEditor, the legacy Java-based
+frontend that was once used in the Brown University CaveWriting program to
+create VR projects. It outputs to the same XML archival format as Writing3D, so
+it should interoperate smoothly with the Writing3D backend. You may download
+this legacy software from `here for Mac and Linux
+<https://drive.google.com/file/d/0By7izea0dXGyYUgwZVNReUhfOXM/edit?usp=sharing>`_
+and `here for Windows
+<https://drive.google.com/file/d/0By7izea0dXGyekFCVFUzZVdCa28/edit?usp=sharing>`_.
+
+Once you have downloaded the indicated zip file, extract CWEditor.jar **and
+only CWEditor.jar** to some convenient location on your system. Do *not*
+extract the other files, or if you do, just copy CWEditor.jar to another
+directory. Next double-click on CWEditor.jar (on most systems) to run it with
+the Jave JRE.
+
+Within the editor, go to the "Run" menu and select "Configure paths." In the
+resulting dialog, navigate to cwapp.py in the Writing3D samples folder. The
+editor should now be able to use Writing3D to preview VR projects. See
+documentation within cwapp.py for additional help and caveats.
+
 Module Documentation
 ^^^^^^^^^^^^^^^^^^^^
 TODO: Create and link w3dui documentation
