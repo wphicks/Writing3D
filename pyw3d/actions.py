@@ -43,7 +43,7 @@ except ImportError:
 
 
 class W3DAction(W3DFeature, metaclass=SubRegisteredClass):
-    """An action causing a change in the W3D
+    """An action causing a change in virtual space
 
     Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
     appropriate subclasses"""

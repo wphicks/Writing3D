@@ -31,24 +31,21 @@ class W3DFeature(dict):
 
     By overriding argument_validators and default_arguments, subclasses can
     easily validate input and provide sensible default arguments.
+
+    :cvar argument_validators: Dictionary mapping names of valid arguments to
+        callable objects that return true if a given value is valid for that
+        argument
+
+    :cvar default_arguments: Dictionary mapping names of arguments to their
+        default values
+
+    :cvar blender_scaling: Scaling factor used to convert back and forth
+        between Blender and legacy units
     """
 
     argument_validators = {}
-    """Dictionary mapping names of valid arguments to callable objects that
-    return true if a given value is valid for that argument
-
-    Note that this is really only used to check simple input from an editor or
-    when reading in an XML file. It is not intended to do type-checking or
-    consistency-checking across features. e.g. Validators might check if
-    reasonable values have been passed in to specify an RGB color, but they
-    would not be used to confirm that everything in a list of W3DProject
-    objects is actually an object. For such higher-level things, we depend on
-    duck-typing."""
     default_arguments = {}
-    """Dictionary mapping names of arguments to their default values"""
     blender_scaling = 1
-    """Scaling factor used to convert back and forth between Blender and legacy
-    units"""
 
     def __init__(self, *args, **kwargs):
         super(W3DFeature, self).__init__()
@@ -77,7 +74,9 @@ class W3DFeature(dict):
 
     def toXML(self, parent_root):
         """Store data in W3D XML format within parent_root
-        :param :py:class:xml.etree.ElementTree.Element parent_root
+
+        :param parent_root: The XML node in which to store data
+        :type parent_root: :class:`xml.etree.ElementTree.Element`
 
         Since this differs for every W3D feature, subclasses MUST override
         this function.
@@ -90,8 +89,9 @@ class W3DFeature(dict):
 
         Since this differs for every W3D feature, subclasses MUST override
         this function.
-        :param :py:class:xml.etree.ElementTree.Element xml_root: xml node for
-        this feature
+
+        :param xml_root: The XML node from which to create class instance
+        :type xml_root: :class:`xml.etree.ElementTree.Element`
         """
         raise NotImplementedError("fromXML not defined for this feature")
 

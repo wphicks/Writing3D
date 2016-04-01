@@ -23,12 +23,7 @@ To run this script, use the following command:
 blender --background --python link_sample.py
 
 where blender is your blender executable.
-
-
-Then, to view the blend file produced:
-blenderplayer link_sample.blend
-
-where blenderplayer is your blenderplayer executable"""
+"""
 
 from pyw3d import project, objects, placement, actions
 
@@ -66,5 +61,6 @@ my_object = objects.W3DObject(
 # Now add this object to the project
 my_project["objects"].append(my_object)
 
-#Finally, we render the whole thing using Blender and export it
-my_project.export("link_sample.blend")
+#Finally, we render the whole thing using Blender, export it, and display the
+#result
+my_project.export("link_sample.blend", display=True)

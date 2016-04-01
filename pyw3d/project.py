@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 import warnings
 import math
+import subprocess
 from .features import W3DFeature
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
 from .validators import ListValidator, IsNumeric, OptionValidator,\
@@ -33,6 +34,7 @@ from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
+from pyw3d import BLENDER_PLAY
 import tkinter as tk
 try:
     import bpy
@@ -442,6 +444,7 @@ class W3DProject(W3DFeature):
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
+        bpy.data.scenes['Scene'].camera = self.main_camera
 
     def setup_controls(self):
         bpy.context.scene.objects.active = self.main_camera
@@ -576,8 +579,15 @@ class W3DProject(W3DFeature):
         for trigger in self["trigger_events"]:
             trigger.write_blender_logic()
         setup_blender_layout()
+        bpy.ops.file.pack_all()
+        #bpy.ops.object.bake_image()
 
-    def export(self, filename):
-        """Save project as .blend file of given name"""
+    def export(self, filename, display=False):
+        """Save project as .blend file of given name
+
+        :param bool display: Display project in standalone player after
+            export?"""
         self.blend()
         bpy.ops.wm.save_as_mainfile(filepath=filename)
+        if display:
+            subprocess.call([BLENDER_PLAY, filename])

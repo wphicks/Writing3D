@@ -16,8 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for moving a Blender object in virtual space"""
-import mathutils
 import math
+import warnings
+try:
+    import mathutils
+except ImportError:
+    warnings.warn(
+        "Module mathutils not found. Loading pyw3d.blender_actions.movement as"
+        " standalone")
 
 
 class MoveAction(object):

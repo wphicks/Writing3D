@@ -76,9 +76,9 @@ class W3DLink(W3DFeature):
     :param tuple enabled_color: RGB color when link is enabled
     :param tuple selected_color: RGB color when link is selected
     :param actions: Dictionary mapping number of clicks to W3DActions
-    (negative for any click)
+        (negative for any click)
     :param int reset: Number of clicks after which to reset link (negative
-    value to never reset)"""
+        value to never reset)"""
 
     ui_order = [
         "enabled", "remain_enabled", "selected_color", "reset", "actions"]
@@ -254,7 +254,7 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
 
 
 class W3DText(W3DContent):
-    """Represents text in the W3D
+    """Represents text in virtual space
 
     :param str text: String of text to be displayed
     :param str halign: Horizontal alignment of text ("left", "right", "center")
@@ -347,7 +347,7 @@ class W3DText(W3DContent):
 
 
 class W3DImage(W3DContent):
-    """Represent a flat image in the W3D
+    """Represent a flat image in 3D space
 
     :param str filename: Filename of image to be displayed"""
     ui_order=["filename"]
@@ -458,7 +458,7 @@ class W3DStereoImage(W3DContent):
 
 
 class W3DModel(W3DContent):
-    """Represents a 3d model in the W3D
+    """Represents a 3d model in virtual space
 
     :param str filename: Filename of model to be displayed
     :param bool check_collisions: TODO Clarify what this does
@@ -523,7 +523,7 @@ class W3DModel(W3DContent):
 
 
 class W3DLight(W3DContent):
-    """Represents a light source in the W3D
+    """Represents a light source in virtual space
 
     :param str light_type: Type of source, one of "Point", "Directional",
     "Spot"
@@ -640,7 +640,7 @@ class W3DLight(W3DContent):
 
 
 class W3DPSys(W3DContent):
-    """Represents a particle system in the W3D
+    """Represents a particle system in virtual space
 
     NOT YET IMPLEMENTED AT ALL"""
     # TODO: everything

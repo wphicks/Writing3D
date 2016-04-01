@@ -29,8 +29,8 @@ class Validator(object):
     """Callable object for validating input
 
     :param W3DProject project: The project this validator is being used for.
-    If specified, this allows for consistency checks between related elements
-    of the project."""
+        If specified, this allows for consistency checks between related
+        elements of the project."""
 
     def __init__(self):
         self.help_string = "No help available for this option"
@@ -42,7 +42,15 @@ class Validator(object):
     def __call__(self, value):
         return False
 
+    def __repr__(self):
+        return self.__class__.__name__
+
+    def coerce(self, value):
+        """Attempt to coerce input to a valid value for this validator"""
+        return value
+
     def help(self):
+        """Provide information on valid options for this validator"""
         return self.help_string
 
 
@@ -55,6 +63,9 @@ class TextValidator(Validator):
 
     def __call__(self, value):
         return True
+
+    def __repr__(self):
+        return "{}()".format(super().__repr__())
 
     def coerce(self, value):
         new_value = str(value)
@@ -73,6 +84,9 @@ class ValidPyString(Validator):
     def __call__(self, value):
         return bool(PY_ID_REGEX.match(str(value))) or not len(str(value))
 
+    def __repr__(self):
+        return "{}()".format(super().__repr__())
+
     def coerce(self, value):
         new_value = str(value)
         new_value = re.sub(r"[^A-Za-z0-9_]", lambda x: "_", new_value)
@@ -90,6 +104,9 @@ class ValidFile(Validator):
 
     def __call__(self, value):
         return os.path.isfile(value)
+
+    def __repr__(self):
+        return "{}()".format(super().__repr__())
 
     def coerce(self, value):
         # TODO: Think about something clever with os.path here
@@ -114,6 +131,9 @@ class OptionValidator(Validator):
     def __call__(self, value):
         return value in self.valid_options
 
+    def __repr__(self):
+        return "{}{}".format(super().__repr__(), tuple(self.valid_menu_items))
+
     def coerce(self, value):
         if value in self.valid_options:
             return value
@@ -125,13 +145,14 @@ class ListValidator(Validator):
     """Used to validate an option which takes a list of values
 
     :param base_validators: Either a single Validator or list of Validators
-    which will be used to validate each value in list. If a list of validators
-    is provided and there are more values than validators, the validation
-    process will "wrap around" to the beginning of the list of values.
+        which will be used to validate each value in list. If a list of
+        validators is provided and there are more values than validators, the
+        validation process will "wrap around" to the beginning of the list of
+        values.
     :param str item_label: A label denoting what each item in the list is
     :param int required_length: If the list of values must be of a particular
-    length, this parameter should be set to an integer. Otherwise, this should
-    be None."""
+        length, this parameter should be set to an integer. Otherwise, this
+        should be None."""
 
     def __init__(
             self, base_validators, item_label="Item", help_string=None,
@@ -160,6 +181,12 @@ class ListValidator(Validator):
                 self.get_base_validator(i).def_value for i in
                 range(self.required_length)]
         return []
+
+    def __repr__(self):
+        return "{}<{}|{}>".format(
+            super().__repr__(), str(*self.base_validators),
+            self.required_length
+        )
 
     def __call__(self, iterable):
         for i in range(len(iterable)):
@@ -205,6 +232,10 @@ class DictValidator(Validator):
     def def_value(self):
         return {}
 
+    def __repr__(self):
+        return "{}<{}, {}>".format(
+            super().__repr__(), self.key_validator, self.value_validator)
+
     def __call__(self, dictionary):
         for key, value in dictionary.items():
             if (
@@ -235,6 +266,10 @@ class ReferenceValidator(Validator):
         self.fallback_validator = fallback_validator
         self.def_value = self.fallback_validator.def_value
         self.ref_path = ProjectPath(project=project, path=reference_path)
+
+    def __repr__(self):
+        return "{}<{}, {}>".format(
+            super().__repr__(), self.ref_path, self.fallback_validator)
 
     def __call__(self, value):
         if self.ref_path.project is None:
@@ -283,6 +318,9 @@ class IsBoolean(OptionValidator):
         super(IsBoolean, self).__init__(True, False)
         self.def_value = True
 
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
+
     def __call__(self, value):
         return True
 
@@ -314,6 +352,10 @@ class IsNumeric(Validator):
                     self.max_value)))
             if self.def_value > self.max_value:
                 self.def_value = self.max_value
+
+    def __repr__(self):
+        return "{}<{}, {}>".format(
+            super().__repr__(), self.min_value, self.max_value)
 
     def __call__(self, value):
         try:
@@ -353,6 +395,10 @@ class FeatureValidator(Validator):
                 self.correct_class)
         else:
             self.help_string = help_string
+
+    def __repr__(self):
+        return "{}<{}>".format(
+            super().__repr__(), self.correct_class.__name__)
 
     def __call__(self, value):
         return isinstance(value, self.correct_class)

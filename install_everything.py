@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2016 William Hicks
 #
 # This file is part of Writing3D.
@@ -217,7 +217,8 @@ class Installer(tk.Frame):
         progress.start(50)
 
         self.next_button.config(state=tk.DISABLED)
-        self.writer_script_location = os.path.join(SCRIPTDIR, "w3d_writer.py")
+        self.writer_script_location = os.path.join(
+            SCRIPTDIR, "pyw3d", "__init__.py")
         with open(self.writer_script_location) as writer_script:
             with open(
                     os.path.join(
