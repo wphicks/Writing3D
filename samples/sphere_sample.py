@@ -68,4 +68,5 @@ my_project.save_XML("sphere_sample.xml")
 
 #Finally, we render the whole thing using Blender, export it, and display the
 #result
-export_to_blender(my_project, filename="sphere_sample.blend", display=True)
+export_to_blender(
+    my_project, filename="sphere_sample.blend", display=True, fullscreen=True)

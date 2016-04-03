@@ -69,4 +69,5 @@ my_project.save_XML("single_sided_sample.xml")
 #Finally, we render the whole thing using Blender, export it, and display the
 #result
 export_to_blender(
-    my_project, filename="single_sided_sample.blend", display=True)
+    my_project, filename="single_sided_sample.blend", display=True,
+    fullscreen=True)
