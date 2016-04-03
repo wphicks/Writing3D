@@ -300,6 +300,7 @@ class W3DText(W3DContent):
         text_root = ET.SubElement(
             content_root, "Text", attrib=attrib
         )
+        text_root = ET.SubElement(text_root, "text")
         text_root.text = self["text"]
 
         return content_root
