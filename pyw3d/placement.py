@@ -21,7 +21,7 @@ import math
 from .features import W3DFeature
 from .validators import OptionValidator, ListValidator, IsNumeric, \
     FeatureValidator
-from .errors import BadW3DXML
+from .errors import BadW3DXML, ConsistencyError
 from .xml_tools import text2tuple
 import warnings
 try:
@@ -85,7 +85,11 @@ class W3DRotation(W3DFeature):
         if not self.is_default("rotation_mode"):
             rot_root = ET.SubElement(parent_root, self["rotation_mode"])
             if self["rotation_vector"] is not None:
-                rot_root.attrib["rotation"] = str(tuple(convert_to_legacy_axes(
+                if self["rotation_mode"] == "LookAt":
+                    vec_attrib = "target"
+                else:
+                    vec_attrib = "rotation"
+                rot_root.attrib[vec_attrib] = str(tuple(convert_to_legacy_axes(
                     self["rotation_vector"])))
             rot_root.attrib["angle"] = str(self["rotation_angle"])
             return rot_root
@@ -103,8 +107,13 @@ class W3DRotation(W3DFeature):
             rotation_vector = rot_root.attrib["rotation"]
             rotation["rotation_vector"] = convert_to_blender_axes(
                 text2tuple(rotation_vector, evaluator=float))
-        except KeyError:  # No rotation vector specified
-            pass
+        except KeyError:
+            try:
+                rotation_vector = rot_root.attrib["target"]
+                rotation["rotation_vector"] = convert_to_blender_axes(
+                    text2tuple(rotation_vector, evaluator=float))
+            except KeyError:  # No rotation vector specified
+                pass
         try:
             rotation_angle = rot_root.attrib["angle"]
             try:
@@ -124,6 +133,10 @@ class W3DRotation(W3DFeature):
                 self["rotation_vector"]
             )
         elif self["rotation_mode"] == "LookAt":
+            if self["rotation_vector"] is None:
+                raise ConsistencyError(
+                    "LookAt rotation *must* specify rotation_vector"
+                )
             look_direction = (
                 blender_object.location -
                 mathutils.Vector(self["rotation_vector"])
@@ -187,9 +200,8 @@ class W3DPlacement(W3DFeature):
 
     def toXML(self, parent_root):
         place_root = ET.SubElement(parent_root, "Placement")
-        if not self.is_default("relative_to"):
-            rel_root = ET.SubElement(place_root, "RelativeTo")
-            rel_root.text = self["relative_to"]
+        rel_root = ET.SubElement(place_root, "RelativeTo")
+        rel_root.text = self["relative_to"]
         if not self.is_default("position"):
             pos_root = ET.SubElement(place_root, "Position")
             pos_root.text = str(tuple(

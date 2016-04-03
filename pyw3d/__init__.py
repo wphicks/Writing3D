@@ -41,7 +41,8 @@ from .project import W3DProject
 from .objects import W3DObject, W3DLink, W3DContent, W3DText, W3DImage, \
     W3DStereoImage, W3DModel, W3DLight, W3DPSys
 from .timeline import W3DTimeline
-from .placement import W3DPlacement, W3DRotation
+from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes, \
+    convert_to_legacy_axes
 from .triggers import W3DTrigger, HeadTrackTrigger, HeadPositionTrigger, \
     LookAtPoint, LookAtDirection, LookAtObject, MovementTrigger, EventBox
 from .actions import W3DAction, ObjectAction, GroupAction, SoundAction, \
@@ -49,4 +50,3 @@ from .actions import W3DAction, ObjectAction, GroupAction, SoundAction, \
 from .groups import W3DGroup
 from .sounds import W3DSound
 from .w3d_export_tools import export_to_blender
-

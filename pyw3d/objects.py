@@ -721,8 +721,9 @@ class W3DObject(W3DFeature):
             all_objects_root, "Object", attrib={"name": self["name"]})
         node = ET.SubElement(object_root, "Visible")
         node.text = bool2text(self["visible"])
-        node = ET.SubElement(object_root, "DoubleSided")
-        node.text = bool2text(self["double_sided"])
+        if not self.is_default("double_sided"):
+            node = ET.SubElement(object_root, "DoubleSided")
+            node.text = bool2text(self["double_sided"])
         node = ET.SubElement(object_root, "Color")
         node.text = "{},{},{}".format(*self["color"])
         node = ET.SubElement(object_root, "Lighting")

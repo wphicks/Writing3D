@@ -77,10 +77,11 @@ def export_to_blender(
         pickle_w3dproject(input_project)
         subprocess.call([
             BLENDER_EXEC, "--background", "--python", EXPORT_SCRIPT, "--", "-f"
-            "pickle", "run.p", "-o", filename]
+            "pickle", "run.p", "-o", os.path.abspath(filename)]
         )
     if display:
-        display_blender_output(filename=filename, fullscreen=fullscreen)
+        display_blender_output(
+            filename=os.path.abspath(filename), fullscreen=fullscreen)
 
 
 def display_blender_output(filename="run.blend", fullscreen=False):

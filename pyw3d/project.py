@@ -276,7 +276,7 @@ class W3DProject(W3DFeature):
     def toXML(self):
         """Store W3DProject as W3D XML tree
         """
-        project_root = ET.Element("Story")
+        project_root = ET.Element("Story", attrib={"version": "8"})
         object_root = ET.SubElement(project_root, "ObjectRoot")
         for object_ in self["objects"]:
             object_.toXML(object_root)

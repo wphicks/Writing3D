@@ -21,7 +21,7 @@ cwapp software
 
 To run this script, use the following command::
 
-    python3 cwapp.py run.xml
+    python3 cwapp.py desktopfull run.xml
 
 where run.xml is a copy of your project in archival XML format.
 
@@ -37,11 +37,9 @@ Unix-based systems, this can be done from terminal via::
 """
 
 import argparse
-import sys
 from pyw3d import project, export_to_blender
 
 if __name__ == "__main__":
-    print(sys.argv)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config", choices=["desktop", "desktopfull"], help="run configuration")
