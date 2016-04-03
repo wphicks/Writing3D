@@ -60,7 +60,8 @@ def unpickle_w3dproject(filename="run.p"):
     return pickle.load(open(filename, "rb"))
 
 
-def export_to_blender(input_project, filename="run.blend", display=True):
+def export_to_blender(
+        input_project, filename="run.blend", display=True, fullscreen=False):
     """Save project as .blend file
 
     :param str filename: Name of .blend file to export to
@@ -79,7 +80,16 @@ def export_to_blender(input_project, filename="run.blend", display=True):
             "pickle", "run.p", "-o", filename]
         )
     if display:
-        subprocess.call([BLENDER_PLAY, filename])
+        display_blender_output(filename=filename, fullscreen=fullscreen)
+
+
+def display_blender_output(filename="run.blend", fullscreen=False):
+    """Display exported project using blenderplayer"""
+    blender_play_call = [BLENDER_PLAY]
+    if fullscreen:
+        blender_play_call.append("-f")
+    blender_play_call.append(filename)
+    subprocess.call(blender_play_call)
 
 if __name__ == "__main__":
     argv = sys.argv
@@ -97,6 +107,8 @@ if __name__ == "__main__":
         help="filename for output blend file")
     parser.add_argument(
         "-d", "--display", default=False, action="store_true")
+    parser.add_argument(
+        "-s", "--fullscreen", default=False, action="store_true")
     args = parser.parse_args(argv)
 
     if args.filetype == "xml":
@@ -104,4 +116,5 @@ if __name__ == "__main__":
     elif args.filetype == "pickle":
         input_project = unpickle_w3dproject(args.project_file)
     export_to_blender(
-        input_project, filename=args.output, display=args.display)
+        input_project, filename=args.output, display=args.display,
+        fullscreen=args.fullscreen)

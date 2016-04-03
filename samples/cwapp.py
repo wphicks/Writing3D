@@ -37,15 +37,20 @@ Unix-based systems, this can be done from terminal via::
 """
 
 import argparse
+import sys
 from pyw3d import project, export_to_blender
 
 if __name__ == "__main__":
+    print(sys.argv)
     parser = argparse.ArgumentParser()
-    parser.add_argument("config", help="run configuration (currently ignored)")
+    parser.add_argument(
+        "config", choices=["desktop", "desktopfull"], help="run configuration")
     parser.add_argument("project_file")
     args = parser.parse_args()
 
     # It's as simple as loading the project...
     my_project = project.W3DProject.fromXML_file(args.project_file)
     # ...and exporting it!
-    export_to_blender(my_project, display=True)
+    export_to_blender(
+        my_project, display=True, fullscreen=(args.config == "desktopfull")
+    )
