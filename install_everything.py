@@ -76,7 +76,7 @@ BLENDER_DIRS = {
 
 #TODO: Check these
 BLENDER_EXECS = {
-    "Mac": ("blender.app", "blenderplayer.app"),
+    "Mac": ("Blender.app", "BlenderPlayer.app"),
     "Windows": ("blender.exe", "blenderplayer.exe"),
     "Linux": ("blender", "blenderplayer"),
     "Other": ("blender", "blenderplayer")
