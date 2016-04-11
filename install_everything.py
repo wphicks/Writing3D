@@ -19,8 +19,11 @@
 """A script to simplify installing Writing3D"""
 
 import sys
+import site
 import platform
 import os
+import shutil
+import fileinput
 import zipfile
 import tarfile
 import subprocess
@@ -76,7 +79,7 @@ BLENDER_DIRS = {
 
 #TODO: Check these
 BLENDER_EXECS = {
-    "Mac": ("Blender.app", "BlenderPlayer.app"),
+    "Mac": ("blender", "blenderplayer"),
     "Windows": ("blender.exe", "blenderplayer.exe"),
     "Linux": ("blender", "blenderplayer"),
     "Other": ("blender", "blenderplayer")
@@ -108,6 +111,23 @@ DOWNLOAD_URLS = {
 SCRIPTDIR = os.path.abspath(os.path.dirname(__file__))
 
 
+def module_dir():
+    py_version = sys.version_info[0:2]
+    if CURRENT_OS == "Windows":
+        return os.path.join(
+            site.USER_BASE,
+            "Python{}{}".format(*py_version),
+            "site-packages"
+        )
+    else:
+        return os.path.join(
+            site.USER_BASE,
+            "lib"
+            "python{}.{}".format(*py_version),
+            "site-packages"
+        )
+
+
 def warn(message):
     warn_window = tk.Toplevel()
     warn_window.title("ERROR")
@@ -116,6 +136,18 @@ def warn(message):
     dismiss = tk.Button(
         warn_window, text="Dismiss", command=warn_window.destroy)
     dismiss.pack()
+
+
+def modify_paths():
+    for root, dirs, files in os.walk(os.path.join(SCRIPTDIR, "samples")):
+        for file_ in files:
+            if os.path.splitext(file_)[1].lower() == ".py":
+                for line in fileinput.input(os.path.join(root, file_), inplace=1):
+                    if "PATHSUBTAG" in line:
+                        print("sys.path.append({})  # PATHSUBTAG".format(
+                            module_dir()))
+                    else:
+                        print(line, end="")
 
 
 class Installer(tk.Frame):
@@ -152,12 +184,7 @@ class Installer(tk.Frame):
             title="Select Blender Executable",
             initialdir=blender_directory
         )
-        if (
-                os.path.basename(blender_directory) ==
-                BLENDER_EXECS[CURRENT_OS][0]):
-            self.blender_directory = os.path.dirname(blender_directory)
-        else:
-            self.blender_directory = None
+        self.blender_directory = os.path.dirname(blender_directory)
         if self.blender_directory is not None:
             self.next_button.config(state=tk.NORMAL)
 
@@ -218,35 +245,43 @@ class Installer(tk.Frame):
 
         self.next_button.config(state=tk.DISABLED)
         self.writer_script_location = os.path.join(
+            SCRIPTDIR, "w3d_writer.py")
+        blender_exec_path = os.path.join(
+            self.blender_directory,
+            BLENDER_EXECS[CURRENT_OS][0]
+        )
+        bplay_exec_path = os.path.join(
+            self.blender_directory,
+            BLENDER_EXECS[CURRENT_OS][1]
+        )
+        if not os.path.exists(blender_exec_path):
+            for root, dirs, files in os.walk(self.blender_directory):
+                if BLENDER_EXECS[CURRENT_OS][0] in files:
+                    blender_exec_path = os.path.join(
+                        root, BLENDER_EXECS[CURRENT_OS][0])
+                if BLENDER_EXECS[CURRENT_OS][1] in files:
+                    bplay_exec_path = os.path.join(
+                        root, BLENDER_EXECS[CURRENT_OS][1])
+        init_filename = os.path.join(
             SCRIPTDIR, "pyw3d", "__init__.py")
-        with open(self.writer_script_location) as writer_script:
-            with open(
-                    os.path.join(
-                        self.install_directory, "w3d_writer.py"),
-                    'w') as new_writer_script:
-                for line in writer_script:
+        new_init_filename = 'tmp_init.py'
+        with open(init_filename) as init_file:
+            with open(new_init_filename, 'w') as new_init_file:
+                for line in init_file:
                     if "BLENDEREXECSUBTAG" in line:
-                        new_writer_script.write(
-                            "BLENDER_EXEC = '{}'".format(
-                                os.path.join(
-                                    self.blender_directory,
-                                    BLENDER_EXECS[CURRENT_OS][0]
-                                )
-                            )
+                        new_init_file.write(
+                            "BLENDER_EXEC = '{}'".format(blender_exec_path)
                         )
-                        new_writer_script.write("  # BLENDEREXECSUBTAG\n")
+                        new_init_file.write("  # BLENDEREXECSUBTAG\n")
                     elif "BLENDERPLAYERSUBTAG" in line:
-                        new_writer_script.write(
-                            "BLENDER_PLAY = '{}'".format(
-                                os.path.join(
-                                    self.blender_directory,
-                                    BLENDER_EXECS[CURRENT_OS][1]
-                                )
-                            )
+                        new_init_file.write(
+                            "BLENDER_PLAY = '{}'".format(bplay_exec_path)
                         )
-                        new_writer_script.write("  # BLENDERPLAYERSUBTAG\n")
+                        new_init_file.write("  # BLENDERPLAYERSUBTAG\n")
                     else:
-                        new_writer_script.write(line)
+                        new_init_file.write(line)
+        shutil.move(new_init_filename, init_filename)
+
         os.chdir(SCRIPTDIR)
         subprocess.call([
             sys.executable, "setup.py", 'install', '--user']
@@ -319,6 +354,8 @@ Please click the Next button to begin the install process.""",
                 command=self.start_blender_install)
             self.use_old_button.pack(fill=tk.X, expand=1)
             self.install_blender_button.pack(fill=tk.X, expand=1)
+            if self.blender_directory is None:
+                self.next_button.config(state=tk.DISABLED)
             return
 
         if self.current_slide == 3:
