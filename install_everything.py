@@ -265,6 +265,7 @@ class Installer(tk.Frame):
         init_filename = os.path.join(
             SCRIPTDIR, "pyw3d", "__init__.py")
         new_init_filename = 'tmp_init.py'
+        #TODO: Use fileinput
         with open(init_filename) as init_file:
             with open(new_init_filename, 'w') as new_init_file:
                 for line in init_file:
@@ -281,6 +282,7 @@ class Installer(tk.Frame):
                     else:
                         new_init_file.write(line)
         shutil.move(new_init_filename, init_filename)
+        modify_paths()
 
         os.chdir(SCRIPTDIR)
         subprocess.call([
