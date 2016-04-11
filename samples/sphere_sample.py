@@ -25,6 +25,8 @@ blender --background --python link_sample.py
 where blender is your blender executable.
 """
 
+import sys
+#PATHSUBTAG
 from random import randint
 from math import pi, sin, cos
 from pyw3d import project, objects, placement, export_to_blender

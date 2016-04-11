@@ -24,6 +24,8 @@ To run this script, use the following command::
     $ python3 single_sided_sample.py
 """
 
+import sys
+#PATHSUBTAG
 from random import randint
 from math import pi, sin, cos
 from pyw3d import project, objects, placement, export_to_blender
