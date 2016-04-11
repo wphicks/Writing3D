@@ -144,7 +144,7 @@ def modify_paths():
             if os.path.splitext(file_)[1].lower() == ".py":
                 for line in fileinput.input(os.path.join(root, file_), inplace=1):
                     if "PATHSUBTAG" in line:
-                        print("sys.path.append({})  # PATHSUBTAG".format(
+                        print("sys.path.append('{}')  # PATHSUBTAG".format(
                             module_dir()))
                     else:
                         print(line, end="")
