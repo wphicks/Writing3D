@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 import warnings
 import math
+import os
 from .features import W3DFeature
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
 from .validators import ListValidator, IsNumeric, OptionValidator,\
@@ -405,6 +406,7 @@ class W3DProject(W3DFeature):
 
         :param str filename: Filename of XML file for project
         """
+        os.chdir(os.path.dirname(filename))  # For relative paths...
         return project_class.fromXML(ET.parse(filename).getroot())
 
     def toprettyxml(self):
