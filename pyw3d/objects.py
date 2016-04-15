@@ -597,7 +597,7 @@ class W3DLight(W3DContent):
             for index, factor in enumerate(("const_atten", "lin_atten",
                                             "quad_atten")):
                 if factor in light_root.attrib:
-                    new_light["attenuation"][index] = text2bool(
+                    new_light["attenuation"][index] = float(
                         light_root.attrib[factor])
             for light_type in W3DLight.argument_validators[
                     "light_type"].valid_options:

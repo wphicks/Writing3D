@@ -68,6 +68,20 @@ class W3DFeature(dict):
     def __missing__(self, key):
         return self.default_arguments[key]
 
+    def __eq__(self, other):
+        # TODO: Not sure if this is best OOP
+        if type(self) != type(other):
+            return False
+        all_keys = set(self.keys())
+        all_keys.update(other.keys())
+        for key in all_keys:
+            try:
+                if self[key] != other[key]:
+                    return False
+            except KeyError:
+                return False
+        return True
+
     def update(self, other):
         for key, value in other:
             self.__setitem__(key, value)

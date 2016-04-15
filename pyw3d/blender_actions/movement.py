@@ -145,7 +145,7 @@ class MoveAction(object):
                 "blender_object['angV'] = (",
                 "    rotation.angle /",
                 "    {}".format(
-                    ("({}*bge.logic.getLogicTicRate())".format(
+                    ("({}*bge.logic.getLogicTicRate()) *".format(
                         self.duration), 1)[
                         self.duration == 0]),
                 "    rotation.axis)"]

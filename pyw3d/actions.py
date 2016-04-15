@@ -22,6 +22,7 @@ project
 """
 import warnings
 import xml.etree.ElementTree as ET
+from functools import total_ordering
 from .features import W3DFeature
 from .placement import W3DPlacement
 from .validators import OptionValidator, IsNumeric,\
@@ -42,11 +43,19 @@ except ImportError:
     )
 
 
+@total_ordering
 class W3DAction(W3DFeature, metaclass=SubRegisteredClass):
     """An action causing a change in virtual space
 
     Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
     appropriate subclasses"""
+
+    def __lt__(self, other):
+        """Order based on __repr__ of self and other
+
+        Defined to allow unambiguous ordering of timelines"""
+
+        return repr(self) < repr(other)
 
     @staticmethod
     def fromXML(action_root):
