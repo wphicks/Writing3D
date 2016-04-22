@@ -61,6 +61,12 @@ class W3DFeature(dict):
             raise InvalidArgument(
                 "{} not a valid option for this W3D feature".format(key))
         if not self.argument_validators[key](value):
+            try:
+                value = self.argument_validators[key].coerce(value)
+            except:
+                raise InvalidArgument(
+                    "{} is not a valid value for option {}".format(value, key))
+        if not self.argument_validators[key](value):
             raise InvalidArgument(
                 "{} is not a valid value for option {}".format(value, key))
         super(W3DFeature, self).__setitem__(key, value)
