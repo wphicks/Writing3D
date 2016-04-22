@@ -19,7 +19,7 @@
 
 import re
 import os
-from .path import ProjectPath
+from .path import ProjectPath, UnsetValueError
 
 
 PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
@@ -277,11 +277,14 @@ class ReferenceValidator(Validator):
         return value in self.valid_options
 
     def coerce(self, value):
-        if value in self.valid_options:
-            return value
-        else:
-            return self.valid_options[
-                self.valid_menu_items.index(value)]
+        try:
+            if value in self.valid_options:
+                return value
+            else:
+                return self.valid_options[
+                    self.valid_menu_items.index(value)]
+        except UnsetValueError:
+            return self.fallback_validator.coerce(value)
 
     def set_project(self, project):
         """Set project to given value"""
