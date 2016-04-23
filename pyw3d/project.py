@@ -536,7 +536,7 @@ class W3DProject(W3DFeature):
         """Create representation of W3DProject in Blender"""
         clear_blender_scene()
         bpy.data.scenes["Scene"].game_settings.physics_gravity = 0
-        bpy.data.scenes["Scene"].game_settings.material_mode = "SINGLETEXTURE"
+        bpy.data.scenes["Scene"].game_settings.material_mode = "MULTITEXTURE"
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
         self.setup_camera()
