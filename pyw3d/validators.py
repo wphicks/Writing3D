@@ -19,6 +19,7 @@
 
 import re
 import os
+import warnings
 from .path import ProjectPath, UnsetValueError
 
 
@@ -273,6 +274,8 @@ class ReferenceValidator(Validator):
 
     def __call__(self, value):
         if self.ref_path.project is None:
+            warnings.warn("Cannot check relative reference to {}".format(
+                value))
             return self.fallback_validator(value)
         return value in self.valid_options
 
@@ -284,6 +287,8 @@ class ReferenceValidator(Validator):
                 return self.valid_options[
                     self.valid_menu_items.index(value)]
         except UnsetValueError:
+            warnings.warn("Cannot check relative reference to {}".format(
+                value))
             return self.fallback_validator.coerce(value)
 
     def set_project(self, project):

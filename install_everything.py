@@ -122,10 +122,30 @@ def module_dir():
     else:
         return os.path.join(
             site.USER_BASE,
-            "lib"
+            "lib",
             "python{}.{}".format(*py_version),
             "site-packages"
         )
+
+def blender_module_dir(blender_directory):
+    cur_path = blender_directory
+    for elem in ["addons", "modules"]:
+        for root, dirs, files in os.walk(cur_path):
+            if elem in dirs:
+                cur_path = os.path.join(root, elem)
+                break
+    return cur_path
+
+
+def copy_module_for_blender(blender_dir):
+    sys_dir = module_dir()
+    for filename in os.listdir(sys_dir):
+        if (
+                filename.startswith("Writing3D") and
+                os.path.splitext(filename)[1].lower() == ".egg"):
+            egg_path = os.path.join(sys_dir, filename)
+            break
+    shutil.copy(egg_path, blender_module_dir(blender_dir))
 
 
 def warn(message):
@@ -288,6 +308,8 @@ class Installer(tk.Frame):
         subprocess.call([
             sys.executable, "setup.py", 'install', '--user']
         )
+        if CURRENT_OS in ("Windows", "Mac"):
+            copy_module_for_blender(self.blender_directory)
         progress.destroy()
         self.next_button.config(state=tk.NORMAL)
         self.next_slide()
