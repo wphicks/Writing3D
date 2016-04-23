@@ -112,20 +112,9 @@ SCRIPTDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def module_dir():
-    py_version = sys.version_info[0:2]
-    if CURRENT_OS == "Windows":
-        return os.path.join(
-            site.USER_BASE,
-            "Python{}{}".format(*py_version),
-            "site-packages"
-        )
-    else:
-        return os.path.join(
-            site.USER_BASE,
-            "lib",
-            "python{}.{}".format(*py_version),
-            "site-packages"
-        )
+    for root, dirs, files in os.walk(site.USER_BASE):
+        if "site-packages" in dirs:
+            return os.path.abspath(os.path.join(root, "site-packages"))
 
 def blender_module_dir(blender_directory):
     cur_path = blender_directory
@@ -399,13 +388,12 @@ Please wait.""",
                 self.interior,
                 text="""Finished!
 
-Writing3D has been successfully installed. You can run
-Writing3D by double-clicking on
+Writing3D has been successfully installed. Please visit
+https://wphicks.github.io/Writing3D/
+for information on how to get started creating VR
+projects.
 
-{}
-
-or by right-clicking and opening it with Python3 depending
-on your system configuration.""".format(self.writer_script_location),
+""",
                 font=self.font,
                 justify=tk.LEFT)
             self.label.pack()
