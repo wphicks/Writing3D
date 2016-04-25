@@ -153,7 +153,7 @@ def modify_paths():
             if os.path.splitext(file_)[1].lower() == ".py":
                 for line in fileinput.input(os.path.join(root, file_), inplace=1):
                     if "PATHSUBTAG" in line:
-                        print("sys.path.append('{}')  # PATHSUBTAG".format(
+                        print("sys.path.append(r'{}')  # PATHSUBTAG".format(
                             module_dir()))
                     else:
                         print(line, end="")
@@ -280,12 +280,12 @@ class Installer(tk.Frame):
                 for line in init_file:
                     if "BLENDEREXECSUBTAG" in line:
                         new_init_file.write(
-                            "BLENDER_EXEC = '{}'".format(blender_exec_path)
+                            "BLENDER_EXEC = r'{}'".format(blender_exec_path)
                         )
                         new_init_file.write("  # BLENDEREXECSUBTAG\n")
                     elif "BLENDERPLAYERSUBTAG" in line:
                         new_init_file.write(
-                            "BLENDER_PLAY = '{}'".format(bplay_exec_path)
+                            "BLENDER_PLAY = r'{}'".format(bplay_exec_path)
                         )
                         new_init_file.write("  # BLENDERPLAYERSUBTAG\n")
                     else:
