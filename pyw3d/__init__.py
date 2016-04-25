@@ -50,3 +50,26 @@ from .actions import W3DAction, ObjectAction, GroupAction, SoundAction, \
 from .groups import W3DGroup
 from .sounds import W3DSound
 from .w3d_export_tools import export_to_blender
+
+import platform
+import os
+import site
+
+
+def get_scripts_directory():
+    """Return directory where W3D scripts have been installed
+
+    :warn: This assumes a default installation with user scheme
+
+    :todo: Add fallbacks for alternate installations"""
+
+    if platform.system() in ("Windows",):
+        scripts_dir = "Scripts"
+    else:
+        scripts_dir = "bin"
+    scripts_dir = os.path.join(site.getuserbase(), scripts_dir)
+    return scripts_dir
+
+
+EXPORT_SCRIPT = os.path.join(get_scripts_directory(), "w3d_export_tools.py")
+# EXPORTSUBTAG

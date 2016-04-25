@@ -18,10 +18,8 @@
 """Tools for exporting W3D projects in various formats
 """
 
-import site
 import os
 import sys
-import platform
 import pickle
 import subprocess
 import argparse
@@ -30,24 +28,7 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     from pyw3d import BLENDER_EXEC, BLENDER_PLAY
     from pyw3d import project
-
-
-def get_scripts_directory():
-    """Return directory where W3D scripts have been installed
-
-    :warn: This assumes a default installation with user scheme
-
-    :todo: Add fallbacks for alternate installations"""
-
-    if platform.system() in ("Windows",):
-        scripts_dir = "Scripts"
-    else:
-        scripts_dir = "bin"
-    scripts_dir = os.path.join(site.getuserbase(), scripts_dir)
-    return scripts_dir
-
-
-EXPORT_SCRIPT = os.path.join(get_scripts_directory(), "w3d_export_tools.py")
+    from pyw3d import EXPORT_SCRIPT
 
 
 def pickle_w3dproject(input_project, filename="run.p"):

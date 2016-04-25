@@ -271,6 +271,10 @@ class Installer(tk.Frame):
                 if BLENDER_EXECS[CURRENT_OS][1] in files:
                     bplay_exec_path = os.path.join(
                         root, BLENDER_EXECS[CURRENT_OS][1])
+        export_script = os.path.join(SCRIPTDIR, "pyw3d", "w3d_export_tools.py")
+        new_export_script = os.path.abspath(os.path.join(
+            self.install_directory, "w3d_export_tools.py"))
+        shutil.copy(export_script, new_export_script)
         init_filename = os.path.join(
             SCRIPTDIR, "pyw3d", "__init__.py")
         new_init_filename = 'tmp_init.py'
@@ -288,6 +292,11 @@ class Installer(tk.Frame):
                             "BLENDER_PLAY = r'{}'".format(bplay_exec_path)
                         )
                         new_init_file.write("  # BLENDERPLAYERSUBTAG\n")
+                    elif "EXPORTSUBTAG" in line and CURRENT_OS == "Windows":
+                        new_init_file.write(
+                            "EXPORT_SCRIPT = r'{}'".format(new_export_script)
+                        )
+                        new_init_file.write("  # EXPORTSUBTAG\n")
                     else:
                         new_init_file.write(line)
         shutil.move(new_init_filename, init_filename)
