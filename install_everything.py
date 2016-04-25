@@ -292,7 +292,7 @@ class Installer(tk.Frame):
                             "BLENDER_PLAY = r'{}'".format(bplay_exec_path)
                         )
                         new_init_file.write("  # BLENDERPLAYERSUBTAG\n")
-                    elif "EXPORTSUBTAG" in line and CURRENT_OS == "Windows":
+                    elif "EXPORTSUBTAG" in line:
                         new_init_file.write(
                             "EXPORT_SCRIPT = r'{}'".format(new_export_script)
                         )

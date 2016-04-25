@@ -20,8 +20,12 @@
 BLENDER_EXEC = "blender"  # BLENDEREXECSUBTAG
 BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
 
+import os  # TODO: Avoid this, obviously
 
-def get_scripts_directory():
+
+def __get_scripts_directory():
+    import platform
+    import site
     """Return directory where W3D scripts have been installed
 
     :warn: This assumes a default installation with user scheme
@@ -36,7 +40,7 @@ def get_scripts_directory():
     return scripts_dir
 
 
-EXPORT_SCRIPT = os.path.join(get_scripts_directory(), "w3d_export_tools.py")
+EXPORT_SCRIPT = os.path.join(__get_scripts_directory(), "w3d_export_tools.py")
 # EXPORTSUBTAG
 
 from . import project
@@ -47,7 +51,6 @@ from . import placement
 from . import errors
 from . import validators
 from . import xml_tools
-from . import ui
 from . import structs
 from . import path
 from . import activators
@@ -69,7 +72,3 @@ from .actions import W3DAction, ObjectAction, GroupAction, SoundAction, \
 from .groups import W3DGroup
 from .sounds import W3DSound
 from .w3d_export_tools import export_to_blender
-
-import platform
-import os
-import site

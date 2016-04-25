@@ -34,48 +34,11 @@ from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
-import tkinter as tk
 try:
     import bpy
 except ImportError:
     warnings.warn(
         "Module bpy not found. Loading pyw3d.objects as standalone")
-
-
-class ProjectOptions(tk.Frame):
-    """A frame for providing global project option input"""
-
-    def __init__(self, parent, project):
-        super(ProjectOptions, self).__init__(parent)
-        self.parent = parent
-        self.project = project
-        self.initUI()
-
-    def add_entries(self):
-        self.entries = {}
-        self.entries["far_clip"] = W3DProject.argument_validators[
-            "far_clip"].ui(self, "Camera far clip", self.project, "far_clip")
-        self.entries["background"] = W3DProject.argument_validators[
-            "background"].ui(
-            self, "Background color", self.project, "background")
-        self.entries["allow_movement"] = W3DProject.argument_validators[
-            "allow_movement"].ui(
-            self, "Allow movement", self.project, "allow_movement")
-        self.entries["allow_rotation"] = W3DProject.argument_validators[
-            "allow_rotation"].ui(
-            self, "Allow rotation", self.project, "allow_movement")
-        self.entries["camera_placement"] = W3DProject.argument_validators[
-            "camera_placement"].ui(
-            self, "Camera placement", self.project, "camera_placement")
-
-    def initUI(self):
-        self.add_entries()
-        self.title_string = "Global Options"
-        for option in [
-                "far_clip", "background", "allow_movement", "allow_rotation",
-                "camera_placement"]:
-            self.entries[option].pack(anchor=tk.W)
-        self.pack(fill=tk.BOTH, expand=1)
 
 
 def clear_blender_scene():
