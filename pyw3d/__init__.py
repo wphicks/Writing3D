@@ -41,7 +41,6 @@ def __get_scripts_directory():
 
 
 EXPORT_SCRIPT = os.path.join(__get_scripts_directory(), "w3d_export_tools.py")
-# EXPORTSUBTAG
 
 from . import project
 from . import features

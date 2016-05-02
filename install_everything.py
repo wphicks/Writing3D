@@ -112,9 +112,7 @@ SCRIPTDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def module_dir():
-    for root, dirs, files in os.walk(site.USER_BASE):
-        if "site-packages" in dirs:
-            return os.path.abspath(os.path.join(root, "site-packages"))
+    return site.getusersitepackages()
 
 def blender_module_dir(blender_directory):
     cur_path = blender_directory
@@ -126,15 +124,19 @@ def blender_module_dir(blender_directory):
     return cur_path
 
 
-def copy_module_for_blender(blender_dir):
+def copy_modules_for_blender(blender_dir):
     sys_dir = module_dir()
+    print(sys_dir)
     for filename in os.listdir(sys_dir):
+        # TODO: What about old versions?
         if (
                 filename.startswith("Writing3D") and
                 os.path.splitext(filename)[1].lower() == ".egg"):
             egg_path = os.path.join(sys_dir, filename)
             break
     shutil.copy(egg_path, blender_module_dir(blender_dir))
+    import pkg_resources
+    shutil.copy(pkg_resources.__file__, blender_module_dir(blender_dir))
 
 
 def warn(message):
@@ -292,11 +294,6 @@ class Installer(tk.Frame):
                             "BLENDER_PLAY = r'{}'".format(bplay_exec_path)
                         )
                         new_init_file.write("  # BLENDERPLAYERSUBTAG\n")
-                    elif "EXPORTSUBTAG" in line:
-                        new_init_file.write(
-                            "EXPORT_SCRIPT = r'{}'".format(new_export_script)
-                        )
-                        new_init_file.write("  # EXPORTSUBTAG\n")
                     else:
                         new_init_file.write(line)
         shutil.move(new_init_filename, init_filename)
@@ -306,8 +303,7 @@ class Installer(tk.Frame):
         subprocess.call([
             sys.executable, "setup.py", 'install', '--user']
         )
-        if CURRENT_OS in ("Windows", "Mac"):
-            copy_module_for_blender(self.blender_directory)
+        copy_modules_for_blender(self.blender_directory)
         progress.destroy()
         self.next_button.config(state=tk.NORMAL)
         self.next_slide()
