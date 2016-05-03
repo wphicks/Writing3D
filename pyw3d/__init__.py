@@ -24,6 +24,7 @@ import os  # TODO: Avoid this, obviously
 
 
 def __get_scripts_directory():
+    import sys
     import platform
     import site
     """Return directory where W3D scripts have been installed
@@ -33,7 +34,10 @@ def __get_scripts_directory():
     :todo: Add fallbacks for alternate installations"""
 
     if platform.system() in ("Windows",):
-        scripts_dir = "Scripts"
+        scripts_dir = os.path.join(
+            "Python{}{}".format(*(sys.version_info[:2])),
+            "Scripts"
+        )
     else:
         scripts_dir = "bin"
     scripts_dir = os.path.join(site.getuserbase(), scripts_dir)
