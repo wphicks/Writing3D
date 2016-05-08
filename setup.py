@@ -51,7 +51,7 @@ class BlenderInstaller(object):
         *blender_version)
 
     def message(self, string):
-        """Print if self.verbose"""
+        """Print string if self.verbose"""
         if self.verbose:
             print(string)
 
@@ -165,12 +165,12 @@ class BlenderInstaller(object):
         Sets self.blender_directory to directory into which install archive is
         inflated
         
-        :param bool force_install: Force installation even if previous install
-        is found"""
+        :param bool force_install: Force clean installation even if previous
+        install or cached installer archive is found"""
 
         if not force_install and self.check_install():
             return
-        if os.path.isfile(self.archive_name):
+        if os.path.isfile(self.archive_name) and not force_install:
             self.message("Installing from cached archive...")
         else:
             self.download()
@@ -218,15 +218,21 @@ class BlenderInstaller(object):
         self.blender_directory = None
 
 
-class CustomBuild(distutils.command.build.build):
+class CustomInstall(distutils.command.install.install):
     """Insert custom paths into source before installing
 
     This class is used to override the build command for setup.py, inserting
     paths to the blender and blenderplayer executables in pyw3d/__init__.py. In
     order to set these paths, modify setup.cfg as needed."""
 
-    def find_paths(self):
-        """Generate necessary paths from provided information"""
+    user_options = super().user_options + [
+        ('w3d_home=', None, "home directory for Writing3D")
+    ]
+
+    def message(self, string):
+        """Print string if self.verbose"""
+        if self.verbose:
+            print(string)
 
     def insert_paths(self):
         """Insert necessary paths into source"""
@@ -244,12 +250,28 @@ class CustomBuild(distutils.command.build.build):
             else:
                 print(line, end="")
 
+    def install_blender(self):
+        """Install Blender if necessary"""
+        self.blender_installer = BlenderInstaller(
+            self.install_directory, verbose=self.verbose)
+        self.blender_installer.install()
+
     def initialize_options(self, *args, **kwargs):
-        self.install_directory = None
-        self.blender_directory = None
-        self.blender_exec = None
+        self.w3d_home = None
+        super().initialize_options(*args, **kwargs)
+
+    def finalize_options(self, *args, **kwargs):
+        if self.w3d_home is None:
+            self.message("w3d_home not set. Using default.")
+            self.w3d_home = os.path.expanduser(os.path.join("~", "Writing3D"))
+        if not os.path.isdir(self.w3d_home):
+            self.message("Creating {}".format(self.w3d_home))
+            os.makedirs(self.w3d_home)
+        self.message("Installing Writing3D interfaces in {}".format(
+            self.w3d_home))
 
     def run(self, *args, **kwargs):
+        self.install_blender()
         self.insert_paths()
         super().run(*args, **kwargs)
 
@@ -263,7 +285,7 @@ setup(
     keywords="virtual modeling art literature",
     url="https://github.com/wphicks/Writing3D",
     scripts=[
-        'w3d_writer.py', "pyw3d/w3d_export_tools.py"],
+        "pyw3d/w3d_export_tools.py", "samples/cwapp.py"],
     packages=[
         "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
         "pyw3d.w3d_logic", "pyw3d.activators.triggers", "w3dui"
@@ -274,4 +296,7 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later"
         " (GPLv3+)"
     ],
+    cmd_class={
+        "install": CustomInstall
+    },
 )
