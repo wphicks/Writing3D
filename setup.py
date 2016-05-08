@@ -121,8 +121,55 @@ class BlenderInstaller(object):
             chunk = url_response.read()
             download_file.write(chunk)
 
-    def install(self):
-        """Install Blender, downloading if necessary"""
+    def check_install(self):
+        """Check if given Blender version has already been installed in
+        self.install_directory
+
+        Calls configure_blender_paths and returns True if both blender
+        executable and blenderplayer executable are found. Sets
+        self.blender_directory if install is found.
+
+        Note that this method requires the default directory name for the
+        Blender install."""
+
+        # TODO: This should be made more robust by attempting to find the
+        # Blender executable and then checking its version, rather than relying
+        # on a default directory name.
+
+        self.message("Checking for existing Blender install...")
+
+        for root, dirs, files in os.walk(self.install_directory):
+            finds = [dir_.startswith(
+                "blender-{}.{}".format(*self.blender_version)) for dir_ in dirs
+            ]
+            if any(finds):
+                for found, dir_ in zip(finds, dirs):
+                    if found:
+                        self.blender_directory = os.path.abspath(
+                            os.path.join(root, dir_)
+                        )
+                        break
+        self.configure_blender_paths()
+        if self.blender_exec is not None and self.blender_play is not None:
+            self.message("Found Blender install in {}".format(
+                self.blender_directory)
+            )
+            return True
+        self.blender_directory = None
+        self.message("Blender install not found.")
+        return False
+
+    def install(self, force_install=False):
+        """Install Blender, downloading if necessary
+        
+        Sets self.blender_directory to directory into which install archive is
+        inflated
+        
+        :param bool force_install: Force installation even if previous install
+        is found"""
+
+        if not force_install and self.check_install():
+            return
         if os.path.isfile(self.archive_name):
             self.message("Installing from cached archive...")
         else:
