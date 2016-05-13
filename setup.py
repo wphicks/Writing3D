@@ -12,15 +12,12 @@ import platform
 import shutil
 import tarfile
 import zipfile
+import site
 from urllib.request import urlopen
-try:
-    from setuptools import setup, Command
-except ImportError:
-    warnings.warn("setuptools not found. Using distutils for install")
-    from distutils import setup
-    from distutils.core import Command
-
+from distutils.core import setup
+from distutils.core import Command
 import distutils.command.install
+
 
 
 def find_subdirectory(name, path):
@@ -282,12 +279,9 @@ class CustomInstall(distutils.command.install.install):
             else:
                 print(line, end="")
 
-    def copy_egg_to_blender(self):
-        """Copy the Writing3D egg and .pth file to Blender site-packages
-        directory"""
-        #TODO: Start here
-        print(self.install_base)
-        raise SystemExit
+    def copy_modules_to_blender(self):
+        """Copy installed modules to Blender site-packages directory"""
+        py_site_packages = site.getusersitepackages()
 
     def initialize_options(self, *args, **kwargs):
         self.w3dhome = None
@@ -306,10 +300,9 @@ class CustomInstall(distutils.command.install.install):
 
     def run(self, *args, **kwargs):
         self.install_blender()
-        self.copy_pkg_resources()
+        #self.copy_pkg_resources()
         self.insert_paths()
         super().run(*args, **kwargs)
-        self.copy_egg_to_blender()
 
 setup(
     name="Writing3D",
@@ -324,7 +317,7 @@ setup(
         "pyw3d/w3d_export_tools.py", "samples/cwapp.py"],
     packages=[
         "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
-        "pyw3d.w3d_logic", "pyw3d.activators.triggers", "w3dui"
+        "pyw3d.w3d_logic", "pyw3d.activators.triggers"
     ],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
