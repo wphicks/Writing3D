@@ -9,6 +9,7 @@ import os
 import warnings
 import fileinput
 import platform
+import shutil
 import tarfile
 import zipfile
 from urllib.request import urlopen
@@ -19,7 +20,7 @@ except ImportError:
     from distutils import setup
     from distutils.core import Command
 
-import distutils.command.build
+import distutils.command.install
 
 
 def find_subdirectory(name, path):
@@ -176,14 +177,15 @@ class BlenderInstaller(object):
             self.download()
         if self.platform in ("Linux", "Other"):
             with tarfile.open(self.archive_name, "r:bz2") as install_file:
-                install_file.extractall(path=self.install_directory)
                 self.blender_directory = os.path.join(
                     self.install_directory, install_file.next().name)
+                install_file.extractall(path=self.install_directory)
         else:
             with zipfile.ZipFile(self.archive_name) as install_file:
-                install_file.extractall(path=self.install_directory)
                 self.blender_directory = os.path.join(
                     self.install_directory, install_file.namelist()[0])
+                install_file.extractall(path=self.install_directory)
+        self.configure_blender_paths()
 
     def configure_blender_paths(self):
         """Detects and stores several Blender-related paths
@@ -198,7 +200,7 @@ class BlenderInstaller(object):
         self.blender_modules = None
         if self.blender_directory is None:
             self.message(
-                "ERROR: Cannot configure paths until Blender is installed!")
+                "Cannot configure paths until Blender is installed!")
             return
         self.blender_site = find_subdirectory(
             "site-packages", self.blender_directory)
@@ -216,6 +218,8 @@ class BlenderInstaller(object):
         self.message("Installing to {}...".format(self.install_directory))
         self._gather_platform_info()
         self.blender_directory = None
+        self.blender_exec = None
+        self.blender_play = None
 
 
 class CustomInstall(distutils.command.install.install):
@@ -225,8 +229,8 @@ class CustomInstall(distutils.command.install.install):
     paths to the blender and blenderplayer executables in pyw3d/__init__.py. In
     order to set these paths, modify setup.cfg as needed."""
 
-    user_options = super().user_options + [
-        ('w3d_home=', None, "home directory for Writing3D")
+    user_options = distutils.command.install.install.user_options + [
+        ('w3dhome=', None, "home directory for Writing3D")
     ]
 
     def message(self, string):
@@ -234,46 +238,78 @@ class CustomInstall(distutils.command.install.install):
         if self.verbose:
             print(string)
 
+    def install_blender(self):
+        """Install Blender if necessary"""
+        self.blender_installer = BlenderInstaller(
+            self.w3dhome, verbose=self.verbose)
+        self.blender_installer.install()
+
+    def copy_pkg_resources(self):
+        """Copy the pkg_resources module to Blender module directory
+        
+        This is necessary to make scripts built into the Writing3D egg
+        available to Blender"""
+        import pkg_resources
+        pkg_file = pkg_resources.__file__
+
+        # For directory installs...
+        if not os.path.basename(pkg_file).startswith("pkg_resources"):
+            pkg_dir = os.path.dirname(pkg_file) 
+            new_dir = os.path.join(
+                self.blender_installer.blender_modules,
+                os.path.basename(os.path.normpath(pkg_dir))
+            )
+            self.message("Copying {} to {}...".format(pkg_dir, new_dir))
+            shutil.copytree(pkg_dir, new_dir)
+        else:
+            new_dir = self.blender_installer.blender_modules
+            self.message("Copying {} to {}...".format(pkg_file, new_dir))
+            shutil.copy(pkg_file, new_dir)
+
     def insert_paths(self):
         """Insert necessary paths into source"""
         for line in fileinput.input("pyw3d/__init__.py", inplace=1):
             if "BLENDEREXECSUBTAG" in line:
                 print(
                     "BLENDER_EXEC = r'{}' # BLENDEREXECSUBTAG".format(
-                        self.blender_exec)
+                        self.blender_installer.blender_exec)
                 )
             elif "BLENDERPLAYSUBTAG" in line:
                 print(
                     "BLENDER_PLAY = r'{}' # BLENDERPLAYERSUBTAG".format(
-                        self.blender_play)
+                        self.blender_installer.blender_play)
                 )
             else:
                 print(line, end="")
 
-    def install_blender(self):
-        """Install Blender if necessary"""
-        self.blender_installer = BlenderInstaller(
-            self.install_directory, verbose=self.verbose)
-        self.blender_installer.install()
+    def copy_egg_to_blender(self):
+        """Copy the Writing3D egg and .pth file to Blender site-packages
+        directory"""
+        #TODO: Start here
+        print(self.install_base)
+        raise SystemExit
 
     def initialize_options(self, *args, **kwargs):
-        self.w3d_home = None
+        self.w3dhome = None
         super().initialize_options(*args, **kwargs)
 
     def finalize_options(self, *args, **kwargs):
-        if self.w3d_home is None:
-            self.message("w3d_home not set. Using default.")
-            self.w3d_home = os.path.expanduser(os.path.join("~", "Writing3D"))
-        if not os.path.isdir(self.w3d_home):
-            self.message("Creating {}".format(self.w3d_home))
-            os.makedirs(self.w3d_home)
+        if self.w3dhome is None:
+            self.message("w3dhome not set. Using default.")
+            self.w3dhome = os.path.expanduser(os.path.join("~", "Writing3D"))
+        if not os.path.isdir(self.w3dhome):
+            self.message("Creating {}".format(self.w3dhome))
+            os.makedirs(self.w3dhome)
         self.message("Installing Writing3D interfaces in {}".format(
-            self.w3d_home))
+            self.w3dhome))
+        super().finalize_options()
 
     def run(self, *args, **kwargs):
         self.install_blender()
+        self.copy_pkg_resources()
         self.insert_paths()
         super().run(*args, **kwargs)
+        self.copy_egg_to_blender()
 
 setup(
     name="Writing3D",
@@ -296,7 +332,7 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later"
         " (GPLv3+)"
     ],
-    cmd_class={
+    cmdclass={
         "install": CustomInstall
     },
 )
