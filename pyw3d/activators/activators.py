@@ -164,7 +164,7 @@ def activate(cont):
         self.base_object.game.sensors[-1].name = "active_sensor"
         active_sensor = self.base_object.game.sensors["active_sensor"]
         active_sensor.use_pulse_true_level = True
-        active_sensor.frequency = 1
+        #active_sensor.frequency = 1
         active_sensor.property = "status"
         active_sensor.value = "Continue"
 
