@@ -124,6 +124,8 @@ class BlenderInstaller(object):
         self.platform = platform.system()
         if self.platform in ("Darwin",):
             self.platform = "Mac"
+        if "cygwin" in self.platform.lower():
+            self.platform = "Windows"
         if self.platform not in ("Linux", "Windows", "Mac"):
             self.platform = "Other"
         self.message("Detected platform: {}".format(self.platform))
@@ -323,7 +325,7 @@ class CustomInstall(distutils.command.install.install):
             sys.path = old_sys_path
             raise InstallError(
                 "pyw3d module did not install successfully! Please contact the"
-                " Writing3D maintainer"
+                " Writing3D maintainer."
             )
         sys.path = old_sys_path
 
@@ -335,6 +337,9 @@ class CustomInstall(distutils.command.install.install):
             package_path.append(elem)
         package_path = os.path.abspath(os.path.join(*package_path))
 
+        self.message(
+            "Adding {} to Blender site directories...".format(package_path)
+        )
         for line in fileinput.input("sitecustomize.py", inplace=1):
             if "SYSSUBTAG" in line:
                 print(
@@ -343,6 +348,11 @@ class CustomInstall(distutils.command.install.install):
                 )
             else:
                 print(line, end="")
+        self.message(
+            "Copying modified sitecustomize.py to {}".format(
+                self.blender_installer.blender_site
+            )
+        )
         shutil.copy("sitecustomize.py", self.blender_installer.blender_site)
 
     def initialize_options(self, *args, **kwargs):
