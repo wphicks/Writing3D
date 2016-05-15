@@ -294,7 +294,7 @@ class CustomInstall(distutils.command.install.install):
                     "BLENDER_EXEC = r'{}' # BLENDEREXECSUBTAG".format(
                         self.blender_installer.blender_exec)
                 )
-            elif "BLENDERPLAYSUBTAG" in line:
+            elif "BLENDERPLAYERSUBTAG" in line:
                 print(
                     "BLENDER_PLAY = r'{}' # BLENDERPLAYERSUBTAG".format(
                         self.blender_installer.blender_play)
