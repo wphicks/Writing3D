@@ -312,13 +312,20 @@ class CustomInstall(distutils.command.install.install):
         copying of modules to the Blender site-packages directory, which may
         have unintended consequences. If you have a better solution,
         suggestions/ pull requests are very much welcome."""
+        old_sys_path = sys.path
+        sys.path = [
+            path for path in old_sys_path if os.path.abspath(path) !=
+            os.path.abspath(os.getcwd())
+        ]
         try:
             import pyw3d
         except ImportError:
+            sys.path = old_sys_path
             raise InstallError(
                 "pyw3d module did not install successfully! Please contact the"
                 " Writing3D maintainer"
             )
+        sys.path = old_sys_path
 
         pyw3d_path = path_to_list(pyw3d.__file__)
         package_path = []
