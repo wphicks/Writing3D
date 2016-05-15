@@ -56,7 +56,7 @@ def path_to_list(path):
 class InstallError(Exception):
     """Exception thrown if install fatally fails"""
     def __init__(self, message):
-        super(InvalidArgument, self).__init__(message)
+        super(InstallError, self).__init__(message)
 
 
 class BlenderInstaller(object):
@@ -334,6 +334,9 @@ class CustomInstall(distutils.command.install.install):
         for elem in pyw3d_path:
             if os.path.splitext(elem)[1].lower() == ".egg":
                 break
+            if elem.lower() == "__init__.py":
+                package_path.pop()
+                break
             package_path.append(elem)
         package_path = os.path.abspath(os.path.join(*package_path))
 
@@ -374,6 +377,7 @@ class CustomInstall(distutils.command.install.install):
         self.install_blender()
         #self.copy_pkg_resources()
         self.insert_paths()
+        super().run()
         self._setup_blender_paths()
 
 setup(
