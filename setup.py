@@ -38,6 +38,27 @@ def find_executable(name, path):
     return None
 
 
+def _path_to_list(path):
+    head, tail = os.path.split(path)
+    if head and head != path:
+        split_head = _path_to_list(head)
+        split_head.append(tail)
+        return split_head
+    return [head or tail]
+
+
+def path_to_list(path):
+    """Split path into list of elements"""
+    path = os.path.normpath(path)
+    return _path_to_list(path)
+
+
+class InstallError(Exception):
+    """Exception thrown if install fatally fails"""
+    def __init__(self, message):
+        super(InvalidArgument, self).__init__(message)
+
+
 class BlenderInstaller(object):
     """Class for installing Blender if necessary
 
@@ -279,9 +300,43 @@ class CustomInstall(distutils.command.install.install):
             else:
                 print(line, end="")
 
-    def copy_modules_to_blender(self):
-        """Copy installed modules to Blender site-packages directory"""
-        py_site_packages = site.getusersitepackages()
+    def _setup_blender_paths(self):
+        """Create sitecustomize.py path to make Writing3D available to Blender
+        
+        :warning: This will add the directory containing the Writing3D install
+        to Blender as a site directory. This is not necessarily a good idea,
+        since it may also make undesired packages that have been installed to
+        the same directory available to Blender. At the moment, this seems to
+        be the best solution that 1. Does not require the system Python version
+        to match the Blender internal version 2. Does not involve wholesale
+        copying of modules to the Blender site-packages directory, which may
+        have unintended consequences. If you have a better solution,
+        suggestions/ pull requests are very much welcome."""
+        try:
+            import pyw3d
+        except ImportError:
+            raise InstallError(
+                "pyw3d module did not install successfully! Please contact the"
+                " Writing3D maintainer"
+            )
+
+        pyw3d_path = path_to_list(pyw3d.__file__)
+        package_path = []
+        for elem in pyw3d_path:
+            if os.path.splitext(elem)[1].lower() == ".egg":
+                break
+            package_path.append(elem)
+        package_path = os.path.abspath(os.path.join(*package_path))
+
+        for line in fileinput.input("sitecustomize.py", inplace=1):
+            if "SYSSUBTAG" in line:
+                print(
+                    "site.addsitedir(r'{}') # SYSSUBTAG".format(
+                        package_path)
+                )
+            else:
+                print(line, end="")
+        shutil.copy("sitecustomize.py", self.blender_installer.blender_site)
 
     def initialize_options(self, *args, **kwargs):
         self.w3dhome = None
@@ -302,7 +357,7 @@ class CustomInstall(distutils.command.install.install):
         self.install_blender()
         #self.copy_pkg_resources()
         self.insert_paths()
-        super().run(*args, **kwargs)
+        self._setup_blender_paths()
 
 setup(
     name="Writing3D",
