@@ -79,7 +79,7 @@ class BlenderInstaller(object):
         """The basename of the blender executable"""
         exec_name = "blender"
         if self.platform in ("Windows",):
-            exec_name = ".".join(exec_name, "exe")
+            exec_name = ".".join((exec_name, "exe"))
         return exec_name
 
     @property
@@ -87,7 +87,7 @@ class BlenderInstaller(object):
         """The basename of the blenderplayer executable"""
         exec_name = "blenderplayer"
         if self.platform in ("Windows",):
-            exec_name = ".".join(exec_name, "exe")
+            exec_name = ".".join((exec_name, "exe"))
         return exec_name
 
     @property
