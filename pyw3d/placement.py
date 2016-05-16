@@ -231,11 +231,13 @@ class W3DPlacement(W3DFeature):
     def _create_relative_to_objects(
             self,
             wall_positions={
+                "Center": convert_to_blender_axes((0, 0, 0)),
                 "FrontWall": convert_to_blender_axes((0, 0, -4)),
                 "LeftWall": convert_to_blender_axes((-4, 0, 0)),
                 "RightWall": convert_to_blender_axes((4, 0, 0)),
                 "FloorWall": convert_to_blender_axes((0, 0, -4))},
             wall_rotations={
+                "Center": (0, 0, 0),
                 "FrontWall": (0, 0, 0),
                 "LeftWall": (0, 0, math.pi/2),
                 "RightWall": (0, 0, -math.pi/2),
@@ -261,19 +263,16 @@ class W3DPlacement(W3DFeature):
         """Place Blender object in specified position and orientation
         """
         self._create_relative_to_objects()
+        relative_object = self.relative_to_objects[self["relative_to"]]
+
         position = self["position"]
-        if self["relative_to"] != "Center":
-            position = [
-                position[i] +
-                self.relative_to_objects[self["relative_to"]].location[i]
-                for i in range(len(position))
-            ]
+        position = [
+            position[i] + relative_object.location[i]
+            for i in range(len(position))
+        ]
         blender_object.layers = [layer == 1 for layer in range(1, 21)]
 
         blender_object.location = position
-        if self["relative_to"] != "Center":
-            blender_object.rotation_euler.rotate(
-                self.relative_to_objects[self["relative_to"]].rotation_euler
-            )
+        blender_object.rotation_euler.rotate(relative_object.rotation_euler)
         self["rotation"].rotate(blender_object)
         return blender_object

@@ -190,9 +190,9 @@ class W3DProject(W3DFeature):
         if "desktop_camera_placement" not in self:
             self["desktop_camera_placement"] = W3DPlacement(
                 position=convert_to_blender_axes((0, 0, 0)))
-        # Note: Center position shift will not be used right now. This has
-        # never been used to my knowledge and probably shouldn't be. Changing
-        # initial camera position should be preferred.
+        # NOTE: This currently does nothing. Need to call
+        # _create_relative_to_objects for W3DPlacement in order to change
+        # placements
         if "wall_placements" not in self:
             self["wall_placements"] = {
                 "Center": W3DPlacement(

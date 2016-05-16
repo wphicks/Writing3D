@@ -26,6 +26,7 @@ except ImportError:
         " standalone")
 
 
+#TODO: Handle moves relative to walls
 class MoveAction(object):
     """Generate Python logic for how object should move when action first
     starts, as it continues, and when it ends

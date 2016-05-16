@@ -344,7 +344,10 @@ class W3DText(W3DContent):
         new_text_object.data.extrude = self["depth"]
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
-        #TODO: Vertical alignment. This is non-trivial
+        if self["valign"] == "center":
+            new_text_object.data.offset_y = -new_text_object.dimensions[1]/2
+        elif self["valign"] == "bottom":
+            new_text_object.data.offset_y = -new_text_object.dimensions[1]
         new_text_object.select = True
         bpy.ops.object.convert(target='MESH', keep_original=False)
         bpy.ops.object.transform_apply(rotation=True)
@@ -825,9 +828,6 @@ class W3DObject(W3DFeature):
         blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
-        if "depth" in self["content"]:
-            # Make extrusion independent of scale
-            blender_object.scale[2] = 1
 
         self["placement"].place(blender_object)
         #TODO: Apply link
