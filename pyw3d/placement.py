@@ -261,11 +261,19 @@ class W3DPlacement(W3DFeature):
         """Place Blender object in specified position and orientation
         """
         self._create_relative_to_objects()
+        position = self["position"]
         if self["relative_to"] != "Center":
-            blender_object.parent = self.relative_to_objects[
-                self["relative_to"]]
+            position = [
+                position[i] +
+                self.relative_to_objects[self["relative_to"]].location[i]
+                for i in range(len(position))
+            ]
         blender_object.layers = [layer == 1 for layer in range(1, 21)]
 
-        blender_object.location = self["position"]
+        blender_object.location = position
+        if self["relative_to"] != "Center":
+            blender_object.rotation_euler.rotate(
+                self.relative_to_objects[self["relative_to"]].rotation_euler
+            )
         self["rotation"].rotate(blender_object)
         return blender_object
