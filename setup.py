@@ -13,6 +13,7 @@ import shutil
 import tarfile
 import zipfile
 import site
+import stat
 from urllib.request import urlopen
 from distutils.core import setup
 from distutils.core import Command
@@ -28,12 +29,21 @@ def find_subdirectory(name, path):
     return None
 
 
-def find_executable(name, path):
-    """Recursively search for executable of given name in path"""
+def find_executable(name, path, force=False):
+    """Recursively search for executable of given name in path
+    
+    :param str name: The name of the executable
+    :param str path: The path to search
+    :param bool force: If file of given name is found and is NOT executable,
+    then make it executable"""
     for root, dirs, files in os.walk(path):
         if name in files:
             filename = os.path.join(root, name)
             if os.access(filename, os.X_OK):
+                return filename
+            elif force:
+                current_permissions = os.stat(filename)
+                os.chmod(filename, current_permissions.st_mode | stat.S_IEXEC)
                 return filename
     return None
 
@@ -202,9 +212,11 @@ class BlenderInstaller(object):
                 install_file.extractall(path=self.install_directory)
         else:
             with zipfile.ZipFile(self.archive_name) as install_file:
-                self.blender_directory = os.path.join(
-                    self.install_directory, install_file.namelist()[0])
-                install_file.extractall(path=self.install_directory)
+                self.blender_directory = os.path.splitext(self.archive_name)[0]
+                if self.platform in ("Mac,"):
+                    install_file.extractall(path=self.blender_directory)
+                else:
+                    install_file.extractall(path=self.install_directory)
         self.configure_blender_paths()
 
     def configure_blender_paths(self):
@@ -228,9 +240,13 @@ class BlenderInstaller(object):
             "modules", find_subdirectory("addons", self.blender_directory)
         )
         self.blender_exec = find_executable(
-            self.executable_basename, self.blender_directory)
+            self.executable_basename, self.blender_directory,
+            force=(self.platform == "Mac")
+        )
         self.blender_play = find_executable(
-            self.player_basename, self.blender_directory)
+            self.player_basename, self.blender_directory,
+            force=(self.platform == "Mac")
+        )
 
     def __init__(self, install_directory, verbose=False):
         self.verbose = verbose
