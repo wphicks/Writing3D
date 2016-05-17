@@ -232,6 +232,7 @@ you are using Writing3D with the legacy CWEditor.jar, you will find cwapp.py at
 
 def start_installer():
     root = tk.Tk()
+    root.lift()
     Installer(root)
     root.mainloop()
 
