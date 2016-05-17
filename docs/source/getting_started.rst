@@ -72,19 +72,19 @@ Installing Writing3D
 Using the GUI installation script
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Once you've installed Python3, you can use the included GUI install script
-(install_everything.py) to install everything you need for Writing3D.
+(install_w3d.py) to install everything you need for Writing3D.
 
 On Windows
 ^^^^^^^^^^
 Windows automatically associates .py files with the Python launcher, so you
-should be able to just double-click on install_everything.py to begin the
+should be able to just double-click on install_w3d.py to begin the
 install process. Follow the prompts, and the installer will walk you through
 the process.
 
 On Mac
 ^^^^^^
 After installing Python3, you should have an application called PythonLauncher
-in /Applications/MacPython 3.5/. Drag and drop install_everything.py onto
+in /Applications/MacPython 3.5/. Drag and drop install_w3d.py onto
 PythonLauncher, and then follow the prompts. More details are available `here
 <https://docs.python.org/3.5/using/mac.html#how-to-run-a-python-script>`_.
 
@@ -94,12 +94,12 @@ a Mac user would be appreciated
 On Linux
 ^^^^^^^^
 Depending on your desktop environment, you may be able to just double-click on
-install_everything.py to run it. If not, open a terminal, cd to the directory
-containing install_everything.py and then run:
+install_w3d.py to run it. If not, open a terminal, cd to the directory
+containing install_w3d.py and then run:
 
 .. code:: bash
 
-    $ python3 install_everything.py
+    $ python3 install_w3d.py
 
 Manual installation
 ^^^^^^^^^^^^^^^^^^^

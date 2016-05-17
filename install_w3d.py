@@ -26,6 +26,7 @@ import queue
 import subprocess
 import threading
 import shutil
+import argparse
 from setup import find_existing_pyw3d, find_subdirectory
 
 CURRENT_OS = platform.system()
@@ -220,7 +221,7 @@ you are using Writing3D with the legacy CWEditor.jar, you will find cwapp.py at
         self.init_slide()
         self.create_buttons()
 
-    def __init__(self, parent, clean=True):
+    def __init__(self, parent, clean=False):
         super(Installer, self).__init__(parent)
         self.parent = parent
         self.current_slide = 0
@@ -230,11 +231,15 @@ you are using Writing3D with the legacy CWEditor.jar, you will find cwapp.py at
         self.clean = clean
 
 
-def start_installer():
+def start_installer(clean=False):
     root = tk.Tk()
     root.lift()
-    Installer(root)
+    Installer(root, clean)
     root.mainloop()
 
 if __name__ == "__main__":
-    start_installer()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c", "--clean", default=False, action="store_true")
+    args = parser.parse_args(sys.argv[1:])
+    start_installer(clean=args.clean)

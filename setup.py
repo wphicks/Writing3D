@@ -408,7 +408,7 @@ class CustomInstall(distutils.command.install.install):
 if __name__ == "__main__":
     setup(
         name="Writing3D",
-        version="0.0.1",
+        version="0.0.2",
         author="William Hicks",
         author_email="william_hicks@alumni.brown.edu",
         description="A program for creating literary and artistic VR projects",
@@ -422,7 +422,7 @@ if __name__ == "__main__":
             "pyw3d.w3d_logic", "pyw3d.activators.triggers"
         ],
         classifiers=[
-            "Development Status :: 2 - Pre-Alpha",
+            "Development Status :: 3 - Alpha",
             "Topic :: Artistic Software",
             "License :: OSI Approved :: GNU General Public License v3 or later"
             " (GPLv3+)"
