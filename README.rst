@@ -22,19 +22,19 @@ to stay up to date on all the latest changes:
 
     $ git clone https://github.com/wphicks/Writing3D.git
 
-Once you have a copy, run the install_everything.py script using Python3, and
-the GUI installer will help get you everything you need to get going:
+Once you have a copy, run setup.py with Python3, and you should have everything
+you need.
 
 .. code:: bash
 
     $ cd Writing3D
-    $ python3 install_everything.py
+    $ python3 setup.py install --user
 
 .. warning::
     You **must** use Python3 with Writing3D. Python2 is **not** supported.
 
-Once you've run the installer, take a look at the samples directory to see
-some simple Writing3D examples.
+Once you've run setup.py, take a look at the samples directory to see some
+simple Writing3D examples.
 
 Overview
 --------

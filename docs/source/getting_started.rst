@@ -88,6 +88,9 @@ in /Applications/MacPython 3.5/. Drag and drop install_everything.py onto
 PythonLauncher, and then follow the prompts. More details are available `here
 <https://docs.python.org/3.5/using/mac.html#how-to-run-a-python-script>`_.
 
+TODO: This seems to occasionally point to the wrong Python version. Advice from
+a Mac user would be appreciated
+
 On Linux
 ^^^^^^^^
 Depending on your desktop environment, you may be able to just double-click on
@@ -100,25 +103,12 @@ containing install_everything.py and then run:
 
 Manual installation
 ^^^^^^^^^^^^^^^^^^^
-If you'd like to install everything manually (on a headless machine, for
-instance), please do the following after installing Python3:
-
-1. Install Blender by following the instructions provided on the `Blender
-   download page <https://www.blender.org/download/>`_.
-2. Open the file pyw3d/__init__.py and replace the values in the lines::
-
-        BLENDER_EXEC = "blender"  # BLENDEREXECSUBTAG
-        BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
-
-
-    with the paths to your blender and blenderplayer executables respectively.
-    Note that this may not be necessary on all systems.
-3. Run the following in terminal from the root Writing3D directory::
+To install manually from terminal, just execute the following:
 
         $ python3 setup.py install --user
 
-You should now have access to the :ref:`pyw3d module <pyw3d_docs>` from
-Python3.
+This will install Blender, and you should now have access to the :ref:`pyw3d
+module <pyw3d_docs>` from Python3.
 
 Using w3d_writer: The Writing3D GUI
 -----------------------------------
