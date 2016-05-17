@@ -26,7 +26,7 @@ import queue
 import subprocess
 import threading
 import shutil
-from setup import find_existing_pyw3d
+from setup import find_existing_pyw3d, find_subdirectory
 
 CURRENT_OS = platform.system()
 if CURRENT_OS in ['Darwin']:
@@ -70,12 +70,14 @@ def warn(message):
 
 
 def find_script(name):
-    script_path = os.path.join(site.getuserbase(), "bin", name)
+    user_base = site.getuserbase()
+    script_path = find_subdirectory("bin", user_base)
+    if script_path is None:
+        script_path = find_subdirectory("Scripts", user_base)
+    script_path = os.path.join(script_path, name)
     if os.path.isfile(script_path):
         return script_path
-    script_path = os.path.join(site.getuserbase(), "Scripts", name)
-    if os.path.isfile(script_path):
-        return script_path
+    return None
 
 
 class W3DCleanAndInstall(threading.Thread):
