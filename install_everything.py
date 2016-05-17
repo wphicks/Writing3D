@@ -22,12 +22,11 @@ import sys
 import site
 import platform
 import os
-import shutil
-import fileinput
-import zipfile
-import tarfile
+import queue
 import subprocess
-from urllib.request import urlopen
+import threading
+import shutil
+from setup import find_existing_pyw3d
 
 CURRENT_OS = platform.system()
 if CURRENT_OS in ['Darwin']:
@@ -37,106 +36,27 @@ if CURRENT_OS not in ("Linux", "Windows", "Mac"):
 try:
     import tkinter as tk
     from tkinter import font
-    from tkinter import filedialog
     import tkinter.ttk as ttk
 except ImportError:
     if sys.version_info[0] != 3:
         print("Must be run with Python 3.x")
-        raw_input()
+        input()
         raise RuntimeError("Incorrect Python version")
 
     if CURRENT_OS not in ["Windows", "Mac"]:
         print("Please install tkinter and try again.")
-        raw_input()
+        input()
         raise RuntimeError("tkinter not found")
     else:
         print(
             "tkinter not found on your system. Please contact the Writing3D"
             " maintainer.")
-BLENDER_VERSION = "2.76"
-IS_64_BIT = sys.maxsize > 2**32
-#TODO: Figure out dirs more carefully
-BLENDER_DIRS = {
-    "Linux": (
-        os.path.expandvars(
-            "/usr/bin".format(BLENDER_VERSION)
-        ),
-    ),
-    "Mac": (
-        os.path.expandvars(
-            "/Applications/Blender/"
-        ),
-    ),
-    "Windows": (
-        os.path.expandvars(
-            "/Applications/Blender/"
-        ),
-    ),
-    "Other": (
-        os.path.expanduser("~"),
-    )
-}
-
-#TODO: Check these
-BLENDER_EXECS = {
-    "Mac": ("blender", "blenderplayer"),
-    "Windows": ("blender.exe", "blenderplayer.exe"),
-    "Linux": ("blender", "blenderplayer"),
-    "Other": ("blender", "blenderplayer")
-}
-
-BASEURL = "http://download.blender.org/release/Blender{}/".format(
-    BLENDER_VERSION)
-
-#TODO: No 32 bit versions for Unix-based systems
-#TODO: Add check for i686 architecture
-#TODO: Add FreeBSD as available OS
-DOWNLOAD_URLS = {
-    "Linux": (
-        "{}blender-{}-linux-glibc211-x86_64.tar.bz2".format(
-            BASEURL, BLENDER_VERSION),
-        "{}blender-{}-linux-glibc211-x86_64.tar.bz2".format(
-            BASEURL, BLENDER_VERSION)
-    ),
-    "Mac": (
-        "{}blender-{}-OSX_10.6-x86_64.zip".format(BASEURL, BLENDER_VERSION),
-        "{}blender-{}-OSX_10.6-x86_64.zip".format(BASEURL, BLENDER_VERSION)
-    ),
-    "Windows": (
-        "{}blender-{}-windows32.zip".format(BASEURL, BLENDER_VERSION),
-        "{}blender-{}-windows64.zip".format(BASEURL, BLENDER_VERSION)
-    )
-}
 
 SCRIPTDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def module_dir():
     return site.getusersitepackages()
-
-def blender_module_dir(blender_directory):
-    cur_path = blender_directory
-    for elem in ["addons", "modules"]:
-        for root, dirs, files in os.walk(cur_path):
-            if elem in dirs:
-                cur_path = os.path.join(root, elem)
-                break
-    return cur_path
-
-
-def copy_modules_for_blender(blender_dir):
-    sys_dir = module_dir()
-    print(sys_dir)
-    for filename in os.listdir(sys_dir):
-        # TODO: What about old versions?
-        if (
-                filename.startswith("Writing3D") and
-                os.path.splitext(filename)[1].lower() == ".egg"):
-            egg_path = os.path.join(sys_dir, filename)
-            break
-    shutil.copy(egg_path, blender_module_dir(blender_dir))
-    import pkg_resources
-    shutil.copy(pkg_resources.__file__, blender_module_dir(blender_dir))
 
 
 def warn(message):
@@ -149,164 +69,55 @@ def warn(message):
     dismiss.pack()
 
 
-def modify_paths():
-    for root, dirs, files in os.walk(os.path.join(SCRIPTDIR, "samples")):
-        for file_ in files:
-            if os.path.splitext(file_)[1].lower() == ".py":
-                for line in fileinput.input(os.path.join(root, file_), inplace=1):
-                    if "PATHSUBTAG" in line:
-                        print("sys.path.append(r'{}')  # PATHSUBTAG".format(
-                            module_dir()))
-                    else:
-                        print(line, end="")
+def find_script(name):
+    script_path = os.path.join(site.getuserbase(), "bin", name)
+    if os.path.isfile(script_path):
+        return script_path
+    script_path = os.path.join(site.getuserbase(), "Scripts", name)
+    if os.path.isfile(script_path):
+        return script_path
+
+
+class W3DCleanAndInstall(threading.Thread):
+    def clean_old_install(self):
+        subprocess.call(
+            [sys.executable, "setup.py", 'clean']
+        )
+        old_pyw3d = find_existing_pyw3d()
+        if old_pyw3d is not None:
+            if os.path.splitext(old_pyw3d)[1].lower() == ".egg":
+                os.remove(old_pyw3d)
+            else:
+                shutil.rmtree(old_pyw3d)
+
+    def __init__(self, queue, clean=False):
+        super().__init__()
+        self.queue = queue
+        self.clean = clean
+
+    def run(self):
+        if self.clean:
+            self.clean_old_install()
+        os.chdir(SCRIPTDIR)
+        with open("w3d_install.log", "w") as log_file:
+            subprocess.call([
+                sys.executable, "setup.py", 'install', '--user'],
+                stdout=log_file, stderr=log_file
+            )
+        self.queue.put("Install complete!")
 
 
 class Installer(tk.Frame):
     """GUI installer for Writing3D"""
 
-    def choose_install_directory(self):
-        if (
-                self.install_directory is not None and
-                os.path.exists(self.install_directory)):
-            directory = self.install_directory
-        else:
-            directory = os.path.expanduser("~")
-        directory = filedialog.askdirectory(
-            title="Install directory",
-            initialdir=directory
-        )
-        directory = os.path.abspath(directory)
-        install_directory = os.path.join(directory, "Writing3D")
-        if not os.path.exists(install_directory):
-            os.makedirs(install_directory)
-            #TODO: Handle failure to make install directory
-        self.install_directory = install_directory
-        if self.install_directory is not None:
+    def check_completion(self):
+        try:
+            self.queue.get(0)
+            self.progress.stop()
             self.next_button.config(state=tk.NORMAL)
-
-    def use_old_blender(self):
-        default_directories = BLENDER_DIRS[CURRENT_OS]
-        blender_directory = os.path.expanduser("~")
-        for directory in default_directories:
-            if os.path.exists(directory):
-                blender_directory = directory
-                break
-        blender_directory = filedialog.askopenfilename(
-            title="Select Blender Executable",
-            initialdir=blender_directory
-        )
-        self.blender_directory = os.path.dirname(blender_directory)
-        if self.blender_directory is not None:
-            self.next_button.config(state=tk.NORMAL)
-
-    def download_blender(self):
-        chunk = self.url_response.read(16*1024)
-        if chunk:
-            self.download_file.write(chunk)
-            self.progress.step(16/1024.)
-            self.after(1, self.download_blender)
-        else:
-            self.download_file.close()
-            self.install_blender()
-
-    def start_blender_install(self):
-        self.next_button.config(state=tk.DISABLED)
-        self.progress = ttk.Progressbar(
-            self.interior, orient="horizontal", mode="indeterminate"
-        )
-        self.progress.pack(expand=1, fill=tk.X, side=tk.BOTTOM)
-        os.chdir(self.install_directory)
-        #TODO: This is ugly
-        self.downloading = True
-        self.url_response = urlopen(DOWNLOAD_URLS[CURRENT_OS][IS_64_BIT])
-        if CURRENT_OS in ("Linux", "Other"):
-            self.download_filename = os.path.join(
-                self.install_directory, "blender.tar.bz2")
-        else:
-            self.download_filename = os.path.join(
-                self.install_directory, "blender.zip")
-        self.download_file = open(self.download_filename, 'wb')
-        self.after(1, self.download_blender)
-
-    def install_blender(self):
-        filename = self.download_filename
-        if CURRENT_OS in ("Linux", "Other"):
-            with tarfile.open(filename, "r:bz2") as install_file:
-                self.blender_directory = os.path.join(
-                    self.install_directory, "blender",
-                    install_file.next().name)
-                install_file.extractall(path="blender")
-        else:
-            with zipfile.ZipFile(filename) as install_file:
-                self.blender_directory = os.path.join(
-                    self.install_directory, "blender",
-                    install_file.namelist()[0])
-                install_file.extractall(path="blender")
-        if self.blender_directory is not None:
-            self.next_button.config(state=tk.NORMAL)
-        self.progress.destroy()
-        self.next_slide()
-
-    def install_w3d(self):
-        progress = ttk.Progressbar(
-            self.interior, orient="horizontal", mode="indeterminate"
-        )
-        progress.pack(expand=1, fill=tk.X, side=tk.BOTTOM)
-        progress.start(50)
-
-        self.next_button.config(state=tk.DISABLED)
-        self.writer_script_location = os.path.join(
-            SCRIPTDIR, "w3d_writer.py")
-        blender_exec_path = os.path.join(
-            self.blender_directory,
-            BLENDER_EXECS[CURRENT_OS][0]
-        )
-        bplay_exec_path = os.path.join(
-            self.blender_directory,
-            BLENDER_EXECS[CURRENT_OS][1]
-        )
-        if not os.path.exists(blender_exec_path):
-            for root, dirs, files in os.walk(self.blender_directory):
-                if BLENDER_EXECS[CURRENT_OS][0] in files:
-                    blender_exec_path = os.path.join(
-                        root, BLENDER_EXECS[CURRENT_OS][0])
-                if BLENDER_EXECS[CURRENT_OS][1] in files:
-                    bplay_exec_path = os.path.join(
-                        root, BLENDER_EXECS[CURRENT_OS][1])
-        export_script = os.path.join(SCRIPTDIR, "pyw3d", "w3d_export_tools.py")
-        new_export_script = os.path.abspath(os.path.join(
-            self.install_directory, "w3d_export_tools.py"))
-        shutil.copy(export_script, new_export_script)
-        init_filename = os.path.join(
-            SCRIPTDIR, "pyw3d", "__init__.py")
-        new_init_filename = 'tmp_init.py'
-        #TODO: Use fileinput
-        with open(init_filename) as init_file:
-            with open(new_init_filename, 'w') as new_init_file:
-                for line in init_file:
-                    if "BLENDEREXECSUBTAG" in line:
-                        new_init_file.write(
-                            "BLENDER_EXEC = r'{}'".format(blender_exec_path)
-                        )
-                        new_init_file.write("  # BLENDEREXECSUBTAG\n")
-                    elif "BLENDERPLAYERSUBTAG" in line:
-                        new_init_file.write(
-                            "BLENDER_PLAY = r'{}'".format(bplay_exec_path)
-                        )
-                        new_init_file.write("  # BLENDERPLAYERSUBTAG\n")
-                    else:
-                        new_init_file.write(line)
-        shutil.move(new_init_filename, init_filename)
-        modify_paths()
-
-        os.chdir(SCRIPTDIR)
-        subprocess.call([
-            sys.executable, "setup.py", 'install', '--user']
-        )
-        copy_modules_for_blender(self.blender_directory)
-        progress.destroy()
-        self.next_button.config(state=tk.NORMAL)
-        self.next_slide()
+            self.next_slide()
+        except queue.Empty:
+            self.after(100, self.check_completion)
 
     def init_slide(self):
         self.interior.destroy()
@@ -318,9 +129,9 @@ class Installer(tk.Frame):
                 self.interior,
                 text="""Welcome to Writing3D!
 
-This installer will help guide you through the process
-of setting up Writing3D and Blender, the engine used to
-render Writing3D projects.
+This installer will set up Writing3D and Blender, the engine used to render
+Writing3D projects. The install may take some time (especially with a slow
+network connection) so please be patient after clicking the Next button.
 
 Please click the Next button to begin the install process.""",
                 font=self.font,
@@ -331,74 +142,34 @@ Please click the Next button to begin the install process.""",
         if self.current_slide == 1:
             self.label = tk.Label(
                 self.interior,
-                text="""Select an Install Directory
+                text="""Now installing...
 
-First, choose where you would like to install Writing3D by
-clicking the "Choose Install Directory" button. Then click
-Next.""",
+Writing3D is now being installed. Please wait.""",
+
                 font=self.font,
                 justify=tk.LEFT)
             self.label.pack()
-            if self.install_directory is None:
-                self.next_button.config(state=tk.DISABLED)
-            self.choose_dir = tk.Button(
-                self.interior, text="Choose Install Directory",
-                command=self.choose_install_directory)
-            self.choose_dir.pack(expand=1, fill=tk.X)
+            self.progress = ttk.Progressbar(
+                self.interior, orient="horizontal", mode="indeterminate"
+            )
+            self.progress.pack(expand=1, fill=tk.X, side=tk.BOTTOM)
+            self.next_button.config(state=tk.DISABLED)
+
+            self.queue = queue.Queue()
+            self.progress.start()
+            W3DCleanAndInstall(self.queue, clean=self.clean).start()
+            self.after(100, self.check_completion)
             return
 
         if self.current_slide == 2:
             self.label = tk.Label(
                 self.interior,
-                text="""Installing Blender
+                text="""Installation Complete!
 
-Next, let's set up Blender. If you already have Blender
-installed and would like to use the previously-installed
-version, please click "Use Installed Version" Otherwise,
-select "Install Blender Now."
-
-Note: It may take several minutes to download and install
-Blender, depending on your network connection. Please wait.
-
-Please click the Next button to begin the install process.""",
-                font=self.font,
-                justify=tk.LEFT)
-            self.label.pack()
-            self.use_old_button = tk.Button(
-                self.interior, text="Use Installed Version",
-                command=self.use_old_blender)
-            self.install_blender_button = tk.Button(
-                self.interior, text="Install Blender Now",
-                command=self.start_blender_install)
-            self.use_old_button.pack(fill=tk.X, expand=1)
-            self.install_blender_button.pack(fill=tk.X, expand=1)
-            if self.blender_directory is None:
-                self.next_button.config(state=tk.DISABLED)
-            return
-
-        if self.current_slide == 3:
-            self.label = tk.Label(
-                self.interior,
-                text="""Installing Writing3D
-
-Please wait.""",
-                font=self.font,
-                justify=tk.LEFT)
-            self.label.pack()
-            self.install_w3d()
-            return
-
-        if self.current_slide == 4:
-            self.label = tk.Label(
-                self.interior,
-                text="""Finished!
-
-Writing3D has been successfully installed. Please visit
-https://wphicks.github.io/Writing3D/
-for information on how to get started creating VR
-projects.
-
-""",
+Installation of Writing3D is now complete. Log written to w3d_install.log. As a
+starting point, try running some of the samples in the samples directory. If
+you are using Writing3D with the legacy CWEditor.jar, you will find cwapp.py at
+{} """.format(find_script("cwapp.py")),
                 font=self.font,
                 justify=tk.LEFT)
             self.label.pack()
@@ -423,7 +194,7 @@ projects.
             side=tk.RIGHT, anchor=tk.SE, fill=tk.X, expand=1)
 
     def create_buttons(self):
-        #TODO: This is an ugly hack
+        # TODO: This is an ugly hack
         try:
             self.back_button.destroy()
             self.next_button.destroy()
@@ -447,23 +218,18 @@ projects.
         self.init_slide()
         self.create_buttons()
 
-    def __init__(self, parent):
+    def __init__(self, parent, clean=True):
         super(Installer, self).__init__(parent)
         self.parent = parent
         self.current_slide = 0
-        self.total_slides = 5
-        self.install_directory = None
-        self.blender_directory = None
-        self.downloading = True
+        self.total_slides = 3
         self.font = font.Font(family="Helvetica", size=14)
         self.initUI()
+        self.clean = clean
 
 
 def start_installer():
     root = tk.Tk()
-    #width = root.winfo_screenwidth()
-    #height = root.winfo_screenheight()
-    #root.geometry("{}x{}".format(width, height))
     Installer(root)
     root.mainloop()
 

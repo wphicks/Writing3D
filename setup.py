@@ -63,6 +63,33 @@ def path_to_list(path):
     return _path_to_list(path)
 
 
+def find_existing_pyw3d():
+    """Return the egg or install directory for an existing pyw3d install"""
+    old_sys_path = sys.path
+    sys.path = [
+        path for path in old_sys_path if os.path.abspath(path) !=
+        os.path.abspath(os.getcwd())
+    ]
+    try:
+        import pyw3d
+    except ImportError:
+        sys.path = old_sys_path
+        return None
+    sys.path = old_sys_path
+
+    pyw3d_path = path_to_list(pyw3d.__file__)
+    package_path = []
+    for elem in pyw3d_path:
+        if os.path.splitext(elem)[1].lower() == ".egg":
+            break
+        if elem.lower() == "__init__.py":
+            package_path.pop()
+            break
+        package_path.append(elem)
+    package_path = os.path.abspath(os.path.join(*package_path))
+    return package_path
+
+
 class InstallError(Exception):
     """Exception thrown if install fatally fails"""
     def __init__(self, message):
@@ -330,31 +357,13 @@ class CustomInstall(distutils.command.install.install):
         copying of modules to the Blender site-packages directory, which may
         have unintended consequences. If you have a better solution,
         suggestions/ pull requests are very much welcome."""
-        old_sys_path = sys.path
-        sys.path = [
-            path for path in old_sys_path if os.path.abspath(path) !=
-            os.path.abspath(os.getcwd())
-        ]
-        try:
-            import pyw3d
-        except ImportError:
-            sys.path = old_sys_path
+
+        package_path = find_existing_pyw3d()
+        if package_path is None:
             raise InstallError(
                 "pyw3d module did not install successfully! Please contact the"
                 " Writing3D maintainer."
             )
-        sys.path = old_sys_path
-
-        pyw3d_path = path_to_list(pyw3d.__file__)
-        package_path = []
-        for elem in pyw3d_path:
-            if os.path.splitext(elem)[1].lower() == ".egg":
-                break
-            if elem.lower() == "__init__.py":
-                package_path.pop()
-                break
-            package_path.append(elem)
-        package_path = os.path.abspath(os.path.join(*package_path))
 
         self.message(
             "Adding {} to Blender site directories...".format(package_path)
@@ -396,28 +405,29 @@ class CustomInstall(distutils.command.install.install):
         super().run()
         self._setup_blender_paths()
 
-setup(
-    name="Writing3D",
-    version="0.0.1",
-    author="William Hicks",
-    author_email="william_hicks@alumni.brown.edu",
-    description="A program for creating literary and artistic VR projects",
-    license="GPL",
-    keywords="virtual modeling art literature",
-    url="https://github.com/wphicks/Writing3D",
-    scripts=[
-        "pyw3d/w3d_export_tools.py", "samples/cwapp.py"],
-    packages=[
-        "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
-        "pyw3d.w3d_logic", "pyw3d.activators.triggers"
-    ],
-    classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
-        "Topic :: Artistic Software",
-        "License :: OSI Approved :: GNU General Public License v3 or later"
-        " (GPLv3+)"
-    ],
-    cmdclass={
-        "install": CustomInstall
-    },
-)
+if __name__ == "__main__":
+    setup(
+        name="Writing3D",
+        version="0.0.1",
+        author="William Hicks",
+        author_email="william_hicks@alumni.brown.edu",
+        description="A program for creating literary and artistic VR projects",
+        license="GPL",
+        keywords="virtual modeling art literature",
+        url="https://github.com/wphicks/Writing3D",
+        scripts=[
+            "pyw3d/w3d_export_tools.py", "samples/cwapp.py"],
+        packages=[
+            "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
+            "pyw3d.w3d_logic", "pyw3d.activators.triggers"
+        ],
+        classifiers=[
+            "Development Status :: 2 - Pre-Alpha",
+            "Topic :: Artistic Software",
+            "License :: OSI Approved :: GNU General Public License v3 or later"
+            " (GPLv3+)"
+        ],
+        cmdclass={
+            "install": CustomInstall
+        },
+    )
