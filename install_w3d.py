@@ -104,7 +104,7 @@ class W3DCleanAndInstall(threading.Thread):
         os.chdir(SCRIPTDIR)
         with open("w3d_install.log", "w") as log_file:
             subprocess.call([
-                sys.executable, "setup.py", 'install', '--user'],
+                sys.executable, "setup.py", 'install', '--user', '--force'],
                 stdout=log_file, stderr=log_file
             )
         self.queue.put("Install complete!")
