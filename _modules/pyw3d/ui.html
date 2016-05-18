@@ -1,0 +1,936 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.ui &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.ui</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tk widgets for inputting W3DProject options&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="kn">as</span> <span class="nn">tk</span>
+<span class="kn">import</span> <span class="nn">tkinter.filedialog</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span>
+
+
+<div class="viewcode-block" id="InputUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI">[docs]</a><span class="k">class</span> <span class="nc">InputUI</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dummy base class for building Tkinter input widgets</span>
+
+<span class="sd">    Classes that inherit from InputUI should also inherit from a TK widget</span>
+<span class="sd">    :param parent: The parent widget for this widget</span>
+<span class="sd">    :param str title: A title to label this widget,</span>
+<span class="sd">    :param W3DFeature feature: The feature whose options are being modified</span>
+<span class="sd">    :param feature_key: The key for the particular option being modified&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="InputUI.set_project"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.set_project">[docs]</a>    <span class="k">def</span> <span class="nf">set_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the current W3DProject for this UI widget</span>
+
+<span class="sd">        :param W3DProject project: The project for this widget&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">set_project</span><span class="p">(</span><span class="n">project</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initUI</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InputUI.help_bubble"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.help_bubble">[docs]</a>    <span class="k">def</span> <span class="nf">help_bubble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Toplevel</span><span class="p">()</span>
+        <span class="n">top</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Error&quot;</span><span class="p">)</span>
+        <span class="n">error_message</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span>
+            <span class="n">top</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">help_string</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">error_message</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="n">dismiss</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Dismiss&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">top</span><span class="o">.</span><span class="n">destroy</span><span class="p">)</span>
+        <span class="n">dismiss</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InputUI.initTK"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.initTK">[docs]</a>    <span class="k">def</span> <span class="nf">initTK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call base TK widget __init__ method&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_clear_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set value to new (non-None) default and re-initialize UI&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none_flag</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">def_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initUI</span><span class="p">()</span>
+
+<div class="viewcode-block" id="InputUI.noneUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.noneUI">[docs]</a>    <span class="k">def</span> <span class="nf">noneUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method to handle features defaulted to None</span>
+
+<span class="sd">        :param factory: A callable that will return a new sensible default for</span>
+<span class="sd">        feature&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none_flag</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Create&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_clear_none</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputUI.create_label"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.create_label">[docs]</a>    <span class="k">def</span> <span class="nf">create_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create element to label this widget&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;{}:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputUI.reset_label"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.reset_label">[docs]</a>    <span class="k">def</span> <span class="nf">reset_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset label with new title_string&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;{}:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="InputUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add all elements to build up this widget&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="InputUI.evaluate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert input from TK widget to appropriate type&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputUI.validate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.InputUI.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">none_flag</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">help_bubble</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">valid</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_string</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span> <span class="o">=</span> <span class="n">feature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span> <span class="o">=</span> <span class="n">feature_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none_flag</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cur_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">cur_value</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">cur_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cur_value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initTK</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initUI</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.TextUI">[docs]</a><span class="k">class</span> <span class="nc">TextUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TextUI.destroy"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.TextUI.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TextUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TextUI.validate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.TextUI.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">none_flag</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">help_bubble</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">valid</span></div>
+
+<div class="viewcode-block" id="TextUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.TextUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusOut&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FileUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FileUI">[docs]</a><span class="k">class</span> <span class="nc">FileUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FileUI.validate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FileUI.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileUI.file_dialog"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FileUI.file_dialog">[docs]</a>    <span class="k">def</span> <span class="nf">file_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">filedialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="FileUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FileUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="n">vcmd</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">),</span> <span class="s1">&#39;%P&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="s1">&#39;focusout&#39;</span><span class="p">,</span> <span class="n">validatecommand</span><span class="o">=</span><span class="n">vcmd</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s1">&#39;&lt;Button-1&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_dialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ScrollableFrame"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ScrollableFrame">[docs]</a><span class="k">class</span> <span class="nc">ScrollableFrame</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Scrollable frame widget</span>
+
+<span class="sd">    This implementation based on the one presented at</span>
+<span class="sd">    http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ScrollableFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Scrollbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">RIGHT</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">bd</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">highlightthickness</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">yscrollcommand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scroll</span><span class="o">.</span><span class="n">set</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">yview</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">xview_moveto</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">yview_moveto</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_window</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s1">&#39;&lt;Configure&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inside_dimensions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s1">&#39;&lt;Configure&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_canvas_dimensions</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_inside_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">new_dims</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="o">.</span><span class="n">winfo_reqwidth</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="o">.</span><span class="n">winfo_reqheight</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">scrollregion</span><span class="o">=</span><span class="s2">&quot;0 0 {} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">new_dims</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="o">.</span><span class="n">winfo_reqwidth</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">winfo_width</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="o">.</span><span class="n">winfo_reqwidth</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_update_canvas_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inside_frame</span><span class="o">.</span><span class="n">winfo_reqwidth</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">winfo_width</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">itemconfigure</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_id</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">winfo_width</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="FeatureUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureUI">[docs]</a><span class="k">class</span> <span class="nc">FeatureUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">ttk</span><span class="o">.</span><span class="n">LabelFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for creating a W3DFeature&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FeatureUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FeatureUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">ui_order</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">argument_validators</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span> <span class="n">option</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FeatureListUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureListUI">[docs]</a><span class="k">class</span> <span class="nc">FeatureListUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">ttk</span><span class="o">.</span><span class="n">LabelFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for inputting a list of W3DFeatures&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span>
+            <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Item&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span> <span class="o">=</span> <span class="s2">&quot;Add {}...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span> <span class="o">=</span> <span class="n">item_label</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FeatureListUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FeatureListUI.create_add_button"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureListUI.create_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">create_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_feature</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FeatureListUI.add_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureListUI.add_feature">[docs]</a>    <span class="k">def</span> <span class="nf">add_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">correct_class</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span>
+            <span class="s2">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">pop_out</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">destroy_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Delete&quot;</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_feature</span><span class="p">(</span><span class="n">new_entry</span><span class="o">.</span><span class="n">feature_key</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">new_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">)</span>
+        <span class="n">destroy_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FeatureListUI.remove_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureListUI.remove_feature">[docs]</a>    <span class="k">def</span> <span class="nf">remove_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">removed_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">removed_entry</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">index</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature_key</span> <span class="o">+=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span>
+                    <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">title_string</span> <span class="o">=</span> <span class="s2">&quot;Object {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reset_label</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FeatureListUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureListUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span> <span class="o">=</span> <span class="n">ScrollableFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="MultiFeatureListUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureListUI">[docs]</a><span class="k">class</span> <span class="nc">MultiFeatureListUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for inputting a list of W3DFeatures of multiple types&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span>
+            <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Item&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span> <span class="o">=</span> <span class="s2">&quot;Add {}...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span> <span class="o">=</span> <span class="n">item_label</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MultiFeatureListUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MultiFeatureListUI.add_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureListUI.add_feature">[docs]</a>    <span class="k">def</span> <span class="nf">add_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">def_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span>
+            <span class="s2">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">pop_out</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">destroy_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Delete&quot;</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_feature</span><span class="p">(</span><span class="n">new_entry</span><span class="o">.</span><span class="n">feature_key</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">new_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">)</span>
+        <span class="n">destroy_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MultiFeatureListUI.remove_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureListUI.remove_feature">[docs]</a>    <span class="k">def</span> <span class="nf">remove_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">removed_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">removed_entry</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">index</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature_key</span> <span class="o">+=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span>
+                    <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">title_string</span> <span class="o">=</span> <span class="s2">&quot;Object {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reset_label</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MultiFeatureListUI.create_add_button"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureListUI.create_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">create_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_feature</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MultiFeatureListUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureListUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span> <span class="o">=</span> <span class="n">ScrollableFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="PopOutUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PopOutUI">[docs]</a><span class="k">class</span> <span class="nc">PopOutUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PopOutUI.edit"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PopOutUI.edit">[docs]</a>    <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_window</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Toplevel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_window</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Edit&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_window</span><span class="o">.</span><span class="n">protocol</span><span class="p">(</span><span class="s2">&quot;WM_DELETE_WINDOW&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_editor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edit_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">,</span> <span class="n">pop_out</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">BOTH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopOutUI.exit_editor"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PopOutUI.exit_editor">[docs]</a>    <span class="k">def</span> <span class="nf">exit_editor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO: Make sure last-edited value gets saved when window is destroyed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_window</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">featre</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">title_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reset_label</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="PopOutUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PopOutUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Edit&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edit_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MultiFeatureUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureUI">[docs]</a><span class="k">class</span> <span class="nc">MultiFeatureUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">ttk</span><span class="o">.</span><span class="n">LabelFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for creating one of several subclasses of W3DFeature&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MultiFeatureUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MultiFeatureUI.create_editor"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureUI.create_editor">[docs]</a>    <span class="k">def</span> <span class="nf">create_editor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_validator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validators</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">valid_menu_items</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_validator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">def_value</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">correct_class</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MultiFeatureUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.MultiFeatureUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">def_value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_picker</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">valid_menu_items</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_picker</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_editor</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_editor</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="BaseUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.BaseUI">[docs]</a><span class="k">class</span> <span class="nc">BaseUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for inputting &quot;primitive&quot; values</span>
+
+<span class="sd">    (e.g. ints, floats, strings, etc.)&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BaseUI.destroy"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.BaseUI.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">silent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BaseUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.BaseUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="n">vcmd</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">),</span> <span class="s1">&#39;%P&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="s1">&#39;focusout&#39;</span><span class="p">,</span> <span class="n">validatecommand</span><span class="o">=</span><span class="n">vcmd</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="IterableUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.IterableUI">[docs]</a><span class="k">class</span> <span class="nc">IterableUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for inputting several of the same type of value&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IterableUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IterableUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.IterableUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># Test for item assignment</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># Item assignment unavailable</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># Feature value is None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>  <span class="c1"># feature_key not yet assigned or len 0</span>
+                                        <span class="c1"># iterable</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">required_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">required_length</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">widget</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="OptionUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.OptionUI">[docs]</a><span class="k">class</span> <span class="nc">OptionUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for selecting from a limited list of options&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OptionUI.destroy"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.OptionUI.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OptionUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OptionUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.OptionUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">valid_menu_items</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UpdateOptionUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.UpdateOptionUI">[docs]</a><span class="k">class</span> <span class="nc">UpdateOptionUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for selecting from an updateable list of options&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="UpdateOptionUI.destroy"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.UpdateOptionUI.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UpdateOptionUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UpdateOptionUI.create_entry"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.UpdateOptionUI.create_entry">[docs]</a>    <span class="k">def</span> <span class="nf">create_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">OptionMenu</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">valid_options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;FocusIn&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_entry</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UpdateOptionUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.UpdateOptionUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_entry</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="NonFeatureUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI">[docs]</a><span class="k">class</span> <span class="nc">NonFeatureUI</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for input and validation of values that are not</span>
+<span class="sd">    associated with a W3DFeature option&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NonFeatureUI.help_bubble"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI.help_bubble">[docs]</a>    <span class="k">def</span> <span class="nf">help_bubble</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Toplevel</span><span class="p">()</span>
+        <span class="n">top</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Error&quot;</span><span class="p">)</span>
+        <span class="n">error_message</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span>
+            <span class="n">top</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">help_string</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">error_message</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="n">dismiss</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Dismiss&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">top</span><span class="o">.</span><span class="n">destroy</span><span class="p">)</span>
+        <span class="n">dismiss</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NonFeatureUI.create_label"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI.create_label">[docs]</a>    <span class="k">def</span> <span class="nf">create_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create element to label this widget&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;{}:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NonFeatureUI.evaluate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="NonFeatureUI.validate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">help_bubble</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">valid</span></div>
+
+<div class="viewcode-block" id="NonFeatureUI.destroy"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NonFeatureUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NonFeatureUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.NonFeatureUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add all elements to build up this widget&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="n">vcmd</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">),</span> <span class="s1">&#39;%P&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="s1">&#39;focusout&#39;</span><span class="p">,</span> <span class="n">validatecommand</span><span class="o">=</span><span class="n">vcmd</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_string</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">default_value</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NonFeatureUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initUI</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DictEntryUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.DictEntryUI">[docs]</a><span class="k">class</span> <span class="nc">DictEntryUI</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for inputting dictionary key-value pairs&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DictEntryUI.create_value_entry"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.DictEntryUI.create_value_entry">[docs]</a>    <span class="k">def</span> <span class="nf">create_value_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DictEntryUI.evaluate_key"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.DictEntryUI.evaluate_key">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="DictEntryUI.update_key"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.DictEntryUI.update_key">[docs]</a>    <span class="k">def</span> <span class="nf">update_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">new_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_key</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">old_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature_key</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_value_entry</span><span class="p">(</span><span class="n">new_key</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span>
+            <span class="n">new_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature_key</span> <span class="o">=</span> <span class="n">new_key</span></div>
+
+<div class="viewcode-block" id="DictEntryUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.DictEntryUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span> <span class="o">=</span> <span class="n">NonFeatureUI</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DictEntryUI.destroy_entry"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.DictEntryUI.destroy_entry">[docs]</a>    <span class="k">def</span> <span class="nf">destroy_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">key_label</span><span class="p">,</span> <span class="n">key_validator</span><span class="p">,</span>
+            <span class="n">value_validator</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span> <span class="o">=</span> <span class="n">dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span> <span class="o">=</span> <span class="n">key_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span> <span class="o">=</span> <span class="n">key_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span> <span class="o">=</span> <span class="n">value_validator</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DictEntryUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initUI</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FeatureDictUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureDictUI">[docs]</a><span class="k">class</span> <span class="nc">FeatureDictUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for building a dictionary with lists of W3DFeatures as</span>
+<span class="sd">    values&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span>
+            <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Item&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span> <span class="o">=</span> <span class="s2">&quot;Add...&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span> <span class="o">=</span> <span class="n">item_label</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FeatureDictUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FeatureDictUI.add_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureDictUI.add_feature">[docs]</a>    <span class="k">def</span> <span class="nf">add_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">DictEntryUI</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">key_validator</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">value_validator</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FeatureDictUI.create_add_button"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureDictUI.create_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">create_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_feature</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FeatureDictUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.FeatureDictUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span> <span class="o">=</span> <span class="n">ScrollableFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">key_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">key_label</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span> <span class="o">=</span> <span class="s2">&quot;Key&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="ListUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ListUI">[docs]</a><span class="k">class</span> <span class="nc">ListUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">ttk</span><span class="o">.</span><span class="n">LabelFrame</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span>
+            <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Item&quot;</span><span class="p">,</span> <span class="n">pop_out</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span> <span class="o">=</span> <span class="s2">&quot;Add {}...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item_label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span> <span class="o">=</span> <span class="n">item_label</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ListUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">title_string</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_out</span> <span class="o">=</span> <span class="n">pop_out</span>
+
+<div class="viewcode-block" id="ListUI.create_add_button"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ListUI.create_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">create_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ListUI.add_item"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ListUI.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">def_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">base_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span>
+            <span class="s2">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">pop_out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_out</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">new_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">destroy_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Delete&quot;</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_feature</span><span class="p">(</span><span class="n">new_entry</span><span class="o">.</span><span class="n">feature_key</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">new_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">)</span>
+        <span class="n">destroy_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ListUI.remove_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ListUI.remove_feature">[docs]</a>    <span class="k">def</span> <span class="nf">remove_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">removed_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">removed_entry</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">index</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature_key</span> <span class="o">+=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span>
+                    <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">title_string</span> <span class="o">=</span> <span class="s2">&quot;{} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reset_label</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ListUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ListUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">noneUI</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span> <span class="o">=</span> <span class="n">ScrollableFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="PairUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PairUI">[docs]</a><span class="k">class</span> <span class="nc">PairUI</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for inputting pairs of values&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PairUI.create_value_entry"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PairUI.create_value_entry">[docs]</a>    <span class="k">def</span> <span class="nf">create_value_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span><span class="o">.</span><span class="n">ui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PairUI.evaluate_key"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PairUI.evaluate_key">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">get</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="PairUI.update_key"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PairUI.update_key">[docs]</a>    <span class="k">def</span> <span class="nf">update_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">new_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_key</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">old_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature_key</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_value_entry</span><span class="p">(</span><span class="n">new_key</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span>
+            <span class="n">new_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature_key</span> <span class="o">=</span> <span class="n">new_key</span></div>
+
+<div class="viewcode-block" id="PairUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PairUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span> <span class="o">=</span> <span class="n">NonFeatureUI</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span><span class="o">.</span><span class="n">entry_value</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_entry</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PairUI.destroy_entry"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.PairUI.destroy_entry">[docs]</a>    <span class="k">def</span> <span class="nf">destroy_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_entry</span><span class="o">.</span><span class="n">feature_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">key_label</span><span class="p">,</span> <span class="n">key_validator</span><span class="p">,</span>
+            <span class="n">value_validator</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span> <span class="o">=</span> <span class="n">dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span> <span class="o">=</span> <span class="n">key_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span> <span class="o">=</span> <span class="n">key_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span> <span class="o">=</span> <span class="n">value_validator</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DictEntryUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initUI</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ActionListUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ActionListUI">[docs]</a><span class="k">class</span> <span class="nc">ActionListUI</span><span class="p">(</span><span class="n">InputUI</span><span class="p">,</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tkinter widget for building a dictionary with lists of W3DFeatures as</span>
+<span class="sd">    values&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span>
+            <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Action&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_label</span> <span class="o">=</span> <span class="s2">&quot;Add Action...&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_label</span> <span class="o">=</span> <span class="n">item_label</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ActionListUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ActionListUI.add_feature"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ActionListUI.add_feature">[docs]</a>    <span class="k">def</span> <span class="nf">add_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">PairUI</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_key</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">key_validator</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">value_validator</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ActionListUI.create_add_button"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ActionListUI.create_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">create_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">inside_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_label</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_feature</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ActionListUI.initUI"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.ui.ActionListUI.initUI">[docs]</a>    <span class="k">def</span> <span class="nf">initUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_label</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span> <span class="o">=</span> <span class="n">ScrollableFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_area</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_add_button</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">key_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">key_label</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_label</span> <span class="o">=</span> <span class="s2">&quot;Time&quot;</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

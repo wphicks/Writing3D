@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.w3d_logic.blender_action &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.w3d_logic.blender_action</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for implementing changes to Blender objects&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BlenderAction"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.BlenderAction">[docs]</a><span class="k">class</span> <span class="nc">BlenderAction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A single unit of action within Blender</span>
+
+<span class="sd">    Note that this may correspond to part of a W3DAction or several</span>
+<span class="sd">    W3DActions</span>
+<span class="sd">    :param BlenderTrigger trigger: The trigger used to activate this action&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BlenderAction.create_on_script"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.BlenderAction.create_on_script">[docs]</a>    <span class="k">def</span> <span class="nf">create_on_script</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create section of Blender Python controller script to activate this</span>
+<span class="sd">        action&quot;&quot;&quot;</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">script</span></div>
+
+<div class="viewcode-block" id="BlenderAction.create_off_script"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.BlenderAction.create_off_script">[docs]</a>    <span class="k">def</span> <span class="nf">create_off_script</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create section of Blender Python controller script to deactivate</span>
+<span class="sd">        this action&quot;&quot;&quot;</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">off_body</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">script</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">=</span> <span class="n">trigger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        own[&quot;{index_property}&quot;] += 1</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">off_body</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        pass</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ActivateTrigger"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.ActivateTrigger">[docs]</a><span class="k">class</span> <span class="nc">ActivateTrigger</span><span class="p">(</span><span class="n">BlenderAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used to activate or pause a BlenderTrigger</span>
+
+<span class="sd">    :param BlenderAction other_trigger: The trigger to activate&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">other_trigger</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;Start&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ActivateTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span> <span class="o">=</span> <span class="n">other_trigger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">actuator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        other_object = scene.objects[&quot;{other_object_name}&quot;]</span>
+<span class="s2">        current_actuator = other_object.actuators[</span>
+<span class="s2">            &quot;{actuator_name}&quot;]</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">other_object_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+            <span class="n">actuator_name</span><span class="o">=</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">actuator</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;Start&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        current_actuator.value = &quot;True&quot;</span>
+<span class="s2">        other_object[&quot;{pause_index_property}&quot;] = 0</span>
+<span class="s2">        other_object[&quot;{pause_time_property}&quot;] = 0</span>
+<span class="s2">        cont.activate(current_actuator)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">pause_index_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">pause_index_name</span><span class="p">,</span>
+                <span class="n">pause_time_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">pause_time_name</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;Stop&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        current_actuator.value = &quot;False&quot;</span>
+<span class="s2">        other_object[&quot;{pause_index_property}&quot;] = other_object[</span>
+<span class="s2">            &quot;{index_property}&quot;]</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">pause_index_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">pause_index_name</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        other_object[&quot;{pause_time_property}&quot;] = other_object[</span>
+<span class="s2">            &quot;{time_property}&quot;]</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">pause_time_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">pause_time_name</span><span class="p">,</span>
+                    <span class="n">time_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">timer_name</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        cont.activate(current_actuator)</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;Continue&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        current_actuator.value = &quot;True&quot;</span>
+<span class="s2">        cont.activate(current_actuator)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;Start if not started&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        if other_object[&quot;{trigger_name}&quot;]:</span>
+<span class="s2">            current_actuator.value = &quot;True&quot;</span>
+<span class="s2">            other_object[&quot;{pause_index_property}&quot;] = 0</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">trigger_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">pause_index_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">pause_index_name</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            other_object[&quot;{pause_time_property}&quot;] = 0</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pause_time_property</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">other_trigger</span><span class="o">.</span><span class="n">pause_time_name</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            cont.activate(current_actuator)</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LinearMovement"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.LinearMovement">[docs]</a><span class="k">class</span> <span class="nc">LinearMovement</span><span class="p">(</span><span class="n">BlenderAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used to execute a linear movement of a Blender object</span>
+
+<span class="sd">    :param W3DPlacement target_placement: Target destination and orientation</span>
+<span class="sd">    of object&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LinearMovement.create_movement_actuator"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.LinearMovement.create_movement_actuator">[docs]</a>    <span class="k">def</span> <span class="nf">create_movement_actuator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a motion actuator for object if it does not exist&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">motion_actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span>
+                <span class="s2">&quot;MOVE&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOTION&quot;</span><span class="p">,</span>
+                <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;MOVE&quot;</span>
+            <span class="p">)</span>
+            <span class="n">motion_actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span>
+                <span class="s2">&quot;MOVE&quot;</span><span class="p">]</span>
+            <span class="n">motion_actuator</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;OBJECT_NORMAL&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motion_actuator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">motion_actuator</span></div>
+
+<div class="viewcode-block" id="LinearMovement.create_rotation_logic"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.LinearMovement.create_rotation_logic">[docs]</a>    <span class="k">def</span> <span class="nf">create_rotation_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add rotation logic to trigger script&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Axis&quot;</span><span class="p">:</span>
+            <span class="n">target_rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span><span class="p">[</span>
+                <span class="s2">&quot;rotation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_rotation_matrix</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object</span><span class="p">)</span><span class="o">.</span><span class="n">to_quaternion</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        rotation = own.orientation.to_quaternion()</span>
+<span class="s2">        target_rotation = Quaternion()</span>
+<span class="s2">        target_rotation.w={w}</span>
+<span class="s2">        target_rotation.x={x}</span>
+<span class="s2">        target_rotation.y={y}</span>
+<span class="s2">        target_rotation.z={z}</span>
+<span class="s2">        rotation_delta = target_rotation.rotation_difference(rotation)</span>
+<span class="s2">        angular_velocity = rotation_delta.angle*rotation_delta.axis/{duration}</span>
+<span class="s2">        motion_actuator = cont.actuators[&quot;{motion_actuator}&quot;]</span>
+<span class="s2">        motion_actuator.angV = angular_velocity</span>
+<span class="s2">        cont.activate(motion_actuator)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">w</span><span class="o">=</span><span class="n">target_rotation</span><span class="o">.</span><span class="n">w</span><span class="p">,</span>
+                    <span class="n">x</span><span class="o">=</span><span class="n">target_rotation</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                    <span class="n">y</span><span class="o">=</span><span class="n">target_rotation</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                    <span class="n">z</span><span class="o">=</span><span class="n">target_rotation</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+                    <span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                    <span class="n">motion_actuator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_actuator</span><span class="o">.</span><span class="n">name</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">off_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        motion_actuator = cont.actuators[&quot;{motion_actuator}&quot;]</span>
+<span class="s2">        motion_actuator.angV = [0, 0, 0]</span>
+<span class="s2">        own.angularVelocity = [0, 0, 0]</span>
+<span class="s2">        cont.activate(motion_actuator)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">motion_actuator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_actuator</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearMovement.create_position_logic"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.LinearMovement.create_position_logic">[docs]</a>    <span class="k">def</span> <span class="nf">create_position_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add positional movement logic to trigger script&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        target_position = [own.position[i] + {target_position}[i] for i in</span>
+<span class="s2">            range(3)]&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">target_position</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]))</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        target_position = {target_position}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">target_position</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]))</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        motion_actuator = cont.actuators[&quot;{motion_actuator}&quot;]</span>
+<span class="s2">        motion_actuator.linV = [</span>
+<span class="s2">            (target_position[i] - own.position[i])/{duration} for i in</span>
+<span class="s2">            range(3)]</span>
+<span class="s2">        cont.activate(motion_actuator)&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                <span class="n">target_position</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]),</span>
+                <span class="n">motion_actuator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_actuator</span><span class="o">.</span><span class="n">name</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">off_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        motion_actuator = cont.actuators[&quot;{motion_actuator}&quot;]</span>
+<span class="s2">        motion_actuator.linV = [0, 0, 0]</span>
+<span class="s2">        target_position = {target_position}</span>
+<span class="s2">        motion_actuator.dLoc = [(target_position[i] - own.position[i])</span>
+<span class="s2">            for i in range(3)]</span>
+<span class="s2">        cont.activate(motion_actuator)</span>
+<span class="s2">        motion_actuator.dLoc = [0, 0, 0]</span>
+<span class="s2">        own.setLinearVelocity([0,0,0]) # Nasty workaround for Blender 2.69</span>
+<span class="s2">        cont.activate(motion_actuator)&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">target_position</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]),</span>
+            <span class="n">motion_actuator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_actuator</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">target_placement</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinearMovement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relative</span> <span class="o">=</span> <span class="n">relative</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motion_actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_movement_actuator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">=</span> <span class="n">trigger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_placement</span> <span class="o">=</span> <span class="n">target_placement</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">trigger</span><span class="o">.</span><span class="n">duration</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_position_logic</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_rotation_logic</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="VisibilityChange"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.VisibilityChange">[docs]</a><span class="k">class</span> <span class="nc">VisibilityChange</span><span class="p">(</span><span class="n">BlenderAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used to change the visibility of a Blender object</span>
+
+<span class="sd">    :param bool visibility: Whether object should be visible after action has</span>
+<span class="sd">    been executed&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VisibilityChange.create_visibility_actuator"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.VisibilityChange.create_visibility_actuator">[docs]</a>    <span class="k">def</span> <span class="nf">create_visibility_actuator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">visibility_actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span>
+                <span class="s2">&quot;VISIBILITY&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;VISIBILITY&quot;</span><span class="p">,</span>
+                <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;VISIBILITY&quot;</span>
+            <span class="p">)</span>
+            <span class="n">visibility_actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span>
+                <span class="s2">&quot;VISIBILITY&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">visibility_actuator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">visibility_actuator</span></div>
+
+<div class="viewcode-block" id="VisibilityChange.create_visibility_logic"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_action.VisibilityChange.create_visibility_logic">[docs]</a>    <span class="k">def</span> <span class="nf">create_visibility_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        visibility_actuator = cont.actuators[&quot;{visibility_actuator}&quot;]</span>
+<span class="s2">        visibility_actuator.visibility = {visibility}</span>
+<span class="s2">        cont.activate(visibility_actuator)&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">visibility_actuator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visibility_actuator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">visibility</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visibility</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">visibility</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VisibilityChange</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visibility</span> <span class="o">=</span> <span class="n">visibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visibility_actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_visibility_actuator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_visibility_logic</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

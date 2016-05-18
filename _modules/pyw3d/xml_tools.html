@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.xml_tools &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.xml_tools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Convenience tools for working with W3D xml&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">BadW3DXML</span>
+
+
+<div class="viewcode-block" id="text2tuple"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.xml_tools.text2tuple">[docs]</a><span class="k">def</span> <span class="nf">text2tuple</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take a string of the format 1,2, 3,... or (1,2, 3,...) or [1,2, 3,...]</span>
+<span class="sd">    and return equivalent tuple</span>
+
+<span class="sd">    :param func evaluator A function used to evaluate each element within the</span>
+<span class="sd">    sequence. For instance &quot;float&quot; could be used to read in a tuple of floats.</span>
+<span class="sd">    Default is &quot;str&quot;, yielding a tuple of strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sep_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;,\s*&#39;</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[()]&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">sep_regex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">evaluator</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span> <span class="k">for</span> <span class="n">datum</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="attrib2bool"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.xml_tools.attrib2bool">[docs]</a><span class="k">def</span> <span class="nf">attrib2bool</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">attrib_name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take an xml node and try to evaluate given attribute as true/false</span>
+
+<span class="sd">    :param xml.etree.ElementTree.Element root: xml node with given attribute</span>
+<span class="sd">    :param str attrib_name: Attribute to be evaluated</span>
+<span class="sd">    :param bool default: Value to be returned if attribute is not found.</span>
+<span class="sd">    :raises BadW3DXML: if default is not set and attribute is not found or if</span>
+<span class="sd">    attribute does not have value &quot;true&quot; or &quot;false&quot;</span>
+<span class="sd">    :raises AttributeError: if root is not a valid ElementTree Element</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attrib_value</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib_name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">attrib_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Attribute {} is required for node {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">attrib_name</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="n">attrib_value</span> <span class="o">=</span> <span class="n">attrib_value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">attrib_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+            <span class="s1">&#39;Attribute {} in node {} must be one of &quot;true&quot;, &quot;false&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">attrib_name</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">attrib_value</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span></div>
+
+
+<div class="viewcode-block" id="text2bool"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.xml_tools.text2bool">[docs]</a><span class="k">def</span> <span class="nf">text2bool</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take string of the form &quot;true&quot; or &quot;false&quot; and return boolean&quot;&quot;&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;false&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Boolean value not set to true or false&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="bool2text"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.xml_tools.bool2text">[docs]</a><span class="k">def</span> <span class="nf">bool2text</span><span class="p">(</span><span class="n">boolean</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Take boolean and return string of the form &quot;true&quot; or &quot;false&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">boolean</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="find_xml_text"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.xml_tools.find_xml_text">[docs]</a><span class="k">def</span> <span class="nf">find_xml_text</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">search</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find &quot;search&quot; node and return its text content or else None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">search_root</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">search</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">search_root</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

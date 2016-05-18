@@ -1,0 +1,940 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.objects &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.objects</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for working with displayable objects in W3D projects</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">BadW3DXML</span><span class="p">,</span> <span class="n">InvalidArgument</span><span class="p">,</span> <span class="n">EBKAC</span>
+<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">find_xml_text</span><span class="p">,</span> <span class="n">text2bool</span><span class="p">,</span> <span class="n">text2tuple</span><span class="p">,</span> <span class="n">bool2text</span>
+<span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
+<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="n">W3DAction</span><span class="p">,</span> <span class="n">ObjectAction</span><span class="p">,</span> <span class="n">GroupAction</span><span class="p">,</span> <span class="n">TimelineAction</span><span class="p">,</span>\
+    <span class="n">SoundAction</span><span class="p">,</span> <span class="n">EventTriggerAction</span><span class="p">,</span> <span class="n">MoveVRAction</span><span class="p">,</span> <span class="n">W3DResetAction</span>
+<span class="kn">from</span> <span class="nn">.placement</span> <span class="kn">import</span> <span class="n">W3DPlacement</span>
+<span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">OptionValidator</span><span class="p">,</span> <span class="n">IsNumeric</span><span class="p">,</span> <span class="n">ListValidator</span><span class="p">,</span> <span class="n">IsInteger</span><span class="p">,</span>\
+    <span class="n">ValidPyString</span><span class="p">,</span> <span class="n">IsBoolean</span><span class="p">,</span> <span class="n">FeatureValidator</span><span class="p">,</span> <span class="n">DictValidator</span><span class="p">,</span>\
+    <span class="n">TextValidator</span><span class="p">,</span> <span class="n">ValidFile</span>
+<span class="kn">from</span> <span class="nn">.names</span> <span class="kn">import</span> <span class="n">generate_blender_object_name</span><span class="p">,</span>\
+    <span class="n">generate_blender_material_name</span>
+<span class="kn">from</span> <span class="nn">.metaclasses</span> <span class="kn">import</span> <span class="n">SubRegisteredClass</span>
+<span class="kn">from</span> <span class="nn">.activators</span> <span class="kn">import</span> <span class="n">BlenderClickTrigger</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="generate_material_from_image"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.objects.generate_material_from_image">[docs]</a><span class="k">def</span> <span class="nf">generate_material_from_image</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">double_sided</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate Blender material from image for texturing&quot;&quot;&quot;</span>
+    <span class="n">material_name</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">display_name_from_filepath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">material</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">material_name</span><span class="p">)</span>
+    <span class="n">texture_slot</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">texture_slots</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+    <span class="n">texture_name</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
+         <span class="s2">&quot;image_texture&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1">#TODO: Get image directory</span>
+    <span class="n">image_texture</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">textures</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">texture_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;IMAGE&quot;</span><span class="p">)</span>
+    <span class="n">image_texture</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="c1"># NOTE: The above already raises a sensible RuntimeError if file is not</span>
+    <span class="c1"># found</span>
+    <span class="n">image_texture</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">use_alpha</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">texture_slot</span><span class="o">.</span><span class="n">texture</span> <span class="o">=</span> <span class="n">image_texture</span>
+    <span class="n">texture_slot</span><span class="o">.</span><span class="n">texture_coords</span> <span class="o">=</span> <span class="s1">&#39;UV&#39;</span>
+
+    <span class="c1">#material.alpha = 0.0</span>
+    <span class="c1">#material.specular_alpha = 0.0</span>
+    <span class="c1">#texture_slot.use_map_alpha</span>
+    <span class="c1">#material.use_transparency = True</span>
+    <span class="n">material</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">use_backface_culling</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">double_sided</span>
+
+    <span class="k">return</span> <span class="n">material</span></div>
+
+
+<div class="viewcode-block" id="W3DLink"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DLink">[docs]</a><span class="k">class</span> <span class="nc">W3DLink</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store data on a clickable link</span>
+
+<span class="sd">    :param bool enabled: Is link enabled?</span>
+<span class="sd">    :param bool remain_enabled: Should link remain enabled after activation?</span>
+<span class="sd">    :param tuple enabled_color: RGB color when link is enabled</span>
+<span class="sd">    :param tuple selected_color: RGB color when link is selected</span>
+<span class="sd">    :param actions: Dictionary mapping number of clicks to W3DActions</span>
+<span class="sd">        (negative for any click)</span>
+<span class="sd">    :param int reset: Number of clicks after which to reset link (negative</span>
+<span class="sd">        value to never reset)&quot;&quot;&quot;</span>
+
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;remain_enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;selected_color&quot;</span><span class="p">,</span> <span class="s2">&quot;reset&quot;</span><span class="p">,</span> <span class="s2">&quot;actions&quot;</span><span class="p">]</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;remain_enabled&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;enabled_color&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsInteger</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;selected_color&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsInteger</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="n">DictValidator</span><span class="p">(</span>
+            <span class="n">IsInteger</span><span class="p">(),</span> <span class="n">ListValidator</span><span class="p">(</span><span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DAction</span><span class="p">)),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Must be a dictionary mapping integers to lists of &quot;</span>
+            <span class="s2">&quot;W3DActions&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;reset&quot;</span><span class="p">:</span> <span class="n">IsInteger</span><span class="p">()</span>
+        <span class="p">}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;remain_enabled&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;enabled_color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;selected_color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;reset&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">W3DLink</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;actions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_clicks</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="W3DLink.toXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DLink as LinkRoot node within Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">linkroot_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;LinkRoot&quot;</span><span class="p">)</span>
+        <span class="n">link_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">linkroot_node</span><span class="p">,</span> <span class="s2">&quot;Link&quot;</span><span class="p">)</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;Enabled&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;RemainEnabled&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;EnabledColor&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;{},{},{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled_color&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;SelectedColor&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;{},{},{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;selected_color&quot;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">clicks</span><span class="p">,</span> <span class="n">action_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">current_action</span> <span class="ow">in</span> <span class="n">action_list</span><span class="p">:</span>
+                <span class="n">actions_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;Actions&quot;</span><span class="p">)</span>
+                <span class="n">current_action</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">actions_node</span><span class="p">)</span>
+                <span class="n">clicks_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">actions_node</span><span class="p">,</span> <span class="s2">&quot;Clicks&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">clicks</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">clicks_node</span><span class="p">,</span> <span class="s2">&quot;Any&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+                        <span class="n">clicks_node</span><span class="p">,</span>
+                        <span class="s2">&quot;NumClicks&quot;</span><span class="p">,</span>
+                        <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                            <span class="s2">&quot;num_clicks&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">clicks</span><span class="p">),</span>
+                            <span class="s2">&quot;reset&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">clicks</span><span class="p">)</span>
+                            <span class="p">}</span>
+                        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">linkroot_node</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DLink.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">link_class</span><span class="p">,</span> <span class="n">link_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DLink from LinkRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element link_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">link_class</span><span class="p">()</span>
+        <span class="n">link_node</span> <span class="o">=</span> <span class="n">link_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Link&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">link_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;LinkRoot element has no Link subelement&quot;</span><span class="p">)</span>
+        <span class="n">link</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">find_xml_text</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;Enabled&quot;</span><span class="p">))</span>
+        <span class="n">link</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span>
+            <span class="n">find_xml_text</span><span class="p">(</span><span class="n">link_node</span><span class="p">,</span> <span class="s2">&quot;RemainEnabled&quot;</span><span class="p">))</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">link_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;EnabledColor&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">link</span><span class="p">[</span><span class="s2">&quot;enabled_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">link_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;SelectedColor&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">link</span><span class="p">[</span><span class="s2">&quot;selected_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">actions_node</span> <span class="ow">in</span> <span class="n">link_node</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Actions&quot;</span><span class="p">):</span>
+            <span class="n">num_clicks</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">actions_node</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;Clicks&quot;</span><span class="p">:</span>
+                    <span class="n">num_clicks_node</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;NumClicks&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">num_clicks_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">num_clicks</span> <span class="o">=</span> <span class="n">num_clicks_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;num_clicks&quot;</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                                <span class="s2">&quot;num_clicks attribute not set in NumClicks&quot;</span>
+                                <span class="s2">&quot;node&quot;</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">num_clicks_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">]):</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="n">num_clicks</span> <span class="o">&lt;</span> <span class="n">link</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">]</span>
+                                        <span class="ow">or</span> <span class="n">link</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                                    <span class="n">link</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_clicks</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">link</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">][</span><span class="n">num_clicks</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">W3DAction</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">link</span></div>
+
+<div class="viewcode-block" id="W3DLink.blend"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create Blender object to implement W3DLink</span>
+
+<span class="sd">        :param str object_name: The name of the object to which link is</span>
+<span class="sd">        assigned&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderClickTrigger</span><span class="p">(</span>
+            <span class="n">object_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span> <span class="n">object_name</span><span class="p">,</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">],</span>
+            <span class="n">select_color</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;selected_color&quot;</span><span class="p">],</span>
+            <span class="n">enable_color</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled_color&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div>
+
+<div class="viewcode-block" id="W3DLink.link_blender_logic"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink.link_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">link_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link BGE logic bricks for this W3DLink&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">link_logic_bricks</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;blend() must be called before link_blender_logic()&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DLink.write_blender_logic"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink.write_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write any necessary game engine logic for this W3DTimeline&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">write_python_logic</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;blend() must be called before write_blender_logic()&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="W3DContent"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DContent">[docs]</a><span class="k">class</span> <span class="nc">W3DContent</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">SubRegisteredClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents content of a W3D object&quot;&quot;&quot;</span>
+
+    <span class="n">blender_scaling</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="W3DContent.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DContent.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create object of appropriate subclass from Content node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element content_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DContent</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Text&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DText</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Image&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DImage</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;StereoImage&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DStereoImage</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Model&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DModel</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Light&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DLight</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ParticleSystem&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">W3DPSys</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">content_root</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;No known child node found in Content node&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="W3DText"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DText">[docs]</a><span class="k">class</span> <span class="nc">W3DText</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents text in virtual space</span>
+
+<span class="sd">    :param str text: String of text to be displayed</span>
+<span class="sd">    :param str halign: Horizontal alignment of text (&quot;left&quot;, &quot;right&quot;, &quot;center&quot;)</span>
+<span class="sd">    :param str valign: Vertical alignment of text (&quot;top&quot;, &quot;center&quot;, &quot;bottom&quot;)</span>
+<span class="sd">    :param str font: Name of font to be used</span>
+<span class="sd">    :param float depth: Depth to extrude each letter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;halign&quot;</span><span class="p">,</span> <span class="s2">&quot;depth&quot;</span><span class="p">,</span> <span class="s2">&quot;font&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">TextValidator</span><span class="p">(),</span>
+        <span class="s2">&quot;halign&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span>
+            <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;valign&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span>
+            <span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="n">ValidFile</span><span class="p">(</span><span class="s2">&quot;Filename of font&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">()}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;halign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;valign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+    <span class="n">blender_scaling</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">blender_depth_scaling</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;halign&quot;</span><span class="p">,</span> <span class="s2">&quot;valign&quot;</span><span class="p">,</span> <span class="s2">&quot;font&quot;</span><span class="p">,</span> <span class="s2">&quot;depth&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="W3DText.toXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DText.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DText as Content node within Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Content&quot;</span><span class="p">)</span>
+        <span class="n">attrib</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;horiz-align&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;halign&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;vert-align&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;valign&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_depth_scaling</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;font&quot;</span><span class="p">):</span>
+            <span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;font&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;font&quot;</span><span class="p">]</span>
+        <span class="n">text_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">content_root</span><span class="p">,</span> <span class="s2">&quot;Text&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">attrib</span>
+        <span class="p">)</span>
+        <span class="n">text_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">text_root</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">)</span>
+        <span class="n">text_root</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">content_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DText.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DText.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">text_class</span><span class="p">,</span> <span class="n">content_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DText object from Content node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element content_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_text</span> <span class="o">=</span> <span class="n">text_class</span><span class="p">()</span>
+        <span class="n">text_root</span> <span class="o">=</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Text&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">text_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;horiz-align&quot;</span> <span class="ow">in</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_text</span><span class="p">[</span><span class="s2">&quot;halign&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;horiz-align&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;vert-align&quot;</span> <span class="ow">in</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_text</span><span class="p">[</span><span class="s2">&quot;valign&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;vert-align&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;font&quot;</span> <span class="ow">in</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_text</span><span class="p">[</span><span class="s2">&quot;font&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;font&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;depth&quot;</span> <span class="ow">in</span> <span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_text</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">text_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">])</span> <span class="o">*</span>
+                    <span class="n">text_class</span><span class="o">.</span><span class="n">blender_depth_scaling</span><span class="p">)</span>
+            <span class="n">text_root</span> <span class="o">=</span> <span class="n">text_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">text_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">new_text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text_root</span><span class="o">.</span><span class="n">text</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Text node must contain text node&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_text</span>
+        <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
+            <span class="s2">&quot;Content node must contain Text node to create W3DText object&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DText.blend"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DText.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DText in Blender&quot;&quot;&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">text_add</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">new_text_object</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+        <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+        <span class="c1">#TODO: Get proper font directory</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;font&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fonts</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;font&quot;</span><span class="p">])</span>
+        <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">extrude</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span>
+        <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fill_mode</span> <span class="o">=</span> <span class="s2">&quot;BOTH&quot;</span>
+        <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;halign&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;valign&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;center&quot;</span><span class="p">:</span>
+            <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">offset_y</span> <span class="o">=</span> <span class="o">-</span><span class="n">new_text_object</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;valign&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;bottom&quot;</span><span class="p">:</span>
+            <span class="n">new_text_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">offset_y</span> <span class="o">=</span> <span class="o">-</span><span class="n">new_text_object</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">new_text_object</span><span class="o">.</span><span class="n">select</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;MESH&#39;</span><span class="p">,</span> <span class="n">keep_original</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">transform_apply</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">new_text_object</span><span class="o">.</span><span class="n">select</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">new_text_object</span></div></div>
+
+
+<div class="viewcode-block" id="W3DImage"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DImage">[docs]</a><span class="k">class</span> <span class="nc">W3DImage</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent a flat image in 3D space</span>
+
+<span class="sd">    :param str filename: Filename of image to be displayed&quot;&quot;&quot;</span>
+    <span class="n">ui_order</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="n">ValidFile</span><span class="p">()}</span>
+
+<div class="viewcode-block" id="W3DImage.toXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DImage.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DImage as Content node within Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Content&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">content_root</span><span class="p">,</span> <span class="s2">&quot;Image&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">content_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DImage.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DImage.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">image_class</span><span class="p">,</span> <span class="n">content_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DImage object from Content node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element content_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_image</span> <span class="o">=</span> <span class="n">image_class</span><span class="p">()</span>
+        <span class="n">image_root</span> <span class="o">=</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Image&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">image_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_image</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Image node must have filename attribute set&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_image</span>
+        <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
+            <span class="s2">&quot;Content node must contain Image node to create W3DImage object&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DImage.blend"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DImage.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DImage in Blender&quot;&quot;&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">primitive_plane_add</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">transform_apply</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">new_image_object</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+
+        <span class="n">material</span> <span class="o">=</span> <span class="n">generate_material_from_image</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+        <span class="n">material</span><span class="o">.</span><span class="n">use_nodes</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">texture_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texture</span><span class="o">.</span><span class="n">image</span>
+
+        <span class="n">new_image_object</span><span class="o">.</span><span class="n">active_material</span> <span class="o">=</span> <span class="n">material</span>
+
+        <span class="n">new_image_object</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span>
+        <span class="n">new_image_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uv_textures</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+        <span class="n">new_image_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">material</span><span class="p">)</span>
+        <span class="n">new_image_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uv_textures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="n">material</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">alpha_blend</span> <span class="o">=</span> <span class="s1">&#39;ALPHA&#39;</span>
+
+        <span class="k">return</span> <span class="n">new_image_object</span></div></div>
+
+
+<div class="viewcode-block" id="W3DStereoImage"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DStereoImage">[docs]</a><span class="k">class</span> <span class="nc">W3DStereoImage</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents different images in left and right eye</span>
+
+<span class="sd">    :param str left_file: Filename of image to be displayed to left eye</span>
+<span class="sd">    :param str right_file: Filename of image to be displayed to right eye</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ui_order</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;left_file&quot;</span><span class="p">,</span> <span class="s2">&quot;right_file&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;left_file&quot;</span><span class="p">:</span> <span class="n">ValidFile</span><span class="p">(</span><span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Filename of left-eye image&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;right_file&quot;</span><span class="p">:</span> <span class="n">ValidFile</span><span class="p">(</span><span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Filename of right-eye image&quot;</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="W3DStereoImage.toXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DStereoImage.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DStereoImage as Content node within Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Content&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">content_root</span><span class="p">,</span> <span class="s2">&quot;StereoImage&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;left_file&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;left-image&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;right_file&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;right-image&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">content_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DStereoImage.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DStereoImage.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">image_class</span><span class="p">,</span> <span class="n">content_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DStereoImage object from Content node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element content_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_image</span> <span class="o">=</span> <span class="n">image_class</span><span class="p">()</span>
+        <span class="n">image_root</span> <span class="o">=</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;StereoImage&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">image_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_image</span><span class="p">[</span><span class="s2">&quot;left_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;left-image&quot;</span><span class="p">]</span>
+                <span class="n">new_image</span><span class="p">[</span><span class="s2">&quot;right_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;right-image&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                    <span class="s2">&quot;StereoImage node must have left-image and right-image &quot;</span>
+                    <span class="s2">&quot;attributes set&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_image</span>
+        <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
+            <span class="s2">&quot;Content node must contain StereoImage node to create &quot;</span>
+            <span class="s2">&quot;W3DStereoImage object&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DStereoImage.blend"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DStereoImage.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DStereoImage in Blender&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># TODO</span></div></div>
+
+
+<div class="viewcode-block" id="W3DModel"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DModel">[docs]</a><span class="k">class</span> <span class="nc">W3DModel</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a 3d model in virtual space</span>
+
+<span class="sd">    :param str filename: Filename of model to be displayed</span>
+<span class="sd">    :param bool check_collisions: TODO Clarify what this does</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#TODO: Does not seem to play nice with GLSL shader. FIX THIS.</span>
+    <span class="n">ui_order</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="n">ValidFile</span><span class="p">(),</span>
+        <span class="s2">&quot;check_collisions&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">()}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;check_collisions&quot;</span><span class="p">:</span> <span class="bp">False</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="W3DModel.toXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DModel.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DModel as Content node within Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Content&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">content_root</span><span class="p">,</span> <span class="s2">&quot;Model&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;check-collisions&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;check_collisions&quot;</span><span class="p">])</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">content_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DModel.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DModel.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">content_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DModel object from Content node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element content_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">()</span>
+        <span class="n">model_root</span> <span class="o">=</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Model&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_model</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                    <span class="s2">&quot;StereoImage node must have filename attribute set&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;check-collisions&quot;</span> <span class="ow">in</span> <span class="n">model_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_model</span><span class="p">[</span><span class="s2">&quot;check_collisions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span>
+                    <span class="n">model_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;check-collisions&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">new_model</span>
+        <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
+            <span class="s2">&quot;Content node must contain Model node to create &quot;</span>
+            <span class="s2">&quot;W3DModel object&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DModel.blend"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DModel.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DModel in Blender&quot;&quot;&quot;</span>
+        <span class="c1">#TODO: Get proper directory</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">import_scene</span><span class="o">.</span><span class="n">obj</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+        <span class="n">model_pieces</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">selected_objects</span>
+        <span class="k">for</span> <span class="n">piece</span> <span class="ow">in</span> <span class="n">model_pieces</span><span class="p">:</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">piece</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;MESH&#39;</span><span class="p">,</span> <span class="n">keep_original</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">new_model</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+        <span class="k">return</span> <span class="n">new_model</span></div></div>
+
+
+<div class="viewcode-block" id="W3DLight"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DLight">[docs]</a><span class="k">class</span> <span class="nc">W3DLight</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a light source in virtual space</span>
+
+<span class="sd">    :param str light_type: Type of source, one of &quot;Point&quot;, &quot;Directional&quot;,</span>
+<span class="sd">    &quot;Spot&quot;</span>
+<span class="sd">    :param bool diffuse: Provide diffuse light?</span>
+<span class="sd">    :param bool specular: Provide specular light?</span>
+<span class="sd">    :param tuple attenuation: Tuple of 3 floats specifying constant, linear,</span>
+<span class="sd">    and</span>
+<span class="sd">    quadratic attenuation of light source respectively</span>
+<span class="sd">    :param float angle: Angle in degrees specifying spread of spot light</span>
+<span class="sd">    source</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">,</span> <span class="s2">&quot;diffuse&quot;</span><span class="p">,</span> <span class="s2">&quot;specular&quot;</span><span class="p">,</span> <span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="s2">&quot;attenuation&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;light_type&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span><span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;Directional&quot;</span><span class="p">,</span> <span class="s2">&quot;Spot&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;diffuse&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;specular&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;attenuation&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsNumeric</span><span class="p">(),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">()}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;diffuse&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;specular&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;attenuation&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">}</span>
+
+<div class="viewcode-block" id="W3DLight.toXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DLight.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DLight as Content node within Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Content&quot;</span><span class="p">)</span>
+        <span class="n">light_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">content_root</span><span class="p">,</span> <span class="s2">&quot;Light&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;diffuse&quot;</span><span class="p">):</span>
+            <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;diffuse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;diffuse&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;specular&quot;</span><span class="p">):</span>
+            <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;specular&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;specular&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;attenuation&quot;</span><span class="p">):</span>
+            <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;const_atten&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;lin_atten&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;quad_atten&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Point&quot;</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">light_root</span><span class="p">,</span> <span class="s2">&quot;Point&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Directional&quot;</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">light_root</span><span class="p">,</span> <span class="s2">&quot;Directional&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Spot&quot;</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">light_root</span><span class="p">,</span> <span class="s2">&quot;Spot&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])})</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DLight.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DLight.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">light_class</span><span class="p">,</span> <span class="n">content_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DLight object from Content node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element content_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_light</span> <span class="o">=</span> <span class="n">light_class</span><span class="p">()</span>
+        <span class="n">light_root</span> <span class="o">=</span> <span class="n">content_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Light&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">light_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;diffuse&quot;</span> <span class="ow">in</span> <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;diffuse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;diffuse&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;specular&quot;</span> <span class="ow">in</span> <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;specular&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span>
+                    <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;specular&quot;</span><span class="p">])</span>
+            <span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">factor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">((</span><span class="s2">&quot;const_atten&quot;</span><span class="p">,</span> <span class="s2">&quot;lin_atten&quot;</span><span class="p">,</span>
+                                            <span class="s2">&quot;quad_atten&quot;</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                    <span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                        <span class="n">light_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">factor</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">light_type</span> <span class="ow">in</span> <span class="n">W3DLight</span><span class="o">.</span><span class="n">argument_validators</span><span class="p">[</span>
+                    <span class="s2">&quot;light_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">valid_options</span><span class="p">:</span>
+                <span class="n">type_root</span> <span class="o">=</span> <span class="n">light_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">light_type</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">type_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">light_type</span>
+                    <span class="k">if</span> <span class="s2">&quot;angle&quot;</span> <span class="ow">in</span> <span class="n">type_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                        <span class="n">new_light</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">type_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])</span>
+                    <span class="k">break</span>
+            <span class="k">return</span> <span class="n">new_light</span>
+        <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
+            <span class="s2">&quot;Content node must contain Light node to create W3DLight object&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DLight.blend"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DLight.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DLight in Blender&quot;&quot;&quot;</span>
+        <span class="c1">#TODO: Check default direction of lights in legacy</span>
+        <span class="n">light_type_conversion</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Point&quot;</span><span class="p">:</span> <span class="s2">&quot;POINT&quot;</span><span class="p">,</span> <span class="s2">&quot;Directional&quot;</span><span class="p">:</span> <span class="s2">&quot;SUN&quot;</span><span class="p">,</span> <span class="s2">&quot;Spot&quot;</span><span class="p">:</span> <span class="s2">&quot;SPOT&quot;</span>
+        <span class="p">}</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">lamp_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">light_type_conversion</span><span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]],</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># TODO: Why isn&#39;t the following working?</span>
+        <span class="c1"># bpy.ops.object.transform_apply(rotation=True)</span>
+        <span class="n">new_light_object</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+        <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">use_diffuse</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;diffuse&quot;</span><span class="p">]</span>
+        <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">use_specular</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;specular&quot;</span><span class="p">]</span>
+        <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">energy</span><span class="o">/</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Directional&quot;</span><span class="p">:</span>
+            <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">falloff_type</span> <span class="o">=</span> <span class="s2">&quot;LINEAR_QUADRATIC_WEIGHTED&quot;</span>
+            <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">linear_attenuation</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">quadratic_attenuation</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span>
+                <span class="s2">&quot;attenuation&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># NOTE: Blender and OpenGL define attenuation factors differently, and</span>
+        <span class="c1"># this implementation is in no way equivalent to that in the legacy</span>
+        <span class="c1"># software. The implementation of constant attenuation is particularly</span>
+        <span class="c1"># suspect, as is the distance.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;light_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Spot&quot;</span><span class="p">:</span>
+            <span class="n">new_light_object</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">spot_size</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">new_light_object</span></div></div>
+
+
+<div class="viewcode-block" id="W3DPSys"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DPSys">[docs]</a><span class="k">class</span> <span class="nc">W3DPSys</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a particle system in virtual space</span>
+
+<span class="sd">    NOT YET IMPLEMENTED AT ALL&quot;&quot;&quot;</span></div>
+    <span class="c1"># TODO: everything</span>
+
+
+<div class="viewcode-block" id="W3DObject"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DObject">[docs]</a><span class="k">class</span> <span class="nc">W3DObject</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store data on single W3D object</span>
+
+<span class="sd">    :param str name: The name of the object</span>
+<span class="sd">    :param W3DPlacement placement: Position and orientation of object</span>
+<span class="sd">    :param W3DLink link: Clickable link for object</span>
+<span class="sd">    :param tuple color: Three floats representing RGB color of object</span>
+<span class="sd">    :param bool double_sided: Is object visible from both sides?</span>
+<span class="sd">    :param bool visible: Is object visible?</span>
+<span class="sd">    :param bool lighting: Does object respond to scene lighting?</span>
+<span class="sd">    :param float scale: Scaling factor for size of object</span>
+<span class="sd">    :param bool click_through: Should clicks also pass through object?</span>
+<span class="sd">    :param bool around_own_axis: TODO clarify</span>
+<span class="sd">    :param str sound: Name of sound element associated with this object</span>
+<span class="sd">    :param content: Content of object; one of W3DText, W3DImage,</span>
+<span class="sd">    W3DStereoImage, W3DModel, W3DLight, W3DPSys</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;placement&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;visible&quot;</span><span class="p">,</span> <span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;click_through&quot;</span><span class="p">,</span> <span class="s2">&quot;around_own_axis&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">]</span>
+    <span class="c1">#TODO: Add sound</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ValidPyString</span><span class="p">(),</span>
+        <span class="s2">&quot;placement&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
+            <span class="n">W3DPlacement</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Orientation and position of object&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
+            <span class="n">W3DLink</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Clickable link associated with object&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsInteger</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;double_sided&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;lighting&quot;</span><span class="p">:</span>  <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;click_through&quot;</span><span class="p">:</span>  <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;around_own_axis&quot;</span><span class="p">:</span>  <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;sound&quot;</span><span class="p">:</span> <span class="n">TextValidator</span><span class="p">(),</span>  <span class="c1">#TODO: FIX THIS</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DContent</span><span class="p">)}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;lighting&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;click_through&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="s2">&quot;around_own_axis&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="s2">&quot;sound&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="s2">&quot;double_sided&quot;</span><span class="p">:</span> <span class="bp">True</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">W3DObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;visible&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;click_through&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;around_own_axis&quot;</span><span class="p">,</span>
+            <span class="c1">#&quot;sound&quot;,</span>
+            <span class="s2">&quot;placement&quot;</span><span class="p">,</span> <span class="s2">&quot;link&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="W3DObject.toXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DObject.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_objects_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DObject as Object node within ObjectRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element all_objects_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">object_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">all_objects_root</span><span class="p">,</span> <span class="s2">&quot;Object&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]})</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Visible&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;visible&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;double_sided&quot;</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;DoubleSided&quot;</span><span class="p">)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;double_sided&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Color&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;{},{},{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Lighting&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;lighting&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;ClickThrough&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;click_through&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;AroundSelfAxis&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;around_own_axis&quot;</span><span class="p">])</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;Scale&quot;</span><span class="p">)</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">blender_scaling</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sound&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+                <span class="n">object_root</span><span class="p">,</span> <span class="s2">&quot;SoundRef&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sound&quot;</span><span class="p">]})</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sound&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">object_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">object_root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">object_root</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">object_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DObject.fromXML"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DObject.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">object_class</span><span class="p">,</span> <span class="n">object_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DObject from Object node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element object_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_object</span> <span class="o">=</span> <span class="n">object_class</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;All Object nodes must have a name attribute set&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Visible&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;DoubleSided&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;double_sided&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Color&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Lighting&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;lighting&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ClickThrough&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;click_through&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;AroundSelfAxis&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;around_own_axis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Scale&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;SoundRef&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;sound&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;SoundRef node must have name attribute set&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;LinkRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DLink</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">object_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Content&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DContent</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">new_object</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">blender_scaling</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_object</span></div>
+
+<div class="viewcode-block" id="W3DObject.apply_material"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DObject.apply_material">[docs]</a>    <span class="k">def</span> <span class="nf">apply_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blender_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply properties of object to material for Blender object&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+                <span class="n">generate_blender_material_name</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c1"># Object cannot have active material</span>
+                <span class="k">return</span> <span class="n">blender_object</span>
+        <span class="c1">#blender_object.active_material.diffuse_color = [</span>
+        <span class="c1">#    channel/255.0 for channel in self[&quot;color&quot;]]</span>
+        <span class="c1">#blender_object.active_material.specular_color = (</span>
+        <span class="c1">#    blender_object.active_material.diffuse_color)</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span><span class="o">.</span><span class="n">use_shadeless</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;lighting&quot;</span><span class="p">]</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span><span class="o">.</span><span class="n">use_transparency</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span><span class="o">.</span><span class="n">use_nodes</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span><span class="o">.</span><span class="n">use_object_color</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">active_material</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">use_backface_culling</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;double_sided&quot;</span><span class="p">])</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel</span><span class="o">/</span><span class="mf">255.0</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">]]</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;visible&quot;</span><span class="p">]))</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="k">return</span> <span class="n">blender_object</span></div>
+
+<div class="viewcode-block" id="W3DObject.blend"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DObject.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DObject in Blender&quot;&quot;&quot;</span>
+        <span class="n">blender_object</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">generate_blender_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">hide_render</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">],</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">blender_object</span><span class="p">)</span>
+        <span class="c1">#TODO: Apply link</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">blend</span><span class="p">(</span><span class="n">generate_blender_object_name</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;click_through&quot;</span><span class="p">]:</span>
+            <span class="k">pass</span>
+            <span class="c1">#TODO</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">physics_type</span> <span class="o">=</span> <span class="s1">&#39;DYNAMIC&#39;</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">use_ghost</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_material</span><span class="p">(</span><span class="n">blender_object</span><span class="p">)</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+
+        <span class="c1">#TODO: Add around_own_axis</span>
+        <span class="c1">#TODO: Add sound</span>
+
+        <span class="k">return</span> <span class="n">blender_object</span></div>
+
+<div class="viewcode-block" id="W3DObject.write_blender_logic"><a class="viewcode-back" href="../../pyw3d_objects.html#pyw3d.objects.W3DObject.write_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write Python logic for this object to associated script&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_trigger</span><span class="o">.</span><span class="n">write_to_script</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;blend() method must be called before write_blender_logic()&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

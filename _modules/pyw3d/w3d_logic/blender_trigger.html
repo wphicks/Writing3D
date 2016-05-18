@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.w3d_logic.blender_trigger &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.w3d_logic.blender_trigger</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for activating an event in Blender&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. </span><span class="se">\</span>
+<span class="s2">Loading pyw3d.cave_logic.blender_trigger as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="generate_project_root"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.generate_project_root">[docs]</a><span class="k">def</span> <span class="nf">generate_project_root</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generate a &quot;ROOT&quot; object which is used to activate initial actions&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;ROOT&quot;</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">objects</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">]</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;EMPTY&quot;</span><span class="p">,</span>
+        <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">20</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)],</span>
+    <span class="p">)</span>
+    <span class="n">root_object</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">root_object</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ROOT&quot;</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;BOOL&#39;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ROOT&quot;</span>
+    <span class="p">)</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="s2">&quot;ROOT&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ROOT&quot;</span>
+    <span class="p">)</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ROOT&quot;</span>
+
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;ROOT&quot;</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
+
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LOGIC_AND&#39;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="s2">&quot;ROOT&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ROOT&quot;</span><span class="p">)</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ROOT&quot;</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">]</span>
+    <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">])</span>
+
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="s2">&quot;ROOT&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;run_once&quot;</span>
+    <span class="p">)</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;run_once&quot;</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="s2">&quot;run_once&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;ROOT&quot;</span>
+    <span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="s2">&quot;run_once&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;False&quot;</span>
+
+    <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="s2">&quot;run_once&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">root_object</span></div>
+
+
+<div class="viewcode-block" id="BlenderTrigger"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger">[docs]</a><span class="k">class</span> <span class="nc">BlenderTrigger</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A control element used to activate events within Blender</span>
+
+<span class="sd">    Note that while this frequently corresponds to a single W3DFeature, it may</span>
+<span class="sd">    correspond to part of a W3DFeature or several W3DFeatures. For instance,</span>
+<span class="sd">    a W3DTimeline constitutes a single BlenderTrigger, which will trigger</span>
+<span class="sd">    multiple events.</span>
+
+<span class="sd">    :param str blender_object_name: The name of the blender object to which</span>
+<span class="sd">    trigger is attached</span>
+<span class="sd">    :ivar blender_object: The blender object to which this trigger is attached</span>
+<span class="sd">    :ivar name: A unique (to the associated object) name for this trigger</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BlenderTrigger.get_object"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.get_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the Blender object associated with this trigger</span>
+
+<span class="sd">        :note Subclasses may create the object if necessary but should check to</span>
+<span class="sd">        see if the object already exists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">blender_object</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">blender_object</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.make_object_active"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.make_object_active">[docs]</a>    <span class="k">def</span> <span class="nf">make_object_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make this trigger&#39;s object the currently active object&quot;&quot;&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_controller"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_controller">[docs]</a>    <span class="k">def</span> <span class="nf">create_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Python controller for this trigger</span>
+
+<span class="sd">        This controller will have the same name as the trigger itself</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PYTHON&#39;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;MODULE&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;{}.activate_{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">controller</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_control_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_control_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_control_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a boolean property to control this trigger</span>
+
+<span class="sd">        Iff this property is set to True, the trigger will be activated.</span>
+<span class="sd">        Triggers should not change anything within Blender unless this property</span>
+<span class="sd">        is True.  This property will have the same name as the trigger itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        <span class="n">control_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">control_property</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;Stop&quot;</span>
+        <span class="k">return</span> <span class="n">control_property</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_control_sensor"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_control_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">create_control_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a sensor to detect when control property is set to True</span>
+
+<span class="sd">        This sensor will have the same name as the trigger itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sensor</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_change_sensor"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_change_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">create_change_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a sensor to detect when control property is changed</span>
+
+<span class="sd">        This sensor will be named [NAME]_change where [NAME] is the name of the</span>
+<span class="sd">        trigger.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">sensor_name</span> <span class="o">=</span> <span class="s2">&quot;{}_change&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">sensor_name</span>
+        <span class="p">)</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="n">sensor_name</span><span class="p">]</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">evaluation_type</span> <span class="o">=</span> <span class="s2">&quot;PROPCHANGED&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sensor</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_actuator"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_actuator">[docs]</a>    <span class="k">def</span> <span class="nf">create_actuator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an actuator that will set control property to desired</span>
+<span class="sd">        value</span>
+
+<span class="sd">        This actuator will have the same name as the trigger itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">actuator</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">actuator</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">actuator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">actuator</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_pause_index_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_pause_index_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_pause_index_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a property which will keep track of timer value when last</span>
+<span class="sd">        stopped</span>
+
+<span class="sd">        This property is used to facilitate pausing of an action or series of</span>
+<span class="sd">        actions. For instance, when a timeline is stopped, the current action</span>
+<span class="sd">        index is stored. If the timeline is then told to continue, the action</span>
+<span class="sd">        index will be set to the stored index, allowing execution to continue</span>
+<span class="sd">        from that point.  This property will have a name specified by the</span>
+<span class="sd">        pause_index_name attribute of this object. See also the</span>
+<span class="sd">        create_pause_time_property method for TimedTrigger objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;INT&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pause_index_name</span>
+        <span class="p">)</span>
+        <span class="n">pause_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pause_index_name</span><span class="p">]</span>
+        <span class="n">pause_property</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">pause_property</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.create_index_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.create_index_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_index_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a property that keeps track of how many actions have been</span>
+<span class="sd">        triggered by this trigger</span>
+
+<span class="sd">        This index should increment with each action associated with this</span>
+<span class="sd">        trigger in order to keep track of which actions have already been</span>
+<span class="sd">        triggered. This is mostly useful for preventing timed actions from</span>
+<span class="sd">        being repeatedly triggered but may be used for other cases in which a</span>
+<span class="sd">        sensor remains active after the associated action has already occurred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">property_name</span> <span class="o">=</span> <span class="s2">&quot;{}_index&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;INT&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">property_name</span>
+        <span class="p">)</span>
+        <span class="n">index_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span>
+        <span class="n">index_property</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">index_property</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.start_immediately"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.start_immediately">[docs]</a>    <span class="k">def</span> <span class="nf">start_immediately</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Causes trigger to start immediately when project starts&quot;&quot;&quot;</span>
+        <span class="n">root_object</span> <span class="o">=</span> <span class="n">generate_project_root</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">root_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;ROOT&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_script_body</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    root_sensor = cont.sensors[&quot;ROOT&quot;]</span>
+<span class="s2">    if root_sensor.positive:</span>
+<span class="s2">        control_actuator.value = &quot;True&quot;</span>
+<span class="s2">        cont.activate(control_actuator)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.get_script_template_values"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.get_script_template_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_script_template_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a dictionary used to fill in templates which will create</span>
+<span class="sd">        the control script for this trigger&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;control_sensor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_sensor</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;change_sensor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_sensor</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;index_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_property</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;control_actuator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">actuator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;pause_index_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pause_index_name</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.add_to_script_body"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.add_to_script_body">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_script_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">script_string</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Append to body of script (after header but before footer)&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">section</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">script_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlenderTrigger.write_to_script"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.BlenderTrigger.write_to_script">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_script</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write this trigger to the Python script associated with its</span>
+<span class="sd">        object&quot;&quot;&quot;</span>
+        <span class="n">script_name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span> <span class="s2">&quot;py&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">script_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">:</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">script_name</span><span class="p">)</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">script_name</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">import bge</span>
+<span class="s2">from mathutils import Quaternion&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">script_name</span><span class="p">]</span>
+        <span class="n">template_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_script_template_values</span><span class="p">()</span>
+        <span class="n">script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">template_values</span><span class="p">))</span>
+        <span class="n">script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">template_values</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">template_values</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">script</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blender_object_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span> <span class="o">=</span> <span class="n">blender_object_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="c1"># Create a unique name for this trigger</span>
+        <span class="n">trigger_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;trigger_{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trigger_count</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">trigger_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_controller</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_actuator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_control_property</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_control_sensor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">change_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_change_sensor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_index_property</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pause_index_name</span> <span class="o">=</span> <span class="s2">&quot;{}_pausei&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_pause_index_property</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">def activate_{name}(cont):</span>
+<span class="s2">    scene = bge.logic.getCurrentScene()</span>
+<span class="s2">    own = cont.owner</span>
+<span class="s2">    sensor = cont.sensors[&quot;{control_sensor}&quot;]</span>
+<span class="s2">    change_sensor = cont.sensors[&quot;{change_sensor}&quot;]</span>
+<span class="s2">    control_actuator = cont.actuators[&quot;{control_actuator}&quot;]</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">footer</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[]]</span>
+        <span class="c1"># Note: Body is divided up into multiple sections to allow for</span>
+        <span class="c1"># separation of execution when order matters. For instance, after</span>
+        <span class="c1"># resetting the timer in a timed trigger, no timed actions should be</span>
+        <span class="c1"># activated until the next frame.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_script_body</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    if sensor.positive and change_sensor.positive:</span>
+<span class="s2">        own[&quot;{index_property}&quot;] = own[&quot;{pause_index_property}&quot;]</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TimedTrigger"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.TimedTrigger">[docs]</a><span class="k">class</span> <span class="nc">TimedTrigger</span><span class="p">(</span><span class="n">BlenderTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Blender trigger which turns itself off after a specified duration</span>
+
+<span class="sd">    TimedTriggers also create an associated Timer property in Blender which</span>
+<span class="sd">    keeps track of how long they have been active&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TimedTrigger.create_pause_time_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_pause_time_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_pause_time_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a property which will keep track of timer value when last</span>
+<span class="sd">        stopped</span>
+
+<span class="sd">        This property is used to facilitate pausing of an action or series of</span>
+<span class="sd">        actions. For instance, when a timeline is stopped, the current time is</span>
+<span class="sd">        stored. If the timeline is then told to continue, the timer will be set</span>
+<span class="sd">        to the stored time, allowing execution to continue from that point.</span>
+<span class="sd">        This property will have a name specified by the pause_time_name</span>
+<span class="sd">        attribute of this object. See also the create_pause_index_property</span>
+<span class="sd">        method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pause_time_name</span>
+        <span class="p">)</span>
+        <span class="n">pause_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pause_time_name</span><span class="p">]</span>
+        <span class="n">pause_property</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">pause_property</span></div>
+
+<div class="viewcode-block" id="TimedTrigger.create_timer_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_timer_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_timer_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a property which will keep track of time since activation</span>
+
+<span class="sd">        This property will have a name specified by the timer_name attribute of</span>
+<span class="sd">        this object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;TIMER&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer_name</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timer_name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TimedTrigger.create_time_sensor"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.TimedTrigger.create_time_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">create_time_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a sensor which will register True when the specified time is</span>
+<span class="sd">        exceeded by the timer property</span>
+
+<span class="sd">        The sensor will have a unique name of the form [TIMER_NAME]_#, where</span>
+<span class="sd">        [TIMER_NAME] is specified by the timer_name attribute of this object,</span>
+<span class="sd">        and # is a unique number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_object_active</span><span class="p">()</span>
+        <span class="n">sensor_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">sensor_name</span> <span class="o">=</span> <span class="s2">&quot;{}_{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timer_name</span><span class="p">,</span> <span class="n">sensor_count</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sensor_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">sensor_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blender_object_name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">sensor_name</span>
+        <span class="p">)</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="n">sensor_name</span><span class="p">]</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_name</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">evaluation_type</span> <span class="o">=</span> <span class="s2">&quot;PROPINTERVAL&quot;</span>
+        <span class="c1"># Note: In Blender 7.1, this can be replaced by a direct Greater Than</span>
+        <span class="c1"># evaluation</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">value_min</span> <span class="o">=</span> <span class="s2">&quot;{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">value_max</span> <span class="o">=</span> <span class="s2">&quot;9999999&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sensor</span></div>
+
+<div class="viewcode-block" id="TimedTrigger.get_script_template_values"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.w3d_logic.html#pyw3d.w3d_logic.blender_trigger.TimedTrigger.get_script_template_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_script_template_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">template_values</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
+            <span class="n">TimedTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_script_template_values</span><span class="p">()</span>
+        <span class="n">template_values</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;duration_sensor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_sensor</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;timer_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_name</span><span class="p">,</span>
+            <span class="s2">&quot;pause_time_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pause_time_name</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">template_values</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blender_object_name</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimedTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">blender_object_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer_name</span> <span class="o">=</span> <span class="s2">&quot;{}_timer&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pause_time_name</span> <span class="o">=</span> <span class="s2">&quot;{}_pauset&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_timer_property</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_time_sensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_pause_time_property</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    duration_sensor = cont.sensors[&quot;{duration_sensor}&quot;]</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_script_body</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    if sensor.positive and change_sensor.positive:</span>
+<span class="s2">        own[&quot;{timer_name}&quot;] = own[&quot;{pause_time_property}&quot;]</span>
+<span class="s2">        return</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    if sensor.positive and duration_sensor.positive:</span>
+<span class="s2">        control_actuator.value = &quot;False&quot;</span>
+<span class="s2">        cont.activate(control_actuator)</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.activators.triggers.links &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.activators.triggers.links</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Blender implementation of clickable object links in virtual space</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">.triggers</span> <span class="kn">import</span> <span class="n">BlenderTrigger</span>
+<span class="kn">from</span> <span class="nn">pyw3d.errors</span> <span class="kn">import</span> <span class="n">EBKAC</span>
+<span class="kn">from</span> <span class="nn">pyw3d.names</span> <span class="kn">import</span> <span class="n">generate_link_name</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading pyw3d.timeline as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BlenderClickTrigger"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger">[docs]</a><span class="k">class</span> <span class="nc">BlenderClickTrigger</span><span class="p">(</span><span class="n">BlenderTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Activator based on mouseclick on objects in virtual space</span>
+
+<span class="sd">    :param str object_name: The name of the clickable object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#TODO: Change color when enabled</span>
+
+<div class="viewcode-block" id="BlenderClickTrigger.select_target_object"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.select_target_object">[docs]</a>    <span class="k">def</span> <span class="nf">select_target_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select the clickable object for modification&quot;&quot;&quot;</span>
+        <span class="n">click_object</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">object_name</span><span class="p">]</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">click_object</span>
+        <span class="k">return</span> <span class="n">click_object</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">generate_link_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name_string</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BlenderClickTrigger.create_primed_property"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.create_primed_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_primed_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add property to track if mousedown is followed by mouseup&quot;&quot;&quot;</span>
+        <span class="n">click_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_target_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;BOOL&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;click_primed&#39;</span>
+        <span class="p">)</span>
+        <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;click_primed&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;click_primed&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.create_click_property"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.create_click_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_click_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add property to keep track of how many times link has been</span>
+<span class="sd">        clicked&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;INT&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;clicks&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;clicks&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;clicks&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.create_detection_controller"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.create_detection_controller">[docs]</a>    <span class="k">def</span> <span class="nf">create_detection_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add controller for detecting mouseclick and mouseover</span>
+
+<span class="sd">        This controller also changes the color of the selected object on</span>
+<span class="sd">        mouse-down events.&quot;&quot;&quot;</span>
+        <span class="n">click_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_target_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PYTHON&#39;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object_name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;MODULE&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;{}.detect_event&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span> <span class="o">=</span> <span class="n">controller</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.create_detection_sensors"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.create_detection_sensors">[docs]</a>    <span class="k">def</span> <span class="nf">create_detection_sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add mouseclick and mouseover sensors to clickable object&quot;&quot;&quot;</span>
+        <span class="n">click_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_target_object</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;mouse_click&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">:</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOUSE&quot;</span><span class="p">,</span>
+                <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object_name</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mouse_click&quot;</span>
+            <span class="p">)</span>
+            <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mouse_click&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">click_sensor</span> <span class="o">=</span> <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;mouse_click&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">click_sensor</span><span class="o">.</span><span class="n">mouse_event</span> <span class="o">=</span> <span class="s2">&quot;LEFTCLICK&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;mouse_over&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">:</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOUSE&quot;</span><span class="p">,</span>
+                <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object_name</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mouse_over&quot;</span>
+            <span class="p">)</span>
+            <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mouse_over&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">over_sensor</span> <span class="o">=</span> <span class="n">click_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;mouse_over&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">over_sensor</span><span class="o">.</span><span class="n">mouse_event</span> <span class="o">=</span> <span class="s2">&quot;MOUSEOVER&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_sensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">over_sensor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.link_detection_bricks"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.link_detection_bricks">[docs]</a>    <span class="k">def</span> <span class="nf">link_detection_bricks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link necessary logic bricks for click detections</span>
+
+<span class="sd">        :raises EBKAC: if necessary controller and sensors do not</span>
+<span class="sd">        exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">click_sensor</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">over_sensor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;Detection sensors and controller must be created before they &quot;</span>
+                <span class="s2">&quot;can be linked&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.generate_detection_logic"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.generate_detection_logic">[docs]</a>    <span class="k">def</span> <span class="nf">generate_detection_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a function to Python control script to handle mouse click events</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">detection_logic</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">def detect_event(cont):&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    scene = bge.logic.getCurrentScene()&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    own = cont.owner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    mouse_click = cont.sensors[&#39;mouse_click&#39;]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    mouse_over = own.sensors[&#39;mouse_over&#39;]&quot;</span><span class="p">,</span>
+            <span class="c1"># TODO: Test the above</span>
+            <span class="s2">&quot;    trigger = scene.objects[&#39;{}&#39;]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="s2">&quot;    select_color = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">coord</span><span class="o">/</span><span class="mf">255.</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_color</span><span class="p">])),</span>
+            <span class="s2">&quot;    enable_color = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">coord</span><span class="o">/</span><span class="mf">255.</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_color</span><span class="p">])),</span>
+            <span class="s2">&quot;    if mouse_click.positive and mouse_over.positive:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        if &#39;old_color&#39; not in own or own[&#39;old_color&#39;] is None:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            own[&#39;old_color&#39;] = [coord for coord in own.color]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        new_color = own.color&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        for i in range(len(select_color)):&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            new_color[i] = select_color[i]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        own[&#39;click_primed&#39;] = True&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    else:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        if (&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;                not mouse_click.positive and mouse_over.positive&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;                and trigger[&#39;enabled&#39;] and own[&#39;click_primed&#39;]):&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            if trigger[&#39;status&#39;] == &#39;Stop&#39;:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;                trigger[&#39;status&#39;] = &#39;Start&#39;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            trigger[&#39;clicks&#39;] += 1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            own.color = own[&#39;old_color&#39;]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            own[&#39;old_color&#39;] = None&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        own[&#39;click_primed&#39;] = False&quot;</span>
+        <span class="p">]</span>
+        <span class="n">detection_logic</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">detection_logic</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">detection_logic</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.create_blender_objects"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.create_blender_objects">[docs]</a>    <span class="k">def</span> <span class="nf">create_blender_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlenderClickTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_click_property</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_primed_property</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_detection_controller</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_detection_sensors</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.link_logic_bricks"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.link_logic_bricks">[docs]</a>    <span class="k">def</span> <span class="nf">link_logic_bricks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlenderClickTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">link_logic_bricks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_detection_bricks</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BlenderClickTrigger.generate_action_logic"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.links.BlenderClickTrigger.generate_action_logic">[docs]</a>    <span class="k">def</span> <span class="nf">generate_action_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">action_logic</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;        # ACTION LOGIC BEGINS HERE&quot;</span><span class="p">]</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">action_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">clicks</span><span class="p">,</span> <span class="n">all_actions</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">all_actions</span><span class="p">:</span>
+                <span class="n">action_logic</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="n">action</span><span class="o">.</span><span class="n">generate_blender_logic</span><span class="p">(</span>
+                        <span class="n">click_condition</span><span class="o">=</span><span class="n">clicks</span><span class="p">,</span>
+                        <span class="n">index_condition</span><span class="o">=</span><span class="n">action_index</span><span class="p">,</span>
+                        <span class="n">offset</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">action_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">max_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_time</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">end_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_clicks</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">action_logic</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="s2">&quot;        if own[&#39;clicks&#39;] == {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_clicks</span><span class="p">),</span>
+                <span class="s2">&quot;            own[&#39;clicks&#39;] = 0&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">script_footer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">script_footer</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_time</span><span class="o">=</span><span class="n">max_time</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">action_logic</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">select_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">enable_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+            <span class="n">reset_clicks</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlenderClickTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="n">enable_immediately</span><span class="p">,</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="n">remain_enabled</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object_name</span> <span class="o">=</span> <span class="n">object_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_color</span> <span class="o">=</span> <span class="n">select_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_clicks</span> <span class="o">=</span> <span class="n">reset_clicks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_color</span> <span class="o">=</span> <span class="n">enable_color</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

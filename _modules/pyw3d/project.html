@@ -1,0 +1,628 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.project &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.project</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for working with W3D projects</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">import</span> <span class="nn">xml.dom.minidom</span> <span class="kn">as</span> <span class="nn">minidom</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
+<span class="kn">from</span> <span class="nn">.placement</span> <span class="kn">import</span> <span class="n">W3DPlacement</span><span class="p">,</span> <span class="n">W3DRotation</span><span class="p">,</span> <span class="n">convert_to_blender_axes</span>
+<span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">ListValidator</span><span class="p">,</span> <span class="n">IsNumeric</span><span class="p">,</span> <span class="n">OptionValidator</span><span class="p">,</span>\
+    <span class="n">IsBoolean</span><span class="p">,</span> <span class="n">FeatureValidator</span><span class="p">,</span> <span class="n">IsInteger</span><span class="p">,</span> <span class="n">DictValidator</span>
+<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">bool2text</span><span class="p">,</span> <span class="n">text2tuple</span><span class="p">,</span> <span class="n">attrib2bool</span>
+<span class="kn">from</span> <span class="nn">.objects</span> <span class="kn">import</span> <span class="n">W3DObject</span>
+<span class="kn">from</span> <span class="nn">.sounds</span> <span class="kn">import</span> <span class="n">W3DSound</span>
+<span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">W3DTimeline</span>
+<span class="kn">from</span> <span class="nn">.groups</span> <span class="kn">import</span> <span class="n">W3DGroup</span>
+<span class="kn">from</span> <span class="nn">.triggers</span> <span class="kn">import</span> <span class="n">W3DTrigger</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">BadW3DXML</span>
+<span class="kn">from</span> <span class="nn">.blender_scripts</span> <span class="kn">import</span> <span class="n">MOUSE_LOOK_SCRIPT</span><span class="p">,</span> <span class="n">MOVE_TOGGLE_SCRIPT</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="clear_blender_scene"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.clear_blender_scene">[docs]</a><span class="k">def</span> <span class="nf">clear_blender_scene</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="p">:</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">select</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="setup_blender_layout"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.setup_blender_layout">[docs]</a><span class="k">def</span> <span class="nf">setup_blender_layout</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Put Blender interface in a convenient layout&quot;&quot;&quot;</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">screen</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">screens</span><span class="p">[</span><span class="s2">&quot;Game Logic&quot;</span><span class="p">]</span></div>
+    <span class="c1">#for area in bpy.context.window.screen.areas:</span>
+    <span class="c1">#    if area.type == &#39;VIEW_3D&#39;:</span>
+    <span class="c1">#        for space in area.spaces:</span>
+    <span class="c1">#            space.region_3d.view_perspective = &#39;CAMERA&#39;</span>
+    <span class="c1">#            space.viewport_shade = &quot;TEXTURED&quot;</span>
+
+
+<div class="viewcode-block" id="add_key_movement"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.add_key_movement">[docs]</a><span class="k">def</span> <span class="nf">add_key_movement</span><span class="p">(</span>
+        <span class="n">blender_object</span><span class="p">,</span> <span class="n">move_name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience function for adding keyboard-controlled motion to</span>
+<span class="sd">    Blender object</span>
+
+<span class="sd">    :param blender_object: object to add motion to</span>
+<span class="sd">    :param str move_name: Name for controller</span>
+<span class="sd">    :param str key: Key used to activate motion</span>
+<span class="sd">    :param int direction: 0, 1, 2 for x, y, z</span>
+<span class="sd">    :param float speed: Speed of motion&quot;&quot;&quot;</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">blender_object</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;KEYBOARD&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="n">blender_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">move_name</span>
+    <span class="p">)</span>
+    <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">move_name</span>
+    <span class="n">sensor</span> <span class="o">=</span> <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="n">move_name</span><span class="p">]</span>
+    <span class="n">sensor</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LOGIC_AND&#39;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="n">blender_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">move_name</span>
+    <span class="p">)</span>
+    <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">move_name</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="n">move_name</span><span class="p">]</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOTION&quot;</span><span class="p">,</span>
+        <span class="nb">object</span><span class="o">=</span><span class="n">blender_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">move_name</span>
+    <span class="p">)</span>
+    <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">move_name</span>
+    <span class="n">actuator</span> <span class="o">=</span> <span class="n">blender_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="n">move_name</span><span class="p">]</span>
+    <span class="n">actuator</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;OBJECT_NORMAL&quot;</span>
+    <span class="n">actuator</span><span class="o">.</span><span class="n">offset_location</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> <span class="o">=</span> <span class="n">speed</span>
+    <span class="n">actuator</span><span class="o">.</span><span class="n">use_local_location</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">actuator</span><span class="p">)</span>
+    <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="W3DProject"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject">[docs]</a><span class="k">class</span> <span class="nc">W3DProject</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent entire project for display in W3D</span>
+
+<span class="sd">    :param list objects: List of W3DObjects to be displayed</span>
+<span class="sd">    :param list groups: Maps names of groups to lists of W3DObjects</span>
+<span class="sd">    :param list timelines: List of W3DTimelines within project</span>
+<span class="sd">    :param list sounds: List of W3DSounds within project</span>
+<span class="sd">    :param list trigger_events: List of W3DEvents within project</span>
+<span class="sd">    :param W3DPlacement camera_placement: Initial placement of camera</span>
+<span class="sd">    :param W3DPlacement desktop_camera_placement: Initial placement of camera</span>
+<span class="sd">    if project is run outside an actual W3D environment</span>
+<span class="sd">    :param float far_clip: Far clip for camera (how far away from camera</span>
+<span class="sd">    objects remain visible)</span>
+<span class="sd">    :param tuple background: Color of background as an RGB tuple of 3 ints</span>
+<span class="sd">    :param bool allow_movement: Allow user to navigate within project?</span>
+<span class="sd">    :param bool allow_rotation: Allow user to rotate withing project?</span>
+<span class="sd">    :param dict wall_placements: Dictionary mapping names of walls to</span>
+<span class="sd">    W3DPlacements specifying their position and orientation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#ui_order = [</span>
+    <span class="c1">#    &quot;camera_placement&quot;, &quot;desktop_camera_placement&quot;, &quot;far_clip&quot;,</span>
+    <span class="c1">#    &quot;allow_movement&quot;, &quot;allow_rotation&quot;, &quot;background&quot;</span>
+    <span class="c1">#]</span>
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;objects&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DObject</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DObjects in the project&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DGroup</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DObjects in the project&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;timelines&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DTimeline</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DTimelines in the project&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;sounds&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DSound</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DSounds in the project&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;trigger_events&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DTriggers in the project&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;camera_placement&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
+            <span class="n">W3DPlacement</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Orientation and position of camera&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
+            <span class="n">W3DPlacement</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Orientation and position of camera in desktop preview&quot;</span>
+            <span class="p">),</span>
+        <span class="s2">&quot;far_clip&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsInteger</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span>
+            <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Red, Green, Blue values&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;allow_movement&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;wall_placements&quot;</span><span class="p">:</span> <span class="n">DictValidator</span><span class="p">(</span>
+            <span class="n">OptionValidator</span><span class="p">(</span>
+                <span class="s2">&quot;Center&quot;</span><span class="p">,</span> <span class="s2">&quot;FrontWall&quot;</span><span class="p">,</span> <span class="s2">&quot;LeftWall&quot;</span><span class="p">,</span> <span class="s2">&quot;RightWall&quot;</span><span class="p">,</span> <span class="s2">&quot;FloorWall&quot;</span><span class="p">),</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DPlacement</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Dictionary mapping wall names to placements&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;far_clip&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;allow_movement&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="bp">False</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">W3DProject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;objects&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;groups&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;timelines&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;sounds&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;trigger_events&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;camera_placement&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="s2">&quot;desktop_camera_placement&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="c1"># NOTE: This currently does nothing. Need to call</span>
+        <span class="c1"># _create_relative_to_objects for W3DPlacement in order to change</span>
+        <span class="c1"># placements</span>
+        <span class="k">if</span> <span class="s2">&quot;wall_placements&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;wall_placements&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Center&quot;</span><span class="p">:</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="n">W3DRotation</span><span class="p">(</span>
+                        <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;Axis&quot;</span><span class="p">,</span>
+                        <span class="n">rotation_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                        <span class="n">rotation_angle</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;FrontWall&quot;</span><span class="p">:</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">)),</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="n">W3DRotation</span><span class="p">(</span>
+                        <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;LookAt&quot;</span><span class="p">,</span>
+                        <span class="n">rotation_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                        <span class="n">up_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;LeftWall&quot;</span><span class="p">:</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="n">W3DRotation</span><span class="p">(</span>
+                        <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;LookAt&quot;</span><span class="p">,</span>
+                        <span class="n">rotation_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                        <span class="n">up_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;RightWall&quot;</span><span class="p">:</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="n">W3DRotation</span><span class="p">(</span>
+                        <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;LookAt&quot;</span><span class="p">,</span>
+                        <span class="n">rotation_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                        <span class="n">up_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;FloorWall&quot;</span><span class="p">:</span> <span class="n">W3DPlacement</span><span class="p">(</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="n">W3DRotation</span><span class="p">(</span>
+                        <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;LookAt&quot;</span><span class="p">,</span>
+                        <span class="n">rotation_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                        <span class="n">up_vector</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+
+<div class="viewcode-block" id="W3DProject.toXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DProject as W3D XML tree</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">project_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;Story&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">})</span>
+        <span class="n">object_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;ObjectRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
+            <span class="n">object_</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">object_root</span><span class="p">)</span>
+        <span class="n">group_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;GroupRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]:</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">group_root</span><span class="p">)</span>
+        <span class="n">timeline_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;TimelineRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
+            <span class="n">timeline</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">timeline_root</span><span class="p">)</span>
+        <span class="n">sound_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;SoundRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sound</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]:</span>
+            <span class="n">sound</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">sound_root</span><span class="p">)</span>
+        <span class="n">event_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;EventRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
+            <span class="n">trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">event_root</span><span class="p">)</span>
+        <span class="n">global_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;Global&quot;</span><span class="p">)</span>
+        <span class="c1"># CameraPos corresponds to position when run in Cave mode</span>
+        <span class="c1"># CaveCameraPos corresponds to position when run in Desktop mode</span>
+        <span class="c1"># Editorial aside: I can&#39;t even...</span>
+        <span class="n">camera_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;CameraPos&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;far-clip&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;far_clip&quot;</span><span class="p">])})</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">camera_node</span><span class="p">)</span>
+        <span class="n">camera_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;CaveCameraPos&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;far-clip&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;far_clip&quot;</span><span class="p">])})</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">camera_node</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;Background&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;{}, {}, {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">])})</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;WandNavigation&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;allow-rotation&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_rotation&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;allow-movement&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">])</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">wall_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;PlacementRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">wall</span><span class="p">,</span> <span class="n">placement</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;wall_placements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">place_root</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">wall_root</span><span class="p">)</span>
+            <span class="n">place_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wall</span>
+
+        <span class="k">return</span> <span class="n">project_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DProject.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">project_class</span><span class="p">,</span> <span class="n">project_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DProject from Story node of W3D XML</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element project_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_project</span> <span class="o">=</span> <span class="n">project_class</span><span class="p">()</span>
+        <span class="n">object_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ObjectRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">object_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">object_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Object&quot;</span><span class="p">):</span>
+                <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DObject</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">group_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;GroupRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">group_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Group&quot;</span><span class="p">):</span>
+                <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DGroup</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">timeline_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;TimelineRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeline_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">timeline_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Timeline&quot;</span><span class="p">):</span>
+                <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DTimeline</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">sound_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;SoundRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sound_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">sound_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Sound&quot;</span><span class="p">):</span>
+                <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DSound</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;EventRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">trigger_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;EventTrigger&quot;</span><span class="p">):</span>
+                <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+
+        <span class="n">global_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Global&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">global_root</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Story root has no Global node&quot;</span><span class="p">)</span>
+
+        <span class="n">camera_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;CaveCameraPos&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Global node has no CaveCameraPos child&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;far-clip&quot;</span> <span class="ow">in</span> <span class="n">camera_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;far_clip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">camera_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;far-clip&quot;</span><span class="p">])</span>
+        <span class="n">place_node</span> <span class="o">=</span> <span class="n">camera_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;CameraPos node has no Placement child&quot;</span><span class="p">)</span>
+        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span>
+            <span class="n">place_node</span><span class="p">)</span>
+
+        <span class="n">camera_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;CameraPos&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Global node has no CameraPos child&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;far-clip&quot;</span> <span class="ow">in</span> <span class="n">camera_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;far_clip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">camera_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;far-clip&quot;</span><span class="p">])</span>
+        <span class="n">place_node</span> <span class="o">=</span> <span class="n">camera_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;CameraPos node has no Placement child&quot;</span><span class="p">)</span>
+        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">place_node</span><span class="p">)</span>
+
+        <span class="n">bg_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Background&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bg_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Global node has no Background child&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;color&quot;</span> <span class="ow">in</span> <span class="n">bg_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span>
+                <span class="n">bg_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;color&quot;</span><span class="p">],</span>
+                <span class="n">evaluator</span><span class="o">=</span><span class="nb">int</span>
+            <span class="p">)</span>
+
+        <span class="n">wand_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;WandNavigation&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wand_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Global node has no WandNavigation child&quot;</span><span class="p">)</span>
+        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;allow_rotation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrib2bool</span><span class="p">(</span>
+            <span class="n">wand_node</span><span class="p">,</span> <span class="s2">&quot;allow-rotation&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrib2bool</span><span class="p">(</span>
+            <span class="n">wand_node</span><span class="p">,</span> <span class="s2">&quot;allow-movement&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">wall_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;PlacementRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">wall_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">wall_name</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                    <span class="s2">&quot;Placements within PlacementRoot must specify name&quot;</span><span class="p">)</span>
+            <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;wall_placements&quot;</span><span class="p">][</span>
+                <span class="n">wall_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_project</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DProject.fromXML_file"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.fromXML_file">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML_file</span><span class="p">(</span><span class="n">project_class</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DProject from XML file of given filename</span>
+
+<span class="sd">        :param str filename: Filename of XML file for project</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>  <span class="c1"># For relative paths...</span>
+        <span class="k">return</span> <span class="n">project_class</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="W3DProject.toprettyxml"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.toprettyxml">[docs]</a>    <span class="k">def</span> <span class="nf">toprettyxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXML</span><span class="p">()</span>
+        <span class="n">xml_string</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;unicode&quot;</span><span class="p">)</span>
+        <span class="n">xml_string</span> <span class="o">=</span> <span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">xml_string</span><span class="p">)</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">()</span>
+        <span class="c1"># WARNING: Need to make sure that this doesn&#39;t miss up paragraphs of</span>
+        <span class="c1"># text</span>
+        <span class="n">xml_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">xml_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()])</span>
+        <span class="k">return</span> <span class="n">xml_string</span></div>
+
+<div class="viewcode-block" id="W3DProject.save_XML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.save_XML">[docs]</a>    <span class="k">def</span> <span class="nf">save_XML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+            <span class="n">file_</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="W3DProject.sort_groups"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.sort_groups">[docs]</a>    <span class="k">def</span> <span class="nf">sort_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sort groups such that no group contains a later group&quot;&quot;&quot;</span>
+        <span class="n">new_groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]):</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">cur_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_groups</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cur_len</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">new_groups</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;groups&quot;</span><span class="p">]:</span>
+                    <span class="n">new_groups</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">cur_len</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_groups</span><span class="p">):</span>
+                <span class="n">new_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_groups</span></div>
+
+<div class="viewcode-block" id="W3DProject.setup_camera"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.setup_camera">[docs]</a>    <span class="k">def</span> <span class="nf">setup_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">camera_add</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cameras</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">clip_end</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;far_clip&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CAMERA&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s1">&#39;Scene&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span></div>
+
+<div class="viewcode-block" id="W3DProject.setup_controls"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.setup_controls">[docs]</a>    <span class="k">def</span> <span class="nf">setup_controls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span>
+        <span class="c1"># TODO: if self[&quot;allow_rotation&quot;]:</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOUSE&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Look&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Look&quot;</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;Look&quot;</span><span class="p">]</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">mouse_event</span> <span class="o">=</span> <span class="s2">&quot;MOVEMENT&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PYTHON&#39;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Look&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Look&quot;</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="s2">&quot;Look&quot;</span><span class="p">]</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;MODULE&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;mouse.look&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOTION&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Look_x&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Look_x&quot;</span>
+        <span class="n">actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="s2">&quot;Look_x&quot;</span><span class="p">]</span>
+        <span class="n">actuator</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;OBJECT_NORMAL&quot;</span>
+        <span class="n">actuator</span><span class="o">.</span><span class="n">use_local_rotation</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">actuator</span><span class="p">)</span>
+
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">actuator_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;MOTION&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Look_y&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Look_y&quot;</span>
+        <span class="n">actuator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="s2">&quot;Look_y&quot;</span><span class="p">]</span>
+        <span class="n">actuator</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;OBJECT_NORMAL&quot;</span>
+        <span class="n">actuator</span><span class="o">.</span><span class="n">use_local_rotation</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">actuator</span><span class="p">)</span>
+
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;mouse.py&quot;</span><span class="p">)</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="s2">&quot;mouse.py&quot;</span><span class="p">]</span>
+        <span class="n">script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">MOUSE_LOOK_SCRIPT</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_move_toggle</span><span class="p">()</span>
+
+        <span class="c1">#TODO: Mouselook script and actuators</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">]:</span>
+            <span class="n">add_key_movement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">,</span> <span class="s2">&quot;Forward&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">)</span>
+            <span class="n">add_key_movement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">,</span> <span class="s2">&quot;Backward&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">)</span>
+            <span class="n">add_key_movement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">)</span>
+            <span class="n">add_key_movement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DProject.add_move_toggle"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.add_move_toggle">[docs]</a>    <span class="k">def</span> <span class="nf">add_move_toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PYTHON&#39;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;move_toggle&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;move_toggle&quot;</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="s2">&quot;move_toggle&quot;</span><span class="p">]</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;MODULE&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;move.move_toggle&quot;</span>
+
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;BOOL&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;toggle_movement&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;toggle_movement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;KEYBOARD&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;toggle_movement&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;toggle_movement&quot;</span>
+        <span class="n">sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;toggle_movement&quot;</span><span class="p">]</span>
+        <span class="n">sensor</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;TAB&quot;</span>
+
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;move.py&quot;</span><span class="p">)</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="s2">&quot;move.py&quot;</span><span class="p">]</span>
+        <span class="n">script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">MOVE_TOGGLE_SCRIPT</span><span class="p">)</span>
+
+        <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="n">sensor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DProject.blend"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DProject in Blender&quot;&quot;&quot;</span>
+        <span class="n">clear_blender_scene</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s2">&quot;Scene&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">physics_gravity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s2">&quot;Scene&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">material_mode</span> <span class="o">=</span> <span class="s2">&quot;MULTITEXTURE&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s2">&quot;Scene&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">layer</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_camera</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_controls</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sort_groups</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;group_defs.py&quot;</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">worlds</span><span class="p">[</span><span class="s2">&quot;World&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">horizon_color</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">]</span>
+        <span class="c1">#bpy.data.worlds[&quot;World&quot;].ambient_color = self[&quot;background&quot;]</span>
+
+        <span class="c1"># Create Objects</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]:</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">blend_objects</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]:</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">blend_groups</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
+            <span class="n">object_</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+        <span class="c1"># TODO: Call methods to add links</span>
+        <span class="k">for</span> <span class="n">sound</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]:</span>
+            <span class="n">sound</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+
+        <span class="c1"># Create Activators</span>
+        <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
+            <span class="n">timeline</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
+            <span class="n">trigger</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+        <span class="c1"># Link game engine logic bricks for Activators</span>
+        <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
+            <span class="n">timeline</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
+            <span class="n">trigger</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
+        <span class="c1"># Write any necessary game engine logic for Activators</span>
+        <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
+            <span class="n">timeline</span><span class="o">.</span><span class="n">write_blender_logic</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">write_blender_logic</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
+            <span class="n">trigger</span><span class="o">.</span><span class="n">write_blender_logic</span><span class="p">()</span>
+        <span class="n">setup_blender_layout</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">pack_all</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

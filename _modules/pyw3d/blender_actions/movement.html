@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.blender_actions.movement &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.blender_actions.movement</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for moving a Blender object in virtual space&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">mathutils</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module mathutils not found. Loading pyw3d.blender_actions.movement as&quot;</span>
+        <span class="s2">&quot; standalone&quot;</span><span class="p">)</span>
+
+
+<span class="c1">#TODO: Handle moves relative to walls</span>
+<div class="viewcode-block" id="MoveAction"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.blender_actions.html#pyw3d.blender_actions.movement.MoveAction">[docs]</a><span class="k">class</span> <span class="nc">MoveAction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate Python logic for how object should move when action first</span>
+<span class="sd">    starts, as it continues, and when it ends</span>
+
+<span class="sd">    :param placement: A W3DPlacement object specifying movement</span>
+<span class="sd">    :param bool move_relative: Whether motion is specified relative to current</span>
+<span class="sd">    location</span>
+<span class="sd">    :param float duration: Time for action to complete in seconds</span>
+<span class="sd">    :param int offset: A number of tabs (4 spaces) to add before Python logic</span>
+<span class="sd">    strings&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">start_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">script_text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># First take care of object rotation...</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+            <span class="n">vector</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">])</span>
+            <span class="n">vector</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">move_relative</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span>
+                        <span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Axis&quot;</span><span class="p">:</span>
+                    <span class="n">axis</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">])</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+                    <span class="n">angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_angle&quot;</span><span class="p">])</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;rotation = mathutils.Quaternion({}, {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">tuple</span><span class="p">(</span><span class="n">vector</span><span class="p">),</span> <span class="o">-</span><span class="n">angle</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span>
+                        <span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Normal&quot;</span><span class="p">:</span>
+                    <span class="c1"># TODO: Is this the legacy behavior?</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;current_normal = mathutils.Vector((1, 0, 0))&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation = mathutils.Vector(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    {}).rotation_difference(&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">tuple</span><span class="p">(</span><span class="n">vector</span><span class="p">)),</span>
+                        <span class="s2">&quot;    current_normal)&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span>
+                        <span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LookAt&quot;</span><span class="p">:</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;look_direction = (&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    blender_object.position +&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    mathutils.Vector({}) -&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]),</span>
+                        <span class="s2">&quot;    mathutils.Vector({})).normalized()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]),</span>
+                        <span class="s2">&quot;up_direction = mathutils.Vector(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    {}).normalized()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;up_vector&quot;</span><span class="p">]),</span>
+                        <span class="s2">&quot;rotation_matrix = mathutils.Matrix.Rotation(&quot;</span>
+                        <span class="s2">&quot;0, 4, (0, 0, 1))&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;frame_y = look_direction&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;frame_x = frame_y.cross(up_direction)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;frame_z = frame_x.cross(frame_y)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix = mathutils.Matrix().to_3x3()&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix.col[0] = frame_x&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix.col[1] = frame_y&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix.col[2] = frame_z&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation = rotation_matrix.to_quaternion()&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Not move relative</span>
+                <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;orientation =&quot;</span>
+                    <span class="s2">&quot;blender_object.orientation.to_quaternion()&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span>
+                        <span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Axis&quot;</span><span class="p">:</span>
+                    <span class="n">angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_angle&quot;</span><span class="p">])</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;target_orientation = mathutils.Quaternion(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    {}, {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">vector</span><span class="p">),</span> <span class="o">-</span><span class="n">angle</span><span class="p">),</span>
+                        <span class="s2">&quot;rotation = (&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    target_orientation.rotation_difference(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;        orientation))&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span>
+                        <span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Normal&quot;</span><span class="p">:</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;current_normal = mathutils.Vector((1, 0, 0))&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;current_normal.rotate(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    blender_object.orientation)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation = mathutils.Vector(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    {}).rotation_difference(&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">tuple</span><span class="p">(</span><span class="n">vector</span><span class="p">)),</span>
+                        <span class="s2">&quot;    current_normal)&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span>
+                        <span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LookAt&quot;</span><span class="p">:</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;look_direction = (&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    mathutils.Vector({}) -&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]),</span>
+                        <span class="s2">&quot;    mathutils.Vector({})).normalized()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]),</span>
+                        <span class="s2">&quot;up_direction = mathutils.Vector(&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    {}).normalized()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;up_vector&quot;</span><span class="p">]),</span>
+                        <span class="s2">&quot;rotation_matrix = mathutils.Matrix.Rotation(&quot;</span>
+                        <span class="s2">&quot;0, 4, (0, 0, 1))&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;frame_y = look_direction&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;frame_x = frame_y.cross(up_direction)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;frame_z = frame_x.cross(frame_y)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix = mathutils.Matrix().to_3x3()&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix.col[0] = frame_x&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix.col[1] = frame_y&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation_matrix.col[2] = frame_z&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;rotation = rotation_matrix.to_quaternion()&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+            <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="s2">&quot;blender_object[&#39;angV&#39;] = (&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;    rotation.angle /&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;    {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s2">&quot;({}*bge.logic.getLogicTicRate()) *&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]),</span>
+                <span class="s2">&quot;    rotation.axis)&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="c1"># ...and now take care of object position</span>
+        <span class="k">if</span> <span class="s2">&quot;position&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">move_relative</span><span class="p">:</span>
+                <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                    <span class="s2">&quot;blender_object[&#39;linV&#39;] = [&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;    coord/{} for coord in {}]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="p">(</span><span class="s2">&quot;({}*bge.logic.getLogicTicRate())&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span>
+                    <span class="p">)]</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                    <span class="s2">&quot;target_pos = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">])),</span>
+                    <span class="s2">&quot;delta_pos = [target_pos[i] - blender_object.position[i]&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;    for i in range(len(blender_object.position))]&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;blender_object[&#39;linV&#39;] = [&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;    coord/{} for coord in delta_pos]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="p">(</span><span class="s2">&quot;({}*bge.logic.getLogicTicRate())&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])]</span>
+                <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">continue_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">script_text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+            <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;delta_rot = blender_object[&#39;angV&#39;]&quot;</span>
+            <span class="p">)</span>
+            <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;blender_object.applyRotation(delta_rot)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;position&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">:</span>
+            <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="s2">&quot;blender_object.position = [&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;    blender_object.position[i] + blender_object[&#39;linV&#39;][i]&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;    for i in range(len(blender_object.position))]&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">end_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">script_text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+                <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;delta_rot = blender_object[&#39;angV&#39;]&quot;</span>
+                <span class="p">)</span>
+                <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;blender_object.applyRotation(delta_rot)&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;position&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">:</span>
+                <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                    <span class="s2">&quot;blender_object.position = [&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;    blender_object.position[i] +&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;    blender_object[&#39;linV&#39;][i]&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;    for i in range(len(blender_object.position))]&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;{}pass&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">move_relative</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">=</span> <span class="n">placement</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_relative</span> <span class="o">=</span> <span class="n">move_relative</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

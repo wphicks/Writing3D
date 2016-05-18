@@ -1,0 +1,724 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.triggers &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.triggers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for working with particular W3D events that can trigger actions</span>
+
+<span class="sd">Here, triggers are any events within the W3D that can be used to start another</span>
+<span class="sd">action. For example, when the viewer reaches a particular location, a timeline</span>
+<span class="sd">can be started.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
+<span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">IsNumeric</span><span class="p">,</span> <span class="n">ListValidator</span><span class="p">,</span> \
+    <span class="n">OptionValidator</span><span class="p">,</span> <span class="n">IsBoolean</span><span class="p">,</span> <span class="n">ValidPyString</span><span class="p">,</span> \
+    <span class="n">FeatureValidator</span><span class="p">,</span> <span class="n">ReferenceValidator</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">ConsistencyError</span><span class="p">,</span> <span class="n">BadW3DXML</span><span class="p">,</span> <span class="n">InvalidArgument</span><span class="p">,</span> \
+    <span class="n">EBKAC</span>
+<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">bool2text</span><span class="p">,</span> <span class="n">text2tuple</span><span class="p">,</span> <span class="n">text2bool</span>
+<span class="kn">from</span> <span class="nn">.activators</span> <span class="kn">import</span> <span class="n">BlenderTrigger</span><span class="p">,</span> <span class="n">BlenderPositionTrigger</span><span class="p">,</span> \
+    <span class="n">BlenderPointTrigger</span><span class="p">,</span> <span class="n">BlenderDirectionTrigger</span><span class="p">,</span> <span class="n">BlenderLookObjectTrigger</span><span class="p">,</span> \
+    <span class="n">BlenderObjectPositionTrigger</span>
+<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="n">W3DAction</span>
+
+
+<div class="viewcode-block" id="W3DTrigger"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.W3DTrigger">[docs]</a><span class="k">class</span> <span class="nc">W3DTrigger</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store data on a trigger event in the cave</span>
+
+<span class="sd">    :ivar base_trigger: A trigger object wrapped by this trigger (see</span>
+<span class="sd">    __setitem__ and __getitem__ implementation for details)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span> <span class="o">=</span> <span class="n">BareTrigger</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidArgument</span> <span class="k">as</span> <span class="n">bad_key_error</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">InvalidArgument</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">bad_key_error</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">not_found_error</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">not_found_error</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="W3DTrigger.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.W3DTrigger.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DTrigger from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element trigger_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tag_class_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;HeadTrack&quot;</span><span class="p">:</span> <span class="n">HeadTrackTrigger</span><span class="p">,</span>
+            <span class="s2">&quot;MoveTrack&quot;</span><span class="p">:</span> <span class="n">MovementTrigger</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">trigger_class</span> <span class="ow">in</span> <span class="n">tag_class_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">trigger_class</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BareTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DTrigger.blend"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.W3DTrigger.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DTrigger in Blender&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderTrigger</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div>
+
+<div class="viewcode-block" id="W3DTrigger.link_blender_logic"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.W3DTrigger.link_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">link_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link BGE logic bricks for this W3DTrigger&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">link_logic_bricks</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;blend() must be called before link_blender_logic()&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DTrigger.write_blender_logic"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.triggers.W3DTrigger.write_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">write_python_logic</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;blend() must be called before write_blender_logic()&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="BareTrigger"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.triggers.BareTrigger">[docs]</a><span class="k">class</span> <span class="nc">BareTrigger</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A trigger specifying only base information common to other triggers</span>
+
+<span class="sd">    :param str name: Unique name for this trigger</span>
+<span class="sd">    :param bool enabled: Is this trigger enabled?</span>
+<span class="sd">    :param bool remain-enabled: Should this remain enabled after it is</span>
+<span class="sd">    triggered?</span>
+<span class="sd">    :param float duration: TODO: Clarify</span>
+<span class="sd">    :param actions: List of W3DActions to be triggered</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ValidPyString</span><span class="p">(),</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;remain_enabled&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DAction</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DActions&quot;</span>
+        <span class="p">)}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;remain_enabled&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BareTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;actions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="BareTrigger.toXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.triggers.BareTrigger.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_triggers_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store BareTrigger as EventTrigger node within EventRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element all_triggers_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml_attrib</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;W3DTrigger must specify name&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">):</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">):</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;remain-enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">):</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">])</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">all_triggers_root</span><span class="p">,</span> <span class="s2">&quot;EventTrigger&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+        <span class="n">action_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">,</span> <span class="s2">&quot;Actions&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]:</span>
+            <span class="n">action</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">action_root</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trigger_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="BareTrigger.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.triggers.BareTrigger.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="n">new_trigger</span> <span class="o">=</span> <span class="n">trigger_class</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;EventTrigger must specify name attribute&quot;</span><span class="p">)</span>
+        <span class="n">xml_tags</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;remain_enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;remain-enabled&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">xml_tags</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">new_trigger</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">trigger_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">tag</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;duration&quot;</span> <span class="ow">in</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">trigger_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">])</span>
+        <span class="n">action_root</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Actions&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">action_root</span><span class="o">.</span><span class="n">getchildren</span><span class="p">():</span>
+                <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DAction</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">new_trigger</span></div></div>
+
+
+<div class="viewcode-block" id="HeadTrackTrigger"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.HeadTrackTrigger">[docs]</a><span class="k">class</span> <span class="nc">HeadTrackTrigger</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For triggers based on head-tracking of W3D user</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="HeadTrackTrigger.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.HeadTrackTrigger.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create HeadTrackTrigger from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element trigger_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">head_node</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">direction_node</span> <span class="o">=</span> <span class="n">head_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">direction_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">HeadPositionTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">direction_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;PointTarget&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">LookAtPoint</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">direction_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;DirectionTarget&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">LookAtDirection</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">direction_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ObjectTarget&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">LookAtObject</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                <span class="s2">&quot;HeadTrack node must contain None, PointTarget,&quot;</span>
+                <span class="s2">&quot; DirectionTarget, or ObjectTarget child node&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EventBox"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.EventBox">[docs]</a><span class="k">class</span> <span class="nc">EventBox</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For triggers based on movement into or out of box</span>
+
+<span class="sd">    :param str direction: One of &quot;Inside&quot; or &quot;Outside&quot; depending on whether</span>
+<span class="sd">    trigger occurs for movement into or out of box</span>
+<span class="sd">    :param bool ignore_y: Should y-direction be ignored in checking box? In</span>
+<span class="sd">    other words, vertical position in W3D doesn&#39;t matter when this is set to</span>
+<span class="sd">    true.</span>
+<span class="sd">    :param tuple corner1: First corner specifiying box location</span>
+<span class="sd">    :param tuple corner2: Second corner specifying box location</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span><span class="s2">&quot;Inside&quot;</span><span class="p">,</span> <span class="s2">&quot;Outside&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;ignore_y&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;corner1&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsNumeric</span><span class="p">(),</span>
+            <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Coordinates of box corner&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;corner2&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsNumeric</span><span class="p">(),</span>
+            <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Coordinates of box corner&quot;</span>
+        <span class="p">)}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;ignore_y&quot;</span><span class="p">:</span> <span class="bp">True</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="EventBox.toXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.EventBox.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store EventBox as Box node within one of several possible node types</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element parent_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml_attrib</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;corner1&quot;</span><span class="p">:</span> <span class="s2">&quot;({}, {}, {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;corner1&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;corner2&quot;</span><span class="p">:</span> <span class="s2">&quot;({}, {}, {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;corner2&quot;</span><span class="p">]),</span>
+                <span class="p">}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;EventBox must specify corner1 and corner2&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;ignore_y&quot;</span><span class="p">):</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;ignore-y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ignore_y&quot;</span><span class="p">])</span>
+        <span class="n">box_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">parent_root</span><span class="p">,</span> <span class="s2">&quot;Box&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">box_node</span><span class="p">,</span> <span class="s2">&quot;Movement&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;EventBox must specify direction&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">box_node</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="EventBox.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.EventBox.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">box_class</span><span class="p">,</span> <span class="n">box_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create EventBox from Box node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element box_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_box</span> <span class="o">=</span> <span class="n">box_class</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">corner</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;corner1&quot;</span><span class="p">,</span> <span class="s2">&quot;corner2&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_box</span><span class="p">[</span><span class="n">corner</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span>
+                    <span class="n">box_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">corner</span><span class="p">],</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                    <span class="s1">&#39;Box node must specify attribute {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">corner</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s2">&quot;ignore-y&quot;</span> <span class="ow">in</span> <span class="n">box_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">new_box</span><span class="p">[</span><span class="s2">&quot;ignore_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">box_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;ignore-y&quot;</span><span class="p">])</span>
+
+        <span class="n">movement_node</span> <span class="o">=</span> <span class="n">box_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Movement&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">movement_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s1">&#39;Box node must contain Movement child&#39;</span><span class="p">)</span>
+        <span class="n">direction_node</span> <span class="o">=</span> <span class="n">movement_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Inside&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">direction_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">direction_node</span> <span class="o">=</span> <span class="n">movement_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Outside&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">direction_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                    <span class="s1">&#39;Movement node must contain Inside or Outside child&#39;</span><span class="p">)</span>
+            <span class="n">new_box</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Outside&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_box</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Inside&quot;</span>
+
+        <span class="k">return</span> <span class="n">new_box</span></div></div>
+
+
+<div class="viewcode-block" id="HeadPositionTrigger"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.HeadPositionTrigger">[docs]</a><span class="k">class</span> <span class="nc">HeadPositionTrigger</span><span class="p">(</span><span class="n">HeadTrackTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For triggers based on position of user in W3D</span>
+
+<span class="sd">    :param EventBox box: Used to trigger events when user&#39;s head moves into or</span>
+<span class="sd">    out of specified box. If None, trigger can occur anywhere in W3D</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;box&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
+            <span class="n">EventBox</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Movement into or out of a box to trigger action?&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;box&quot;</span><span class="p">:</span> <span class="bp">None</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="HeadPositionTrigger.toXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.HeadPositionTrigger.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_triggers_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store HeadPositionTrigger as EventTrigger node within EventRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element all_triggers_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">all_triggers_root</span><span class="p">)</span>
+        <span class="n">head_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">,</span> <span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">position_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">head_node</span><span class="p">,</span> <span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">position_node</span><span class="p">,</span> <span class="s2">&quot;Anywhere&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">position_node</span><span class="p">)</span>
+        <span class="n">direction_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">head_node</span><span class="p">,</span> <span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">direction_node</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trigger_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="HeadPositionTrigger.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.HeadPositionTrigger.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create HeadPositionTrigger from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element trigger_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_trigger</span> <span class="o">=</span> <span class="n">trigger_class</span><span class="p">()</span>
+        <span class="n">new_trigger</span><span class="o">.</span><span class="n">base_trigger</span> <span class="o">=</span> <span class="n">BareTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="n">head_node</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">position_node</span> <span class="o">=</span> <span class="n">head_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+        <span class="n">box_node</span> <span class="o">=</span> <span class="n">position_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Box&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">box_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">EventBox</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">box_node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_trigger</span></div>
+
+<div class="viewcode-block" id="HeadPositionTrigger.blend"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.HeadPositionTrigger.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DTrigger in Blender&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderPositionTrigger</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">],</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div></div>
+
+
+<div class="viewcode-block" id="LookAtPoint"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtPoint">[docs]</a><span class="k">class</span> <span class="nc">LookAtPoint</span><span class="p">(</span><span class="n">HeadTrackTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For event triggers based on user looking at a point</span>
+
+<span class="sd">    :param tuple point: The point to look at</span>
+<span class="sd">    :param float angle: TODO: clarify (WARNING: currently does nothing)&quot;&quot;&quot;</span>
+    <span class="c1"># TODO: Do we need to allow localization in box?</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;point&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsNumeric</span><span class="p">(),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Coordinates of point to look at&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="mi">30</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="LookAtPoint.toXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtPoint.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_triggers_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store LookAtPoint as EventTrigger node within EventRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element all_triggers_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">all_triggers_root</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">,</span> <span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">position_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">position_node</span><span class="p">,</span> <span class="s2">&quot;Anywhere&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml_attrib</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;point&quot;</span><span class="p">:</span> <span class="s2">&quot;({}, {}, {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;point&quot;</span><span class="p">])}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;LookAtPoint must specify point&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">):</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;PointTarget&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trigger_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="LookAtPoint.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtPoint.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create LookAtPoint from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element target_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_trigger</span> <span class="o">=</span> <span class="n">trigger_class</span><span class="p">()</span>
+        <span class="n">new_trigger</span><span class="o">.</span><span class="n">base_trigger</span> <span class="o">=</span> <span class="n">HeadPositionTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;PointTarget&quot;</span><span class="p">)</span>
+        <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;point&quot;</span><span class="p">],</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">new_trigger</span></div>
+
+<div class="viewcode-block" id="LookAtPoint.blend"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtPoint.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DTrigger in Blender&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderPointTrigger</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;point&quot;</span><span class="p">],</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div></div>
+
+
+<div class="viewcode-block" id="LookAtDirection"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtDirection">[docs]</a><span class="k">class</span> <span class="nc">LookAtDirection</span><span class="p">(</span><span class="n">HeadTrackTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For event triggers based on user looking in a direction</span>
+
+<span class="sd">    :param tuple direction: Direction in which to look</span>
+<span class="sd">    :param float angle: Look direction must be within this angle of target&quot;&quot;&quot;</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsNumeric</span><span class="p">(),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Vector specifying look direction&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="mi">30</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="LookAtDirection.toXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtDirection.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_triggers_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store LookAtDirection as EventTrigger node within EventRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element all_triggers_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">all_triggers_root</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">,</span> <span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">position_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">position_node</span><span class="p">,</span> <span class="s2">&quot;Anywhere&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml_attrib</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="s2">&quot;({}, {}, {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">])</span>
+            <span class="p">}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;LookAtDirection must specify direction&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">):</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;DirectionTarget&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trigger_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="LookAtDirection.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtDirection.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create LookAtDirection from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element target_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_trigger</span> <span class="o">=</span> <span class="n">trigger_class</span><span class="p">()</span>
+        <span class="n">new_trigger</span><span class="o">.</span><span class="n">base_trigger</span> <span class="o">=</span> <span class="n">HeadPositionTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;DirectionTarget&quot;</span><span class="p">)</span>
+        <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2tuple</span><span class="p">(</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">],</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">new_trigger</span></div>
+
+<div class="viewcode-block" id="LookAtDirection.blend"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtDirection.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DTrigger in Blender&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderDirectionTrigger</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">],</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div></div>
+
+
+<div class="viewcode-block" id="LookAtObject"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtObject">[docs]</a><span class="k">class</span> <span class="nc">LookAtObject</span><span class="p">(</span><span class="n">HeadTrackTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For event triggers based on user looking at an object</span>
+
+<span class="sd">    :param str object: Name of the object to look at</span>
+<span class="sd">    :param float angle: TODO: clarify (WARNING: currently does nothing)&quot;&quot;&quot;</span>
+
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="n">ReferenceValidator</span><span class="p">(</span>
+            <span class="n">ValidPyString</span><span class="p">(),</span>
+            <span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">],</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Must be an existing object&quot;</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">()</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="LookAtObject.toXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtObject.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_triggers_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store LookAtObject as EventTrigger node within EventRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element all_triggers_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">all_triggers_root</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">,</span> <span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">position_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">position_node</span><span class="p">,</span> <span class="s2">&quot;Anywhere&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml_attrib</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;LookAtObject must specify object&quot;</span><span class="p">)</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;ObjectTarget&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">trigger_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="LookAtObject.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtObject.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create LookAtObject from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element target_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_trigger</span> <span class="o">=</span> <span class="n">trigger_class</span><span class="p">()</span>
+        <span class="n">new_trigger</span><span class="o">.</span><span class="n">base_trigger</span> <span class="o">=</span> <span class="n">HeadPositionTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;HeadTrack&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Direction&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ObjectTarget&quot;</span><span class="p">)</span>
+        <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">new_trigger</span></div>
+
+<div class="viewcode-block" id="LookAtObject.blend"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.LookAtObject.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DTrigger in Blender&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderLookObjectTrigger</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">],</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div></div>
+
+
+<div class="viewcode-block" id="MovementTrigger"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.MovementTrigger">[docs]</a><span class="k">class</span> <span class="nc">MovementTrigger</span><span class="p">(</span><span class="n">W3DTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For triggers based on movement of W3D objects</span>
+
+<span class="sd">    :param str type: One of &quot;Single Object&quot;, &quot;Group(Any)&quot;, or &quot;Group(All)&quot;,</span>
+<span class="sd">    depending on if action should be triggered based on movements of a single</span>
+<span class="sd">    object, any object in group, or all objects in group. That is, should</span>
+<span class="sd">    trigger occur when any object in the group moves into specified region or</span>
+<span class="sd">    once all objects have moved into the region?</span>
+<span class="sd">    :param str name: The name of the object or group to track</span>
+<span class="sd">    :param EventBox box: Used to trigger events when objects move into or out</span>
+<span class="sd">    of specified box</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span>
+            <span class="s2">&quot;Single Object&quot;</span><span class="p">,</span> <span class="s2">&quot;Group(Any)&quot;</span><span class="p">,</span> <span class="s2">&quot;Group(All)&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;object_name&quot;</span><span class="p">:</span> <span class="n">ValidPyString</span><span class="p">(),</span>
+        <span class="s2">&quot;box&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
+            <span class="n">EventBox</span><span class="p">,</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Box used to check position of objects&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="MovementTrigger.toXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.MovementTrigger.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_triggers_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store MovementTrigger as EventTrigger node within EventRoot node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element trigger_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">all_triggers_root</span><span class="p">)</span>
+        <span class="n">track_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">,</span> <span class="s2">&quot;MoveTrack&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">track_node</span><span class="p">,</span> <span class="s2">&quot;Source&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml_attrib</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;object_name&quot;</span><span class="p">]}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;MovementTrigger must specify object_name&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Single Object&quot;</span><span class="p">:</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;ObjectRef&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Extract Any/All</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">][</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">)]</span>
+            <span class="c1">#Add Objects to the end</span>
+            <span class="n">xml_attrib</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot; Objects&quot;</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;GroupObj&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">xml_attrib</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">track_node</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;MovementTrigger must specify box&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">trigger_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="MovementTrigger.fromXML"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.MovementTrigger.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">trigger_class</span><span class="p">,</span> <span class="n">trigger_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create MovementTrigger from EventTrigger node</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element movement_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_trigger</span> <span class="o">=</span> <span class="n">trigger_class</span><span class="p">()</span>
+        <span class="n">new_trigger</span><span class="o">.</span><span class="n">base_trigger</span> <span class="o">=</span> <span class="n">BareTrigger</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">trigger_root</span><span class="p">)</span>
+        <span class="n">track_node</span> <span class="o">=</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;MoveTrack&quot;</span><span class="p">)</span>
+        <span class="n">source_node</span> <span class="o">=</span> <span class="n">track_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">source_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ObjectRef&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Single Object&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">source_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;GroupObj&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Group ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                        <span class="s1">&#39;GroupObj node must specify &quot;objects&quot; attribute&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;object_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                <span class="s1">&#39;GroupObj or ObjectRef node must specify &quot;name&quot; attribute&#39;</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">track_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Box&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Source node must have Box child&quot;</span><span class="p">)</span>
+        <span class="n">new_trigger</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">EventBox</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_trigger</span></div>
+
+<div class="viewcode-block" id="MovementTrigger.blend"><a class="viewcode-back" href="../../pyw3d_triggers.html#pyw3d.triggers.MovementTrigger.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create representation of W3DTrigger in Blender&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Single Object&quot;</span><span class="p">:</span>
+            <span class="n">objects_string</span> <span class="o">=</span> <span class="s2">&quot;[&#39;{}&#39;]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;object_name&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">objects_string</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;object_name&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;All&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]:</span>
+            <span class="n">detect_any</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderObjectPositionTrigger</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">],</span>
+            <span class="n">objects_string</span><span class="p">,</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">],</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;remain_enabled&quot;</span><span class="p">],</span>
+            <span class="n">detect_any</span><span class="o">=</span><span class="n">detect_any</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

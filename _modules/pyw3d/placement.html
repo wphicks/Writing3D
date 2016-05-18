@@ -1,0 +1,361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.placement &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.placement</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for working with placement of objects within W3D&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
+<span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">OptionValidator</span><span class="p">,</span> <span class="n">ListValidator</span><span class="p">,</span> <span class="n">IsNumeric</span><span class="p">,</span> \
+    <span class="n">FeatureValidator</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">BadW3DXML</span><span class="p">,</span> <span class="n">ConsistencyError</span>
+<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">text2tuple</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+    <span class="kn">import</span> <span class="nn">mathutils</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="convert_to_blender_axes"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.convert_to_blender_axes">[docs]</a><span class="k">def</span> <span class="nf">convert_to_blender_axes</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert from legacy axis orientation and scale to Blender</span>
+
+<span class="sd">    In Blender, positive z-axis points up&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.3048</span><span class="p">,</span> <span class="o">-</span><span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mf">0.3048</span><span class="p">,</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.3048</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="convert_to_legacy_axes"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.convert_to_legacy_axes">[docs]</a><span class="k">def</span> <span class="nf">convert_to_legacy_axes</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert from Blender axis orientation and scale to legacy</span>
+
+<span class="sd">    In Blender, positive z-axis points up&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mf">0.3048</span><span class="p">,</span> <span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mf">0.3048</span><span class="p">,</span> <span class="o">-</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">0.3048</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="matrix_from_look"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.matrix_from_look">[docs]</a><span class="k">def</span> <span class="nf">matrix_from_look</span><span class="p">(</span><span class="n">look_direction</span><span class="p">,</span> <span class="n">up_direction</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create rotation_matrix from look-at direction&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">up_direction</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># Gracefully handle no mathutils module</span>
+        <span class="n">up_direction</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Matrix</span><span class="o">.</span><span class="n">Rotation</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">frame_y</span> <span class="o">=</span> <span class="n">look_direction</span>
+    <span class="n">frame_x</span> <span class="o">=</span> <span class="n">frame_y</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">up_direction</span><span class="p">)</span>
+    <span class="n">frame_z</span> <span class="o">=</span> <span class="n">frame_x</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">frame_y</span><span class="p">)</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span><span class="o">.</span><span class="n">to_3x3</span><span class="p">()</span>
+    <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_x</span>
+    <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">col</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_y</span>
+    <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">col</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_z</span>
+    <span class="k">return</span> <span class="n">rotation_matrix</span></div>
+
+
+<div class="viewcode-block" id="W3DRotation"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DRotation">[docs]</a><span class="k">class</span> <span class="nc">W3DRotation</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stores data on rotation of objects within W3D&quot;&quot;&quot;</span>
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;rotation_mode&quot;</span><span class="p">,</span> <span class="s2">&quot;rotation_vector&quot;</span><span class="p">,</span> <span class="s2">&quot;up_vector&quot;</span><span class="p">,</span> <span class="s2">&quot;rotation_angle&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;rotation_mode&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span>
+            <span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;Axis&quot;</span><span class="p">,</span> <span class="s2">&quot;LookAt&quot;</span><span class="p">,</span> <span class="s2">&quot;Normal&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;rotation_vector&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span><span class="n">IsNumeric</span><span class="p">(),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;up_vector&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span><span class="n">IsNumeric</span><span class="p">(),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;rotation_angle&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">()}</span>
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;rotation_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rotation_vector&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="s2">&quot;up_vector&quot;</span><span class="p">:</span> <span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+        <span class="s2">&quot;rotation_angle&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<div class="viewcode-block" id="W3DRotation.toXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DRotation.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_root</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">):</span>
+            <span class="n">rot_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">parent_root</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LookAt&quot;</span><span class="p">:</span>
+                    <span class="n">vec_attrib</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vec_attrib</span> <span class="o">=</span> <span class="s2">&quot;rotation&quot;</span>
+                <span class="n">rot_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">vec_attrib</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">convert_to_legacy_axes</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">])))</span>
+            <span class="n">rot_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_angle&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">rot_root</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;rotation_angle&quot;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                <span class="s2">&quot;Attempting to set rotation vector or angle without setting&quot;</span>
+                <span class="s2">&quot; rotation mode&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DRotation.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DRotation.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">rot_class</span><span class="p">,</span> <span class="n">rot_root</span><span class="p">):</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">rot_class</span><span class="p">()</span>
+        <span class="n">rotation</span><span class="p">[</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rot_root</span><span class="o">.</span><span class="n">tag</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rotation_vector</span> <span class="o">=</span> <span class="n">rot_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">]</span>
+            <span class="n">rotation</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_to_blender_axes</span><span class="p">(</span>
+                <span class="n">text2tuple</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">rotation_vector</span> <span class="o">=</span> <span class="n">rot_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
+                <span class="n">rotation</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_to_blender_axes</span><span class="p">(</span>
+                    <span class="n">text2tuple</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>  <span class="c1"># No rotation vector specified</span>
+                <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rotation_angle</span> <span class="o">=</span> <span class="n">rot_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;angle&quot;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">rotation</span><span class="p">[</span><span class="s2">&quot;rotation_angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;Rotation angle must be specified as a float&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>  <span class="c1"># No rotation vector specified</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">rotation</span></div>
+
+<div class="viewcode-block" id="W3DRotation.get_rotation_matrix"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DRotation.get_rotation_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_rotation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blender_object</span><span class="p">):</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Matrix</span><span class="o">.</span><span class="n">Rotation</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Axis&quot;</span><span class="p">:</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Matrix</span><span class="o">.</span><span class="n">Rotation</span><span class="p">(</span>
+                <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_angle&quot;</span><span class="p">]),</span>
+                <span class="mi">4</span><span class="p">,</span>  <span class="c1"># Size of rotation matrix (4x4)</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LookAt&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span>
+                    <span class="s2">&quot;LookAt rotation *must* specify rotation_vector&quot;</span>
+                <span class="p">)</span>
+            <span class="n">look_direction</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">blender_object</span><span class="o">.</span><span class="n">location</span> <span class="o">-</span>
+                <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">])</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
+
+            <span class="n">up_direction</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;up_vector&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">matrix_from_look</span><span class="p">(</span><span class="n">look_direction</span><span class="p">,</span> <span class="n">up_direction</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Normal&quot;</span><span class="p">:</span>
+            <span class="n">current_normal</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">current_normal</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">blender_object</span><span class="o">.</span><span class="n">rotation_euler</span><span class="p">)</span>
+            <span class="c1"># NOTE: Not absolutely sure that the above is sufficient to deal</span>
+            <span class="c1"># with previously rotated objects, but the behavior here is a</span>
+            <span class="c1"># little ambiguous anyway</span>
+            <span class="n">difference</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rotation_difference</span><span class="p">(</span><span class="n">current_normal</span><span class="p">)</span>
+            <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">difference</span><span class="o">.</span><span class="n">to_matrix</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">rotation_matrix</span></div>
+
+<div class="viewcode-block" id="W3DRotation.rotate"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DRotation.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blender_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate Blender object to specified orientation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">rotation_euler</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_rotation_matrix</span><span class="p">(</span>
+            <span class="n">blender_object</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">blender_object</span></div></div>
+
+
+<div class="viewcode-block" id="W3DPlacement"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement">[docs]</a><span class="k">class</span> <span class="nc">W3DPlacement</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stores data on placement of objects within W3D</span>
+
+<span class="sd">    Specifies both position and rotation of W3D objects</span>
+<span class="sd">    :param str relative_to: Position specified relative to what? One of Center,</span>
+<span class="sd">    FloorWall, LeftWall, RightWall or FloorWall</span>
+<span class="sd">    :param tuple position: Tuple of three numbers specifying x, y, z position</span>
+<span class="sd">    :param py:class:W3DRotation rotation: py:class:W3DRotation object</span>
+<span class="sd">    specifying rotation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="s2">&quot;relative_to&quot;</span><span class="p">,</span> <span class="s2">&quot;rotation&quot;</span><span class="p">]</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;relative_to&quot;</span><span class="p">:</span> <span class="n">OptionValidator</span><span class="p">(</span>
+            <span class="s2">&quot;Center&quot;</span><span class="p">,</span> <span class="s2">&quot;FrontWall&quot;</span><span class="p">,</span> <span class="s2">&quot;LeftWall&quot;</span><span class="p">,</span> <span class="s2">&quot;RightWall&quot;</span><span class="p">,</span> <span class="s2">&quot;FloorWall&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">IsNumeric</span><span class="p">(),</span> <span class="n">required_length</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="s2">&quot;rotation&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DRotation</span><span class="p">)}</span>
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;relative_to&quot;</span><span class="p">:</span> <span class="s2">&quot;Center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="n">relative_to_objects</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="sd">&quot;&quot;&quot;Dictionary mapping names of relative_to options to Blender</span>
+<span class="sd">    representations</span>
+
+<span class="sd">    In default W3DWriting, these are simply the four walls, but this can be</span>
+<span class="sd">    overridden to provide additional functionality&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">W3DPlacement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;rotation&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DRotation</span><span class="p">()</span>
+
+<div class="viewcode-block" id="W3DPlacement.toXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_root</span><span class="p">):</span>
+        <span class="n">place_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">parent_root</span><span class="p">,</span> <span class="s2">&quot;Placement&quot;</span><span class="p">)</span>
+        <span class="n">rel_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place_root</span><span class="p">,</span> <span class="s2">&quot;RelativeTo&quot;</span><span class="p">)</span>
+        <span class="n">rel_root</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;relative_to&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+            <span class="n">pos_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">place_root</span><span class="p">,</span> <span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+            <span class="n">pos_root</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">convert_to_legacy_axes</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">])))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">place_root</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">place_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DPlacement.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">place_class</span><span class="p">,</span> <span class="n">place_root</span><span class="p">):</span>
+        <span class="n">placement</span> <span class="o">=</span> <span class="n">place_class</span><span class="p">()</span>
+        <span class="n">rel_root</span> <span class="o">=</span> <span class="n">place_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;RelativeTo&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rel_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">placement</span><span class="p">[</span><span class="s2">&quot;relative_to&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rel_root</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">pos_root</span> <span class="o">=</span> <span class="n">place_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Position&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pos_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_to_blender_axes</span><span class="p">(</span>
+                <span class="n">text2tuple</span><span class="p">(</span><span class="n">pos_root</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">evaluator</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">rotation_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Axis&quot;</span><span class="p">,</span> <span class="s2">&quot;LookAt&quot;</span><span class="p">,</span> <span class="s2">&quot;Normal&quot;</span><span class="p">]:</span>
+            <span class="n">rot_root</span> <span class="o">=</span> <span class="n">place_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">rotation_mode</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rot_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DRotation</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">rot_root</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">placement</span>
+        <span class="k">return</span> <span class="n">placement</span></div>
+
+    <span class="c1">#TODO: Deal with non-standard wall placements</span>
+    <span class="k">def</span> <span class="nf">_create_relative_to_objects</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">wall_positions</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Center&quot;</span><span class="p">:</span> <span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="s2">&quot;FrontWall&quot;</span><span class="p">:</span> <span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">)),</span>
+                <span class="s2">&quot;LeftWall&quot;</span><span class="p">:</span> <span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="s2">&quot;RightWall&quot;</span><span class="p">:</span> <span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="s2">&quot;FloorWall&quot;</span><span class="p">:</span> <span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">))},</span>
+            <span class="n">wall_rotations</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Center&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;FrontWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;LeftWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;RightWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;FloorWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
+            <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create Blender objects corresponding to relative_to options if</span>
+<span class="sd">        necessary&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">argument_validators</span><span class="p">[</span><span class="s2">&quot;relative_to&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">valid_options</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">wall_name</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">wall_positions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;EMPTY&quot;</span><span class="p">,</span>
+                    <span class="n">location</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="n">wall_rotations</span><span class="p">[</span><span class="n">wall_name</span><span class="p">],</span>
+                    <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">[</span><span class="n">wall_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">[</span><span class="n">wall_name</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">wall_name</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span>
+
+<div class="viewcode-block" id="W3DPlacement.place"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement.place">[docs]</a>    <span class="k">def</span> <span class="nf">place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blender_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Place Blender object in specified position and orientation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_relative_to_objects</span><span class="p">()</span>
+        <span class="n">relative_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;relative_to&quot;</span><span class="p">]]</span>
+
+        <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">position</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">relative_object</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="n">blender_object</span><span class="o">.</span><span class="n">rotation_euler</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">relative_object</span><span class="o">.</span><span class="n">rotation_euler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">blender_object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">blender_object</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

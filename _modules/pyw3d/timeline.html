@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.timeline &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.timeline</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Tools for working with timelines in W3D projects</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
+<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="n">W3DAction</span>
+<span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">ListValidator</span><span class="p">,</span> <span class="n">IsNumeric</span><span class="p">,</span> <span class="n">IsBoolean</span><span class="p">,</span> <span class="n">ValidPyString</span><span class="p">,</span> \
+    <span class="n">FeatureValidator</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">ConsistencyError</span><span class="p">,</span> <span class="n">BadW3DXML</span>
+<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">bool2text</span><span class="p">,</span> <span class="n">text2bool</span>
+<span class="kn">from</span> <span class="nn">.activators</span> <span class="kn">import</span> <span class="n">BlenderTimeline</span>
+<span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">EBKAC</span>
+<span class="kn">from</span> <span class="nn">.structs</span> <span class="kn">import</span> <span class="n">SortedList</span>
+
+
+<div class="viewcode-block" id="W3DTimeline"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline">[docs]</a><span class="k">class</span> <span class="nc">W3DTimeline</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent timeline for choreography of actions in the W3D</span>
+
+<span class="sd">    :param str name: Name of timeline</span>
+<span class="sd">    :param bool start_immediately: Start timeline when project starts?</span>
+<span class="sd">    :param list actions: A list of two-element tuples specifying (start time</span>
+<span class="sd">    for action, W3DAction)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ValidPyString</span><span class="p">(),</span>
+        <span class="s2">&quot;start_immediately&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">ListValidator</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">IsNumeric</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DAction</span><span class="p">)],</span>
+                <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Start Time(s), Action&quot;</span><span class="p">,</span>
+                <span class="n">required_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Start time in seconds, action to perform&quot;</span>
+            <span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of (float, W3DAction) tuples&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;start_immediately&quot;</span><span class="p">:</span> <span class="bp">True</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">W3DTimeline</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;actions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SortedList</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SortedList</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="W3DTimeline.toXML"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_timelines_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store W3DTimeline as Timeline node within TimelineRoot node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">timeline_attribs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]}</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConsistencyError</span><span class="p">(</span><span class="s2">&quot;W3DTimeline must specify a name&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;start_immediately&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">timeline_attribs</span><span class="p">[</span><span class="s2">&quot;start-immediately&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;start_immediately&quot;</span><span class="p">])</span>
+        <span class="n">timeline_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">all_timelines_root</span><span class="p">,</span> <span class="s2">&quot;Timeline&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="n">timeline_attribs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">time</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]:</span>
+            <span class="n">action_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+                <span class="n">timeline_root</span><span class="p">,</span> <span class="s2">&quot;TimedActions&quot;</span><span class="p">,</span>
+                <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;seconds-time&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">)}</span>
+                <span class="p">)</span>
+            <span class="n">action</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">action_root</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">timeline_root</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="W3DTimeline.fromXML"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">timeline_class</span><span class="p">,</span> <span class="n">timeline_root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create W3DTimeline from Timeline node of W3D XML</span>
+
+<span class="sd">        :param :py:class:xml.etree.ElementTree.Element timeline_root</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_timeline</span> <span class="o">=</span> <span class="n">timeline_class</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_timeline</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeline_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                <span class="s2">&quot;Timeline node must specify name attribute&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;start-immediately&quot;</span> <span class="ow">in</span> <span class="n">timeline_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">new_timeline</span><span class="p">[</span><span class="s2">&quot;start_immediately&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">timeline_root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span>
+                <span class="s2">&quot;start-immediately&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">timed_action</span> <span class="ow">in</span> <span class="n">timeline_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;TimedActions&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">action_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">timed_action</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;seconds-time&quot;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span>
+                    <span class="s2">&quot;TimedActions node must specify numeric seconds-time &quot;</span>
+                    <span class="s2">&quot;attribute&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">timed_action</span><span class="o">.</span><span class="n">getchildren</span><span class="p">():</span>
+                <span class="n">new_timeline</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">action_time</span><span class="p">,</span> <span class="n">W3DAction</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">new_timeline</span></div>
+
+<div class="viewcode-block" id="W3DTimeline.blend"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create Blender object to implement W3DTimeline&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderTimeline</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
+            <span class="n">start_immediately</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;start_immediately&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div>
+
+<div class="viewcode-block" id="W3DTimeline.link_blender_logic"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.link_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">link_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link BGE logic bricks for this W3DTimeline&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">link_logic_bricks</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;blend() must be called before link_blender_logic()&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="W3DTimeline.write_blender_logic"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.write_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write any necessary game engine logic for this W3DTimeline&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">write_python_logic</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;blend() must be called before write_blender_logic()&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

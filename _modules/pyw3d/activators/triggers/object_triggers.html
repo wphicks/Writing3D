@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.activators.triggers.object_triggers &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.activators.triggers.object_triggers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;A Blender implementation of triggers based on the state of objects in</span>
+<span class="sd">virtual space</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pyw3d.errors</span> <span class="kn">import</span> <span class="n">EBKAC</span>
+<span class="kn">from</span> <span class="nn">.triggers</span> <span class="kn">import</span> <span class="n">BlenderTrigger</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading &quot;</span>
+        <span class="s2">&quot;pyw3d.activators.triggers.object_triggers as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger">[docs]</a><span class="k">class</span> <span class="nc">BlenderObjectPositionTrigger</span><span class="p">(</span><span class="n">BlenderTrigger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Activator based on position of objects in virtual space</span>
+
+<span class="sd">    :param str objects_string: A string containing either a</span>
+<span class="sd">    Python-formatted list of names of Blender objects or a single valid</span>
+<span class="sd">    group name (e.g. &quot;[&#39;object_myobj1&#39;, &#39;object_myobj2&#39;]&quot; or &quot;group_mygrp&quot;</span>
+<span class="sd">    :param bool detect_any: True if trigger should activate when any</span>
+<span class="sd">    specified object passes the box&#39;s boundaries as specified, False if</span>
+<span class="sd">    trigger should activate when ALL specified objects have done so</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger.create_enabled_sensor"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_enabled_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">create_enabled_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a sensor to fire continuously while trigger is enabled&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;enabled_sensor&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;enabled_sensor&quot;</span>
+        <span class="n">enable_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;enabled_sensor&quot;</span><span class="p">]</span>
+        <span class="n">enable_sensor</span><span class="o">.</span><span class="n">use_pulse_true_level</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">enable_sensor</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">enable_sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;enabled&quot;</span>
+        <span class="n">enable_sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_sensor</span> <span class="o">=</span> <span class="n">enable_sensor</span>
+
+        <span class="k">return</span> <span class="n">enable_sensor</span></div>
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger.create_detection_controller"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_detection_controller">[docs]</a>    <span class="k">def</span> <span class="nf">create_detection_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a controller for detecting specified event&quot;&quot;&quot;</span>
+
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PYTHON&#39;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;detect&quot;</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="s2">&quot;detect&quot;</span><span class="p">]</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;MODULE&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;{}.detect_event&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span> <span class="o">=</span> <span class="n">controller</span>
+        <span class="k">return</span> <span class="n">controller</span></div>
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger.link_detection_bricks"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.link_detection_bricks">[docs]</a>    <span class="k">def</span> <span class="nf">link_detection_bricks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link necessary logic bricks for event detection</span>
+
+<span class="sd">        :raises EBKAC: if controller or sensor does not exist&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_sensor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;Detection sensor and controller must be created before they &quot;</span>
+                <span class="s2">&quot;can be linked&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_controller</span></div>
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger.generate_detection_logic"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.generate_detection_logic">[docs]</a>    <span class="k">def</span> <span class="nf">generate_detection_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a function to Python control script to detect user position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">detection_logic</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">def detect_event(cont):&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    scene = bge.logic.getCurrentScene()&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    own = cont.owner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    corners = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">][</span><span class="s2">&quot;corner1&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;box&quot;</span><span class="p">][</span><span class="s2">&quot;corner2&quot;</span><span class="p">])),</span>
+            <span class="s2">&quot;    all_objects = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects_string</span><span class="p">),</span>
+            <span class="s2">&quot;    all_objects = [&quot;</span>
+            <span class="s2">&quot;scene.objects[object_name] for object_name in all_objects]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    in_region = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_any</span><span class="p">),</span>
+            <span class="s2">&quot;    for object_ in all_objects:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        position = object_.position&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        in_region = (in_region {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;or&quot;</span><span class="p">,</span> <span class="s2">&quot;and&quot;</span><span class="p">)[</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_any</span><span class="p">]),</span>
+            <span class="s2">&quot;            {}(position[i] &lt; min(corners[i]) or&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;not &quot;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="s2">&quot;direction&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Inside&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;               position[i] &gt; max(corners[i])))&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    if (&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            in_region and own[&#39;enabled&#39;] and&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;            own[&#39;status&#39;] == &#39;Stop&#39;):&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        own[&#39;status&#39;] = &#39;Start&#39;&quot;</span>
+        <span class="p">]</span>
+        <span class="n">detection_logic</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">detection_logic</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">detection_logic</span></div>
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger.create_blender_objects"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.create_blender_objects">[docs]</a>    <span class="k">def</span> <span class="nf">create_blender_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlenderObjectPositionTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_enabled_sensor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_detection_controller</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BlenderObjectPositionTrigger.link_logic_bricks"><a class="viewcode-back" href="../../../../pyw3d_api/pyw3d.activators.triggers.html#pyw3d.activators.triggers.object_triggers.BlenderObjectPositionTrigger.link_logic_bricks">[docs]</a>    <span class="k">def</span> <span class="nf">link_logic_bricks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlenderObjectPositionTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">link_logic_bricks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_detection_bricks</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">objects_string</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">enable_immediately</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">remain_enabled</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">detect_any</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlenderObjectPositionTrigger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">enable_imediately</span><span class="o">=</span><span class="n">enable_immediately</span><span class="p">,</span>
+            <span class="n">remain_enabled</span><span class="o">=</span><span class="n">remain_enabled</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects_string</span> <span class="o">=</span> <span class="n">objects_string</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detect_any</span> <span class="o">=</span> <span class="n">detect_any</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

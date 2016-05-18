@@ -1,0 +1,373 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d.activators.activators &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d.activators.activators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;Classes used to initiate actions in Blender</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pyw3d.errors</span> <span class="kn">import</span> <span class="n">EBKAC</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">bpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Module bpy not found. Loading pyw3d.timeline as standalone&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Activator"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator">[docs]</a><span class="k">class</span> <span class="nc">Activator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An object used to create BGE logic for triggering W3DActions</span>
+
+<span class="sd">    :param str name_string: A string which is used to generate the name of the</span>
+<span class="sd">    object associated with this activator (e.g. the user-assigned name of a</span>
+<span class="sd">    timeline)</span>
+<span class="sd">    :param SortedList actions: A list of actions to be activated by this</span>
+<span class="sd">    activator</span>
+
+<span class="sd">    Associated with every Activator is a single Blender object called</span>
+<span class="sd">    base_object, which has a &quot;status&quot; property. This status is used to control</span>
+<span class="sd">    when execution of actions is triggered.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_string</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_string</span> <span class="o">=</span> <span class="n">name_string</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="n">actions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">script_header</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">import bge</span>
+<span class="s2">from group_defs import *</span>
+<span class="s2">import mathutils</span>
+<span class="s2">from time import monotonic</span>
+<span class="s2">import random</span>
+<span class="s2">def activate(cont):</span>
+<span class="s2">    scene = bge.logic.getCurrentScene()</span>
+<span class="s2">    own = cont.owner</span>
+<span class="s2">    status = own[&#39;status&#39;]</span>
+<span class="s2">    if status == &#39;Start&#39;:</span>
+<span class="s2">        own[&#39;start_time&#39;] = monotonic()</span>
+<span class="s2">        if (&#39;action_index&#39; not in own</span>
+<span class="s2">                or &#39;clicks&#39; not in own</span>
+<span class="s2">                or own[&#39;clicks&#39;] == 0):</span>
+<span class="s2">            own[&#39;action_index&#39;] = 0</span>
+<span class="s2">        # action_index property is used to ensure that each action is activated</span>
+<span class="s2">        # exactly once</span>
+<span class="s2">        own[&#39;offset_time&#39;] = 0</span>
+<span class="s2">        own[&#39;offset_index&#39;] = 0</span>
+<span class="s2">        own[&#39;status&#39;] = &#39;Continue&#39;</span>
+<span class="s2">    if status == &#39;Stop&#39;:</span>
+<span class="s2">        try:</span>
+<span class="s2">            own[&#39;offset_time&#39;] = monotonic() - own[&#39;start_time&#39;]</span>
+<span class="s2">            own[&#39;offset_index&#39;] = own[&#39;action_index&#39;]</span>
+<span class="s2">        except KeyError:</span>
+<span class="s2">            pass</span>
+<span class="s2">    if status == &#39;Continue&#39;:</span>
+<span class="s2">        try:</span>
+<span class="s2">            if own[&#39;offset_time&#39;] != 0:</span>
+<span class="s2">                own[&#39;start_time&#39;] = (</span>
+<span class="s2">                    monotonic() - own[&#39;offset_time&#39;])</span>
+<span class="s2">                own[&#39;offset_time&#39;] = 0</span>
+<span class="s2">        except KeyError:</span>
+<span class="s2">            # Should this just switch status to start instead of throwing an</span>
+<span class="s2">            # error?</span>
+<span class="s2">            raise RuntimeError(</span>
+<span class="s2">                &#39;Must start activator before continue is used&#39;)</span>
+<span class="s2">        time = monotonic() - own[&#39;start_time&#39;]</span>
+<span class="s2">        index = own[&#39;offset_index&#39;] + own[&#39;action_index&#39;]</span>
+<span class="s2">&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">script_footer</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        # FOOTER BEGINS HERE</span>
+<span class="s2">        own[&#39;action_index&#39;] = index</span>
+<span class="s2">        own[&#39;offset_index&#39;] = 0</span>
+<span class="s2">        if time &gt;= {max_time}:</span>
+<span class="s2">            own[&#39;status&#39;] = &#39;Stop&#39;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A method intended to be overridden with the proper function from</span>
+<span class="sd">        names.py&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_string</span>
+
+<div class="viewcode-block" id="Activator.select_base_object"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.select_base_object">[docs]</a>    <span class="k">def</span> <span class="nf">select_base_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select base_object in Blender for modifications&quot;&quot;&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span></div>
+
+<div class="viewcode-block" id="Activator.create_status_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.create_status_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_status_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="s2">&quot;Stop&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a property called &quot;status&quot; which defines whether the</span>
+<span class="sd">        activator is in a &quot;Start&quot;, &quot;Stop&quot;, or &quot;Continue&quot; state</span>
+
+<span class="sd">        Note that Stop essentially pauses any partially completed actions for</span>
+<span class="sd">        an activator, if possible. Continue means that the actions are ongoing,</span>
+<span class="sd">        and Start is used to initially start the actions associated with this</span>
+<span class="sd">        activator&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;status&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">initial_value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Activator.create_enabled_property"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.create_enabled_property">[docs]</a>    <span class="k">def</span> <span class="nf">create_enabled_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a property called &quot;enabled&quot; which defines whether or not</span>
+<span class="sd">        activator can currently be activated</span>
+
+<span class="sd">        .. warn: This property should be checked when a W3DAction attempts to</span>
+<span class="sd">        start an activator. It is NOT checked by the activator itself. This is</span>
+<span class="sd">        to allow the activator to be immediately disabled after activation but</span>
+<span class="sd">        still process the remainder of its actions&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">game_property_new</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;BOOL&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;enabled&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">initial_value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;enabled&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Activator.create_status_sensors"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.create_status_sensors">[docs]</a>    <span class="k">def</span> <span class="nf">create_status_sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates sensors to detect change in &quot;status&quot; of activator</span>
+
+<span class="sd">        Generates three sensors: &quot;start_sensor&quot; which detects when the status</span>
+<span class="sd">        is set to &quot;Start&quot;, &quot;active_sensor&quot; which sends continuous pulses so</span>
+<span class="sd">        long as the status is set to &quot;Continue&quot;, and &quot;stop_sensor&quot; which</span>
+<span class="sd">        detects when the status is set to &quot;Stop&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
+        <span class="c1">#Create property sensor to initiate actions</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;start_sensor&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;start_sensor&quot;</span>
+        <span class="n">start_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;start_sensor&quot;</span><span class="p">]</span>
+        <span class="n">start_sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;status&quot;</span>
+        <span class="n">start_sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;Start&quot;</span>
+
+        <span class="c1">#Create property sensor to activate actions</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;active_sensor&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;active_sensor&quot;</span>
+        <span class="n">active_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;active_sensor&quot;</span><span class="p">]</span>
+        <span class="n">active_sensor</span><span class="o">.</span><span class="n">use_pulse_true_level</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1">#active_sensor.frequency = 1</span>
+        <span class="n">active_sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;status&quot;</span>
+        <span class="n">active_sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;Continue&quot;</span>
+
+        <span class="c1">#Create property sensor to pause actions</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stop_sensor&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;stop_sensor&quot;</span>
+        <span class="n">stop_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;stop_sensor&quot;</span><span class="p">]</span>
+        <span class="n">stop_sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;status&quot;</span>
+        <span class="n">stop_sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;Stop&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_sensor</span> <span class="o">=</span> <span class="n">start_sensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_sensor</span> <span class="o">=</span> <span class="n">active_sensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_sensor</span> <span class="o">=</span> <span class="n">stop_sensor</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">start_sensor</span><span class="p">,</span> <span class="n">active_sensor</span><span class="p">,</span> <span class="n">stop_sensor</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Activator.create_controller"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.create_controller">[docs]</a>    <span class="k">def</span> <span class="nf">create_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Python controller used to effect actions triggered by this</span>
+<span class="sd">        Activator&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">controller_add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PYTHON&#39;</span><span class="p">,</span>
+            <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;activate&quot;</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">controllers</span><span class="p">[</span><span class="s2">&quot;activate&quot;</span><span class="p">]</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;MODULE&quot;</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;{}.activate&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span>
+        <span class="k">return</span> <span class="n">controller</span></div>
+
+<div class="viewcode-block" id="Activator.link_status_sensors"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.link_status_sensors">[docs]</a>    <span class="k">def</span> <span class="nf">link_status_sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link the start, active, and stop sensors to the controller</span>
+
+<span class="sd">        :raises EBKAC: if controller or sensors do not exist&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;Controller must be created before sensors can be linked&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_sensor</span><span class="p">)</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_sensor</span><span class="p">)</span>
+            <span class="n">controller</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_sensor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
+                <span class="s2">&quot;Sensors must be created before they can be linked&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">controller</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_base_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the object which controls the current status of the</span>
+<span class="sd">        activator&quot;&quot;&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;EMPTY&quot;</span><span class="p">,</span>
+            <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">20</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the object which controls the current status of the</span>
+<span class="sd">        activator, creating it if necessary&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">blender_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_base_object</span><span class="p">()</span>
+            <span class="n">blender_object</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">return</span> <span class="n">blender_object</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">script</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Python control script for base_object, creating it if</span>
+<span class="sd">        necessary&quot;&quot;&quot;</span>
+        <span class="n">script_name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;py&quot;</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">script_name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">script_name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">script_name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Activator.generate_action_logic"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.generate_action_logic">[docs]</a>    <span class="k">def</span> <span class="nf">generate_action_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a string to be written into Python control script for</span>
+<span class="sd">        activating W3DActions</span>
+
+<span class="sd">        .. note: This method is responsible for writing the max_time for</span>
+<span class="sd">        execution of actions into the script_footer. Failure to do this will</span>
+<span class="sd">        result in BGE complaining about attempting to compare a dictionary with</span>
+<span class="sd">        an integer or having the name max_time not defined&quot;&quot;&quot;</span>
+        <span class="n">action_logic</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;        # ACTION LOGIC BEGINS HERE&quot;</span><span class="p">]</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">script_footer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">script_footer</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_time</span><span class="o">=</span><span class="n">max_time</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">action_logic</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Activator.create_blender_objects"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.create_blender_objects">[docs]</a>    <span class="k">def</span> <span class="nf">create_blender_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate all new objects, properties, sensors, and controllers</span>
+<span class="sd">        associated with this activator in Blender</span>
+
+<span class="sd">        .. note:: This is a separate step from connecting logic bricks in order</span>
+<span class="sd">        to ensure that all necessary objects, sensors, controllers, and</span>
+<span class="sd">        actuators are created before we attempt to link them. Nevertheless, it</span>
+<span class="sd">        is crucial that both of these steps (and writing Python logic, if</span>
+<span class="sd">        necessary) be called when creating an Activator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_status_property</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_status_sensors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_controller</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_enabled_property</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Activator.link_logic_bricks"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.link_logic_bricks">[docs]</a>    <span class="k">def</span> <span class="nf">link_logic_bricks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Link together any Blender &quot;logic bricks&quot; for this activator&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_status_sensors</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Activator.write_python_logic"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.activators.html#pyw3d.activators.activators.Activator.write_python_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_python_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write any necessary Python controller scripts for this activator&quot;&quot;&quot;</span>
+        <span class="n">script_text</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">script_header</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generate_action_logic</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">script_footer</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">script</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

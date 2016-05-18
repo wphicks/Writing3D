@@ -50,7 +50,7 @@ you can swap out &#8220;my_awesome_selfie.jpg&#8221; for a <a class="reference i
 <p>You can also interact with W3DObjects by adding a <a class="reference internal" href="#pyw3d-docs-links"><span class="std std-ref">W3DLink</span></a> to them.</p>
 <dl class="class">
 <dt id="pyw3d.W3DObject">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DObject" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
 <p>Store data on single W3D object</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -60,7 +60,7 @@ you can swap out &#8220;my_awesome_selfie.jpg&#8221; for a <a class="reference i
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the object</li>
 <li><strong>placement</strong> (<a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; Position and orientation of object</li>
-<li><strong>link</strong> (<a class="reference internal" href="#pyw3d.W3DLink" title="pyw3d.W3DLink"><em>W3DLink</em></a>) &#8211; Clickable link for object</li>
+<li><strong>link</strong> (<a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink" title="pyw3d.objects.W3DLink"><em>W3DLink</em></a>) &#8211; Clickable link for object</li>
 <li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; Three floats representing RGB color of object</li>
 <li><strong>double_sided</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Is object visible from both sides?</li>
 <li><strong>visible</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Is object visible?</li>
@@ -78,33 +78,33 @@ you can swap out &#8220;my_awesome_selfie.jpg&#8221; for a <a class="reference i
 <p>W3DStereoImage, W3DModel, W3DLight, W3DPSys</p>
 <dl class="method">
 <dt id="pyw3d.W3DObject.apply_material">
-<code class="descname">apply_material</code><span class="sig-paren">(</span><em>blender_object</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DObject.apply_material" title="Permalink to this definition">¶</a></dt>
+<code class="descname">apply_material</code><span class="sig-paren">(</span><em>blender_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject.apply_material"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject.apply_material" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply properties of object to material for Blender object</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DObject.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DObject.blend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject.blend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create representation of W3DObject in Blender</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.W3DObject.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>object_class</em>, <em>object_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DObject.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>object_class</em>, <em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DObject from Object node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DObject.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_objects_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DObject.toXML" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_objects_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject.toXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store W3DObject as Object node within ObjectRoot node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element all_objects_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DObject.write_blender_logic">
-<code class="descname">write_blender_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DObject.write_blender_logic" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_blender_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject.write_blender_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject.write_blender_logic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write Python logic for this object to associated script</p>
 </dd></dl>
 
@@ -119,12 +119,12 @@ common to any object you might add to a Writing3D project. The W3DContent class
 image, model, lighting, etc.</p>
 <dl class="class">
 <dt id="pyw3d.W3DContent">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DContent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DContent" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DContent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DContent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
 <p>Represents content of a W3D object</p>
 <dl class="staticmethod">
 <dt id="pyw3d.W3DContent.fromXML">
-<em class="property">static </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>content_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DContent.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DContent.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DContent.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create object of appropriate subclass from Content node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element content_root</p>
 </dd></dl>
@@ -133,7 +133,7 @@ image, model, lighting, etc.</p>
 
 <dl class="class">
 <dt id="pyw3d.W3DText">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DText</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DText" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DText</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DText" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents text in virtual space</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -153,20 +153,20 @@ image, model, lighting, etc.</p>
 </table>
 <dl class="method">
 <dt id="pyw3d.W3DText.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DText.blend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DText.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DText.blend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create representation of W3DText in Blender</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.W3DText.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>text_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DText.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>text_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DText.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DText.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DText object from Content node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element content_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DText.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DText.toXML" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DText.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DText.toXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store W3DText as Content node within Object node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
 </dd></dl>
@@ -175,7 +175,7 @@ image, model, lighting, etc.</p>
 
 <dl class="class">
 <dt id="pyw3d.W3DImage">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DImage</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DImage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DImage</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DImage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represent a flat image in 3D space</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -188,20 +188,20 @@ image, model, lighting, etc.</p>
 </table>
 <dl class="method">
 <dt id="pyw3d.W3DImage.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DImage.blend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DImage.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DImage.blend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create representation of W3DImage in Blender</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.W3DImage.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>image_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DImage.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>image_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DImage.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DImage.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DImage object from Content node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element content_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DImage.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DImage.toXML" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DImage.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DImage.toXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store W3DImage as Content node within Object node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
 </dd></dl>
@@ -210,7 +210,7 @@ image, model, lighting, etc.</p>
 
 <dl class="class">
 <dt id="pyw3d.W3DStereoImage">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DStereoImage</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DStereoImage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DStereoImage</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DStereoImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DStereoImage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents different images in left and right eye</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -227,20 +227,20 @@ image, model, lighting, etc.</p>
 </table>
 <dl class="method">
 <dt id="pyw3d.W3DStereoImage.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DStereoImage.blend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DStereoImage.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DStereoImage.blend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create representation of W3DStereoImage in Blender</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.W3DStereoImage.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>image_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DStereoImage.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>image_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DStereoImage.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DStereoImage.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DStereoImage object from Content node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element content_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DStereoImage.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DStereoImage.toXML" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DStereoImage.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DStereoImage.toXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store W3DStereoImage as Content node within Object node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
 </dd></dl>
@@ -253,7 +253,7 @@ image, model, lighting, etc.</p>
 </div>
 <dl class="class">
 <dt id="pyw3d.W3DModel">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DModel</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DModel</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents a 3d model in virtual space</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -270,20 +270,20 @@ image, model, lighting, etc.</p>
 </table>
 <dl class="method">
 <dt id="pyw3d.W3DModel.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DModel.blend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DModel.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DModel.blend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create representation of W3DModel in Blender</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.W3DModel.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>model_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DModel.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>model_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DModel.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DModel.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DModel object from Content node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element content_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DModel.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DModel.toXML" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DModel.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DModel.toXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store W3DModel as Content node within Object node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
 </dd></dl>
@@ -292,7 +292,7 @@ image, model, lighting, etc.</p>
 
 <dl class="class">
 <dt id="pyw3d.W3DLight">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DLight</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DLight" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DLight</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DLight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DLight" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents a light source in virtual space</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -313,20 +313,20 @@ quadratic attenuation of light source respectively
 source</p>
 <dl class="method">
 <dt id="pyw3d.W3DLight.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DLight.blend" title="Permalink to this definition">¶</a></dt>
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DLight.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DLight.blend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create representation of W3DLight in Blender</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.W3DLight.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>light_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DLight.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>light_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DLight.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DLight.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DLight object from Content node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element content_root</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.W3DLight.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DLight.toXML" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DLight.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DLight.toXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store W3DLight as Content node within Object node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
 </dd></dl>
@@ -335,7 +335,7 @@ source</p>
 
 <dl class="class">
 <dt id="pyw3d.W3DPSys">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DPSys</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DPSys" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DPSys</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DPSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DPSys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents a particle system in virtual space</p>
 <p>NOT YET IMPLEMENTED AT ALL</p>
@@ -353,7 +353,7 @@ link is implemented using the W3DLink class and may trigger a series of
 <a class="reference internal" href="pyw3d_actions.html#pyw3d-docs-actions"><span class="std std-ref">W3DActions</span></a>.</p>
 <dl class="class">
 <dt id="pyw3d.W3DLink">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DLink</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pyw3d.W3DLink" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DLink</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DLink" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store data on a clickable link</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
