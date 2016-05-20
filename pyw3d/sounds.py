@@ -23,6 +23,11 @@ from .validators import IsNumeric, OptionValidator, ValidPyString, IsBoolean,\
     ValidFile
 from .errors import ConsistencyError, BadW3DXML
 from .xml_tools import bool2text, text2bool
+from .names import generate_blender_sound_name
+try:
+    import bpy
+except ImportError:
+    pass
 
 
 class W3DSound(W3DFeature):
@@ -165,4 +170,7 @@ class W3DSound(W3DFeature):
 
     def blend(self):
         """Create representation of W3DSound in Blender"""
-        raise NotImplementedError  # TODO
+        bpy.ops.sound.open(filepath=self["filename"])
+        blender_sound = bpy.data.sounds[-1]
+        blender_sound.name = generate_blender_sound_name(self["name"])
+        print(">>>>>>>", dir(blender_sound))

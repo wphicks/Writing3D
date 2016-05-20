@@ -28,6 +28,11 @@ def generate_blender_object_name(string):
     return "object_{}".format(string)
 
 
+def generate_blender_sound_name(string):
+    """Generate name used for Blender sound"""
+    return "sound_{}".format(string)
+
+
 def generate_blender_material_name(string):
     """Generate name used for Blender material"""
     return "material_{}".format(string)
