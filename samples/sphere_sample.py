@@ -34,34 +34,37 @@ from pyw3d import project, objects, placement, export_to_blender
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
     allow_movement=True)
-
+# initialize theta_div, phi_div, and the radius of the sphere
 theta_div = 10
 phi_div = 10
 radius = 10
+
 for i in range(1, theta_div):
     for j in range(phi_div):
+        # decrement theta by pi over theta_div each time
+        # decrement phi by 2pi/phi_div every time
         theta = pi/theta_div*i
         phi = 2*pi/phi_div*j
-
+        #create a basic object
         my_object = objects.W3DObject(
-            name="elem{}x{}".format(i, j),
-            color=(randint(0, 255), randint(0, 255), randint(0, 255)),
+            name="elem{}x{}".format(i, j), #give it a name based on the "location"
+            color=(randint(0, 255), randint(0, 255), randint(0, 255)), #with a random color
             placement=placement.W3DPlacement(
-                position=(
-                    radius*sin(theta)*cos(phi),
+                position=( #each object has a location based on theta and phi
+                    radius*sin(theta)*cos(phi), 
                     radius*sin(theta)*sin(phi),
                     radius*cos(theta)
                 ),
-                rotation=placement.W3DRotation(
+                rotation=placement.W3DRotation( #set up rotation specifications
                     rotation_mode="LookAt",
-                    rotation_vector=(0, 0, 0)
+                    rotation_vector=(0, 0, 0) #with a vector
                 )
             ),
-            content=objects.W3DText(
-                text="W3D"
+            content=objects.W3DText( #set up text
+                text="W3D" #that reads W3D
             ),
         )
-
+        #add the object to the project
         my_project["objects"].append(my_object)
 
 #Now, we export the project to archival XML (e.g. for use in legacy cwapp
