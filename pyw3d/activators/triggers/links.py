@@ -24,7 +24,7 @@ from pyw3d.names import generate_link_name
 try:
     import bpy
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. Loading pyw3d.timeline as standalone")
 
 

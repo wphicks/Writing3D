@@ -287,7 +287,7 @@ class ReferenceValidator(Validator):
                 return self.valid_options[
                     self.valid_menu_items.index(value)]
         except UnsetValueError:
-            logging.warn("Cannot check relative reference to {}".format(
+            logging.debug("Cannot check relative reference to {}".format(
                 value))
             return self.fallback_validator.coerce(value)
 

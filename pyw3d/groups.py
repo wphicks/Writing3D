@@ -25,7 +25,7 @@ from .names import generate_group_name, \
 try:
     import bpy
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. Loading pyw3d.actions as standalone")
 
 

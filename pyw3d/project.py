@@ -37,7 +37,7 @@ from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
 try:
     import bpy
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 

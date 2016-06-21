@@ -37,7 +37,7 @@ try:
         MoveAction, ColorAction, LinkAction, TimelineStarter, TriggerEnabler,\
         SceneReset, ScaleAction
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Could not import from blender_actions submodule. Loading"
         "pyw3d.actions as standalone."
     )

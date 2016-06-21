@@ -38,7 +38,7 @@ import logging
 try:
     import bpy
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
@@ -852,6 +852,6 @@ class W3DObject(W3DFeature):
         try:
             return self.blender_trigger.write_to_script()
         except AttributeError:
-            logging.warn(
+            logging.debug(
                 "blend() method must be called before write_blender_logic()")
             return None

@@ -25,7 +25,7 @@ from .triggers import BlenderTrigger
 try:
     import bpy
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. Loading "
         "pyw3d.activators.triggers.look_triggers as standalone")
 

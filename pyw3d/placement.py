@@ -28,7 +28,7 @@ try:
     import bpy
     import mathutils
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 

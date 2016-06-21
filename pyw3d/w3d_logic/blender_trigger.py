@@ -21,7 +21,7 @@ import logging
 try:
     import bpy
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module bpy not found. \
 Loading pyw3d.cave_logic.blender_trigger as standalone")
 

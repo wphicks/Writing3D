@@ -21,7 +21,7 @@ import logging
 try:
     import mathutils
 except ImportError:
-    logging.warn(
+    logging.debug(
         "Module mathutils not found. Loading pyw3d.blender_actions.movement as"
         " standalone")
 
