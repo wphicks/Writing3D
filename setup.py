@@ -2,7 +2,7 @@
 import sys
 
 if sys.version_info[0] != 3:
-    raw_input("ERROR: Must be run with Python 3.x. Press enter to exit.")
+    input("ERROR: Must be run with Python 3.x. Press enter to exit.")
     raise RuntimeError("Incorrect Python version")
 
 import os
@@ -11,14 +11,11 @@ import platform
 import shutil
 import tarfile
 import zipfile
-import site
 import stat
 import tempfile
 from urllib.request import urlopen
 from distutils.core import setup
-from distutils.core import Command
 import distutils.command.install
-
 
 
 def find_subdirectory(name, path):
@@ -31,7 +28,7 @@ def find_subdirectory(name, path):
 
 def find_executable(name, path, force=False):
     """Recursively search for executable of given name in path
-    
+
     :param str name: The name of the executable
     :param str path: The path to search
     :param bool force: If file of given name is found and is NOT executable,
@@ -223,10 +220,10 @@ class BlenderInstaller(object):
 
     def install(self, force_install=False):
         """Install Blender, downloading if necessary
-        
+
         Sets self.blender_directory to directory into which install archive is
         inflated
-        
+
         :param bool force_install: Force clean installation even if previous
         install or cached installer archive is found"""
 
@@ -313,7 +310,7 @@ class CustomInstall(distutils.command.install.install):
 
     def copy_pkg_resources(self):
         """Copy the pkg_resources module to Blender module directory
-        
+
         This is necessary to make scripts built into the Writing3D egg
         available to Blender"""
         import pkg_resources
@@ -321,7 +318,7 @@ class CustomInstall(distutils.command.install.install):
 
         # For directory installs...
         if not os.path.basename(pkg_file).startswith("pkg_resources"):
-            pkg_dir = os.path.dirname(pkg_file) 
+            pkg_dir = os.path.dirname(pkg_file)
             new_dir = os.path.join(
                 self.blender_installer.blender_modules,
                 os.path.basename(os.path.normpath(pkg_dir))
@@ -351,7 +348,7 @@ class CustomInstall(distutils.command.install.install):
 
     def _setup_blender_paths(self):
         """Create sitecustomize.py path to make Writing3D available to Blender
-        
+
         :warning: This will add the directory containing the Writing3D install
         to Blender as a site directory. This is not necessarily a good idea,
         since it may also make undesired packages that have been installed to
@@ -404,7 +401,7 @@ class CustomInstall(distutils.command.install.install):
 
     def run(self, *args, **kwargs):
         self.install_blender()
-        #self.copy_pkg_resources()
+        # self.copy_pkg_resources()
         self.insert_paths()
         super().run()
         self._setup_blender_paths()
