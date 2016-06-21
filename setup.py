@@ -13,6 +13,7 @@ import tarfile
 import zipfile
 import site
 import stat
+import tempfile
 from urllib.request import urlopen
 from distutils.core import setup
 from distutils.core import Command
@@ -64,6 +65,8 @@ def path_to_list(path):
 
 def find_existing_pyw3d():
     """Return the egg or install directory for an existing pyw3d install"""
+    cur_dir = os.getcwd()
+    os.chdir(tempfile.gettempdir())
     old_sys_path = sys.path
     sys.path = [
         path for path in old_sys_path if os.path.abspath(path) !=
@@ -73,7 +76,9 @@ def find_existing_pyw3d():
         import pyw3d
     except ImportError:
         sys.path = old_sys_path
+        os.chdir(cur_dir)
         return None
+    os.chdir(cur_dir)
     sys.path = old_sys_path
 
     pyw3d_path = path_to_list(pyw3d.__file__)
