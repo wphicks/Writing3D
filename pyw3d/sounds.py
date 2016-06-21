@@ -157,7 +157,7 @@ class W3DSound(W3DFeature):
                 "Sound node must have Settings child node")
         xml_map = {
             "freq": "frequency_scale", "volume": "volume_scale", "pan": "pan"}
-        for key, value in xml_map:
+        for key, value in xml_map.items():
             if key in settings_node.attrib:
                 new_sound[value] = float(settings_node.attrib[key])
 
