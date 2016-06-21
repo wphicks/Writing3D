@@ -17,14 +17,14 @@
 
 """Blender implementation of clickable object links in virtual space
 """
-import warnings
+import logging
 from .triggers import BlenderTrigger
 from pyw3d.errors import EBKAC
 from pyw3d.names import generate_link_name
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.timeline as standalone")
 
 

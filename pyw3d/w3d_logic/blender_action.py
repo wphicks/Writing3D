@@ -16,11 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for implementing changes to Blender objects"""
-import warnings
+import logging
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 

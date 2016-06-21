@@ -17,11 +17,11 @@
 
 """Tools for activating an event in Blender"""
 
-import warnings
+import logging
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. \
 Loading pyw3d.cave_logic.blender_trigger as standalone")
 

@@ -34,11 +34,11 @@ from .names import generate_blender_object_name,\
     generate_blender_material_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
-import warnings
+import logging
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
@@ -852,6 +852,6 @@ class W3DObject(W3DFeature):
         try:
             return self.blender_trigger.write_to_script()
         except AttributeError:
-            warnings.warn(
+            logging.warn(
                 "blend() method must be called before write_blender_logic()")
             return None

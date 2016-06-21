@@ -23,12 +23,9 @@ import sys
 import pickle
 import subprocess
 import argparse
-import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from pyw3d import BLENDER_EXEC, BLENDER_PLAY
-    from pyw3d import project
-    from pyw3d import EXPORT_SCRIPT
+from pyw3d import BLENDER_EXEC, BLENDER_PLAY
+from pyw3d import project
+from pyw3d import EXPORT_SCRIPT
 
 
 def pickle_w3dproject(input_project, filename="run.p"):

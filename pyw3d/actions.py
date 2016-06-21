@@ -20,7 +20,7 @@
 Here, actions refer generically to any discrete change in elements of a W3D
 project
 """
-import warnings
+import logging
 import xml.etree.ElementTree as ET
 from functools import total_ordering
 from .features import W3DFeature
@@ -37,7 +37,7 @@ try:
         MoveAction, ColorAction, LinkAction, TimelineStarter, TriggerEnabler,\
         SceneReset, ScaleAction
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Could not import from blender_actions submodule. Loading"
         "pyw3d.actions as standalone."
     )

@@ -17,12 +17,12 @@
 
 """Classes used to initiate actions in Blender
 """
-import warnings
+import logging
 from pyw3d.errors import EBKAC
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.timeline as standalone")
 
 

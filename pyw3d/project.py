@@ -19,7 +19,7 @@
 """
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
-import warnings
+import logging
 import math
 import os
 from .features import W3DFeature
@@ -37,7 +37,7 @@ from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 

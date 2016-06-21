@@ -17,11 +17,11 @@
 
 """Tools for moving a Blender object in virtual space"""
 import math
-import warnings
+import logging
 try:
     import mathutils
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module mathutils not found. Loading pyw3d.blender_actions.movement as"
         " standalone")
 

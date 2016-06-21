@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import warnings
+import logging
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .validators import ValidPyString, ListValidator, ReferenceValidator
@@ -25,7 +25,7 @@ from .names import generate_group_name, \
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.actions as standalone")
 
 

@@ -18,13 +18,13 @@
 """A Blender-based implementation of triggers based on the state of the user in
 virtual space
 """
-import warnings
+import logging
 from pyw3d.errors import EBKAC
 from .triggers import BlenderTrigger
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading "
         "pyw3d.activators.triggers.object_triggers as standalone")
 

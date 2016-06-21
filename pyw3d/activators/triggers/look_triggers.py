@@ -18,14 +18,14 @@
 """Blender-based implementation of triggers based on the user's field of view
 """
 import math
-import warnings
+import logging
 from pyw3d.names import generate_blender_object_name
 from pyw3d.errors import EBKAC
 from .triggers import BlenderTrigger
 try:
     import bpy
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading "
         "pyw3d.activators.triggers.look_triggers as standalone")
 

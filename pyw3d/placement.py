@@ -23,12 +23,12 @@ from .validators import OptionValidator, ListValidator, IsNumeric, \
     FeatureValidator
 from .errors import BadW3DXML, ConsistencyError
 from .xml_tools import text2tuple
-import warnings
+import logging
 try:
     import bpy
     import mathutils
 except ImportError:
-    warnings.warn(
+    logging.warn(
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 

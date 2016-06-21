@@ -6,7 +6,6 @@ if sys.version_info[0] != 3:
     raise RuntimeError("Incorrect Python version")
 
 import os
-import warnings
 import fileinput
 import platform
 import shutil
