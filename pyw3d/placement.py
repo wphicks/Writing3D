@@ -23,6 +23,7 @@ from .validators import OptionValidator, ListValidator, IsNumeric, \
     FeatureValidator
 from .errors import BadW3DXML, ConsistencyError
 from .xml_tools import text2tuple
+from .names import generate_relative_to_name
 import logging
 try:
     import bpy
@@ -255,7 +256,7 @@ class W3DPlacement(W3DFeature):
                     layers=[layer == 3 for layer in range(1, 21)]
                 )
                 self.relative_to_objects[wall_name] = bpy.context.object
-                self.relative_to_objects[wall_name].name = wall_name
+                self.relative_to_objects[wall_name].name = generate_relative_to_name(wall_name)
 
         return self.relative_to_objects
 

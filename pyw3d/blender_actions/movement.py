@@ -18,6 +18,7 @@
 """Tools for moving a Blender object in virtual space"""
 import math
 import logging
+from pyw3d.names import generate_relative_to_name
 try:
     import mathutils
 except ImportError:
@@ -153,6 +154,7 @@ class MoveAction(object):
             )
         # ...and now take care of object position
         if "position" in self.placement:
+            
             if self.move_relative:
                 script_text.extend([
                     "blender_object['linV'] = [",
@@ -163,9 +165,22 @@ class MoveAction(object):
                     )]
                 )
             else:
-                script_text.extend([
-                    "target_pos = {}".format(
-                        list(self.placement["position"])),
+                if self.placement["relative_to"] == "Center":
+                     script_test.append(
+                     "target_pos = {}".format(
+                            list(self.placement["position"]))
+                     )
+                    
+                else:
+                    script_text.extend([
+                            "relative_to = scene.objects['{}']".format(
+                                generate_relative_to_name(self.placement["relative_to"])),
+                            "target_pos = ["
+                            "relative_to.position[i] +"
+                            " {}[i] for i in range(len(relative_to.position))]".format(
+                                list(self.placement["position"]))
+                        ])
+                script_text.extend([                  
                     "delta_pos = [target_pos[i] - blender_object.position[i]",
                     "    for i in range(len(blender_object.position))]",
                     "blender_object['linV'] = [",
