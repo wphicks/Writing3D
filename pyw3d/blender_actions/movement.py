@@ -43,7 +43,9 @@ class MoveAction(object):
     def start_string(self):
         script_text = []
         # First take care of object rotation...
+        
         if self.placement["rotation"]["rotation_mode"] != "None":
+
             vector = mathutils.Vector(
                 self.placement["rotation"]["rotation_vector"])
             vector.normalize()
@@ -92,10 +94,11 @@ class MoveAction(object):
                         "rotation = rotation_matrix.to_quaternion()"]
                     )
             else:  # Not move relative
+                
                 script_text.append(
                     "orientation ="
                     "blender_object.orientation.to_quaternion()")
-
+                
                 if self.placement[
                         "rotation"]["rotation_mode"] == "Axis":
                     angle = math.radians(
@@ -142,7 +145,7 @@ class MoveAction(object):
                         "rotation_matrix.col[2] = frame_z",
                         "rotation = rotation_matrix.to_quaternion()"]
                     )
-
+                
             script_text.extend([
                 "blender_object['angV'] = (",
                 "    rotation.angle /",
@@ -152,7 +155,8 @@ class MoveAction(object):
                         self.duration == 0]),
                 "    rotation.axis)"]
             )
-        # ...and now take care of object position
+                   # ...and now take care of object position
+                
         if "position" in self.placement:
             
             if self.move_relative:
@@ -166,7 +170,7 @@ class MoveAction(object):
                 )
             else:
                 if self.placement["relative_to"] == "Center":
-                     script_test.append(
+                     script_text.append( #typo
                      "target_pos = {}".format(
                             list(self.placement["position"]))
                      )
