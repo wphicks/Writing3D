@@ -45,14 +45,18 @@ class Activator(object):
         self.actions = actions
         self.script_header = """
 import bge
+from w3d_settings import *
 from group_defs import *
 import mathutils
 from time import monotonic
 import random
+import logging
 def activate(cont):
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     status = own['status']
+    W3D_LOG.debug("activate called on {} with status {}".format(
+        own.name, own['status']))
     if status == 'Start':
         own['start_time'] = monotonic()
         if ('action_index' not in own

@@ -26,7 +26,7 @@ from .features import W3DFeature
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
 from .validators import ListValidator, IsNumeric, OptionValidator,\
     IsBoolean, FeatureValidator, IsInteger, DictValidator
-from .xml_tools import bool2text, text2tuple, attrib2bool
+from .xml_tools import bool2text, text2tuple, attrib2bool, text2bool
 from .objects import W3DObject
 from .sounds import W3DSound
 from .timeline import W3DTimeline
@@ -50,11 +50,11 @@ def clear_blender_scene():
 def setup_blender_layout():
     """Put Blender interface in a convenient layout"""
     bpy.context.window.screen = bpy.data.screens["Game Logic"]
-    #for area in bpy.context.window.screen.areas:
-    #    if area.type == 'VIEW_3D':
-    #        for space in area.spaces:
-    #            space.region_3d.view_perspective = 'CAMERA'
-    #            space.viewport_shade = "TEXTURED"
+    # for area in bpy.context.window.screen.areas:
+    #     if area.type == 'VIEW_3D':
+    #         for space in area.spaces:
+    #             space.region_3d.view_perspective = 'CAMERA'
+    #             space.viewport_shade = "TEXTURED"
 
 
 def add_key_movement(
@@ -113,14 +113,15 @@ class W3DProject(W3DFeature):
     :param tuple background: Color of background as an RGB tuple of 3 ints
     :param bool allow_movement: Allow user to navigate within project?
     :param bool allow_rotation: Allow user to rotate withing project?
+    :param bool debug: Turn on debug-level logging
     :param dict wall_placements: Dictionary mapping names of walls to
     W3DPlacements specifying their position and orientation
     """
 
-    #ui_order = [
-    #    "camera_placement", "desktop_camera_placement", "far_clip",
-    #    "allow_movement", "allow_rotation", "background"
-    #]
+    # ui_order = [
+    #     "camera_placement", "desktop_camera_placement", "far_clip",
+    #     "allow_movement", "allow_rotation", "background"
+    # ]
     ui_order = ["camera_placement"]
 
     argument_validators = {
@@ -150,7 +151,7 @@ class W3DProject(W3DFeature):
         "desktop_camera_placement": FeatureValidator(
             W3DPlacement,
             help_string="Orientation and position of camera in desktop preview"
-            ),
+        ),
         "far_clip": IsNumeric(min_value=0),
         "background": ListValidator(
             IsInteger(min_value=0, max_value=255),
@@ -158,19 +159,21 @@ class W3DProject(W3DFeature):
             help_string="Red, Green, Blue values"),
         "allow_movement": IsBoolean(),
         "allow_rotation": IsBoolean(),
+        "debug": IsBoolean(),
         "wall_placements": DictValidator(
             OptionValidator(
                 "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
             FeatureValidator(W3DPlacement),
             help_string="Dictionary mapping wall names to placements")
-        }
+    }
 
     default_arguments = {
         "far_clip": 100,
         "background": (0, 0, 0),
         "allow_movement": False,
-        "allow_rotation": False
-        }
+        "allow_rotation": False,
+        "debug": False
+    }
 
     def __init__(self, *args, **kwargs):
         super(W3DProject, self).__init__(*args, **kwargs)
@@ -270,11 +273,15 @@ class W3DProject(W3DFeature):
         self["desktop_camera_placement"].toXML(camera_node)
         ET.SubElement(global_node, "Background", attrib={
             "color": "{}, {}, {}".format(*self["background"])})
-        ET.SubElement(global_node, "WandNavigation", attrib={
-            "allow-rotation": bool2text(self["allow_rotation"]),
-            "allow-movement": bool2text(self["allow_movement"])
+        ET.SubElement(
+            global_node, "WandNavigation",
+            attrib={
+                "allow-rotation": bool2text(self["allow_rotation"]),
+                "allow-movement": bool2text(self["allow_movement"])
             }
         )
+        debug_node = ET.SubElement(global_node, "Debug")
+        debug_node.text = bool2text(self["debug"])
         wall_root = ET.SubElement(project_root, "PlacementRoot")
         for wall, placement in self["wall_placements"].items():
             place_root = placement.toXML(wall_root)
@@ -352,6 +359,10 @@ class W3DProject(W3DFeature):
         new_project["allow_movement"] = attrib2bool(
             wand_node, "allow-movement", default=False)
 
+        debug_node = global_root.find("Debug")
+        if debug_node is not None:
+            new_project["debug"] = text2bool(debug_node.text)
+
         wall_root = project_root.find("PlacementRoot")
         for placement in wall_root.findall("Placement"):
             try:
@@ -402,13 +413,29 @@ class W3DProject(W3DFeature):
         self["groups"] = new_groups
 
     def setup_camera(self):
-        bpy.ops.object.camera_add(rotation=(math.pi/2, 0, 0))
+        bpy.ops.object.camera_add(rotation=(math.pi / 2, 0, 0))
         bpy.data.cameras[-1].clip_end = self["far_clip"]
         self.main_camera = bpy.context.object
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
         bpy.data.scenes['Scene'].camera = self.main_camera
+
+    def setup_settings(self):
+        """Put any global settings in w3d_settings.py"""
+        bpy.data.texts.new("w3d_settings.py")
+        settings_script = bpy.data.texts["w3d_settings.py"]
+        script_text = [
+            "import logging",
+            "W3D_DEBUG = {}".format(self["debug"]),
+            "W3D_LOG = logging.getLogger('W3D')",
+            "if W3D_DEBUG:",
+            "    logging.basicConfig(",
+            "        level=logging.DEBUG,",
+            "        format='%(asctime)-15s %(levelname)8s %(name)s "
+            "%(message)s')",
+        ]
+        settings_script.write("\n".join(script_text))
 
     def setup_controls(self):
         bpy.context.scene.objects.active = self.main_camera
@@ -458,7 +485,6 @@ class W3DProject(W3DFeature):
 
         self.add_move_toggle()
 
-        #TODO: Mouselook script and actuators
         if self["allow_movement"]:
             add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
             add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
@@ -503,12 +529,13 @@ class W3DProject(W3DFeature):
         bpy.data.scenes["Scene"].game_settings.material_mode = "MULTITEXTURE"
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
+        self.setup_settings()
         self.setup_camera()
         self.setup_controls()
         self.sort_groups()
-        bpy.data.texts.new("group_defs.py")
+        bpy.data.texts.new("group_defs.py")  # Script for assigning group names
         bpy.data.worlds["World"].horizon_color = self["background"]
-        #bpy.data.worlds["World"].ambient_color = self["background"]
+        # bpy.data.worlds["World"].ambient_color = self["background"]
 
         # Create Objects
         for group in self["groups"]:
@@ -517,7 +544,6 @@ class W3DProject(W3DFeature):
             group.blend_groups()
         for object_ in self["objects"]:
             object_.blend()
-        # TODO: Call methods to add links
         for sound in self["sounds"]:
             sound.blend()
 
