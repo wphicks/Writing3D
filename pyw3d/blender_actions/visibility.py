@@ -36,6 +36,7 @@ class VisibilityAction(object):
             "blender_object.setVisible(True)",
             "delta_alpha = {} - blender_object.color[3]".format(
                 int(self.visible)),
+            "W3D_LOG.debug('object {} visibility set to {}')".format(blender_object,self.visible),
             "blender_object['visV'] = delta_alpha/{}".format(
                 ("({}*bge.logic.getLogicTicRate())".format(self.duration), 1)[
                     self.duration == 0])]

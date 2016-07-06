@@ -155,7 +155,6 @@ class W3DRotation(W3DFeature):
             difference = mathutils.Vector(
                 self["rotation_vector"]).rotation_difference(current_normal)
             rotation_matrix = difference.to_matrix()
-
         return rotation_matrix
 
     def rotate(self, blender_object):

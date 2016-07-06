@@ -360,6 +360,8 @@ class W3DProject(W3DFeature):
             wand_node, "allow-movement", default=False)
 
         debug_node = global_root.find("Debug")
+        print("bug") 
+        print(debug_node)
         if debug_node is not None:
             new_project["debug"] = text2bool(debug_node.text)
 

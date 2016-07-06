@@ -156,7 +156,7 @@ class MoveAction(object):
                 "    rotation.axis)"]
             )
                    # ...and now take care of object position
-                
+
         if "position" in self.placement:
             
             if self.move_relative:
@@ -247,7 +247,7 @@ class MoveAction(object):
             return "{}pass".format("    "*self.offset)
         return "\n{}".format("    "*self.offset).join(script_text)
 
-    def __init__(self, placement, duration, move_relative=False, offset=0):
+    def __init__(self, placement, duration, move_relative=False, offset=0):       
         self.placement = placement
         self.duration = duration
         self.move_relative = move_relative

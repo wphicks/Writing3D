@@ -69,6 +69,7 @@ def activate(cont):
         own['offset_index'] = 0
         own['status'] = 'Continue'
     if status == 'Stop':
+        W3D_LOG.debug("activate status stopped on {}".format(own.name))
         try:
             own['offset_time'] = monotonic() - own['start_time']
             own['offset_index'] = own['action_index']
