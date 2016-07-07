@@ -136,7 +136,7 @@ class BlenderClickTrigger(BlenderTrigger):
                 [coord/255. for coord in self.select_color])),
             "    enable_color = {}".format(str(
                 [coord/255. for coord in self.enable_color])),
-            "    if mouse_click.positive and mouse_over.positive:",
+            "    if mouse_click.positive and mouse_over.positive and own.visible:",
             "        if 'old_color' not in own or own['old_color'] is None:",
             "            own['old_color'] = [coord for coord in own.color]",
             "        new_color = own.color",
