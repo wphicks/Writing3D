@@ -300,7 +300,9 @@ class CustomInstall(distutils.command.install.install):
     order to set these paths, modify setup.cfg as needed."""
 
     user_options = distutils.command.install.install.user_options + [
-        ('w3dhome=', None, "home directory for Writing3D")
+        ('w3dhome=', None, "home directory for Writing3D"),
+        ('blenderdir=', None,
+            "directory containing blender and blenderplayer executable"),
     ]
 
     def message(self, string):
@@ -310,8 +312,10 @@ class CustomInstall(distutils.command.install.install):
 
     def install_blender(self):
         """Install Blender if necessary"""
+        if self.blenderdir is None:
+            self.blenderdir = self.w3dhome
         self.blender_installer = BlenderInstaller(
-            self.w3dhome, verbose=self.verbose)
+            self.blenderdir, verbose=self.verbose)
         self.blender_installer.install()
 
     def insert_paths(self):
@@ -374,13 +378,11 @@ class CustomInstall(distutils.command.install.install):
 
     def finalize_options(self, *args, **kwargs):
         if self.w3dhome is None:
-            self.message("w3dhome not set. Using default.")
             self.w3dhome = os.path.expanduser(os.path.join("~", "Writing3D"))
+            self.message("w3dhome not set. Using {}.".format(self.w3dhome))
         if not os.path.isdir(self.w3dhome):
             self.message("Creating {}".format(self.w3dhome))
             os.makedirs(self.w3dhome)
-        self.message("Installing Writing3D interfaces in {}".format(
-            self.w3dhome))
         super().finalize_options()
 
     def run(self, *args, **kwargs):
