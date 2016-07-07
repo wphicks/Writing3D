@@ -13,9 +13,15 @@ import tarfile
 import zipfile
 import stat
 import tempfile
+import logging
 from urllib.request import urlopen
 from distutils.core import setup
 import distutils.command.install
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 def find_subdirectory(name, path):
@@ -308,28 +314,6 @@ class CustomInstall(distutils.command.install.install):
             self.w3dhome, verbose=self.verbose)
         self.blender_installer.install()
 
-    def copy_pkg_resources(self):
-        """Copy the pkg_resources module to Blender module directory
-
-        This is necessary to make scripts built into the Writing3D egg
-        available to Blender"""
-        import pkg_resources
-        pkg_file = pkg_resources.__file__
-
-        # For directory installs...
-        if not os.path.basename(pkg_file).startswith("pkg_resources"):
-            pkg_dir = os.path.dirname(pkg_file)
-            new_dir = os.path.join(
-                self.blender_installer.blender_modules,
-                os.path.basename(os.path.normpath(pkg_dir))
-            )
-            self.message("Copying {} to {}...".format(pkg_dir, new_dir))
-            shutil.copytree(pkg_dir, new_dir)
-        else:
-            new_dir = self.blender_installer.blender_modules
-            self.message("Copying {} to {}...".format(pkg_file, new_dir))
-            shutil.copy(pkg_file, new_dir)
-
     def insert_paths(self):
         """Insert necessary paths into source"""
         for line in fileinput.input("pyw3d/__init__.py", inplace=1):
@@ -401,7 +385,6 @@ class CustomInstall(distutils.command.install.install):
 
     def run(self, *args, **kwargs):
         self.install_blender()
-        # self.copy_pkg_resources()
         self.insert_paths()
         super().run()
         self._setup_blender_paths()
