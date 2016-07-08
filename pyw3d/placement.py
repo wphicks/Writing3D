@@ -39,7 +39,7 @@ def convert_to_blender_axes(vector):
     In Blender, positive z-axis points up"""
     if vector is None:
         return None
-    return list((vector[0]*0.3048, -vector[2]*0.3048, vector[1]*0.3048))
+    return list((vector[0] * 0.3048, -vector[2] * 0.3048, vector[1] * 0.3048))
 
 
 def convert_to_legacy_axes(vector):
@@ -48,7 +48,7 @@ def convert_to_legacy_axes(vector):
     In Blender, positive z-axis points up"""
     if vector is None:
         return None
-    return list((vector[0]/0.3048, vector[2]/0.3048, -vector[1]/0.3048))
+    return list((vector[0] / 0.3048, vector[2] / 0.3048, -vector[1] / 0.3048))
 
 
 def matrix_from_look(look_direction, up_direction=None):
@@ -155,6 +155,7 @@ class W3DRotation(W3DFeature):
             difference = mathutils.Vector(
                 self["rotation_vector"]).rotation_difference(current_normal)
             rotation_matrix = difference.to_matrix()
+
         return rotation_matrix
 
     def rotate(self, blender_object):
@@ -185,7 +186,7 @@ class W3DPlacement(W3DFeature):
     default_arguments = {
         "relative_to": "Center",
         "position": (0, 0, 0),
-        }
+    }
     relative_to_objects = {}
     """Dictionary mapping names of relative_to options to Blender
     representations
@@ -227,7 +228,7 @@ class W3DPlacement(W3DFeature):
                 return placement
         return placement
 
-    #TODO: Deal with non-standard wall placements
+    # TODO: Deal with non-standard wall placements
     def _create_relative_to_objects(
             self,
             wall_positions={
@@ -239,10 +240,9 @@ class W3DPlacement(W3DFeature):
             wall_rotations={
                 "Center": (0, 0, 0),
                 "FrontWall": (0, 0, 0),
-                "LeftWall": (0, 0, math.pi/2),
-                "RightWall": (0, 0, -math.pi/2),
-                "FloorWall": (-math.pi/2, 0, 0)}
-            ):
+                "LeftWall": (0, 0, math.pi / 2),
+                "RightWall": (0, 0, -math.pi / 2),
+                "FloorWall": (-math.pi / 2, 0, 0)}):
         """Create Blender objects corresponding to relative_to options if
         necessary"""
         if len(self.relative_to_objects) != len(
@@ -255,7 +255,8 @@ class W3DPlacement(W3DFeature):
                     layers=[layer == 3 for layer in range(1, 21)]
                 )
                 self.relative_to_objects[wall_name] = bpy.context.object
-                self.relative_to_objects[wall_name].name = generate_relative_to_name(wall_name)
+                self.relative_to_objects[
+                    wall_name].name = generate_relative_to_name(wall_name)
 
         return self.relative_to_objects
 

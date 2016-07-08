@@ -372,7 +372,7 @@ class CustomInstall(distutils.command.install.install):
         for line in fileinput.input("sitecustomize.py", inplace=1):
             if "SYSSUBTAG" in line:
                 print(
-                    "site.addsitedir(r'{}') # SYSSUBTAG".format(
+                    "site.addsitedir(r'{}')  # SYSSUBTAG".format(
                         package_path)
                 )
             else:

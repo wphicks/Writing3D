@@ -109,7 +109,7 @@ def generate_object_action_logic(
     offset = conditions.offset + 1
     start_text.append(conditions.start_string)
     start_text.append("{}index += 1".format(
-        "    "*(offset)))
+        "    " * (offset)))
     start_text.extend(object_action._blender_object_selection(
         offset=offset)
     )
@@ -126,7 +126,7 @@ def generate_object_action_logic(
     # Yeah... I know. It's kinda ugly.
 
     cont_text.append("{}remaining_time = {} - time".format(
-        "    "*(offset),
+        "    " * (offset),
         object_action.end_time)
     )
 
@@ -178,7 +178,7 @@ def generate_object_action_logic(
         end_text.append(action.end_string)
 
     end_text.append(
-        "{}own['random_choice'] = None".format("    "*offset)
+        "{}own['random_choice'] = None".format("    " * offset)
     )
 
     return start_text + cont_text + end_text
@@ -211,21 +211,21 @@ class ObjectAction(W3DAction):
             W3DPlacement,
             help_string="Orientation and position for movement"),
         "move_relative": IsBoolean(),
-        "color": ListValidator( 
+        "color": ListValidator(
             IsInteger(min_value=0, max_value=255),
             required_length=3,
             help_string="Red, Green, Blue values"),
         "scale": IsNumeric(min_value=0),
-        #TODO
+        # TODO
         "sound_change": OptionValidator("Play Sound", "Stop Sound"),
         "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
-        }
+    }
 
     default_arguments = {
         "duration": 1,
         "move_relative": False
-        }
+    }
 
     link_xml_tags = {
         "Enable": "link_on", "Disable": "link_off", "Activate": "activate",
@@ -239,7 +239,7 @@ class ObjectAction(W3DAction):
         """
         change_root = ET.SubElement(
             parent_root, "ObjectChange", attrib={"name": self["object_name"]}
-            )
+        )
         trans_root = ET.SubElement(
             change_root, "Transition",
             attrib={"duration": str(self["duration"])})
@@ -324,7 +324,7 @@ class ObjectAction(W3DAction):
         blender_object_name = generate_blender_object_name(self["object_name"])
         self.selection_offset = 0
         return ["{}blender_object = scene.objects['{}']".format(
-            "    "*offset, blender_object_name)]
+            "    " * offset, blender_object_name)]
 
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,
@@ -371,12 +371,12 @@ class GroupAction(W3DAction):
         "sound_change": OptionValidator("Play Sound", "Stop Sound"),
         "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
-        }
+    }
 
     default_arguments = {
         "duration": 1,
         "choose_random": False
-        }
+    }
 
     link_xml_tags = {
         "Enable": "link_on", "Disable": "link_off", "Activate": "activate",
@@ -389,7 +389,7 @@ class GroupAction(W3DAction):
         """
         change_root = ET.SubElement(
             parent_root, "GroupRef", attrib={"name": self["group_name"]}
-            )
+        )
         if not self.is_default("choose_random"):
             change_root.attrib["random"] = bool2text(self["choose_random"])
         trans_root = ET.SubElement(
@@ -487,22 +487,22 @@ class GroupAction(W3DAction):
         blender_group_name = generate_group_name(self["group_name"])
         if self["choose_random"]:
             script_text = [
-                "{}if (".format("    "*offset),
-                "{}        'random_choice' not in own".format("    "*offset),
+                "{}if (".format("    " * offset),
+                "{}        'random_choice' not in own".format("    " * offset),
                 "{}        or own['random_choice'] is None):".format(
-                    "    "*offset),
+                    "    " * offset),
                 "{}    own['random_choice'] = random.choice({})".format(
-                    "    "*offset, blender_group_name),
-                "{}blender_object = scene.objects[".format("    "*offset),
-                "{}    own['random_choice']]".format("    "*offset)
+                    "    " * offset, blender_group_name),
+                "{}blender_object = scene.objects[".format("    " * offset),
+                "{}    own['random_choice']]".format("    " * offset)
             ]
             self.selection_offset = 0
         else:
             script_text = [
                 "{}for object_name in {}:".format(
-                    "    "*offset, blender_group_name),
+                    "    " * offset, blender_group_name),
                 "{}    blender_object = scene.objects[object_name]".format(
-                    "    "*offset)
+                    "    " * offset)
             ]
             self.selection_offset = 1
         return script_text
@@ -531,14 +531,14 @@ class TimelineAction(W3DAction):
             help_string="Must be the name of a timeline"),
         "change": OptionValidator(
             "Start", "Stop", "Continue", "Start if not started")
-        }
+    }
 
     default_arguments = {}
 
     change_xml_tags = {
         "Start": "start", "Stop": "stop", "Continue": "continue",
         "Start if not started": "start_if_not_started"
-        }
+    }
 
     def toXML(self, parent_root):
         """Store TimelineChange as TimerChange node within one of several node
@@ -602,9 +602,9 @@ class TimelineAction(W3DAction):
         end_text.append(conditions.end_string)
 
         start_text.append("{}index += 1".format(
-            "    "*(conditions.offset + 1)))
+            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
-            "    "*(conditions.offset + 1),
+            "    " * (conditions.offset + 1),
             self.end_time)
         )
 
@@ -630,7 +630,7 @@ class SoundAction(W3DAction):
             ["sounds"],
             help_string="Must be the name of a sound"),
         "change": OptionValidator("Start", "Stop")
-        }
+    }
 
     default_arguments = {
         "change": "Start"}
@@ -685,7 +685,7 @@ class EventTriggerAction(W3DAction):
             help_string="Must be the name of a trigger"
         ),
         "enable": IsBoolean()
-        }
+    }
 
     default_arguments = {}
 
@@ -701,8 +701,8 @@ class EventTriggerAction(W3DAction):
                 attrib={
                     "name": str(self["trigger_name"]),
                     "enable": str(self["enable"])
-                    }
-                )
+                }
+            )
         except KeyError:
             raise ConsistencyError(
                 "EventTriggerAction must specify both trigger_name and enable")
@@ -747,9 +747,9 @@ class EventTriggerAction(W3DAction):
         end_text.append(conditions.end_string)
 
         start_text.append("{}index += 1".format(
-            "    "*(conditions.offset + 1)))
+            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
-            "    "*(conditions.offset + 1),
+            "    " * (conditions.offset + 1),
             self.end_time)
         )
 
@@ -775,12 +775,12 @@ class MoveVRAction(W3DAction):
         "move_relative": IsBoolean(),
         "duration": IsNumeric(min_value=0),
         "placement": FeatureValidator(W3DPlacement)
-        }
+    }
 
     default_arguments = {
         "move_relative": False,
         "duration": 0
-        }
+    }
 
     def toXML(self, parent_root):
         """Store MoveVRAction as MoveCave node within one of several node
@@ -795,8 +795,7 @@ class MoveVRAction(W3DAction):
             relative = self["move_relative"]
         except KeyError:
             raise ConsistencyError(
-                'MoveVRAction must specify a value for "relative" key'
-                )
+                'MoveVRAction must specify a value for "relative" key')
         if relative:
             ET.SubElement(action_root, "Relative")
         else:
@@ -805,8 +804,7 @@ class MoveVRAction(W3DAction):
             self["placement"].toXML(action_root)
         except KeyError:
             raise ConsistencyError(
-                'MoveVRAction must specify a value for "placement" key'
-                )
+                'MoveVRAction must specify a value for "placement" key')
         return action_root
 
     @classmethod
@@ -824,20 +822,18 @@ class MoveVRAction(W3DAction):
             new_action["move_relative"] = False
         else:
             raise BadW3DXML(
-                "MoveCave node must contain either Absolute or Relative child"
-                )
+                "MoveCave node must contain either Absolute or Relative child")
         place_node = move_cave_root.find("Placement")
         if place_node is None:
             raise BadW3DXML(
-                "MoveCave node must contain Placement child node"
-                )
+                "MoveCave node must contain Placement child node")
         new_action["placement"] = W3DPlacement.fromXML(place_node)
         return new_action
 
     def _blender_object_selection(self, offset=0):
         self.selection_offset = 0
         return ["{}blender_object = scene.objects['CAMERA']".format(
-            "    "*offset)]
+            "    " * offset)]
 
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,
@@ -890,9 +886,9 @@ class W3DResetAction(W3DAction):
         end_text.append(conditions.end_string)
 
         start_text.append("{}index += 1".format(
-            "    "*(conditions.offset + 1)))
+            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
-            "    "*(conditions.offset + 1),
+            "    " * (conditions.offset + 1),
             self.end_time)
         )
 

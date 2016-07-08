@@ -112,7 +112,7 @@ class BlenderLookAtTrigger(BlenderTrigger):
         camera_enable_sensor.value = str(self.enable_immediately)
         self.camera_enable_sensor = camera_enable_sensor
 
-        #Create controller to detect trigger events
+        # Create controller to detect trigger events
         camera_object = self.select_camera()
         bpy.ops.logic.controller_add(
             type='PYTHON',

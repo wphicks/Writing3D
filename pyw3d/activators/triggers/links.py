@@ -34,7 +34,7 @@ class BlenderClickTrigger(BlenderTrigger):
     :param str object_name: The name of the clickable object
     """
 
-    #TODO: Change color when enabled
+    # TODO: Change color when enabled
 
     def select_target_object(self):
         """Select the clickable object for modification"""
@@ -133,10 +133,12 @@ class BlenderClickTrigger(BlenderTrigger):
             # TODO: Test the above
             "    trigger = scene.objects['{}']".format(self.name),
             "    select_color = {}".format(str(
-                [coord/255. for coord in self.select_color])),
+                [coord / 255. for coord in self.select_color])),
             "    enable_color = {}".format(str(
-                [coord/255. for coord in self.enable_color])),
-            "    if mouse_click.positive and mouse_over.positive and own.visible:",
+                [coord / 255. for coord in self.enable_color])),
+            "    if (",
+            "            mouse_click.positive and mouse_over.positive",
+            "            and own.visible):",
             "        if 'old_color' not in own or own['old_color'] is None:",
             "            own['old_color'] = [coord for coord in own.color]",
             "        new_color = own.color",

@@ -17,8 +17,8 @@
 
 """A module for working with W3D Writing projects
 """
-BLENDER_EXEC = "blender" # BLENDEREXECSUBTAG
-BLENDER_PLAY = "blenderplayer" # BLENDERPLAYERSUBTAG
+BLENDER_EXEC = "blender"  # BLENDEREXECSUBTAG
+BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
 
 import os  # TODO: Avoid this, obviously
 

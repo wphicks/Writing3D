@@ -69,7 +69,6 @@ def activate(cont):
         own['offset_index'] = 0
         own['status'] = 'Continue'
     if status == 'Stop':
-        W3D_LOG.debug("activate status stopped on {}".format(own.name))
         try:
             own['offset_time'] = monotonic() - own['start_time']
             own['offset_index'] = own['action_index']
@@ -149,7 +148,7 @@ def activate(cont):
         detects when the status is set to "Stop"
         """
         self.select_base_object()
-        #Create property sensor to initiate actions
+        # Create property sensor to initiate actions
         bpy.ops.logic.sensor_add(
             type="PROPERTY",
             object=self.name,
@@ -160,7 +159,7 @@ def activate(cont):
         start_sensor.property = "status"
         start_sensor.value = "Start"
 
-        #Create property sensor to activate actions
+        # Create property sensor to activate actions
         bpy.ops.logic.sensor_add(
             type="PROPERTY",
             object=self.name,
@@ -169,11 +168,10 @@ def activate(cont):
         self.base_object.game.sensors[-1].name = "active_sensor"
         active_sensor = self.base_object.game.sensors["active_sensor"]
         active_sensor.use_pulse_true_level = True
-        #active_sensor.frequency = 1
         active_sensor.property = "status"
         active_sensor.value = "Continue"
 
-        #Create property sensor to pause actions
+        # Create property sensor to pause actions
         bpy.ops.logic.sensor_add(
             type="PROPERTY",
             object=self.name,

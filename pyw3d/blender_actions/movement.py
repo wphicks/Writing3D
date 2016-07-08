@@ -27,7 +27,7 @@ except ImportError:
         " standalone")
 
 
-#TODO: Handle moves relative to walls
+# TODO: Handle moves relative to walls
 class MoveAction(object):
     """Generate Python logic for how object should move when action first
     starts, as it continues, and when it ends
@@ -43,7 +43,6 @@ class MoveAction(object):
     def start_string(self):
         script_text = []
         # First take care of object rotation...
-        
         if self.placement["rotation"]["rotation_mode"] != "None":
 
             vector = mathutils.Vector(
@@ -94,11 +93,10 @@ class MoveAction(object):
                         "rotation = rotation_matrix.to_quaternion()"]
                     )
             else:  # Not move relative
-                
                 script_text.append(
                     "orientation ="
                     "blender_object.orientation.to_quaternion()")
-                
+
                 if self.placement[
                         "rotation"]["rotation_mode"] == "Axis":
                     angle = math.radians(
@@ -145,7 +143,7 @@ class MoveAction(object):
                         "rotation_matrix.col[2] = frame_z",
                         "rotation = rotation_matrix.to_quaternion()"]
                     )
-                
+
             script_text.extend([
                 "blender_object['angV'] = (",
                 "    rotation.angle /",
@@ -155,10 +153,8 @@ class MoveAction(object):
                         self.duration == 0]),
                 "    rotation.axis)"]
             )
-                   # ...and now take care of object position
-
+        # ...and now take care of object position
         if "position" in self.placement:
-            
             if self.move_relative:
                 script_text.extend([
                     "blender_object['linV'] = [",
@@ -170,21 +166,25 @@ class MoveAction(object):
                 )
             else:
                 if self.placement["relative_to"] == "Center":
-                     script_text.append( #typo
-                     "target_pos = {}".format(
-                            list(self.placement["position"]))
-                     )
-                    
+                    script_text.append(
+                        "target_pos = {}".format(
+                            list(self.placement["position"])
+                        )
+                    )
                 else:
                     script_text.extend([
-                            "relative_to = scene.objects['{}']".format(
-                                generate_relative_to_name(self.placement["relative_to"])),
-                            "target_pos = ["
-                            "relative_to.position[i] +"
-                            " {}[i] for i in range(len(relative_to.position))]".format(
-                                list(self.placement["position"]))
-                        ])
-                script_text.extend([                  
+                        "relative_to = scene.objects['{}']".format(
+                            generate_relative_to_name(
+                                self.placement["relative_to"]
+                            )
+                        ),
+                        "target_pos = [",
+                        "    relative_to.position[i] + {}[i] for i in ".format(
+                            list(self.placement["position"])),
+                        "    range(len(relative_to.position))",
+                        "]"
+                    ])
+                script_text.extend([
                     "delta_pos = [target_pos[i] - blender_object.position[i]",
                     "    for i in range(len(blender_object.position))]",
                     "blender_object['linV'] = [",
@@ -194,10 +194,11 @@ class MoveAction(object):
                 )
 
         try:
-            script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
+            script_text[0] = "{}{}".format(
+                "    " * self.offset, script_text[0])
         except IndexError:
             return ""
-        return "\n{}".format("    "*self.offset).join(script_text)
+        return "\n{}".format("    " * self.offset).join(script_text)
 
     @property
     def continue_string(self):
@@ -217,10 +218,11 @@ class MoveAction(object):
             )
 
         try:
-            script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
+            script_text[0] = "{}{}".format(
+                "    " * self.offset, script_text[0])
         except IndexError:
             return ""
-        return "\n{}".format("    "*self.offset).join(script_text)
+        return "\n{}".format("    " * self.offset).join(script_text)
 
     @property
     def end_string(self):
@@ -242,12 +244,13 @@ class MoveAction(object):
                 )
 
         try:
-            script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
+            script_text[0] = "{}{}".format(
+                "    " * self.offset, script_text[0])
         except IndexError:
-            return "{}pass".format("    "*self.offset)
-        return "\n{}".format("    "*self.offset).join(script_text)
+            return "{}pass".format("    " * self.offset)
+        return "\n{}".format("    " * self.offset).join(script_text)
 
-    def __init__(self, placement, duration, move_relative=False, offset=0):       
+    def __init__(self, placement, duration, move_relative=False, offset=0):
         self.placement = placement
         self.duration = duration
         self.move_relative = move_relative

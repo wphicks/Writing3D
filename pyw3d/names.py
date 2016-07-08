@@ -52,6 +52,7 @@ def generate_group_name(string):
     """Generate name used for Blender group"""
     return "group_{}".format(string)
 
+
 def generate_relative_to_name(string):
     """Generate name used for relative_to objects"""
     return "relative_to_{}".format(string)
