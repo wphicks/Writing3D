@@ -409,7 +409,7 @@ class CustomInstall(distutils.command.install.install):
 if __name__ == "__main__":
     setup(
         name="Writing3D",
-        version="0.0.2",
+        version="0.0.3",
         author="William Hicks",
         author_email="william_hicks@alumni.brown.edu",
         description="A program for creating literary and artistic VR projects",
