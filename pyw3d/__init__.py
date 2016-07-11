@@ -17,34 +17,33 @@
 
 """A module for working with W3D Writing projects
 """
-BLENDER_EXEC = "blender"  # BLENDEREXECSUBTAG
-BLENDER_PLAY = "blenderplayer"  # BLENDERPLAYERSUBTAG
-
-import os  # TODO: Avoid this, obviously
+import os
+import json
 
 
-def __get_scripts_directory():
-    import sys
-    import platform
-    import site
-    """Return directory where W3D scripts have been installed
+class W3DConfigError(Exception):
+    """Exception thrown when an error is detected in the configuration or
+    installation of Writing3D
+    """
+    def __init__(self, message):
+        super().__init__(message)
 
-    :warn: This assumes a default installation with user scheme
+W3D_CONFIG_FILENAME = os.path.join(
+    os.path.dirname(__file__),
+    'data',
+    'w3d.json'
+)
+try:
+    with open(W3D_CONFIG_FILENAME) as w3d_config_file:
+        W3D_CONFIG = json.load(w3d_config_file)
+except FileNotFoundError:
+    raise W3DConfigError(
+        "No Writing3D configuration file found"
+    )
 
-    :todo: Add fallbacks for alternate installations"""
-
-    if platform.system() in ("Windows",):
-        scripts_dir = os.path.join(
-            "Python{}{}".format(*(sys.version_info[:2])),
-            "Scripts"
-        )
-    else:
-        scripts_dir = "bin"
-    scripts_dir = os.path.join(site.getuserbase(), scripts_dir)
-    return scripts_dir
-
-
-EXPORT_SCRIPT = os.path.join(__get_scripts_directory(), "w3d_export_tools.py")
+BLENDER_EXEC = W3D_CONFIG["Blender executable"]
+BLENDER_PLAY = W3D_CONFIG["Blender player executable"]
+EXPORT_SCRIPT = W3D_CONFIG["Export script path"
 
 from . import project
 from . import features
