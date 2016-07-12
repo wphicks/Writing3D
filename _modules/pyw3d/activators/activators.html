@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" />
+    <link rel="up" title="pyw3d" href="../../pyw3d.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -57,12 +57,12 @@
 
 <span class="sd">&quot;&quot;&quot;Classes used to initiate actions in Blender</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">pyw3d.errors</span> <span class="kn">import</span> <span class="n">EBKAC</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">bpy</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
         <span class="s2">&quot;Module bpy not found. Loading pyw3d.timeline as standalone&quot;</span><span class="p">)</span>
 
 
@@ -85,14 +85,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="n">actions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">script_header</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">import bge</span>
+<span class="s2">from w3d_settings import *</span>
 <span class="s2">from group_defs import *</span>
 <span class="s2">import mathutils</span>
 <span class="s2">from time import monotonic</span>
 <span class="s2">import random</span>
+<span class="s2">import logging</span>
 <span class="s2">def activate(cont):</span>
 <span class="s2">    scene = bge.logic.getCurrentScene()</span>
 <span class="s2">    own = cont.owner</span>
 <span class="s2">    status = own[&#39;status&#39;]</span>
+<span class="s2">    W3D_LOG.debug(&quot;activate called on {} with status {}&quot;.format(</span>
+<span class="s2">        own.name, own[&#39;status&#39;]))</span>
 <span class="s2">    if status == &#39;Start&#39;:</span>
 <span class="s2">        own[&#39;start_time&#39;] = monotonic()</span>
 <span class="s2">        if (&#39;action_index&#39; not in own</span>
@@ -184,7 +188,7 @@
 <span class="sd">        detects when the status is set to &quot;Stop&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">select_base_object</span><span class="p">()</span>
-        <span class="c1">#Create property sensor to initiate actions</span>
+        <span class="c1"># Create property sensor to initiate actions</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
             <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
             <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -195,7 +199,7 @@
         <span class="n">start_sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;status&quot;</span>
         <span class="n">start_sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;Start&quot;</span>
 
-        <span class="c1">#Create property sensor to activate actions</span>
+        <span class="c1"># Create property sensor to activate actions</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
             <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
             <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -204,11 +208,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;active_sensor&quot;</span>
         <span class="n">active_sensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_object</span><span class="o">.</span><span class="n">game</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s2">&quot;active_sensor&quot;</span><span class="p">]</span>
         <span class="n">active_sensor</span><span class="o">.</span><span class="n">use_pulse_true_level</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="c1">#active_sensor.frequency = 1</span>
         <span class="n">active_sensor</span><span class="o">.</span><span class="n">property</span> <span class="o">=</span> <span class="s2">&quot;status&quot;</span>
         <span class="n">active_sensor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;Continue&quot;</span>
 
-        <span class="c1">#Create property sensor to pause actions</span>
+        <span class="c1"># Create property sensor to pause actions</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">logic</span><span class="o">.</span><span class="n">sensor_add</span><span class="p">(</span>
             <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PROPERTY&quot;</span><span class="p">,</span>
             <span class="nb">object</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -339,6 +342,8 @@
 <ul>
   <li><a href="../../../index.html">Documentation overview</a><ul>
   <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../pyw3d.html">pyw3d</a><ul>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>

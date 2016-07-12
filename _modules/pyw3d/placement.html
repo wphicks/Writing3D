@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" />
+    <link rel="up" title="pyw3d" href="../pyw3d.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -63,12 +63,13 @@
     <span class="n">FeatureValidator</span>
 <span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">BadW3DXML</span><span class="p">,</span> <span class="n">ConsistencyError</span>
 <span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">text2tuple</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">.names</span> <span class="kn">import</span> <span class="n">generate_relative_to_name</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">bpy</span>
     <span class="kn">import</span> <span class="nn">mathutils</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
         <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
 
 
@@ -78,7 +79,7 @@
 <span class="sd">    In Blender, positive z-axis points up&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">None</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.3048</span><span class="p">,</span> <span class="o">-</span><span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mf">0.3048</span><span class="p">,</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">0.3048</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.3048</span><span class="p">,</span> <span class="o">-</span><span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.3048</span><span class="p">,</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.3048</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="convert_to_legacy_axes"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.convert_to_legacy_axes">[docs]</a><span class="k">def</span> <span class="nf">convert_to_legacy_axes</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
@@ -87,7 +88,7 @@
 <span class="sd">    In Blender, positive z-axis points up&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">None</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mf">0.3048</span><span class="p">,</span> <span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mf">0.3048</span><span class="p">,</span> <span class="o">-</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">0.3048</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">0.3048</span><span class="p">,</span> <span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mf">0.3048</span><span class="p">,</span> <span class="o">-</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">0.3048</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="matrix_from_look"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.placement.matrix_from_look">[docs]</a><span class="k">def</span> <span class="nf">matrix_from_look</span><span class="p">(</span><span class="n">look_direction</span><span class="p">,</span> <span class="n">up_direction</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -225,7 +226,7 @@
     <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;relative_to&quot;</span><span class="p">:</span> <span class="s2">&quot;Center&quot;</span><span class="p">,</span>
         <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="p">}</span>
+    <span class="p">}</span>
     <span class="n">relative_to_objects</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="sd">&quot;&quot;&quot;Dictionary mapping names of relative_to options to Blender</span>
 <span class="sd">    representations</span>
@@ -267,7 +268,7 @@
                 <span class="k">return</span> <span class="n">placement</span>
         <span class="k">return</span> <span class="n">placement</span></div>
 
-    <span class="c1">#TODO: Deal with non-standard wall placements</span>
+    <span class="c1"># TODO: Deal with non-standard wall placements</span>
     <span class="k">def</span> <span class="nf">_create_relative_to_objects</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">wall_positions</span><span class="o">=</span><span class="p">{</span>
@@ -279,10 +280,9 @@
             <span class="n">wall_rotations</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;Center&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                 <span class="s2">&quot;FrontWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                <span class="s2">&quot;LeftWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
-                <span class="s2">&quot;RightWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
-                <span class="s2">&quot;FloorWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
-            <span class="p">):</span>
+                <span class="s2">&quot;LeftWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;RightWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;FloorWall&quot;</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}):</span>
         <span class="sd">&quot;&quot;&quot;Create Blender objects corresponding to relative_to options if</span>
 <span class="sd">        necessary&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span>
@@ -295,7 +295,8 @@
                     <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">[</span><span class="n">wall_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">[</span><span class="n">wall_name</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">wall_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span><span class="p">[</span>
+                    <span class="n">wall_name</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">generate_relative_to_name</span><span class="p">(</span><span class="n">wall_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_to_objects</span>
 
@@ -327,6 +328,8 @@
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../pyw3d.html">pyw3d</a><ul>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>

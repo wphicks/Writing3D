@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" />
+    <link rel="up" title="pyw3d" href="../../pyw3d.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -57,16 +57,17 @@
 
 <span class="sd">&quot;&quot;&quot;Tools for moving a Blender object in virtual space&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pyw3d.names</span> <span class="kn">import</span> <span class="n">generate_relative_to_name</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">mathutils</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
         <span class="s2">&quot;Module mathutils not found. Loading pyw3d.blender_actions.movement as&quot;</span>
         <span class="s2">&quot; standalone&quot;</span><span class="p">)</span>
 
 
-<span class="c1">#TODO: Handle moves relative to walls</span>
+<span class="c1"># TODO: Handle moves relative to walls</span>
 <div class="viewcode-block" id="MoveAction"><a class="viewcode-back" href="../../../pyw3d_api/pyw3d.blender_actions.html#pyw3d.blender_actions.movement.MoveAction">[docs]</a><span class="k">class</span> <span class="nc">MoveAction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate Python logic for how object should move when action first</span>
 <span class="sd">    starts, as it continues, and when it ends</span>
@@ -83,6 +84,7 @@
         <span class="n">script_text</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># First take care of object rotation...</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_mode&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+
             <span class="n">vector</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">][</span><span class="s2">&quot;rotation_vector&quot;</span><span class="p">])</span>
             <span class="n">vector</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
@@ -203,9 +205,26 @@
                     <span class="p">)]</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;relative_to&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Center&quot;</span><span class="p">:</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;target_pos = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">])</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                        <span class="s2">&quot;relative_to = scene.objects[&#39;{}&#39;]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">generate_relative_to_name</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;relative_to&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="s2">&quot;target_pos = [&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;    relative_to.position[i] + {}[i] for i in &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">])),</span>
+                        <span class="s2">&quot;    range(len(relative_to.position))&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;]&quot;</span>
+                    <span class="p">])</span>
                 <span class="n">script_text</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
-                    <span class="s2">&quot;target_pos = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">])),</span>
                     <span class="s2">&quot;delta_pos = [target_pos[i] - blender_object.position[i]&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;    for i in range(len(blender_object.position))]&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;blender_object[&#39;linV&#39;] = [&quot;</span><span class="p">,</span>
@@ -215,10 +234,11 @@
                 <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">continue_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -238,10 +258,11 @@
             <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">end_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -263,10 +284,11 @@
                 <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">script_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;{}pass&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;{}pass&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">move_relative</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">=</span> <span class="n">placement</span>
@@ -284,6 +306,8 @@
 <ul>
   <li><a href="../../../index.html">Documentation overview</a><ul>
   <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../../pyw3d.html">pyw3d</a><ul>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>

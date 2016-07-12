@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" />
+    <link rel="up" title="pyw3d" href="../pyw3d.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -59,14 +59,14 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
 <span class="kn">import</span> <span class="nn">xml.dom.minidom</span> <span class="kn">as</span> <span class="nn">minidom</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
 <span class="kn">from</span> <span class="nn">.placement</span> <span class="kn">import</span> <span class="n">W3DPlacement</span><span class="p">,</span> <span class="n">W3DRotation</span><span class="p">,</span> <span class="n">convert_to_blender_axes</span>
 <span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">ListValidator</span><span class="p">,</span> <span class="n">IsNumeric</span><span class="p">,</span> <span class="n">OptionValidator</span><span class="p">,</span>\
     <span class="n">IsBoolean</span><span class="p">,</span> <span class="n">FeatureValidator</span><span class="p">,</span> <span class="n">IsInteger</span><span class="p">,</span> <span class="n">DictValidator</span>
-<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">bool2text</span><span class="p">,</span> <span class="n">text2tuple</span><span class="p">,</span> <span class="n">attrib2bool</span>
+<span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">bool2text</span><span class="p">,</span> <span class="n">text2tuple</span><span class="p">,</span> <span class="n">attrib2bool</span><span class="p">,</span> <span class="n">text2bool</span>
 <span class="kn">from</span> <span class="nn">.objects</span> <span class="kn">import</span> <span class="n">W3DObject</span>
 <span class="kn">from</span> <span class="nn">.sounds</span> <span class="kn">import</span> <span class="n">W3DSound</span>
 <span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">W3DTimeline</span>
@@ -77,7 +77,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">bpy</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
         <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
 
 
@@ -90,11 +90,11 @@
 <div class="viewcode-block" id="setup_blender_layout"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.setup_blender_layout">[docs]</a><span class="k">def</span> <span class="nf">setup_blender_layout</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Put Blender interface in a convenient layout&quot;&quot;&quot;</span>
     <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">screen</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">screens</span><span class="p">[</span><span class="s2">&quot;Game Logic&quot;</span><span class="p">]</span></div>
-    <span class="c1">#for area in bpy.context.window.screen.areas:</span>
-    <span class="c1">#    if area.type == &#39;VIEW_3D&#39;:</span>
-    <span class="c1">#        for space in area.spaces:</span>
-    <span class="c1">#            space.region_3d.view_perspective = &#39;CAMERA&#39;</span>
-    <span class="c1">#            space.viewport_shade = &quot;TEXTURED&quot;</span>
+    <span class="c1"># for area in bpy.context.window.screen.areas:</span>
+    <span class="c1">#     if area.type == &#39;VIEW_3D&#39;:</span>
+    <span class="c1">#         for space in area.spaces:</span>
+    <span class="c1">#             space.region_3d.view_perspective = &#39;CAMERA&#39;</span>
+    <span class="c1">#             space.viewport_shade = &quot;TEXTURED&quot;</span>
 
 
 <div class="viewcode-block" id="add_key_movement"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.add_key_movement">[docs]</a><span class="k">def</span> <span class="nf">add_key_movement</span><span class="p">(</span>
@@ -153,14 +153,15 @@
 <span class="sd">    :param tuple background: Color of background as an RGB tuple of 3 ints</span>
 <span class="sd">    :param bool allow_movement: Allow user to navigate within project?</span>
 <span class="sd">    :param bool allow_rotation: Allow user to rotate withing project?</span>
+<span class="sd">    :param bool debug: Turn on debug-level logging</span>
 <span class="sd">    :param dict wall_placements: Dictionary mapping names of walls to</span>
 <span class="sd">    W3DPlacements specifying their position and orientation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1">#ui_order = [</span>
-    <span class="c1">#    &quot;camera_placement&quot;, &quot;desktop_camera_placement&quot;, &quot;far_clip&quot;,</span>
-    <span class="c1">#    &quot;allow_movement&quot;, &quot;allow_rotation&quot;, &quot;background&quot;</span>
-    <span class="c1">#]</span>
+    <span class="c1"># ui_order = [</span>
+    <span class="c1">#     &quot;camera_placement&quot;, &quot;desktop_camera_placement&quot;, &quot;far_clip&quot;,</span>
+    <span class="c1">#     &quot;allow_movement&quot;, &quot;allow_rotation&quot;, &quot;background&quot;</span>
+    <span class="c1"># ]</span>
     <span class="n">ui_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span>
 
     <span class="n">argument_validators</span> <span class="o">=</span> <span class="p">{</span>
@@ -190,7 +191,7 @@
         <span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">:</span> <span class="n">FeatureValidator</span><span class="p">(</span>
             <span class="n">W3DPlacement</span><span class="p">,</span>
             <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Orientation and position of camera in desktop preview&quot;</span>
-            <span class="p">),</span>
+        <span class="p">),</span>
         <span class="s2">&quot;far_clip&quot;</span><span class="p">:</span> <span class="n">IsNumeric</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
         <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
             <span class="n">IsInteger</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span>
@@ -198,19 +199,21 @@
             <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Red, Green, Blue values&quot;</span><span class="p">),</span>
         <span class="s2">&quot;allow_movement&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
         <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
+        <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="n">IsBoolean</span><span class="p">(),</span>
         <span class="s2">&quot;wall_placements&quot;</span><span class="p">:</span> <span class="n">DictValidator</span><span class="p">(</span>
             <span class="n">OptionValidator</span><span class="p">(</span>
                 <span class="s2">&quot;Center&quot;</span><span class="p">,</span> <span class="s2">&quot;FrontWall&quot;</span><span class="p">,</span> <span class="s2">&quot;LeftWall&quot;</span><span class="p">,</span> <span class="s2">&quot;RightWall&quot;</span><span class="p">,</span> <span class="s2">&quot;FloorWall&quot;</span><span class="p">),</span>
             <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DPlacement</span><span class="p">),</span>
             <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;Dictionary mapping wall names to placements&quot;</span><span class="p">)</span>
-        <span class="p">}</span>
+    <span class="p">}</span>
 
     <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;far_clip&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
         <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="s2">&quot;allow_movement&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-        <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="bp">False</span>
-        <span class="p">}</span>
+        <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="bp">False</span>
+    <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">W3DProject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -310,11 +313,15 @@
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">camera_node</span><span class="p">)</span>
         <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;Background&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;{}, {}, {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">])})</span>
-        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;WandNavigation&quot;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;allow-rotation&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_rotation&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;allow-movement&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">])</span>
+        <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+            <span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;WandNavigation&quot;</span><span class="p">,</span>
+            <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;allow-rotation&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_rotation&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;allow-movement&quot;</span><span class="p">:</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">])</span>
             <span class="p">}</span>
         <span class="p">)</span>
+        <span class="n">debug_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">global_node</span><span class="p">,</span> <span class="s2">&quot;Debug&quot;</span><span class="p">)</span>
+        <span class="n">debug_node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">bool2text</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">])</span>
         <span class="n">wall_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;PlacementRoot&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">wall</span><span class="p">,</span> <span class="n">placement</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;wall_placements&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">place_root</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">wall_root</span><span class="p">)</span>
@@ -392,6 +399,10 @@
         <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrib2bool</span><span class="p">(</span>
             <span class="n">wand_node</span><span class="p">,</span> <span class="s2">&quot;allow-movement&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
+        <span class="n">debug_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Debug&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text2bool</span><span class="p">(</span><span class="n">debug_node</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
         <span class="n">wall_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;PlacementRoot&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">wall_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -409,7 +420,8 @@
 
 <span class="sd">        :param str filename: Filename of XML file for project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>  <span class="c1"># For relative paths...</span>
+        <span class="c1"># For relative paths...</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filename</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">project_class</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="W3DProject.toprettyxml"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.toprettyxml">[docs]</a>    <span class="k">def</span> <span class="nf">toprettyxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -441,13 +453,29 @@
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_groups</span></div>
 
 <div class="viewcode-block" id="W3DProject.setup_camera"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.setup_camera">[docs]</a>    <span class="k">def</span> <span class="nf">setup_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">camera_add</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">camera_add</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cameras</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">clip_end</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;far_clip&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CAMERA&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">)</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s1">&#39;Scene&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span></div>
+
+<div class="viewcode-block" id="W3DProject.setup_settings"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.setup_settings">[docs]</a>    <span class="k">def</span> <span class="nf">setup_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Put any global settings in w3d_settings.py&quot;&quot;&quot;</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;w3d_settings.py&quot;</span><span class="p">)</span>
+        <span class="n">settings_script</span> <span class="o">=</span> <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="s2">&quot;w3d_settings.py&quot;</span><span class="p">]</span>
+        <span class="n">script_text</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;import logging&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;W3D_DEBUG = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;W3D_LOG = logging.getLogger(&#39;W3D&#39;)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;if W3D_DEBUG:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    logging.basicConfig(&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        level=logging.DEBUG,&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;        format=&#39;</span><span class="si">%(asctime)-15s</span><span class="s2"> </span><span class="si">%(levelname)8s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&#39;)&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">settings_script</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_text</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="W3DProject.setup_controls"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.setup_controls">[docs]</a>    <span class="k">def</span> <span class="nf">setup_controls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span>
@@ -497,7 +525,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_move_toggle</span><span class="p">()</span>
 
-        <span class="c1">#TODO: Mouselook script and actuators</span>
         <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;allow_movement&quot;</span><span class="p">]:</span>
             <span class="n">add_key_movement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">,</span> <span class="s2">&quot;Forward&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">)</span>
             <span class="n">add_key_movement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_camera</span><span class="p">,</span> <span class="s2">&quot;Backward&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">)</span>
@@ -542,12 +569,13 @@
         <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s2">&quot;Scene&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">material_mode</span> <span class="o">=</span> <span class="s2">&quot;MULTITEXTURE&quot;</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">scenes</span><span class="p">[</span><span class="s2">&quot;Scene&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">layer</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_settings</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_camera</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_controls</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sort_groups</span><span class="p">()</span>
-        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;group_defs.py&quot;</span><span class="p">)</span>
+        <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;group_defs.py&quot;</span><span class="p">)</span>  <span class="c1"># Script for assigning group names</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">worlds</span><span class="p">[</span><span class="s2">&quot;World&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">horizon_color</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">]</span>
-        <span class="c1">#bpy.data.worlds[&quot;World&quot;].ambient_color = self[&quot;background&quot;]</span>
+        <span class="c1"># bpy.data.worlds[&quot;World&quot;].ambient_color = self[&quot;background&quot;]</span>
 
         <span class="c1"># Create Objects</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]:</span>
@@ -556,7 +584,6 @@
             <span class="n">group</span><span class="o">.</span><span class="n">blend_groups</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
             <span class="n">object_</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
-        <span class="c1"># TODO: Call methods to add links</span>
         <span class="k">for</span> <span class="n">sound</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]:</span>
             <span class="n">sound</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
 
@@ -594,6 +621,8 @@
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../pyw3d.html">pyw3d</a><ul>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>

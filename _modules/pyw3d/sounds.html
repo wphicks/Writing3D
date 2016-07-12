@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" />
+    <link rel="up" title="pyw3d" href="../pyw3d.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -197,7 +197,7 @@
                 <span class="s2">&quot;Sound node must have Settings child node&quot;</span><span class="p">)</span>
         <span class="n">xml_map</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="s2">&quot;frequency_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="s2">&quot;volume_scale&quot;</span><span class="p">,</span> <span class="s2">&quot;pan&quot;</span><span class="p">:</span> <span class="s2">&quot;pan&quot;</span><span class="p">}</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">xml_map</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">xml_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">settings_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
                 <span class="n">new_sound</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">settings_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
@@ -217,6 +217,8 @@
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../pyw3d.html">pyw3d</a><ul>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>

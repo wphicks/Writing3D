@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyw3d &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyw3d</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of Writing3D.</span>
+<span class="c1">#</span>
+<span class="c1"># Writing3D is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;A module for working with W3D Writing projects</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="W3DConfigError"><a class="viewcode-back" href="../pyw3d_api/pyw3d.html#pyw3d.W3DConfigError">[docs]</a><span class="k">class</span> <span class="nc">W3DConfigError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception thrown when an error is detected in the configuration or</span>
+<span class="sd">    installation of Writing3D</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
+<span class="n">W3D_CONFIG_FILENAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span>
+    <span class="s1">&#39;.w3d.json&#39;</span>
+<span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">W3D_CONFIG_FILENAME</span><span class="p">)</span> <span class="k">as</span> <span class="n">w3d_config_file</span><span class="p">:</span>
+        <span class="n">W3D_CONFIG</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">w3d_config_file</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No W3D config file found. Creating default...&quot;</span><span class="p">)</span>
+    <span class="n">W3D_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Blender executable&quot;</span><span class="p">:</span> <span class="s2">&quot;blender&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Blender player executable&quot;</span><span class="p">:</span> <span class="s2">&quot;blenderplayer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Export script path&quot;</span><span class="p">:</span> <span class="s2">&quot;/usr/bin/w3d_export_tools.py&quot;</span>
+    <span class="p">}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">W3D_CONFIG_FILENAME</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">w3d_config_file</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">W3D_CONFIG</span><span class="p">,</span> <span class="n">w3d_config_file</span><span class="p">)</span>
+
+<span class="n">BLENDER_EXEC</span> <span class="o">=</span> <span class="n">W3D_CONFIG</span><span class="p">[</span><span class="s2">&quot;Blender executable&quot;</span><span class="p">]</span>
+<span class="n">BLENDER_PLAY</span> <span class="o">=</span> <span class="n">W3D_CONFIG</span><span class="p">[</span><span class="s2">&quot;Blender player executable&quot;</span><span class="p">]</span>
+<span class="n">EXPORT_SCRIPT</span> <span class="o">=</span> <span class="n">W3D_CONFIG</span><span class="p">[</span><span class="s2">&quot;Export script path&quot;</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">project</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">features</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">objects</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">timeline</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">placement</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">validators</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">xml_tools</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">structs</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">activators</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">triggers</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">actions</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">groups</span>
+
+<span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
+<span class="kn">from</span> <span class="nn">.project</span> <span class="kn">import</span> <span class="n">W3DProject</span>
+<span class="kn">from</span> <span class="nn">.objects</span> <span class="kn">import</span> <span class="n">W3DObject</span><span class="p">,</span> <span class="n">W3DLink</span><span class="p">,</span> <span class="n">W3DContent</span><span class="p">,</span> <span class="n">W3DText</span><span class="p">,</span> <span class="n">W3DImage</span><span class="p">,</span> \
+    <span class="n">W3DStereoImage</span><span class="p">,</span> <span class="n">W3DModel</span><span class="p">,</span> <span class="n">W3DLight</span><span class="p">,</span> <span class="n">W3DPSys</span>
+<span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">W3DTimeline</span>
+<span class="kn">from</span> <span class="nn">.placement</span> <span class="kn">import</span> <span class="n">W3DPlacement</span><span class="p">,</span> <span class="n">W3DRotation</span><span class="p">,</span> <span class="n">convert_to_blender_axes</span><span class="p">,</span> \
+    <span class="n">convert_to_legacy_axes</span>
+<span class="kn">from</span> <span class="nn">.triggers</span> <span class="kn">import</span> <span class="n">W3DTrigger</span><span class="p">,</span> <span class="n">HeadTrackTrigger</span><span class="p">,</span> <span class="n">HeadPositionTrigger</span><span class="p">,</span> \
+    <span class="n">LookAtPoint</span><span class="p">,</span> <span class="n">LookAtDirection</span><span class="p">,</span> <span class="n">LookAtObject</span><span class="p">,</span> <span class="n">MovementTrigger</span><span class="p">,</span> <span class="n">EventBox</span>
+<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="n">W3DAction</span><span class="p">,</span> <span class="n">ObjectAction</span><span class="p">,</span> <span class="n">GroupAction</span><span class="p">,</span> <span class="n">SoundAction</span><span class="p">,</span> \
+    <span class="n">MoveVRAction</span><span class="p">,</span> <span class="n">TimelineAction</span><span class="p">,</span> <span class="n">EventTriggerAction</span><span class="p">,</span> <span class="n">W3DResetAction</span>
+<span class="kn">from</span> <span class="nn">.groups</span> <span class="kn">import</span> <span class="n">W3DGroup</span>
+<span class="kn">from</span> <span class="nn">.sounds</span> <span class="kn">import</span> <span class="n">W3DSound</span>
+<span class="kn">from</span> <span class="nn">.w3d_export_tools</span> <span class="kn">import</span> <span class="n">export_to_blender</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
