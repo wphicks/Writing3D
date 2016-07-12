@@ -89,7 +89,7 @@ PythonLauncher, and then follow the prompts. More details are available `here
 <https://docs.python.org/3.5/using/mac.html#how-to-run-a-python-script>`_.
 
 TODO: This seems to occasionally point to the wrong Python version. Advice from
-a Mac user would be appreciated
+a Mac user would be appreciated.
 
 On Linux
 ^^^^^^^^
