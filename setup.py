@@ -13,9 +13,16 @@ import tarfile
 import zipfile
 import stat
 import tempfile
+import logging
+import json
 from urllib.request import urlopen
 from distutils.core import setup
 import distutils.command.install
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 def find_subdirectory(name, path):
@@ -294,7 +301,9 @@ class CustomInstall(distutils.command.install.install):
     order to set these paths, modify setup.cfg as needed."""
 
     user_options = distutils.command.install.install.user_options + [
-        ('w3dhome=', None, "home directory for Writing3D")
+        ('w3dhome=', None, "home directory for Writing3D"),
+        ('blenderdir=', None,
+            "directory containing blender and blenderplayer executable"),
     ]
 
     def message(self, string):
@@ -305,51 +314,31 @@ class CustomInstall(distutils.command.install.install):
     def install_blender(self):
         """Install Blender if necessary"""
         self.blender_installer = BlenderInstaller(
-            self.w3dhome, verbose=self.verbose)
+            self.blenderdir, verbose=self.verbose)
         self.blender_installer.install()
 
-    def copy_pkg_resources(self):
-        """Copy the pkg_resources module to Blender module directory
-
-        This is necessary to make scripts built into the Writing3D egg
-        available to Blender"""
-        import pkg_resources
-        pkg_file = pkg_resources.__file__
-
-        # For directory installs...
-        if not os.path.basename(pkg_file).startswith("pkg_resources"):
-            pkg_dir = os.path.dirname(pkg_file)
-            new_dir = os.path.join(
-                self.blender_installer.blender_modules,
-                os.path.basename(os.path.normpath(pkg_dir))
+    def update_w3d_config(self):
+        """Update Writing3D config file with Blender install information"""
+        try:
+            import pyw3d
+        except ImportError:
+            raise InstallError(
+                "pyw3d module did not install successfully! Please contact the"
+                " Writing3D maintainer."
             )
-            self.message("Copying {} to {}...".format(pkg_dir, new_dir))
-            shutil.copytree(pkg_dir, new_dir)
-        else:
-            new_dir = self.blender_installer.blender_modules
-            self.message("Copying {} to {}...".format(pkg_file, new_dir))
-            shutil.copy(pkg_file, new_dir)
-
-    def insert_paths(self):
-        """Insert necessary paths into source"""
-        for line in fileinput.input("pyw3d/__init__.py", inplace=1):
-            if "BLENDEREXECSUBTAG" in line:
-                print(
-                    "BLENDER_EXEC = r'{}' # BLENDEREXECSUBTAG".format(
-                        self.blender_installer.blender_exec)
-                )
-            elif "BLENDERPLAYERSUBTAG" in line:
-                print(
-                    "BLENDER_PLAY = r'{}' # BLENDERPLAYERSUBTAG".format(
-                        self.blender_installer.blender_play)
-                )
-            else:
-                print(line, end="")
+        new_config = pyw3d.W3D_CONFIG
+        new_config["Blender executable"] = self.blender_installer.blender_exec
+        new_config[
+            "Blender player executable"] = self.blender_installer.blender_play
+        new_config["Export script path"] = os.path.join(
+            self.install_scripts, "w3d_export_tools.py")
+        with open(pyw3d.W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
+            json.dump(new_config, w3d_config_file)
 
     def _setup_blender_paths(self):
         """Create sitecustomize.py path to make Writing3D available to Blender
 
-        :warning: This will add the directory containing the Writing3D install
+        :warning: This will add the directory containing the pyw3d module
         to Blender as a site directory. This is not necessarily a good idea,
         since it may also make undesired packages that have been installed to
         the same directory available to Blender. At the moment, this seems to
@@ -359,17 +348,23 @@ class CustomInstall(distutils.command.install.install):
         have unintended consequences. If you have a better solution,
         suggestions/ pull requests are very much welcome."""
 
-        package_path = find_existing_pyw3d()
-        if package_path is None:
-            raise InstallError(
-                "pyw3d module did not install successfully! Please contact the"
-                " Writing3D maintainer."
+        self.message(
+            "Copying sitecustomize.py to {}".format(
+                self.blender_installer.blender_site
             )
+        )
+        site_file = shutil.copy(
+            "sitecustomize.py", self.blender_installer.blender_site)
+
+        self.message(
+            "Finding pyw3d install path..."
+        )
+        package_path = find_existing_pyw3d()
 
         self.message(
             "Adding {} to Blender site directories...".format(package_path)
         )
-        for line in fileinput.input("sitecustomize.py", inplace=1):
+        for line in fileinput.input(site_file, inplace=1):
             if "SYSSUBTAG" in line:
                 print(
                     "site.addsitedir(r'{}')  # SYSSUBTAG".format(
@@ -377,33 +372,30 @@ class CustomInstall(distutils.command.install.install):
                 )
             else:
                 print(line, end="")
-        self.message(
-            "Copying modified sitecustomize.py to {}".format(
-                self.blender_installer.blender_site
-            )
-        )
-        shutil.copy("sitecustomize.py", self.blender_installer.blender_site)
 
     def initialize_options(self, *args, **kwargs):
         self.w3dhome = None
+        self.blenderdir = None
         super().initialize_options(*args, **kwargs)
 
     def finalize_options(self, *args, **kwargs):
         if self.w3dhome is None:
-            self.message("w3dhome not set. Using default.")
             self.w3dhome = os.path.expanduser(os.path.join("~", "Writing3D"))
+            self.message("w3dhome not set. Using {}.".format(self.w3dhome))
+        if self.blenderdir is None:
+            self.blenderdir = self.w3dhome
+            self.message(
+                "blenderdir not set. Using {}.".format(self.blenderdir))
         if not os.path.isdir(self.w3dhome):
             self.message("Creating {}".format(self.w3dhome))
             os.makedirs(self.w3dhome)
-        self.message("Installing Writing3D interfaces in {}".format(
-            self.w3dhome))
         super().finalize_options()
 
     def run(self, *args, **kwargs):
         self.install_blender()
-        # self.copy_pkg_resources()
-        self.insert_paths()
         super().run()
+        logging.debug("Script directory: {}".format(self.install_scripts))
+        self.update_w3d_config()
         self._setup_blender_paths()
 
 if __name__ == "__main__":
