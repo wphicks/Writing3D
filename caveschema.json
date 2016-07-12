@@ -1,0 +1,2642 @@
+var generated_Module_Factory = function () {
+  var generated = {
+    name: 'generated',
+    typeInfos: [{
+        localName: 'Link.Actions.Clicks.NumClicks',
+        typeName: null,
+        propertyInfos: [{
+            name: 'numClicks',
+            typeInfo: 'UnsignedInt',
+            attributeName: {
+              localPart: 'num_clicks'
+            },
+            type: 'attribute'
+          }, {
+            name: 'reset',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'reset'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Global.WandNavigation',
+        typeName: null,
+        propertyInfos: [{
+            name: 'allowRotation',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'allow-rotation'
+            },
+            type: 'attribute'
+          }, {
+            name: 'allowMovement',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'allow-movement'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Sound.Mode.Positional',
+        typeName: null
+      }, {
+        localName: 'Objects',
+        typeName: null,
+        propertyInfos: [{
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Story.EventRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'eventTrigger',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'EventTrigger'
+            },
+            typeInfo: '.EventTrigger'
+          }]
+      }, {
+        localName: 'ParticleAction.Gravitate',
+        typeName: null,
+        propertyInfos: [{
+            name: 'magnitude',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'magnitude'
+            },
+            type: 'attribute'
+          }, {
+            name: 'epsilon',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'epsilon'
+            },
+            type: 'attribute'
+          }, {
+            name: 'maxRadius',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'max_radius'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Link.Actions.Clicks',
+        typeName: null,
+        propertyInfos: [{
+            name: 'any',
+            required: true,
+            elementName: {
+              localPart: 'Any'
+            },
+            typeInfo: '.Link.Actions.Clicks.Any'
+          }, {
+            name: 'numClicks',
+            required: true,
+            elementName: {
+              localPart: 'NumClicks'
+            },
+            typeInfo: '.Link.Actions.Clicks.NumClicks'
+          }]
+      }, {
+        localName: 'Content.Light',
+        typeName: null,
+        propertyInfos: [{
+            name: 'point',
+            required: true,
+            elementName: {
+              localPart: 'Point'
+            },
+            typeInfo: '.Content.Light.Point'
+          }, {
+            name: 'directional',
+            required: true,
+            elementName: {
+              localPart: 'Directional'
+            },
+            typeInfo: '.Content.Light.Directional'
+          }, {
+            name: 'spot',
+            required: true,
+            elementName: {
+              localPart: 'Spot'
+            },
+            typeInfo: '.Content.Light.Spot'
+          }, {
+            name: 'diffuse',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'diffuse'
+            },
+            type: 'attribute'
+          }, {
+            name: 'specular',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'specular'
+            },
+            type: 'attribute'
+          }, {
+            name: 'constAtten',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'const_atten'
+            },
+            type: 'attribute'
+          }, {
+            name: 'linAtten',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'lin_atten'
+            },
+            type: 'attribute'
+          }, {
+            name: 'quadAtten',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'quad_atten'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack.Position',
+        typeName: null,
+        propertyInfos: [{
+            name: 'anywhere',
+            required: true,
+            elementName: {
+              localPart: 'Anywhere'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Position.Anywhere'
+          }, {
+            name: 'box',
+            required: true,
+            elementName: {
+              localPart: 'Box'
+            },
+            typeInfo: '.Box'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Box',
+        typeName: null,
+        propertyInfos: [{
+            name: 'p1',
+            required: true,
+            attributeName: {
+              localPart: 'p1'
+            },
+            type: 'attribute'
+          }, {
+            name: 'p2',
+            required: true,
+            attributeName: {
+              localPart: 'p2'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger',
+        typeName: null,
+        propertyInfos: [{
+            name: 'headTrack',
+            required: true,
+            elementName: {
+              localPart: 'HeadTrack'
+            },
+            typeInfo: '.EventTrigger.HeadTrack'
+          }, {
+            name: 'moveTrack',
+            required: true,
+            elementName: {
+              localPart: 'MoveTrack'
+            },
+            typeInfo: '.EventTrigger.MoveTrack'
+          }, {
+            name: 'actions',
+            required: true,
+            collection: true,
+            elementName: {
+              localPart: 'Actions'
+            },
+            typeInfo: '.ActionsType'
+          }, {
+            name: 'enabled',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'enabled'
+            },
+            type: 'attribute'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }, {
+            name: 'duration',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'duration'
+            },
+            type: 'attribute'
+          }, {
+            name: 'remainEnabled',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'remain-enabled'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TransType.Sound',
+        typeName: null,
+        propertyInfos: [{
+            name: 'action',
+            attributeName: {
+              localPart: 'action'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Link.Actions',
+        typeName: null,
+        baseTypeInfo: '.ActionsType',
+        propertyInfos: [{
+            name: 'clicks',
+            elementName: {
+              localPart: 'Clicks'
+            },
+            typeInfo: '.Link.Actions.Clicks'
+          }]
+      }, {
+        localName: 'Content',
+        typeName: null,
+        propertyInfos: [{
+            name: 'none',
+            required: true,
+            elementName: {
+              localPart: 'None'
+            },
+            typeInfo: '.Content.None'
+          }, {
+            name: 'text',
+            required: true,
+            elementName: {
+              localPart: 'Text'
+            },
+            typeInfo: '.Content.Text'
+          }, {
+            name: 'image',
+            required: true,
+            elementName: {
+              localPart: 'Image'
+            },
+            typeInfo: '.Content.Image'
+          }, {
+            name: 'stereoImage',
+            required: true,
+            elementName: {
+              localPart: 'StereoImage'
+            },
+            typeInfo: '.Content.StereoImage'
+          }, {
+            name: 'model',
+            required: true,
+            elementName: {
+              localPart: 'Model'
+            },
+            typeInfo: '.Content.Model'
+          }, {
+            name: 'light',
+            required: true,
+            elementName: {
+              localPart: 'Light'
+            },
+            typeInfo: '.Content.Light'
+          }, {
+            name: 'particleSystem',
+            required: true,
+            elementName: {
+              localPart: 'ParticleSystem'
+            },
+            typeInfo: '.Content.ParticleSystem'
+          }]
+      }, {
+        localName: 'Sound.Mode.Fixed',
+        typeName: null
+      }, {
+        localName: 'Box.Movement.Outside',
+        typeName: null
+      }, {
+        localName: 'EventTrigger.MoveTrack.Source.ObjectRef',
+        typeName: null,
+        propertyInfos: [{
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction.Follow',
+        typeName: null,
+        propertyInfos: [{
+            name: 'magnitude',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'magnitude'
+            },
+            type: 'attribute'
+          }, {
+            name: 'epsilon',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'epsilon'
+            },
+            type: 'attribute'
+          }, {
+            name: 'maxRadius',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'max_radius'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Content.Text',
+        typeName: null,
+        propertyInfos: [{
+            name: 'text',
+            required: true,
+            elementName: {
+              localPart: 'text'
+            }
+          }, {
+            name: 'horizAlign',
+            attributeName: {
+              localPart: 'horiz-align'
+            },
+            type: 'attribute'
+          }, {
+            name: 'vertAlign',
+            attributeName: {
+              localPart: 'vert-align'
+            },
+            type: 'attribute'
+          }, {
+            name: 'font',
+            attributeName: {
+              localPart: 'font'
+            },
+            type: 'attribute'
+          }, {
+            name: 'depth',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'depth'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction.Bounce',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }, {
+            name: 'friction',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'friction'
+            },
+            type: 'attribute'
+          }, {
+            name: 'resilience',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'resilience'
+            },
+            type: 'attribute'
+          }, {
+            name: 'cutoff',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'cutoff'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Triangle',
+        typeName: null,
+        propertyInfos: [{
+            name: 'p1',
+            required: true,
+            attributeName: {
+              localPart: 'p1'
+            },
+            type: 'attribute'
+          }, {
+            name: 'p2',
+            required: true,
+            attributeName: {
+              localPart: 'p2'
+            },
+            type: 'attribute'
+          }, {
+            name: 'p3',
+            required: true,
+            attributeName: {
+              localPart: 'p3'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleDomainType',
+        propertyInfos: [{
+            name: 'point',
+            required: true,
+            elementName: {
+              localPart: 'Point'
+            },
+            typeInfo: '.ParticleDomainType.Point'
+          }, {
+            name: 'line',
+            required: true,
+            elementName: {
+              localPart: 'Line'
+            },
+            typeInfo: '.ParticleDomainType.Line'
+          }, {
+            name: 'triangle',
+            required: true,
+            elementName: {
+              localPart: 'Triangle'
+            },
+            typeInfo: '.ParticleDomainType.Triangle'
+          }, {
+            name: 'plane',
+            required: true,
+            elementName: {
+              localPart: 'Plane'
+            },
+            typeInfo: '.ParticleDomainType.Plane'
+          }, {
+            name: 'rect',
+            required: true,
+            elementName: {
+              localPart: 'Rect'
+            },
+            typeInfo: '.ParticleDomainType.Rect'
+          }, {
+            name: 'box',
+            required: true,
+            elementName: {
+              localPart: 'Box'
+            },
+            typeInfo: '.ParticleDomainType.Box'
+          }, {
+            name: 'sphere',
+            required: true,
+            elementName: {
+              localPart: 'Sphere'
+            },
+            typeInfo: '.ParticleDomainType.Sphere'
+          }, {
+            name: 'cylinder',
+            required: true,
+            elementName: {
+              localPart: 'Cylinder'
+            },
+            typeInfo: '.ParticleDomainType.Cylinder'
+          }, {
+            name: 'cone',
+            required: true,
+            elementName: {
+              localPart: 'Cone'
+            },
+            typeInfo: '.ParticleDomainType.Cone'
+          }, {
+            name: 'blob',
+            required: true,
+            elementName: {
+              localPart: 'Blob'
+            },
+            typeInfo: '.ParticleDomainType.Blob'
+          }, {
+            name: 'disc',
+            required: true,
+            elementName: {
+              localPart: 'Disc'
+            },
+            typeInfo: '.ParticleDomainType.Disc'
+          }]
+      }, {
+        localName: 'ParticleAction.Damping',
+        typeName: null,
+        propertyInfos: [{
+            name: 'direction',
+            required: true,
+            attributeName: {
+              localPart: 'direction'
+            },
+            type: 'attribute'
+          }, {
+            name: 'velLow',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'vel_low'
+            },
+            type: 'attribute'
+          }, {
+            name: 'velHigh',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'vel_high'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Timeline',
+        typeName: null,
+        propertyInfos: [{
+            name: 'timedActions',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'TimedActions'
+            },
+            typeInfo: '.Timeline.TimedActions'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }, {
+            name: 'startImmediately',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'start-immediately'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Content.None',
+        typeName: null
+      }, {
+        localName: 'ParticleActionList.Vel',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Disc',
+        typeName: null,
+        propertyInfos: [{
+            name: 'center',
+            required: true,
+            attributeName: {
+              localPart: 'center'
+            },
+            type: 'attribute'
+          }, {
+            name: 'normal',
+            required: true,
+            attributeName: {
+              localPart: 'normal'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radius',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radiusInner',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius-inner'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction.Jet',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }, {
+            name: 'accelDomain',
+            required: true,
+            elementName: {
+              localPart: 'AccelDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }]
+      }, {
+        localName: 'Content.Model',
+        typeName: null,
+        propertyInfos: [{
+            name: 'filename',
+            required: true,
+            attributeName: {
+              localPart: 'filename'
+            },
+            type: 'attribute'
+          }, {
+            name: 'checkCollisions',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'check-collisions'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Global',
+        typeName: null,
+        propertyInfos: [{
+            name: 'cameraPos',
+            required: true,
+            elementName: {
+              localPart: 'CameraPos'
+            },
+            typeInfo: '.Global.CameraPos'
+          }, {
+            name: 'caveCameraPos',
+            required: true,
+            elementName: {
+              localPart: 'CaveCameraPos'
+            },
+            typeInfo: '.Global.CaveCameraPos'
+          }, {
+            name: 'background',
+            required: true,
+            elementName: {
+              localPart: 'Background'
+            },
+            typeInfo: '.Global.Background'
+          }, {
+            name: 'wandNavigation',
+            required: true,
+            elementName: {
+              localPart: 'WandNavigation'
+            },
+            typeInfo: '.Global.WandNavigation'
+          }]
+      }, {
+        localName: 'Global.CaveCameraPos',
+        typeName: null,
+        propertyInfos: [{
+            name: 'placement',
+            required: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }, {
+            name: 'farClip',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'far-clip'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Box.Movement.Inside',
+        typeName: null
+      }, {
+        localName: 'Object',
+        typeName: null,
+        propertyInfos: [{
+            name: 'visible',
+            required: true,
+            elementName: {
+              localPart: 'Visible'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'color',
+            required: true,
+            elementName: {
+              localPart: 'Color'
+            }
+          }, {
+            name: 'lighting',
+            required: true,
+            elementName: {
+              localPart: 'Lighting'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'clickThrough',
+            required: true,
+            elementName: {
+              localPart: 'ClickThrough'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'aroundSelfAxis',
+            required: true,
+            elementName: {
+              localPart: 'AroundSelfAxis'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'scale',
+            required: true,
+            elementName: {
+              localPart: 'Scale'
+            },
+            typeInfo: 'Double'
+          }, {
+            name: 'soundRef',
+            elementName: {
+              localPart: 'SoundRef'
+            }
+          }, {
+            name: 'placement',
+            required: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }, {
+            name: 'content',
+            required: true,
+            elementName: {
+              localPart: 'Content'
+            },
+            typeInfo: '.Content'
+          }, {
+            name: 'linkRoot',
+            elementName: {
+              localPart: 'LinkRoot'
+            },
+            typeInfo: '.Object.LinkRoot'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ActionsType.MoveCave.Relative',
+        typeName: null
+      }, {
+        localName: 'TimerChange',
+        typeName: null,
+        propertyInfos: [{
+            name: 'start',
+            required: true,
+            elementName: {
+              localPart: 'start'
+            },
+            typeInfo: '.TimerChange.Start'
+          }, {
+            name: 'stop',
+            required: true,
+            elementName: {
+              localPart: 'stop'
+            },
+            typeInfo: '.TimerChange.Stop'
+          }, {
+            name: '_continue',
+            required: true,
+            elementName: {
+              localPart: 'continue'
+            },
+            typeInfo: '.TimerChange.Continue'
+          }, {
+            name: 'startIfNotStarted',
+            required: true,
+            elementName: {
+              localPart: 'start_if_not_started'
+            },
+            typeInfo: '.TimerChange.StartIfNotStarted'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TransType.LinkChange.LinkOff',
+        typeName: null
+      }, {
+        localName: 'Box.Movement',
+        typeName: null,
+        propertyInfos: [{
+            name: 'inside',
+            required: true,
+            elementName: {
+              localPart: 'Inside'
+            },
+            typeInfo: '.Box.Movement.Inside'
+          }, {
+            name: 'outside',
+            required: true,
+            elementName: {
+              localPart: 'Outside'
+            },
+            typeInfo: '.Box.Movement.Outside'
+          }]
+      }, {
+        localName: 'EventTrigger.MoveTrack',
+        typeName: null,
+        propertyInfos: [{
+            name: 'source',
+            required: true,
+            elementName: {
+              localPart: 'Source'
+            },
+            typeInfo: '.EventTrigger.MoveTrack.Source'
+          }, {
+            name: 'box',
+            required: true,
+            elementName: {
+              localPart: 'Box'
+            },
+            typeInfo: '.Box'
+          }]
+      }, {
+        localName: 'Placement',
+        typeName: null,
+        propertyInfos: [{
+            name: 'relativeTo',
+            required: true,
+            elementName: {
+              localPart: 'RelativeTo'
+            }
+          }, {
+            name: 'position',
+            required: true,
+            elementName: {
+              localPart: 'Position'
+            }
+          }, {
+            name: 'axis',
+            required: true,
+            elementName: {
+              localPart: 'Axis'
+            },
+            typeInfo: '.Placement.Axis'
+          }, {
+            name: 'lookAt',
+            required: true,
+            elementName: {
+              localPart: 'LookAt'
+            },
+            typeInfo: '.Placement.LookAt'
+          }, {
+            name: 'normal',
+            required: true,
+            elementName: {
+              localPart: 'Normal'
+            },
+            typeInfo: '.Placement.Normal'
+          }, {
+            name: 'name',
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleActionList.RemoveCondition',
+        typeName: null,
+        propertyInfos: [{
+            name: 'age',
+            required: true,
+            elementName: {
+              localPart: 'Age'
+            },
+            typeInfo: '.ParticleActionList.RemoveCondition.Age'
+          }, {
+            name: 'position',
+            required: true,
+            elementName: {
+              localPart: 'Position'
+            },
+            typeInfo: '.ParticleActionList.RemoveCondition.Position'
+          }, {
+            name: 'velocity',
+            required: true,
+            elementName: {
+              localPart: 'Velocity'
+            },
+            typeInfo: '.ParticleActionList.RemoveCondition.Velocity'
+          }]
+      }, {
+        localName: 'TimerChange.StartIfNotStarted',
+        typeName: null
+      }, {
+        localName: 'Content.Light.Point',
+        typeName: null
+      }, {
+        localName: 'Link.Actions.Clicks.Any',
+        typeName: null
+      }, {
+        localName: 'ParticleDomainType.Cylinder',
+        typeName: null,
+        propertyInfos: [{
+            name: 'p1',
+            required: true,
+            attributeName: {
+              localPart: 'p1'
+            },
+            type: 'attribute'
+          }, {
+            name: 'p2',
+            required: true,
+            attributeName: {
+              localPart: 'p2'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radius',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radiusInner',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius-inner'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ActionsType',
+        propertyInfos: [{
+            name: 'objectChange',
+            required: true,
+            elementName: {
+              localPart: 'ObjectChange'
+            },
+            typeInfo: '.ObjectChange'
+          }, {
+            name: 'groupRef',
+            required: true,
+            elementName: {
+              localPart: 'GroupRef'
+            },
+            typeInfo: '.GroupRef'
+          }, {
+            name: 'timerChange',
+            required: true,
+            elementName: {
+              localPart: 'TimerChange'
+            },
+            typeInfo: '.TimerChange'
+          }, {
+            name: 'soundRef',
+            required: true,
+            elementName: {
+              localPart: 'SoundRef'
+            },
+            typeInfo: '.SoundRef'
+          }, {
+            name: 'event',
+            required: true,
+            elementName: {
+              localPart: 'Event'
+            },
+            typeInfo: '.Event'
+          }, {
+            name: 'moveCave',
+            required: true,
+            elementName: {
+              localPart: 'MoveCave'
+            },
+            typeInfo: '.ActionsType.MoveCave'
+          }, {
+            name: 'restart',
+            required: true,
+            elementName: {
+              localPart: 'Restart'
+            },
+            typeInfo: '.ActionsType.Restart'
+          }]
+      }, {
+        localName: 'Sound.Repeat.RepeatForever',
+        typeName: null
+      }, {
+        localName: 'Story.ObjectRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'object',
+            required: true,
+            collection: true,
+            elementName: {
+              localPart: 'Object'
+            },
+            typeInfo: '.Object'
+          }]
+      }, {
+        localName: 'Content.ParticleSystem',
+        typeName: null,
+        propertyInfos: [{
+            name: 'maxParticles',
+            typeInfo: 'UnsignedInt',
+            attributeName: {
+              localPart: 'max-particles'
+            },
+            type: 'attribute'
+          }, {
+            name: 'actionsName',
+            required: true,
+            attributeName: {
+              localPart: 'actions-name'
+            },
+            type: 'attribute'
+          }, {
+            name: 'particleGroup',
+            required: true,
+            attributeName: {
+              localPart: 'particle-group'
+            },
+            type: 'attribute'
+          }, {
+            name: 'lookAtCamera',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'look-at-camera'
+            },
+            type: 'attribute'
+          }, {
+            name: 'sequential',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'sequential'
+            },
+            type: 'attribute'
+          }, {
+            name: 'speed',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'speed'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction.MatchVel',
+        typeName: null,
+        propertyInfos: [{
+            name: 'magnitude',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'magnitude'
+            },
+            type: 'attribute'
+          }, {
+            name: 'epsilon',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'epsilon'
+            },
+            type: 'attribute'
+          }, {
+            name: 'maxRadius',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'max_radius'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Content.StereoImage',
+        typeName: null,
+        propertyInfos: [{
+            name: 'leftImage',
+            required: true,
+            attributeName: {
+              localPart: 'left-image'
+            },
+            type: 'attribute'
+          }, {
+            name: 'rightImage',
+            required: true,
+            attributeName: {
+              localPart: 'right-image'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction.Avoid',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }, {
+            name: 'magnitude',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'magnitude'
+            },
+            type: 'attribute'
+          }, {
+            name: 'epsilon',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'epsilon'
+            },
+            type: 'attribute'
+          }, {
+            name: 'lookahead',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'lookahead'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack.Direction.PointTarget',
+        typeName: null,
+        propertyInfos: [{
+            name: 'point',
+            required: true,
+            attributeName: {
+              localPart: 'point'
+            },
+            type: 'attribute'
+          }, {
+            name: 'angle',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'angle'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Group',
+        typeName: null,
+        propertyInfos: [{
+            name: 'objects',
+            required: true,
+            collection: true,
+            elementName: {
+              localPart: 'Objects'
+            },
+            typeInfo: '.Objects'
+          }, {
+            name: 'groups',
+            required: true,
+            collection: true,
+            elementName: {
+              localPart: 'Groups'
+            },
+            typeInfo: '.Groups'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TransType.Movement',
+        typeName: null,
+        propertyInfos: [{
+            name: 'placement',
+            required: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }]
+      }, {
+        localName: 'TransType.LinkChange.Activate',
+        typeName: null
+      }, {
+        localName: 'SoundRef',
+        typeName: null,
+        propertyInfos: [{
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Sound.Repeat.NoRepeat',
+        typeName: null
+      }, {
+        localName: 'Event',
+        typeName: null,
+        propertyInfos: [{
+            name: 'enable',
+            required: true,
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'enable'
+            },
+            type: 'attribute'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TimerChange.Stop',
+        typeName: null
+      }, {
+        localName: 'TransType.MoveRel',
+        typeName: null,
+        propertyInfos: [{
+            name: 'placement',
+            required: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }]
+      }, {
+        localName: 'TransType.LinkChange',
+        typeName: null,
+        propertyInfos: [{
+            name: 'linkOn',
+            required: true,
+            elementName: {
+              localPart: 'link_on'
+            },
+            typeInfo: '.TransType.LinkChange.LinkOn'
+          }, {
+            name: 'linkOff',
+            required: true,
+            elementName: {
+              localPart: 'link_off'
+            },
+            typeInfo: '.TransType.LinkChange.LinkOff'
+          }, {
+            name: 'activate',
+            required: true,
+            elementName: {
+              localPart: 'activate'
+            },
+            typeInfo: '.TransType.LinkChange.Activate'
+          }, {
+            name: 'activateIfOn',
+            required: true,
+            elementName: {
+              localPart: 'activate_if_on'
+            },
+            typeInfo: '.TransType.LinkChange.ActivateIfOn'
+          }]
+      }, {
+        localName: 'Link',
+        typeName: null,
+        propertyInfos: [{
+            name: 'enabled',
+            required: true,
+            elementName: {
+              localPart: 'Enabled'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'remainEnabled',
+            required: true,
+            elementName: {
+              localPart: 'RemainEnabled'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'enabledColor',
+            required: true,
+            elementName: {
+              localPart: 'EnabledColor'
+            }
+          }, {
+            name: 'selectedColor',
+            required: true,
+            elementName: {
+              localPart: 'SelectedColor'
+            }
+          }, {
+            name: 'actions',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'Actions'
+            },
+            typeInfo: '.Link.Actions'
+          }]
+      }, {
+        localName: 'GroupRef',
+        typeName: null,
+        propertyInfos: [{
+            name: 'transition',
+            required: true,
+            elementName: {
+              localPart: 'Transition'
+            },
+            typeInfo: '.TransType'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }, {
+            name: 'random',
+            attributeName: {
+              localPart: 'random'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Content.Light.Spot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'angle',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'angle'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Global.Background',
+        typeName: null,
+        propertyInfos: [{
+            name: 'color',
+            attributeName: {
+              localPart: 'color'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleActionList.Source',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }, {
+            name: 'rate',
+            required: true,
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'rate'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TimerChange.Continue',
+        typeName: null
+      }, {
+        localName: 'ParticleDomainType.Blob',
+        typeName: null,
+        propertyInfos: [{
+            name: 'center',
+            required: true,
+            attributeName: {
+              localPart: 'center'
+            },
+            type: 'attribute'
+          }, {
+            name: 'stdev',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'stdev'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Point',
+        typeName: null,
+        propertyInfos: [{
+            name: 'point',
+            required: true,
+            attributeName: {
+              localPart: 'point'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleActionList.RemoveCondition.Velocity',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }, {
+            name: 'inside',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'inside'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Plane',
+        typeName: null,
+        propertyInfos: [{
+            name: 'point',
+            required: true,
+            attributeName: {
+              localPart: 'point'
+            },
+            type: 'attribute'
+          }, {
+            name: 'normal',
+            required: true,
+            attributeName: {
+              localPart: 'normal'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack.Direction.DirectionTarget',
+        typeName: null,
+        propertyInfos: [{
+            name: 'direction',
+            required: true,
+            attributeName: {
+              localPart: 'direction'
+            },
+            type: 'attribute'
+          }, {
+            name: 'angle',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'angle'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Groups',
+        typeName: null,
+        propertyInfos: [{
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Sphere',
+        typeName: null,
+        propertyInfos: [{
+            name: 'center',
+            required: true,
+            attributeName: {
+              localPart: 'center'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radius',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radiusInner',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius-inner'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ObjectChange',
+        typeName: null,
+        propertyInfos: [{
+            name: 'transition',
+            required: true,
+            elementName: {
+              localPart: 'Transition'
+            },
+            typeInfo: '.TransType'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Sound',
+        typeName: null,
+        propertyInfos: [{
+            name: 'mode',
+            elementName: {
+              localPart: 'Mode'
+            },
+            typeInfo: '.Sound.Mode'
+          }, {
+            name: 'repeat',
+            required: true,
+            elementName: {
+              localPart: 'Repeat'
+            },
+            typeInfo: '.Sound.Repeat'
+          }, {
+            name: 'settings',
+            required: true,
+            elementName: {
+              localPart: 'Settings'
+            },
+            typeInfo: '.Sound.Settings'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }, {
+            name: 'filename',
+            required: true,
+            attributeName: {
+              localPart: 'filename'
+            },
+            type: 'attribute'
+          }, {
+            name: 'autostart',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'autostart'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack.Direction.None',
+        typeName: null
+      }, {
+        localName: 'Placement.Axis',
+        typeName: null,
+        propertyInfos: [{
+            name: 'rotation',
+            attributeName: {
+              localPart: 'rotation'
+            },
+            type: 'attribute'
+          }, {
+            name: 'angle',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'angle'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack.Direction.ObjectTarget',
+        typeName: null,
+        propertyInfos: [{
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Global.CameraPos',
+        typeName: null,
+        propertyInfos: [{
+            name: 'placement',
+            required: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }, {
+            name: 'farClip',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'far-clip'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction',
+        typeName: null,
+        propertyInfos: [{
+            name: 'avoid',
+            required: true,
+            elementName: {
+              localPart: 'Avoid'
+            },
+            typeInfo: '.ParticleAction.Avoid'
+          }, {
+            name: 'bounce',
+            required: true,
+            elementName: {
+              localPart: 'Bounce'
+            },
+            typeInfo: '.ParticleAction.Bounce'
+          }, {
+            name: 'gravity',
+            required: true,
+            elementName: {
+              localPart: 'Gravity'
+            },
+            typeInfo: '.ParticleAction.Gravity'
+          }, {
+            name: 'damping',
+            required: true,
+            elementName: {
+              localPart: 'Damping'
+            },
+            typeInfo: '.ParticleAction.Damping'
+          }, {
+            name: 'gravitate',
+            required: true,
+            elementName: {
+              localPart: 'Gravitate'
+            },
+            typeInfo: '.ParticleAction.Gravitate'
+          }, {
+            name: 'follow',
+            required: true,
+            elementName: {
+              localPart: 'Follow'
+            },
+            typeInfo: '.ParticleAction.Follow'
+          }, {
+            name: 'matchVel',
+            required: true,
+            elementName: {
+              localPart: 'MatchVel'
+            },
+            typeInfo: '.ParticleAction.MatchVel'
+          }, {
+            name: 'orbitPoint',
+            required: true,
+            elementName: {
+              localPart: 'OrbitPoint'
+            },
+            typeInfo: '.ParticleAction.OrbitPoint'
+          }, {
+            name: 'jet',
+            required: true,
+            elementName: {
+              localPart: 'Jet'
+            },
+            typeInfo: '.ParticleAction.Jet'
+          }, {
+            name: 'randomVel',
+            required: true,
+            elementName: {
+              localPart: 'RandomVel'
+            },
+            typeInfo: 'AnyType'
+          }, {
+            name: 'randomAccel',
+            required: true,
+            elementName: {
+              localPart: 'RandomAccel'
+            },
+            typeInfo: 'AnyType'
+          }, {
+            name: 'randomDisplace',
+            required: true,
+            elementName: {
+              localPart: 'RandomDisplace'
+            },
+            typeInfo: 'AnyType'
+          }, {
+            name: 'targetColor',
+            required: true,
+            elementName: {
+              localPart: 'TargetColor'
+            },
+            typeInfo: '.ParticleAction.TargetColor'
+          }, {
+            name: 'targetSize',
+            required: true,
+            elementName: {
+              localPart: 'TargetSize'
+            },
+            typeInfo: 'AnyType'
+          }, {
+            name: 'targetVel',
+            required: true,
+            elementName: {
+              localPart: 'TargetVel'
+            },
+            typeInfo: 'AnyType'
+          }]
+      }, {
+        localName: 'Content.Image',
+        typeName: null,
+        propertyInfos: [{
+            name: 'filename',
+            required: true,
+            attributeName: {
+              localPart: 'filename'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.MoveTrack.Source',
+        typeName: null,
+        propertyInfos: [{
+            name: 'objectRef',
+            required: true,
+            elementName: {
+              localPart: 'ObjectRef'
+            },
+            typeInfo: '.EventTrigger.MoveTrack.Source.ObjectRef'
+          }, {
+            name: 'groupObj',
+            required: true,
+            elementName: {
+              localPart: 'GroupObj'
+            },
+            typeInfo: '.EventTrigger.MoveTrack.Source.GroupObj'
+          }]
+      }, {
+        localName: 'Story.About',
+        typeName: null,
+        propertyInfos: [{
+            name: 'news',
+            attributeName: {
+              localPart: 'news'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleAction.TargetColor',
+        typeName: null,
+        propertyInfos: [{
+            name: 'color',
+            required: true,
+            attributeName: {
+              localPart: 'color'
+            },
+            type: 'attribute'
+          }, {
+            name: 'alpha',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'alpha'
+            },
+            type: 'attribute'
+          }, {
+            name: 'scale',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'scale'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Sound.Mode',
+        typeName: null,
+        propertyInfos: [{
+            name: 'positional',
+            required: true,
+            elementName: {
+              localPart: 'Positional'
+            },
+            typeInfo: '.Sound.Mode.Positional'
+          }, {
+            name: 'fixed',
+            required: true,
+            elementName: {
+              localPart: 'Fixed'
+            },
+            typeInfo: '.Sound.Mode.Fixed'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Rect',
+        typeName: null,
+        propertyInfos: [{
+            name: 'point',
+            required: true,
+            attributeName: {
+              localPart: 'point'
+            },
+            type: 'attribute'
+          }, {
+            name: 'uDir',
+            required: true,
+            attributeName: {
+              localPart: 'u-dir'
+            },
+            type: 'attribute'
+          }, {
+            name: 'vDir',
+            required: true,
+            attributeName: {
+              localPart: 'v-dir'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Sound.Settings',
+        typeName: null,
+        propertyInfos: [{
+            name: 'freq',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'freq'
+            },
+            type: 'attribute'
+          }, {
+            name: 'volume',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'volume'
+            },
+            type: 'attribute'
+          }, {
+            name: 'pan',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'pan'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.MoveTrack.Source.GroupObj',
+        typeName: null,
+        propertyInfos: [{
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }, {
+            name: 'objects',
+            attributeName: {
+              localPart: 'objects'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleActionList.RemoveCondition.Age',
+        typeName: null,
+        propertyInfos: [{
+            name: 'age',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'age'
+            },
+            type: 'attribute'
+          }, {
+            name: 'youngerThan',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'younger-than'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Sound.Repeat',
+        typeName: null,
+        propertyInfos: [{
+            name: 'noRepeat',
+            required: true,
+            elementName: {
+              localPart: 'NoRepeat'
+            },
+            typeInfo: '.Sound.Repeat.NoRepeat'
+          }, {
+            name: 'repeatForever',
+            required: true,
+            elementName: {
+              localPart: 'RepeatForever'
+            },
+            typeInfo: '.Sound.Repeat.RepeatForever'
+          }, {
+            name: 'repeatNum',
+            required: true,
+            elementName: {
+              localPart: 'RepeatNum'
+            },
+            typeInfo: 'Long'
+          }]
+      }, {
+        localName: 'Story.PlacementRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'placement',
+            required: true,
+            collection: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }]
+      }, {
+        localName: 'ActionsType.MoveCave.Absolute',
+        typeName: null
+      }, {
+        localName: 'ParticleAction.Gravity',
+        typeName: null,
+        propertyInfos: [{
+            name: 'direction',
+            required: true,
+            attributeName: {
+              localPart: 'direction'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Story',
+        typeName: null,
+        propertyInfos: [{
+            name: 'objectRoot',
+            required: true,
+            elementName: {
+              localPart: 'ObjectRoot'
+            },
+            typeInfo: '.Story.ObjectRoot'
+          }, {
+            name: 'groupRoot',
+            required: true,
+            elementName: {
+              localPart: 'GroupRoot'
+            },
+            typeInfo: '.Story.GroupRoot'
+          }, {
+            name: 'timelineRoot',
+            required: true,
+            elementName: {
+              localPart: 'TimelineRoot'
+            },
+            typeInfo: '.Story.TimelineRoot'
+          }, {
+            name: 'placementRoot',
+            required: true,
+            elementName: {
+              localPart: 'PlacementRoot'
+            },
+            typeInfo: '.Story.PlacementRoot'
+          }, {
+            name: 'soundRoot',
+            required: true,
+            elementName: {
+              localPart: 'SoundRoot'
+            },
+            typeInfo: '.Story.SoundRoot'
+          }, {
+            name: 'eventRoot',
+            required: true,
+            elementName: {
+              localPart: 'EventRoot'
+            },
+            typeInfo: '.Story.EventRoot'
+          }, {
+            name: 'particleActionRoot',
+            required: true,
+            elementName: {
+              localPart: 'ParticleActionRoot'
+            },
+            typeInfo: '.Story.ParticleActionRoot'
+          }, {
+            name: 'global',
+            required: true,
+            elementName: {
+              localPart: 'Global'
+            },
+            typeInfo: '.Global'
+          }, {
+            name: 'about',
+            required: true,
+            elementName: {
+              localPart: 'About'
+            },
+            typeInfo: '.Story.About'
+          }, {
+            name: 'version',
+            required: true,
+            typeInfo: 'UnsignedInt',
+            attributeName: {
+              localPart: 'version'
+            },
+            type: 'attribute'
+          }, {
+            name: 'lastXpath',
+            attributeName: {
+              localPart: 'last_xpath'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Story.SoundRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'sound',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'Sound'
+            },
+            typeInfo: '.Sound'
+          }]
+      }, {
+        localName: 'Object.LinkRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'link',
+            elementName: {
+              localPart: 'Link'
+            },
+            typeInfo: '.Link'
+          }]
+      }, {
+        localName: 'ParticleActionList.RemoveCondition.Position',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleDomain',
+            required: true,
+            elementName: {
+              localPart: 'ParticleDomain'
+            },
+            typeInfo: '.ParticleDomainType'
+          }, {
+            name: 'inside',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'inside'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack',
+        typeName: null,
+        propertyInfos: [{
+            name: 'position',
+            required: true,
+            elementName: {
+              localPart: 'Position'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Position'
+          }, {
+            name: 'direction',
+            required: true,
+            elementName: {
+              localPart: 'Direction'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Direction'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Line',
+        typeName: null,
+        propertyInfos: [{
+            name: 'p1',
+            required: true,
+            attributeName: {
+              localPart: 'p1'
+            },
+            type: 'attribute'
+          }, {
+            name: 'p2',
+            required: true,
+            attributeName: {
+              localPart: 'p2'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Content.Light.Directional',
+        typeName: null
+      }, {
+        localName: 'Box',
+        typeName: null,
+        propertyInfos: [{
+            name: 'movement',
+            required: true,
+            elementName: {
+              localPart: 'Movement'
+            },
+            typeInfo: '.Box.Movement'
+          }, {
+            name: 'ignoreY',
+            typeInfo: 'Boolean',
+            attributeName: {
+              localPart: 'ignore-Y'
+            },
+            type: 'attribute'
+          }, {
+            name: 'corner1',
+            required: true,
+            attributeName: {
+              localPart: 'corner1'
+            },
+            type: 'attribute'
+          }, {
+            name: 'corner2',
+            required: true,
+            attributeName: {
+              localPart: 'corner2'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ParticleDomainType.Cone',
+        typeName: null,
+        propertyInfos: [{
+            name: 'baseCenter',
+            required: true,
+            attributeName: {
+              localPart: 'base-center'
+            },
+            type: 'attribute'
+          }, {
+            name: 'apex',
+            required: true,
+            attributeName: {
+              localPart: 'apex'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radius',
+            required: true,
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius'
+            },
+            type: 'attribute'
+          }, {
+            name: 'radiusInner',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'radius-inner'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ActionsType.MoveCave',
+        typeName: null,
+        propertyInfos: [{
+            name: 'relative',
+            required: true,
+            elementName: {
+              localPart: 'Relative'
+            },
+            typeInfo: '.ActionsType.MoveCave.Relative'
+          }, {
+            name: 'absolute',
+            required: true,
+            elementName: {
+              localPart: 'Absolute'
+            },
+            typeInfo: '.ActionsType.MoveCave.Absolute'
+          }, {
+            name: 'placement',
+            required: true,
+            elementName: {
+              localPart: 'Placement'
+            },
+            typeInfo: '.Placement'
+          }, {
+            name: 'duration',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'duration'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TransType.LinkChange.ActivateIfOn',
+        typeName: null
+      }, {
+        localName: 'ParticleAction.OrbitPoint',
+        typeName: null,
+        propertyInfos: [{
+            name: 'center',
+            required: true,
+            attributeName: {
+              localPart: 'center'
+            },
+            type: 'attribute'
+          }, {
+            name: 'magnitude',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'magnitude'
+            },
+            type: 'attribute'
+          }, {
+            name: 'epsilon',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'epsilon'
+            },
+            type: 'attribute'
+          }, {
+            name: 'maxRadius',
+            typeInfo: 'Float',
+            attributeName: {
+              localPart: 'max_radius'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'ActionsType.Restart',
+        typeName: null
+      }, {
+        localName: 'ParticleActionList',
+        typeName: null,
+        propertyInfos: [{
+            name: 'source',
+            required: true,
+            elementName: {
+              localPart: 'Source'
+            },
+            typeInfo: '.ParticleActionList.Source'
+          }, {
+            name: 'vel',
+            required: true,
+            elementName: {
+              localPart: 'Vel'
+            },
+            typeInfo: '.ParticleActionList.Vel'
+          }, {
+            name: 'particleAction',
+            required: true,
+            collection: true,
+            elementName: {
+              localPart: 'ParticleAction'
+            },
+            typeInfo: '.ParticleAction'
+          }, {
+            name: 'removeCondition',
+            required: true,
+            elementName: {
+              localPart: 'RemoveCondition'
+            },
+            typeInfo: '.ParticleActionList.RemoveCondition'
+          }, {
+            name: 'name',
+            required: true,
+            attributeName: {
+              localPart: 'name'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Story.GroupRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'group',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'Group'
+            },
+            typeInfo: '.Group'
+          }]
+      }, {
+        localName: 'Story.ParticleActionRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'particleActionList',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'ParticleActionList'
+            },
+            typeInfo: '.ParticleActionList'
+          }]
+      }, {
+        localName: 'Placement.Normal',
+        typeName: null,
+        propertyInfos: [{
+            name: 'normal',
+            attributeName: {
+              localPart: 'normal'
+            },
+            type: 'attribute'
+          }, {
+            name: 'angle',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'angle'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'EventTrigger.HeadTrack.Direction',
+        typeName: null,
+        propertyInfos: [{
+            name: 'pointTarget',
+            required: true,
+            elementName: {
+              localPart: 'PointTarget'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Direction.PointTarget'
+          }, {
+            name: 'directionTarget',
+            required: true,
+            elementName: {
+              localPart: 'DirectionTarget'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Direction.DirectionTarget'
+          }, {
+            name: 'objectTarget',
+            required: true,
+            elementName: {
+              localPart: 'ObjectTarget'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Direction.ObjectTarget'
+          }, {
+            name: 'none',
+            required: true,
+            elementName: {
+              localPart: 'None'
+            },
+            typeInfo: '.EventTrigger.HeadTrack.Direction.None'
+          }]
+      }, {
+        localName: 'Placement.LookAt',
+        typeName: null,
+        propertyInfos: [{
+            name: 'target',
+            attributeName: {
+              localPart: 'target'
+            },
+            type: 'attribute'
+          }, {
+            name: 'up',
+            attributeName: {
+              localPart: 'up'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TransType',
+        propertyInfos: [{
+            name: 'visible',
+            required: true,
+            elementName: {
+              localPart: 'Visible'
+            },
+            typeInfo: 'Boolean'
+          }, {
+            name: 'movement',
+            required: true,
+            elementName: {
+              localPart: 'Movement'
+            },
+            typeInfo: '.TransType.Movement'
+          }, {
+            name: 'moveRel',
+            required: true,
+            elementName: {
+              localPart: 'MoveRel'
+            },
+            typeInfo: '.TransType.MoveRel'
+          }, {
+            name: 'color',
+            required: true,
+            elementName: {
+              localPart: 'Color'
+            }
+          }, {
+            name: 'scale',
+            required: true,
+            elementName: {
+              localPart: 'Scale'
+            },
+            typeInfo: 'Double'
+          }, {
+            name: 'sound',
+            required: true,
+            elementName: {
+              localPart: 'Sound'
+            },
+            typeInfo: '.TransType.Sound'
+          }, {
+            name: 'linkChange',
+            required: true,
+            elementName: {
+              localPart: 'LinkChange'
+            },
+            typeInfo: '.TransType.LinkChange'
+          }, {
+            name: 'duration',
+            typeInfo: 'Double',
+            attributeName: {
+              localPart: 'duration'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'Story.TimelineRoot',
+        typeName: null,
+        propertyInfos: [{
+            name: 'timeline',
+            minOccurs: 0,
+            collection: true,
+            elementName: {
+              localPart: 'Timeline'
+            },
+            typeInfo: '.Timeline'
+          }]
+      }, {
+        localName: 'TimerChange.Start',
+        typeName: null
+      }, {
+        localName: 'Timeline.TimedActions',
+        typeName: null,
+        baseTypeInfo: '.ActionsType',
+        propertyInfos: [{
+            name: 'secondsTime',
+            required: true,
+            attributeName: {
+              localPart: 'seconds-time'
+            },
+            type: 'attribute'
+          }]
+      }, {
+        localName: 'TransType.LinkChange.LinkOn',
+        typeName: null
+      }, {
+        localName: 'EventTrigger.HeadTrack.Position.Anywhere',
+        typeName: null
+      }],
+    elementInfos: [{
+        elementName: {
+          localPart: 'Content'
+        },
+        typeInfo: '.Content'
+      }, {
+        elementName: {
+          localPart: 'GroupRef'
+        },
+        typeInfo: '.GroupRef'
+      }, {
+        elementName: {
+          localPart: 'Timeline'
+        },
+        typeInfo: '.Timeline'
+      }, {
+        elementName: {
+          localPart: 'Box'
+        },
+        typeInfo: '.Box'
+      }, {
+        elementName: {
+          localPart: 'ParticleDomain'
+        },
+        typeInfo: '.ParticleDomainType'
+      }, {
+        elementName: {
+          localPart: 'EventTrigger'
+        },
+        typeInfo: '.EventTrigger'
+      }, {
+        elementName: {
+          localPart: 'Sound'
+        },
+        typeInfo: '.Sound'
+      }, {
+        elementName: {
+          localPart: 'SoundRef'
+        },
+        typeInfo: '.SoundRef'
+      }, {
+        elementName: {
+          localPart: 'Global'
+        },
+        typeInfo: '.Global'
+      }, {
+        elementName: {
+          localPart: 'ParticleAction'
+        },
+        typeInfo: '.ParticleAction'
+      }, {
+        elementName: {
+          localPart: 'Transition'
+        },
+        typeInfo: '.TransType'
+      }, {
+        elementName: {
+          localPart: 'Story'
+        },
+        typeInfo: '.Story'
+      }, {
+        elementName: {
+          localPart: 'Link'
+        },
+        typeInfo: '.Link'
+      }, {
+        elementName: {
+          localPart: 'ParticleActionList'
+        },
+        typeInfo: '.ParticleActionList'
+      }, {
+        elementName: {
+          localPart: 'TimerChange'
+        },
+        typeInfo: '.TimerChange'
+      }, {
+        elementName: {
+          localPart: 'Event'
+        },
+        typeInfo: '.Event'
+      }, {
+        elementName: {
+          localPart: 'Placement'
+        },
+        typeInfo: '.Placement'
+      }, {
+        elementName: {
+          localPart: 'ObjectChange'
+        },
+        typeInfo: '.ObjectChange'
+      }, {
+        elementName: {
+          localPart: 'Group'
+        },
+        typeInfo: '.Group'
+      }, {
+        elementName: {
+          localPart: 'Objects'
+        },
+        typeInfo: '.Objects'
+      }, {
+        elementName: {
+          localPart: 'Object'
+        },
+        typeInfo: '.Object'
+      }, {
+        elementName: {
+          localPart: 'Groups'
+        },
+        typeInfo: '.Groups'
+      }]
+  };
+  return {
+    generated: generated
+  };
+};
+if (typeof define === 'function' && define.amd) {
+  define([], generated_Module_Factory);
+}
+else {
+  var generated_Module = generated_Module_Factory();
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports.generated = generated_Module.generated;
+  }
+  else {
+    var generated = generated_Module.generated;
+  }
+}
