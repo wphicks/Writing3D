@@ -19,6 +19,7 @@
 """
 import os
 import json
+import logging
 
 
 class W3DConfigError(Exception):
@@ -29,21 +30,25 @@ class W3DConfigError(Exception):
         super().__init__(message)
 
 W3D_CONFIG_FILENAME = os.path.join(
-    os.path.dirname(__file__),
-    'data',
-    'w3d.json'
+    os.path.expanduser("~"),
+    '.w3d.json'
 )
 try:
     with open(W3D_CONFIG_FILENAME) as w3d_config_file:
         W3D_CONFIG = json.load(w3d_config_file)
 except FileNotFoundError:
-    raise W3DConfigError(
-        "No Writing3D configuration file found"
-    )
+    logging.debug("No W3D config file found. Creating default...")
+    W3D_CONFIG = {
+        "Blender executable": "blender",
+        "Blender player executable": "blenderplayer",
+        "Export script path": "/usr/bin/w3d_export_tools.py"
+    }
+    with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
+        json.dump(W3D_CONFIG, w3d_config_file)
 
 BLENDER_EXEC = W3D_CONFIG["Blender executable"]
 BLENDER_PLAY = W3D_CONFIG["Blender player executable"]
-EXPORT_SCRIPT = W3D_CONFIG["Export script path"
+EXPORT_SCRIPT = W3D_CONFIG["Export script path"]
 
 from . import project
 from . import features
