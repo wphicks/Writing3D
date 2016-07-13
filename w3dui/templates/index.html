@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Writing3D</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css" />
+    <script type="text/javascript" src="/static/tabbed_notebook.js"></script>
 </head>
 <body>
     <h1 class=title>Writing3D</h1>
     <div id="editor">
-        <article class="tabs" id="edit_notebook">
-            <section id="Global">
-                <h2><a href="#Global">Global</a></h2>
-                <p>Global</p>
-            </section>
-            <section id="Objects">
-                <h2><a href="#Objects">Objects</a></h2>
-                <p>Objects</p>
-            </section>
-            <section id="Timelines">
-                <h2><a href="#Timelines">Timelines</a></h2>
-                <p>Timelines</p>
-            </section>
-            <!-- <section id="Events"></section> -->
-            <!-- <section id="Sounds"></section> -->
-        </article>
+        <ul class="notebook">
+            {% for tab in toptabs %}
+            <li>
+                <a href="#" class=tablink
+                        onclick="openTab(event, '{{ tab.name }}')">
+                    {{ tab.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% for tab in toptabs %}
+        <div id="{{ tab.name }}" class=tabcontent>
+            <h3>{{ tab.name }} Editor</h3>
+            <p>{{ tab.name }} content</p>
+        </div>
+        {% endfor %}
     </div>
     <div id="viewer">
     </div>
