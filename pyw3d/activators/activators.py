@@ -18,11 +18,12 @@
 """Classes used to initiate actions in Blender
 """
 import logging
+LOGGER = logging.getLogger("pyw3d")
 from pyw3d.errors import EBKAC
 try:
     import bpy
 except ImportError:
-    logging.debug(
+    LOGGER.debug(
         "Module bpy not found. Loading pyw3d.timeline as standalone")
 
 

@@ -20,6 +20,7 @@
 import re
 import os
 import logging
+LOGGER = logging.getLogger("pyw3d")
 from .path import ProjectPath, UnsetValueError
 
 
@@ -203,7 +204,7 @@ class SortedListValidator(ListValidator):
         for i in range(len(iterable)):
             if not self.get_base_validator(i)(iterable[i]):
                 return False
-            if i > 0 and iterable[i] > iterable[i-1]:
+            if i > 0 and iterable[i] > iterable[i - 1]:
                 return False
         return True
 
@@ -240,8 +241,8 @@ class DictValidator(Validator):
     def __call__(self, dictionary):
         for key, value in dictionary.items():
             if (
-                    not self.key_validator(key)
-                    or not self.value_validator(value)):
+                    not self.key_validator(key) or
+                    not self.value_validator(value)):
                 return False
         return True
 
@@ -274,7 +275,7 @@ class ReferenceValidator(Validator):
 
     def __call__(self, value):
         if self.ref_path.project is None:
-            logging.warn("Cannot check relative reference to {}".format(
+            LOGGER.info("Cannot check relative reference to {}".format(
                 value))
             return self.fallback_validator(value)
         return value in self.valid_options
@@ -287,7 +288,7 @@ class ReferenceValidator(Validator):
                 return self.valid_options[
                     self.valid_menu_items.index(value)]
         except UnsetValueError:
-            logging.debug("Cannot check relative reference to {}".format(
+            LOGGER.debug("Cannot check relative reference to {}".format(
                 value))
             return self.fallback_validator.coerce(value)
 
@@ -349,14 +350,14 @@ class IsNumeric(Validator):
         self.help_string = "Value must be numeric"
         if self.min_value is not None:
             self.help_string = " ".join(
-                (self.help_string,  "and >= {}".format(
+                (self.help_string, "and >= {}".format(
                     self.min_value)))
             self.def_value = self.min_value
         else:
             self.def_value = 0
         if self.max_value is not None:
             self.help_string = " ".join(
-                (self.help_string,  "and <= {}".format(
+                (self.help_string, "and <= {}".format(
                     self.max_value)))
             if self.def_value > self.max_value:
                 self.def_value = self.max_value

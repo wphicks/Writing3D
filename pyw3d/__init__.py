@@ -20,6 +20,11 @@
 import os
 import json
 import logging
+LOGGER = logging.getLogger("pyw3d")
+LOGGER.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)-15s %(levename)8s %(name)s %(message)s'
+)
 
 
 class W3DConfigError(Exception):
@@ -37,7 +42,7 @@ try:
     with open(W3D_CONFIG_FILENAME) as w3d_config_file:
         W3D_CONFIG = json.load(w3d_config_file)
 except FileNotFoundError:
-    logging.debug("No W3D config file found. Creating default...")
+    LOGGER.debug("No W3D config file found. Creating default...")
     W3D_CONFIG = {
         "Blender executable": "blender",
         "Blender player executable": "blenderplayer",
