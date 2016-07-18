@@ -35,7 +35,10 @@ def main():
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    # writer.run()
-    server_thread = threading.Thread(target=writer.run)
-    server_thread.start()
-    webbrowser.open_new_tab("http://localhost:5000")
+    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+        logging.info("Debug mode. Running only server thread.")
+        writer.run()
+    else:
+        server_thread = threading.Thread(target=writer.run)
+        server_thread.start()
+        webbrowser.open_new_tab("http://localhost:5000")

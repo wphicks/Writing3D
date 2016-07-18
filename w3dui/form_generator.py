@@ -36,11 +36,16 @@ def field_from_validator(w3d_validator, label, required=False):
     elif isinstance(w3d_validator, pyw3d.validators.IsBoolean):
         field_type = wtforms.fields.RadioField
         kwargs["coerce"] = w3d_validator.coerce
+        kwargs["choices"] = zip(
+            w3d_validator.valid_menu_items, w3d_validator.valid_menu_items
+        )
 
     elif isinstance(w3d_validator, pyw3d.validators.OptionValidator):
         field_type = wtforms.fields.SelectField
         kwargs["coerce"] = w3d_validator.coerce
-        kwargs["choices"] = w3d_validator.valid_menu_items
+        kwargs["choices"] = zip(
+            w3d_validator.valid_menu_items, w3d_validator.valid_menu_items
+        )
         # TODO: The above needs to be determined dynamically
         # TODO: ReferenceValidator
 
