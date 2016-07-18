@@ -22,7 +22,19 @@
         {% for tab in toptabs %}
         <div id="{{ tab.name }}" class=tabcontent>
             <h3>{{ tab.name }} Editor</h3>
-            {{ form }}
+            <form method=post>
+                {% for field in form %}
+                    <dt>{{ field.label }}</dt>
+                    <dd>{{ field()|safe }}</dd>
+                    {% if field.errors %}
+                        <ul>
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+            </form>
         </div>
         {% endfor %}
     </div>

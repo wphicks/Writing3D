@@ -1,5 +1,6 @@
 import pyw3d
 import wtforms
+import logging
 
 
 class W3DToWTValidator(object):
@@ -23,10 +24,7 @@ def field_from_validator(w3d_validator, label, required=False):
     if required:
         validator_list.append(wtforms.validators.InputRequired())
 
-    if isinstance(w3d_validator, pyw3d.validators.Validator):
-        field_type = wtforms.fields.Field
-
-    elif isinstance(w3d_validator, pyw3d.validators.TextValidator):
+    if isinstance(w3d_validator, pyw3d.validators.TextValidator):
         field_type = wtforms.fields.TextField
 
     elif isinstance(w3d_validator, pyw3d.validators.ValidPyString):
@@ -52,27 +50,32 @@ def field_from_validator(w3d_validator, label, required=False):
             form_name = "{}Form".format(w3d_validator.__class__.__name__)
             form_fields = {
                 "entry{}".format(i): field_from_validator(
-                    w3d_validator.get_base_validator(i)
+                    w3d_validator.get_base_validator(i),
+                    "{}".format(i)
                 ) for i in range(w3d_validator.required_length)
             }
             return wtforms.fields.FormField(
                 type(form_name, (wtforms.Form,), form_fields),
-                label, validator_list
+                label  # , validator_list
             )
         return wtforms.fields.FieldList(
-            field_from_validator(w3d_validator.get_base_validator(0)),
+            field_from_validator(
+                w3d_validator.get_base_validator(0),
+                "Entry"
+            ),
             label, validator_list
         )
 
     elif isinstance(w3d_validator, pyw3d.validators.DictValidator):
         form_name = "{}Form".format(w3d_validator.__class__.__name__)
         form_fields = {
-            "key": field_from_validator(w3d_validator.key_validator),
-            "value": field_from_validator(w3d_validator.value_validator)
+            "key": field_from_validator(w3d_validator.key_validator, "key"),
+            "value": field_from_validator(
+                w3d_validator.value_validator, "value")
         }
         return wtforms.fields.FormField(
             type(form_name, (wtforms.Form,), form_fields),
-            label, validator_list
+            label  # , validator_list
         )
 
     elif isinstance(w3d_validator, pyw3d.validators.IsInteger):
@@ -84,27 +87,37 @@ def field_from_validator(w3d_validator, label, required=False):
 
     elif isinstance(w3d_validator, pyw3d.validators.FeatureValidator):
         return wtforms.fields.FormField(
-            generate_form(w3d_validator.correct_class),
-            label, validator_list
+            generate_form_class(w3d_validator.correct_class),
+            label  # , validator_list
         )
+
+    elif isinstance(w3d_validator, pyw3d.validators.Validator):
+        field_type = wtforms.fields.Field
 
     return field_type(label, validator_list, **kwargs)
 
 
-def generate_form(feature):
-    """Generate WTForm for editing W3DFeature
+def generate_form_class(feature):
+    """Generate WTForm class for editing W3DFeature
 
     :param W3DFeature feature: The feature to be edited or a W3DFeature
     subclass"""
-
-    class_attributes = {}
-    for attribute, validator in feature.argument_validators.items():
-        class_attributes[attribute] = field_from_validator(validator)
 
     if type(feature) is type:
         class_name = "{}Form".format(feature.__name__)
     else:
         class_name = "{}Form".format(feature.__class__.__name__)
+
+    class_attributes = {}
+    for attribute, validator in feature.argument_validators.items():
+        logging.debug(
+            "Creating attribute {} in form {}".format(attribute, class_name)
+        )
+        class_attributes[attribute] = field_from_validator(
+            validator,
+            attribute,
+            required=(attribute not in feature.default_arguments.keys())
+        )
 
     return type(class_name, (wtforms.Form,), class_attributes)
 
