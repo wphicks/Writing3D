@@ -56,7 +56,12 @@ def field_from_validator(w3d_validator, label, required=False):
             form_fields = {
                 "entry{}".format(i): field_from_validator(
                     w3d_validator.get_base_validator(i),
-                    "{}".format(i)
+                    "{}".format(
+                        ("┌", "|", "└")[
+                            int(i != 0) +
+                            int(i == w3d_validator.required_length - 1)
+                        ]
+                    )
                 ) for i in range(w3d_validator.required_length)
             }
             return wtforms.fields.FormField(
@@ -66,7 +71,7 @@ def field_from_validator(w3d_validator, label, required=False):
         return wtforms.fields.FieldList(
             field_from_validator(
                 w3d_validator.get_base_validator(0),
-                "Entry"
+                "|"
             ),
             label, validator_list
         )
@@ -78,9 +83,11 @@ def field_from_validator(w3d_validator, label, required=False):
             "value": field_from_validator(
                 w3d_validator.value_validator, "value")
         }
-        return wtforms.fields.FormField(
-            type(form_name, (wtforms.Form,), form_fields),
-            label  # , validator_list
+        return wtforms.fields.FieldList(
+            wtforms.fields.FormField(
+                type(form_name, (wtforms.Form,), form_fields),
+                label  # , validator_list
+            )
         )
 
     elif isinstance(w3d_validator, pyw3d.validators.IsInteger):
