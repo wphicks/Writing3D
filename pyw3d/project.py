@@ -22,6 +22,7 @@ import xml.dom.minidom as minidom
 import logging
 import math
 import os
+import sys
 from .features import W3DFeature
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes
 from .validators import ListValidator, IsNumeric, OptionValidator,\
@@ -176,7 +177,13 @@ class W3DProject(W3DFeature):
     }
 
     def __init__(self, *args, **kwargs):
+        self.call_directory = kwargs.pop("call_directory", None)
+        if self.call_directory is None:
+            self.call_directory = os.path.normpath(
+                os.path.dirname(sys.argv[0])
+            )
         super(W3DProject, self).__init__(*args, **kwargs)
+        os.chdir(self.call_directory)
         if "objects" not in self:
             self["objects"] = []
         if "groups" not in self:
@@ -290,12 +297,12 @@ class W3DProject(W3DFeature):
         return project_root
 
     @classmethod
-    def fromXML(project_class, project_root):
+    def fromXML(project_class, project_root, call_directory=None):
         """Create W3DProject from Story node of W3D XML
 
         :param :py:class:xml.etree.ElementTree.Element project_root
         """
-        new_project = project_class()
+        new_project = project_class(call_directory=call_directory)
         object_root = project_root.find("ObjectRoot")
         if object_root is not None:
             for child in object_root.findall("Object"):
@@ -381,8 +388,9 @@ class W3DProject(W3DFeature):
         :param str filename: Filename of XML file for project
         """
         # For relative paths...
-        os.chdir(os.path.dirname(os.path.abspath(filename)))
-        return project_class.fromXML(ET.parse(filename).getroot())
+        call_directory = os.path.normpath(os.path.dirname(filename))
+        return project_class.fromXML(
+            ET.parse(filename).getroot(), call_directory)
 
     def toprettyxml(self):
         tree = self.toXML()
