@@ -17,6 +17,8 @@
 
 """Tools for working with sounds in W3D projects
 """
+import logging
+LOGGER = logging.getLogger("pyw3d")
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .validators import IsNumeric, OptionValidator, ValidPyString, IsBoolean,\
@@ -54,7 +56,7 @@ class W3DSound(W3DFeature):
         "frequency_scale": IsNumeric(min_value=0),
         "volume_scale": IsNumeric(min_value=0, max_value=1),
         "pan": IsNumeric(min_value=-1, max_value=1)
-        }
+    }
     default_arguments = {
         "autostart": False,
         "movement_mode": "Positional",
@@ -137,7 +139,7 @@ class W3DSound(W3DFeature):
         if "movement_mode" not in new_sound:
             raise BadW3DXML(
                 "Mode node must contain child node specifying a valid mode"
-                )
+            )
 
         repeat_node = sound_root.find("Repeat")
         if repeat_node is None:
@@ -173,4 +175,6 @@ class W3DSound(W3DFeature):
         bpy.ops.sound.open(filepath=self["filename"])
         blender_sound = bpy.data.sounds[-1]
         blender_sound.name = generate_blender_sound_name(self["name"])
-        print(">>>>>>>", dir(blender_sound))
+        LOGGER.debug("Adding sound {} to blend file".format(
+            blender_sound.name)
+        )
