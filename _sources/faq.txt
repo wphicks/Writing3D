@@ -29,11 +29,11 @@ limitations, and we're looking to move to something else in the near future,
 possibly Qt. No matter what we use, though, we'll want it to be something that
 is likely to be in common usage for the foreseeable future.
 
-4. Why does w3d_writer (the GUI) suck so much?
-----------------------------------------------
+4. Why doesn't w3d_writer (the GUI) wor?
+----------------------------------------
 Cause it's not done! Don't worry, we'll be getting it up and running as soon as
-possible, and it will hopefully suck less once it's complete. Check out
-:ref:`Development Status <development_status>` for more details.
+possible. Check out :ref:`Development Status <development_status>` for more
+details.
 
 5. Why is Writing3D based on Blender?
 -------------------------------------

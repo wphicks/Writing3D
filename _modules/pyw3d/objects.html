@@ -75,10 +75,11 @@
 <span class="kn">from</span> <span class="nn">.metaclasses</span> <span class="kn">import</span> <span class="n">SubRegisteredClass</span>
 <span class="kn">from</span> <span class="nn">.activators</span> <span class="kn">import</span> <span class="n">BlenderClickTrigger</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pyw3d&quot;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">bpy</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
         <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
 
 
@@ -892,7 +893,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blender_trigger</span><span class="o">.</span><span class="n">write_to_script</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s2">&quot;blend() method must be called before write_blender_logic()&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">None</span></div></div>
 </pre></div>

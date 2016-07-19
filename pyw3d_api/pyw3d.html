@@ -114,7 +114,7 @@ project</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.actions.EventTriggerAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'enable': IsBoolean(), 'trigger_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74cf1978&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.EventTriggerAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'trigger_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f55cf8&gt;, ValidPyString()&gt;, 'enable': IsBoolean()}</em><a class="headerlink" href="#pyw3d.actions.EventTriggerAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -174,12 +174,12 @@ play or stop sound associated with this group
 if enabled&#8221;, which will affect this object&#8217;s link</p>
 <dl class="attribute">
 <dt id="pyw3d.actions.GroupAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'scale': IsNumeric&lt;0, None&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'visible': IsBoolean(), 'choose_random': IsBoolean(), 'placement': IsBoolean(), 'sound_change': OptionValidator('Play Sound', 'Stop Sound'), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'group_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74cf1438&gt;, ValidPyString()&gt;, 'move_relative': IsBoolean(), 'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled')}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled'), 'sound_change': OptionValidator('Play Sound', 'Stop Sound'), 'choose_random': IsBoolean(), 'group_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f557b8&gt;, ValidPyString()&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'placement': IsBoolean(), 'move_relative': IsBoolean(), 'visible': IsBoolean(), 'scale': IsNumeric&lt;0, None&gt;, 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.GroupAction.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'duration': 1, 'choose_random': False}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'choose_random': False, 'duration': 1}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -196,7 +196,7 @@ if enabled&#8221;, which will affect this object&#8217;s link</p>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.GroupAction.link_xml_tags">
-<code class="descname">link_xml_tags</code><em class="property"> = {'Disable': 'link_off', 'Activate if enabled': 'activate_if_on', 'Activate': 'activate', 'Enable': 'link_on'}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">link_xml_tags</code><em class="property"> = {'Disable': 'link_off', 'Activate': 'activate', 'Activate if enabled': 'activate_if_on', 'Enable': 'link_on'}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -228,12 +228,12 @@ if enabled&#8221;, which will affect this object&#8217;s link</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.actions.MoveVRAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'duration': IsNumeric&lt;0, None&gt;, 'move_relative': IsBoolean(), 'placement': FeatureValidator&lt;W3DPlacement&gt;}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'move_relative': IsBoolean(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'duration': IsNumeric&lt;0, None&gt;}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.MoveVRAction.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'duration': 0, 'move_relative': False}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'move_relative': False, 'duration': 0}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -286,12 +286,12 @@ types</p>
 if enabled&#8221;, which will affect this object&#8217;s link</p>
 <dl class="attribute">
 <dt id="pyw3d.actions.ObjectAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'scale': IsNumeric&lt;0, None&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'visible': IsBoolean(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'sound_change': OptionValidator('Play Sound', 'Stop Sound'), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'move_relative': IsBoolean(), 'object_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74cd9c50&gt;, ValidPyString()&gt;, 'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled')}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled'), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'object_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f84fd0&gt;, ValidPyString()&gt;, 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'move_relative': IsBoolean(), 'visible': IsBoolean(), 'scale': IsNumeric&lt;0, None&gt;, 'sound_change': OptionValidator('Play Sound', 'Stop Sound')}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.ObjectAction.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'duration': 1, 'move_relative': False}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'move_relative': False, 'duration': 1}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -308,7 +308,7 @@ if enabled&#8221;, which will affect this object&#8217;s link</p>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.ObjectAction.link_xml_tags">
-<code class="descname">link_xml_tags</code><em class="property"> = {'Disable': 'link_off', 'Activate if enabled': 'activate_if_on', 'Activate': 'activate', 'Enable': 'link_on'}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">link_xml_tags</code><em class="property"> = {'Disable': 'link_off', 'Activate': 'activate', 'Activate if enabled': 'activate_if_on', 'Enable': 'link_on'}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -340,7 +340,7 @@ types</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.actions.SoundAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'change': OptionValidator('Start', 'Stop'), 'sound_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74cf1860&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.SoundAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'sound_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f55be0&gt;, ValidPyString()&gt;, 'change': OptionValidator('Start', 'Stop')}</em><a class="headerlink" href="#pyw3d.actions.SoundAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -391,12 +391,12 @@ types</p>
 <p>started&#8221;</p>
 <dl class="attribute">
 <dt id="pyw3d.actions.TimelineAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'change': OptionValidator('Start', 'Stop', 'Continue', 'Start if not started'), 'timeline_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74cf1748&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'timeline_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f55ac8&gt;, ValidPyString()&gt;, 'change': OptionValidator('Start', 'Stop', 'Continue', 'Start if not started')}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.TimelineAction.change_xml_tags">
-<code class="descname">change_xml_tags</code><em class="property"> = {'Start if not started': 'start_if_not_started', 'Continue': 'continue', 'Start': 'start', 'Stop': 'stop'}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.change_xml_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">change_xml_tags</code><em class="property"> = {'Continue': 'continue', 'Start': 'start', 'Start if not started': 'start_if_not_started', 'Stop': 'stop'}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.change_xml_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -478,7 +478,7 @@ types</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>object_action</strong> (<a class="reference internal" href="#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><em>W3DAction</em></a>) &#8211; An ObjectAction or GroupAction</li>
+<li><strong>object_action</strong> (<a class="reference internal" href="../pyw3d_actions.html#pyw3d.W3DAction" title="pyw3d.W3DAction"><em>W3DAction</em></a>) &#8211; An ObjectAction or GroupAction</li>
 <li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; A number of tabs (4 spaces) to add before Python logic</li>
 </ul>
 </td>
@@ -561,12 +561,12 @@ easily validate input and provide sensible default arguments.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="#pyw3d.placement.W3DPlacement.argument_validators" title="pyw3d.placement.W3DPlacement.argument_validators"><strong>argument_validators</strong></a> &#8211; Dictionary mapping names of valid arguments to
+<li><a class="reference internal" href="#pyw3d.placement.W3DRotation.argument_validators" title="pyw3d.placement.W3DRotation.argument_validators"><strong>argument_validators</strong></a> &#8211; Dictionary mapping names of valid arguments to
 callable objects that return true if a given value is valid for that
 argument</li>
-<li><a class="reference internal" href="#pyw3d.actions.MoveVRAction.default_arguments" title="pyw3d.actions.MoveVRAction.default_arguments"><strong>default_arguments</strong></a> &#8211; Dictionary mapping names of arguments to their
+<li><a class="reference internal" href="#pyw3d.triggers.LookAtDirection.default_arguments" title="pyw3d.triggers.LookAtDirection.default_arguments"><strong>default_arguments</strong></a> &#8211; Dictionary mapping names of arguments to their
 default values</li>
-<li><a class="reference internal" href="#pyw3d.objects.W3DText.blender_scaling" title="pyw3d.objects.W3DText.blender_scaling"><strong>blender_scaling</strong></a> &#8211; Scaling factor used to convert back and forth
+<li><a class="reference internal" href="../pyw3d.html#pyw3d.W3DFeature.blender_scaling" title="pyw3d.W3DFeature.blender_scaling"><strong>blender_scaling</strong></a> &#8211; Scaling factor used to convert back and forth
 between Blender and legacy units</li>
 </ul>
 </td>
@@ -657,7 +657,7 @@ this function.</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.groups.W3DGroup.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'objects': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74c004e0&gt;, ValidPyString()&gt;|None&gt;, 'groups': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74c005c0&gt;, ValidPyString()&gt;|None&gt;, 'name': ValidPyString()}</em><a class="headerlink" href="#pyw3d.groups.W3DGroup.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'name': ValidPyString(), 'groups': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f117f0&gt;, ValidPyString()&gt;|None&gt;, 'objects': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f11710&gt;, ValidPyString()&gt;|None&gt;}</em><a class="headerlink" href="#pyw3d.groups.W3DGroup.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -855,7 +855,7 @@ quadratic attenuation of light source respectively
 source</p>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLight.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'diffuse': IsBoolean(), 'specular': IsBoolean(), 'attenuation': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'light_type': OptionValidator('Point', 'Directional', 'Spot'), 'angle': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'light_type': OptionValidator('Point', 'Directional', 'Spot'), 'specular': IsBoolean(), 'attenuation': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'angle': IsNumeric&lt;None, None&gt;, 'diffuse': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -866,7 +866,7 @@ source</p>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLight.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'diffuse': True, 'specular': True, 'attenuation': (1, 0, 0), 'angle': 30}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'specular': True, 'attenuation': (1, 0, 0), 'angle': 30, 'diffuse': True}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -915,7 +915,7 @@ value to never reset)</li>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLink.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'actions': DictValidator&lt;IsInteger&lt;None, None&gt;, ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;&gt;, 'enabled': IsBoolean(), 'selected_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'remain_enabled': IsBoolean(), 'enabled_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'reset': IsInteger&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'reset': IsInteger&lt;None, None&gt;, 'enabled_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'actions': DictValidator&lt;IsInteger&lt;None, None&gt;, ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;&gt;, 'selected_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'remain_enabled': IsBoolean(), 'enabled': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -935,7 +935,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLink.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'selected_color': (255, 0, 0), 'remain_enabled': True, 'enabled_color': (0, 128, 255), 'reset': -1, 'enabled': True}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'selected_color': (255, 0, 0), 'remain_enabled': True, 'enabled_color': (0, 128, 255), 'enabled': True, 'reset': -1}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -990,7 +990,7 @@ value to never reset)</li>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DModel.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'filename': ValidFile(), 'check_collisions': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DModel.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'check_collisions': IsBoolean(), 'filename': ValidFile()}</em><a class="headerlink" href="#pyw3d.objects.W3DModel.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1061,7 +1061,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DObject.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'link': FeatureValidator&lt;W3DLink&gt;, 'double_sided': IsBoolean(), 'sound': TextValidator(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'around_own_axis': IsBoolean(), 'lighting': IsBoolean(), 'name': ValidPyString(), 'scale': IsNumeric&lt;0, None&gt;, 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'visible': IsBoolean(), 'click_through': IsBoolean(), 'content': FeatureValidator&lt;W3DContent&gt;}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'around_own_axis': IsBoolean(), 'click_through': IsBoolean(), 'link': FeatureValidator&lt;W3DLink&gt;, 'content': FeatureValidator&lt;W3DContent&gt;, 'name': ValidPyString(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'scale': IsNumeric&lt;0, None&gt;, 'double_sided': IsBoolean(), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'sound': TextValidator(), 'lighting': IsBoolean(), 'visible': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1072,7 +1072,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DObject.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'link': None, 'color': (255, 255, 255), 'visible': True, 'double_sided': True, 'lighting': False, 'sound': None, 'click_through': False, 'around_own_axis': False, 'scale': 1}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'around_own_axis': False, 'color': (255, 255, 255), 'click_through': False, 'sound': None, 'lighting': False, 'link': None, 'visible': True, 'double_sided': True, 'scale': 1}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1181,7 +1181,7 @@ value to never reset)</li>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DText.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'halign': OptionValidator('left', 'right', 'center'), 'text': TextValidator(), 'valign': OptionValidator('top', 'center', 'bottom'), 'depth': IsNumeric&lt;None, None&gt;, 'font': ValidFile()}</em><a class="headerlink" href="#pyw3d.objects.W3DText.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'depth': IsNumeric&lt;None, None&gt;, 'font': ValidFile(), 'text': TextValidator(), 'halign': OptionValidator('left', 'right', 'center'), 'valign': OptionValidator('top', 'center', 'bottom')}</em><a class="headerlink" href="#pyw3d.objects.W3DText.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1202,7 +1202,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DText.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'halign': 'center', 'valign': 'center', 'depth': 0, 'font': None}</em><a class="headerlink" href="#pyw3d.objects.W3DText.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'depth': 0, 'font': None, 'halign': 'center', 'valign': 'center'}</em><a class="headerlink" href="#pyw3d.objects.W3DText.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1362,12 +1362,12 @@ FloorWall, LeftWall, RightWall or FloorWall
 specifying rotation</p>
 <dl class="attribute">
 <dt id="pyw3d.placement.W3DPlacement.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'relative_to': OptionValidator('Center', 'FrontWall', 'LeftWall', 'RightWall', 'FloorWall'), 'position': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation': FeatureValidator&lt;W3DRotation&gt;}</em><a class="headerlink" href="#pyw3d.placement.W3DPlacement.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'position': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'relative_to': OptionValidator('Center', 'FrontWall', 'LeftWall', 'RightWall', 'FloorWall'), 'rotation': FeatureValidator&lt;W3DRotation&gt;}</em><a class="headerlink" href="#pyw3d.placement.W3DPlacement.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.placement.W3DPlacement.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'relative_to': 'Center', 'position': (0, 0, 0)}</em><a class="headerlink" href="#pyw3d.placement.W3DPlacement.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'position': (0, 0, 0), 'relative_to': 'Center'}</em><a class="headerlink" href="#pyw3d.placement.W3DPlacement.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1409,12 +1409,12 @@ overridden to provide additional functionality</p>
 <p>Stores data on rotation of objects within W3D</p>
 <dl class="attribute">
 <dt id="pyw3d.placement.W3DRotation.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'rotation_mode': OptionValidator('None', 'Axis', 'LookAt', 'Normal'), 'up_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation_angle': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'rotation_angle': IsNumeric&lt;None, None&gt;, 'rotation_mode': OptionValidator('None', 'Axis', 'LookAt', 'Normal'), 'up_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.placement.W3DRotation.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'rotation_mode': 'None', 'up_vector': [0.0, 0.0, 0.3048], 'rotation_vector': None, 'rotation_angle': 0}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'rotation_angle': 0, 'rotation_mode': 'None', 'up_vector': [0.0, 0.0, 0.3048], 'rotation_vector': None}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1507,7 +1507,7 @@ W3DPlacements specifying their position and orientation</p>
 
 <dl class="attribute">
 <dt id="pyw3d.project.W3DProject.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'allow_rotation': IsBoolean(), 'objects': ListValidator&lt;FeatureValidator&lt;W3DObject&gt;|None&gt;, 'timelines': ListValidator&lt;FeatureValidator&lt;W3DTimeline&gt;|None&gt;, 'camera_placement': FeatureValidator&lt;W3DPlacement&gt;, 'groups': ListValidator&lt;FeatureValidator&lt;W3DGroup&gt;|None&gt;, 'trigger_events': ListValidator&lt;FeatureValidator&lt;W3DTrigger&gt;|None&gt;, 'debug': IsBoolean(), 'wall_placements': DictValidator&lt;OptionValidator('Center', 'FrontWall', 'LeftWall', 'RightWall', 'FloorWall'), FeatureValidator&lt;W3DPlacement&gt;&gt;, 'allow_movement': IsBoolean(), 'sounds': ListValidator&lt;FeatureValidator&lt;W3DSound&gt;|None&gt;, 'far_clip': IsNumeric&lt;0, None&gt;, 'background': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'desktop_camera_placement': FeatureValidator&lt;W3DPlacement&gt;}</em><a class="headerlink" href="#pyw3d.project.W3DProject.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'wall_placements': DictValidator&lt;OptionValidator('Center', 'FrontWall', 'LeftWall', 'RightWall', 'FloorWall'), FeatureValidator&lt;W3DPlacement&gt;&gt;, 'trigger_events': ListValidator&lt;FeatureValidator&lt;W3DTrigger&gt;|None&gt;, 'allow_rotation': IsBoolean(), 'debug': IsBoolean(), 'camera_placement': FeatureValidator&lt;W3DPlacement&gt;, 'groups': ListValidator&lt;FeatureValidator&lt;W3DGroup&gt;|None&gt;, 'objects': ListValidator&lt;FeatureValidator&lt;W3DObject&gt;|None&gt;, 'timelines': ListValidator&lt;FeatureValidator&lt;W3DTimeline&gt;|None&gt;, 'background': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'allow_movement': IsBoolean(), 'sounds': ListValidator&lt;FeatureValidator&lt;W3DSound&gt;|None&gt;, 'far_clip': IsNumeric&lt;0, None&gt;, 'desktop_camera_placement': FeatureValidator&lt;W3DPlacement&gt;}</em><a class="headerlink" href="#pyw3d.project.W3DProject.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1518,12 +1518,12 @@ W3DPlacements specifying their position and orientation</p>
 
 <dl class="attribute">
 <dt id="pyw3d.project.W3DProject.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'allow_movement': False, 'allow_rotation': False, 'far_clip': 100, 'background': (0, 0, 0), 'debug': False}</em><a class="headerlink" href="#pyw3d.project.W3DProject.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'debug': False, 'far_clip': 100, 'allow_movement': False, 'background': (0, 0, 0), 'allow_rotation': False}</em><a class="headerlink" href="#pyw3d.project.W3DProject.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="pyw3d.project.W3DProject.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>project_class</em>, <em>project_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/project.html#W3DProject.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.project.W3DProject.fromXML" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>project_class</em>, <em>project_root</em>, <em>call_directory=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/project.html#W3DProject.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.project.W3DProject.fromXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create W3DProject from Story node of W3D XML</p>
 <p>:param :py:class:xml.etree.ElementTree.Element project_root</p>
 </dd></dl>
@@ -1652,7 +1652,7 @@ indicates sound should loop forever
 :param float pan: Stereo panning left to right (-1.0 to 1.0)</p>
 <dl class="attribute">
 <dt id="pyw3d.sounds.W3DSound.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'repetitions': IsNumeric&lt;None, None&gt;, 'pan': IsNumeric&lt;-1, 1&gt;, 'autostart': IsBoolean(), 'filename': ValidFile(), 'frequency_scale': IsNumeric&lt;0, None&gt;, 'volume_scale': IsNumeric&lt;0, 1&gt;, 'name': ValidPyString(), 'movement_mode': OptionValidator('Positional', 'Fixed')}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'volume_scale': IsNumeric&lt;0, 1&gt;, 'movement_mode': OptionValidator('Positional', 'Fixed'), 'autostart': IsBoolean(), 'pan': IsNumeric&lt;-1, 1&gt;, 'filename': ValidFile(), 'frequency_scale': IsNumeric&lt;0, None&gt;, 'repetitions': IsNumeric&lt;None, None&gt;, 'name': ValidPyString()}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1663,7 +1663,7 @@ indicates sound should loop forever
 
 <dl class="attribute">
 <dt id="pyw3d.sounds.W3DSound.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'repetitions': 0, 'pan': 0, 'autostart': False, 'frequency_scale': 1, 'movement_mode': 'Positional', 'volume_scale': 1}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'volume_scale': 1, 'autostart': False, 'pan': 0, 'frequency_scale': 1, 'repetitions': 0, 'movement_mode': 'Positional'}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1832,12 +1832,12 @@ can be started.</p>
 :param actions: List of W3DActions to be triggered</p>
 <dl class="attribute">
 <dt id="pyw3d.triggers.BareTrigger.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'actions': ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'remain_enabled': IsBoolean(), 'name': ValidPyString(), 'enabled': IsBoolean()}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'remain_enabled': IsBoolean(), 'name': ValidPyString(), 'actions': ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;, 'enabled': IsBoolean(), 'duration': IsNumeric&lt;0, None&gt;}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.triggers.BareTrigger.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'duration': 0, 'remain_enabled': True, 'enabled': True}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'remain_enabled': True, 'enabled': True, 'duration': 0}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1875,7 +1875,7 @@ true.
 :param tuple corner2: Second corner specifying box location</p>
 <dl class="attribute">
 <dt id="pyw3d.triggers.EventBox.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'corner2': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'corner1': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'direction': OptionValidator('Inside', 'Outside'), 'ignore_y': IsBoolean()}</em><a class="headerlink" href="#pyw3d.triggers.EventBox.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'direction': OptionValidator('Inside', 'Outside'), 'ignore_y': IsBoolean(), 'corner1': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'corner2': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.triggers.EventBox.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1978,7 +1978,7 @@ true.
 </table>
 <dl class="attribute">
 <dt id="pyw3d.triggers.LookAtDirection.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'angle': IsNumeric&lt;None, None&gt;, 'direction': ListValidator&lt;IsNumeric&lt;None, None&gt;|None&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtDirection.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'direction': ListValidator&lt;IsNumeric&lt;None, None&gt;|None&gt;, 'angle': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtDirection.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2027,7 +2027,7 @@ true.
 </table>
 <dl class="attribute">
 <dt id="pyw3d.triggers.LookAtObject.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'angle': IsNumeric&lt;None, None&gt;, 'object': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2afd74bd2828&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtObject.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'angle': IsNumeric&lt;None, None&gt;, 'object': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7eefa58&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtObject.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2071,7 +2071,7 @@ true.
 </table>
 <dl class="attribute">
 <dt id="pyw3d.triggers.LookAtPoint.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'point': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'angle': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtPoint.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'angle': IsNumeric&lt;None, None&gt;, 'point': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtPoint.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2123,7 +2123,7 @@ once all objects have moved into the region?
 of specified box</p>
 <dl class="attribute">
 <dt id="pyw3d.triggers.MovementTrigger.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'object_name': ValidPyString(), 'type': OptionValidator('Single Object', 'Group(Any)', 'Group(All)'), 'box': FeatureValidator&lt;EventBox&gt;}</em><a class="headerlink" href="#pyw3d.triggers.MovementTrigger.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'object_name': ValidPyString(), 'box': FeatureValidator&lt;EventBox&gt;, 'type': OptionValidator('Single Object', 'Group(Any)', 'Group(All)')}</em><a class="headerlink" href="#pyw3d.triggers.MovementTrigger.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

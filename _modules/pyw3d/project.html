@@ -60,8 +60,10 @@
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
 <span class="kn">import</span> <span class="nn">xml.dom.minidom</span> <span class="kn">as</span> <span class="nn">minidom</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pyw3d&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">.features</span> <span class="kn">import</span> <span class="n">W3DFeature</span>
 <span class="kn">from</span> <span class="nn">.placement</span> <span class="kn">import</span> <span class="n">W3DPlacement</span><span class="p">,</span> <span class="n">W3DRotation</span><span class="p">,</span> <span class="n">convert_to_blender_axes</span>
 <span class="kn">from</span> <span class="nn">.validators</span> <span class="kn">import</span> <span class="n">ListValidator</span><span class="p">,</span> <span class="n">IsNumeric</span><span class="p">,</span> <span class="n">OptionValidator</span><span class="p">,</span>\
@@ -77,7 +79,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">bpy</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
         <span class="s2">&quot;Module bpy not found. Loading pyw3d.objects as standalone&quot;</span><span class="p">)</span>
 
 
@@ -216,7 +218,13 @@
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_directory</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;call_directory&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_directory</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">call_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">W3DProject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">call_directory</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;objects&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;groups&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
@@ -330,12 +338,12 @@
         <span class="k">return</span> <span class="n">project_root</span></div>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="W3DProject.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">project_class</span><span class="p">,</span> <span class="n">project_root</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DProject.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">project_class</span><span class="p">,</span> <span class="n">project_root</span><span class="p">,</span> <span class="n">call_directory</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create W3DProject from Story node of W3D XML</span>
 
 <span class="sd">        :param :py:class:xml.etree.ElementTree.Element project_root</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">new_project</span> <span class="o">=</span> <span class="n">project_class</span><span class="p">()</span>
+        <span class="n">new_project</span> <span class="o">=</span> <span class="n">project_class</span><span class="p">(</span><span class="n">call_directory</span><span class="o">=</span><span class="n">call_directory</span><span class="p">)</span>
         <span class="n">object_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ObjectRoot&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">object_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">object_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Object&quot;</span><span class="p">):</span>
@@ -421,8 +429,9 @@
 <span class="sd">        :param str filename: Filename of XML file for project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># For relative paths...</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filename</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="n">project_class</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">())</span></div>
+        <span class="n">call_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">project_class</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">(),</span> <span class="n">call_directory</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="W3DProject.toprettyxml"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.W3DProject.toprettyxml">[docs]</a>    <span class="k">def</span> <span class="nf">toprettyxml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXML</span><span class="p">()</span>

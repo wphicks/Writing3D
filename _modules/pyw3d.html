@@ -60,6 +60,13 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pyw3d&quot;</span><span class="p">)</span>
+<span class="n">log_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">log_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)-15s</span><span class="s1"> </span><span class="si">%(levelname)8s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">log_handler</span><span class="p">)</span>
+<span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="W3DConfigError"><a class="viewcode-back" href="../pyw3d_api/pyw3d.html#pyw3d.W3DConfigError">[docs]</a><span class="k">class</span> <span class="nc">W3DConfigError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -77,7 +84,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">W3D_CONFIG_FILENAME</span><span class="p">)</span> <span class="k">as</span> <span class="n">w3d_config_file</span><span class="p">:</span>
         <span class="n">W3D_CONFIG</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">w3d_config_file</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No W3D config file found. Creating default...&quot;</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No W3D config file found. Creating default...&quot;</span><span class="p">)</span>
     <span class="n">W3D_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;Blender executable&quot;</span><span class="p">:</span> <span class="s2">&quot;blender&quot;</span><span class="p">,</span>
         <span class="s2">&quot;Blender player executable&quot;</span><span class="p">:</span> <span class="s2">&quot;blenderplayer&quot;</span><span class="p">,</span>

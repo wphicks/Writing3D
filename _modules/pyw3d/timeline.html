@@ -69,7 +69,7 @@
 <span class="kn">from</span> <span class="nn">.structs</span> <span class="kn">import</span> <span class="n">SortedList</span>
 
 
-<div class="viewcode-block" id="W3DTimeline"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline">[docs]</a><span class="k">class</span> <span class="nc">W3DTimeline</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DTimeline"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.timeline.W3DTimeline">[docs]</a><span class="k">class</span> <span class="nc">W3DTimeline</span><span class="p">(</span><span class="n">W3DFeature</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Represent timeline for choreography of actions in the W3D</span>
 
 <span class="sd">    :param str name: Name of timeline</span>
@@ -100,7 +100,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SortedList</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="W3DTimeline.toXML"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_timelines_root</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DTimeline.toXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.timeline.W3DTimeline.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_timelines_root</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Store W3DTimeline as Timeline node within TimelineRoot node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -121,7 +121,7 @@
         <span class="k">return</span> <span class="n">timeline_root</span></div>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="W3DTimeline.fromXML"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">timeline_class</span><span class="p">,</span> <span class="n">timeline_root</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DTimeline.fromXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.timeline.W3DTimeline.fromXML">[docs]</a>    <span class="k">def</span> <span class="nf">fromXML</span><span class="p">(</span><span class="n">timeline_class</span><span class="p">,</span> <span class="n">timeline_root</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create W3DTimeline from Timeline node of W3D XML</span>
 
 <span class="sd">        :param :py:class:xml.etree.ElementTree.Element timeline_root</span>
@@ -148,7 +148,7 @@
 
         <span class="k">return</span> <span class="n">new_timeline</span></div>
 
-<div class="viewcode-block" id="W3DTimeline.blend"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DTimeline.blend"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.timeline.W3DTimeline.blend">[docs]</a>    <span class="k">def</span> <span class="nf">blend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create Blender object to implement W3DTimeline&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">activator</span> <span class="o">=</span> <span class="n">BlenderTimeline</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">],</span>
@@ -156,7 +156,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">create_blender_objects</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">base_object</span></div>
 
-<div class="viewcode-block" id="W3DTimeline.link_blender_logic"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.link_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">link_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DTimeline.link_blender_logic"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.timeline.W3DTimeline.link_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">link_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Link BGE logic bricks for this W3DTimeline&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">link_logic_bricks</span><span class="p">()</span>
@@ -164,7 +164,7 @@
             <span class="k">raise</span> <span class="n">EBKAC</span><span class="p">(</span>
                 <span class="s2">&quot;blend() must be called before link_blender_logic()&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="W3DTimeline.write_blender_logic"><a class="viewcode-back" href="../../pyw3d_timelines.html#pyw3d.timeline.W3DTimeline.write_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="W3DTimeline.write_blender_logic"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.timeline.W3DTimeline.write_blender_logic">[docs]</a>    <span class="k">def</span> <span class="nf">write_blender_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write any necessary game engine logic for this W3DTimeline&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">activator</span><span class="o">.</span><span class="n">write_python_logic</span><span class="p">()</span>

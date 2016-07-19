@@ -60,6 +60,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pyw3d&quot;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.path</span> <span class="kn">import</span> <span class="n">ProjectPath</span><span class="p">,</span> <span class="n">UnsetValueError</span>
 
 
@@ -243,7 +244,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iterable</span><span class="p">)):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_validator</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
                 <span class="k">return</span> <span class="bp">False</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">iterable</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="bp">True</span></div>
 
@@ -280,8 +281,8 @@
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span>
-                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                    <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
                 <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="bp">True</span></div>
 
@@ -314,7 +315,7 @@
 
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_path</span><span class="o">.</span><span class="n">project</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Cannot check relative reference to {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cannot check relative reference to {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">value</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_validator</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_options</span>
@@ -327,7 +328,7 @@
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_options</span><span class="p">[</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">valid_menu_items</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
         <span class="k">except</span> <span class="n">UnsetValueError</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cannot check relative reference to {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cannot check relative reference to {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">value</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_validator</span><span class="o">.</span><span class="n">coerce</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
@@ -389,14 +390,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;Value must be numeric&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_string</span><span class="p">,</span>  <span class="s2">&quot;and &gt;= {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_string</span><span class="p">,</span> <span class="s2">&quot;and &gt;= {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_string</span><span class="p">,</span>  <span class="s2">&quot;and &lt;= {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help_string</span><span class="p">,</span> <span class="s2">&quot;and &lt;= {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">)))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span>

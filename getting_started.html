@@ -133,6 +133,15 @@ containing install_w3d.py and then run:</p>
 <div>$ python3 setup.py install &#8211;user</div></blockquote>
 <p>This will install Blender, and you should now have access to the <a class="reference internal" href="pyw3d.html#pyw3d-docs"><span class="std std-ref">pyw3d
 module</span></a> from Python3.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Due to a bug in the Homebrew configuration of Python, Homebrew users should
+instead run</p>
+<blockquote>
+<div>$ python3 setup.py install &#8211;user &#8211;prefix=</div></blockquote>
+<p class="last">This will prevent the system-level distutils.cfg file from conflicting with
+the &#8211;user flag.</p>
+</div>
 </div>
 </div>
 <div class="section" id="using-w3d-writer-the-writing3d-gui">
