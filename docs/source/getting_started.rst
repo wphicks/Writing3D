@@ -110,6 +110,16 @@ To install manually from terminal, just execute the following:
 This will install Blender, and you should now have access to the :ref:`pyw3d
 module <pyw3d_docs>` from Python3.
 
+.. warning::
+
+    Due to a bug in the Homebrew configuration of Python, Homebrew users should
+    instead run
+
+        $ python3 setup.py install --user --prefix=
+
+    This will prevent the system-level distutils.cfg file from conflicting with
+    the --user flag.
+
 Using w3d_writer: The Writing3D GUI
 -----------------------------------
 Unfortunately, w3d_writer is not yet ready for primetime. Check back soon for
