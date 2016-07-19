@@ -95,6 +95,7 @@ def activate(cont):
         own['offset_index'] = 0
         if time >= {max_time}:
             own['status'] = 'Stop'
+            own['action_index'] = 0
 """
 
     @property
