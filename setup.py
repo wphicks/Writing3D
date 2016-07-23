@@ -412,7 +412,7 @@ if __name__ == "__main__":
             "pyw3d/w3d_export_tools.py", "samples/cwapp.py"],
         packages=[
             "pyw3d", "pyw3d.activators", "pyw3d.blender_actions",
-            "pyw3d.w3d_logic", "pyw3d.activators.triggers"
+            "pyw3d.activators.triggers"
         ],
         classifiers=[
             "Development Status :: 3 - Alpha",
