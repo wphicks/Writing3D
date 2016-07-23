@@ -1,3 +1,12 @@
 *.pyc
 .*.swp
-*.blend
+*.blend*
+*.p
+build/
+dist/
+.cweditor.properties
+.*.bgeconf
+*.hist
+samples/run.processor.py
+samples/*.xml
+samples/*.html
