@@ -57,6 +57,10 @@ class W3DAction(W3DFeature, metaclass=SubRegisteredClass):
 
         return repr(self) < repr(other)
 
+    def create_actuators(self, controller):
+        """Create actuators necessary for this action"""
+        pass
+
     @staticmethod
     def fromXML(action_root):
         """Create W3DAction of appropriate subclass given xml root for any
@@ -667,10 +671,51 @@ class SoundAction(W3DAction):
 
         return new_action
 
-    def blend(self):
-        """Create representation of change in Blender"""
-        raise NotImplementedError  # TODO
+    def create_actuators(self, controller):
+        actuator_name = generate_blender_sound_name(self["sound_name"])
+        bpy.ops.logic.actuator_add(
+            type="SOUND",
+            name=actuator_name
+        )
+        controller.actuators[-1].name = actuator_name
+        actuator = controller.actuators[actuator_name]
+        # TODO: Actuator really needs to know what settings have been given for
+        # this sound, not just the sound action
 
+    def generate_blender_logic(
+            self, offset=0, time_condition=0, index_condition=None,
+            click_condition=-1):
+        start_text = []
+        cont_text = []
+        end_text = []
+
+        conditions = ActionCondition(offset=offset)
+        self.end_time = time_condition
+        conditions.add_time_condition(
+            start_time=time_condition, end_time=self.end_time)
+        if index_condition is not None:
+            conditions.add_index_condition(index_condition)
+        if click_condition > 0:
+            conditions.add_click_condition(click_condition)
+
+        start_text.append(conditions.start_string)
+        cont_text.append(conditions.continue_string)
+        end_text.append(conditions.end_string)
+
+        start_text.append("{}index += 1".format(
+            "    " * (conditions.offset + 1)))
+        cont_text.append("{}remaining_time = {} - time".format(
+            "    " * (conditions.offset + 1),
+            self.end_time)
+        )
+
+        action = SceneReset(
+            offset=(conditions.offset + 1)
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+        return start_text + cont_text + end_text
 
 class EventTriggerAction(W3DAction):
     """Enable or disable an event trigger

@@ -208,6 +208,11 @@ def activate(cont):
         self.controller = controller
         return controller
 
+    def create_actuators(self):
+        """Create any Blender actuators"""
+        for action in self.actions:
+            action.create_actuators(self.controller)
+
     def link_status_sensors(self):
         """Link the start, active, and stop sensors to the controller
 
@@ -283,6 +288,7 @@ def activate(cont):
         self.create_status_property()
         self.create_status_sensors()
         self.create_controller()
+        self.create_actuators()
         self.create_enabled_property()
 
     def link_logic_bricks(self):
