@@ -31,9 +31,10 @@ from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
     ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
     TextValidator, ValidFile
 from .names import generate_blender_object_name,\
-    generate_blender_material_name
+    generate_blender_material_name, generate_blender_sound_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
+from .sounds import audio_playback_object
 import logging
 LOGGER = logging.getLogger("pyw3d")
 try:
@@ -831,20 +832,42 @@ class W3DObject(W3DFeature):
         blender_object.scale = [self["scale"], ] * 3
 
         self["placement"].place(blender_object)
-        #TODO: Apply link
+        # TODO: Apply link
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
         if self["click_through"]:
             pass
-            #TODO
+            # TODO
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
 
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
-        #TODO: Add around_own_axis
-        #TODO: Add sound
+        # TODO: Add around_own_axis
+        if self["sound"] is not None:
+            sound_name = generate_blender_sound_name(self["name"])
+            bpy.ops.logic.actuator_add(
+                type="SOUND",
+                object="AUDIO",
+                name=sound_name
+            )
+            try:
+                actuator = blender_object.actuators[sound_name]
+                central_actuator = audio_playback_object().actuators[
+                    sound_name]
+            except KeyError:
+                LOGGER.warn(
+                    "Sound {} not found for object {}".format(
+                        self["sound"], self["name"]
+                    )
+                )
+                return blender_object
+            actuator.sound = central_actuator.sound
+            actuator.is3D = central_actuator.is3D
+            actuator.mode = central_actuator.mode
+            actuator.pitch = central_actuator.pitch
+            actuator.volume = central_actuator.volume
 
         return blender_object
 

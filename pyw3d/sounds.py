@@ -19,6 +19,7 @@
 """
 import logging
 LOGGER = logging.getLogger("pyw3d")
+import math
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .validators import IsNumeric, OptionValidator, ValidPyString, IsBoolean,\
@@ -32,6 +33,20 @@ except ImportError:
     pass
 
 
+def audio_playback_object():
+    """Get empty used to coordinate audio playback in Blender"""
+    try:
+        return bpy.data.objects["AUDIO"]
+    except KeyError:
+        bpy.ops.object.add(
+            type="EMPTY",
+            layers=[layer == 20 for layer in range(1, 21)]
+        )
+        audio_object = bpy.context.scene.objects.active
+        audio_object.name = "AUDIO"
+        return audio_object
+
+
 class W3DSound(W3DFeature):
     """Store data on a sound to be used in the W3D
 
@@ -42,7 +57,7 @@ class W3DSound(W3DFeature):
     sound is ambient or coming from an apparent position
     :param int repetitions: Number of times to repeat sound. Negative value
     indicates sound should loop forever
-    :param float frequency_scale: Factor by which to scale frequency
+    :param float frequency_scale: Factor by which to scale frequency (0.5 to 2)
     :param float volume_scale: Factor by which to scale volume (must be
     0.0-1.0)
     :param float pan: Stereo panning left to right (-1.0 to 1.0)
@@ -53,8 +68,8 @@ class W3DSound(W3DFeature):
         "autostart": IsBoolean(),
         "movement_mode": OptionValidator("Positional", "Fixed"),
         "repetitions": IsNumeric(),
-        "frequency_scale": IsNumeric(min_value=0),
-        "volume_scale": IsNumeric(min_value=0, max_value=1),
+        "frequency_scale": IsNumeric(min_value=0.5, max_value=2),
+        "volume_scale": IsNumeric(min_value=0, max_value=2),
         "pan": IsNumeric(min_value=-1, max_value=1)
     }
     default_arguments = {
@@ -172,9 +187,29 @@ class W3DSound(W3DFeature):
 
     def blend(self):
         """Create representation of W3DSound in Blender"""
+        sound_name = generate_blender_sound_name(self["name"])
+        LOGGER.debug("Adding sound {} to blend file".format(sound_name))
         bpy.ops.sound.open(filepath=self["filename"])
         blender_sound = bpy.data.sounds[-1]
-        blender_sound.name = generate_blender_sound_name(self["name"])
-        LOGGER.debug("Adding sound {} to blend file".format(
-            blender_sound.name)
+        blender_sound.name = sound_name
+
+        LOGGER.debug("Adding actuator for {}".format(sound_name))
+        bpy.context.scene.objects.active = audio_playback_object()
+        bpy.ops.logic.actuator_add(
+            type="SOUND",
+            object="AUDIO",
+            name=sound_name
         )
+        actuator = audio_playback_object().actuators[sound_name]
+        actuator.sound = blender_sound
+        actuator.is3D = (self["movement_mode"] == "Positional")
+        if self["repetitions"] < 0:
+            actuator.mode = "Loop Stop"
+        else:
+            actuator.mode = "Play Stop"
+        # TODO: Deal with non-infinite loops
+
+        actuator.pitch = 12 * math.log(self["frequency_scale"], 2)
+        actuator.volume = self["volume_scale"]
+        if not self.is_default("pan"):
+            LOGGER.info("Panning audio is not supported at this time")

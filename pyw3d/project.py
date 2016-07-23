@@ -44,6 +44,7 @@ except ImportError:
 
 
 def clear_blender_scene():
+    LOGGER.debug("Clearing all objects from Blender scene...")
     for obj in bpy.context.scene.objects:
         obj.select = True
     bpy.ops.object.delete()
