@@ -32,8 +32,13 @@ class TimelineStarter(object):
     @property
     def start_string(self):
         script_text = [
-            "trigger = scene.objects['{}']".format(self.timeline)
-            ]
+            "trigger = scene.objects['{}']".format(self.timeline),
+            "W3D_LOG.debug(",
+            "    'Starting timeline {} in {}'.format(",
+            "        trigger.name, own.name))",
+            "if trigger is own:",
+            "    stop_block = True"
+        ]
         if self.change == "Start":
             script_text.append(
                 "trigger['status'] = 'Start'"

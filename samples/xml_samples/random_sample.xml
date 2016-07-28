@@ -11,8 +11,8 @@
                      <AroundSelfAxis>false</AroundSelfAxis>
                      <Scale>1.0</Scale>
                      <Placement>
-                            <RelativeTo>LeftWall</RelativeTo>
-                            <Position>(0.0, 0.0, 0.0)</Position>
+                            <RelativeTo>Center</RelativeTo>
+                            <Position>(-2.0, 0.0, -5.0)</Position>
                      </Placement>
                      <Content>
                             <Text horiz-align="center" vert-align="center" depth="0.0">
@@ -29,21 +29,13 @@
                      <Scale>1.0</Scale>
                      <Placement>
                             <RelativeTo>Center</RelativeTo>
-                            <Position>(0.0, 0.0, 0.0)</Position>
+                            <Position>(2.0, 0.0, -5.0)</Position>
                      </Placement>
                      <Content>
                             <Text horiz-align="center" vert-align="center" depth="0.0">
                                    <text>NUMBER TWO</text>
                             </Text>
                      </Content>
-                     <LinkRoot>
-                            <Link>
-                                   <Enabled>true</Enabled>
-                                   <RemainEnabled>true</RemainEnabled>
-                                   <EnabledColor>0,128,255</EnabledColor>
-                                   <SelectedColor>255,0,0</SelectedColor>
-                            </Link>
-                     </LinkRoot>
               </Object>
        </ObjectRoot>
        <GroupRoot>

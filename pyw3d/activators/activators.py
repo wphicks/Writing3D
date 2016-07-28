@@ -76,6 +76,7 @@ def activate(cont):
         except KeyError:
             pass
     if status == 'Continue':
+        stop_block = False  # A flag to handle timeline restarting self
         try:
             if own['offset_time'] != 0:
                 own['start_time'] = (
@@ -88,13 +89,17 @@ def activate(cont):
                 'Must start activator before continue is used')
         time = monotonic() - own['start_time']
         index = own['offset_index'] + own['action_index']
+        W3D_LOG.debug("Action Index {} at time {} on {}".format(
+            index, time, own.name)
+        )
 """
         self.script_footer = """
         # FOOTER BEGINS HERE
         own['action_index'] = index
         own['offset_index'] = 0
         if time >= {max_time}:
-            own['status'] = 'Stop'
+            if not stop_block:
+                own['status'] = 'Stop'
             own['action_index'] = 0
 """
 

@@ -41,7 +41,9 @@ class MoveAction(object):
 
     @property
     def start_string(self):
-        script_text = []
+        script_text = [
+            "W3D_LOG.debug('Starting movement in {}'.format(own.name))"
+        ]
         # First take care of object rotation...
         if self.placement["rotation"]["rotation_mode"] != "None":
 
@@ -226,7 +228,9 @@ class MoveAction(object):
 
     @property
     def end_string(self):
-        script_text = []
+        script_text = [
+            "W3D_LOG.debug('Ending movement in {}'.format(own.name))"
+        ]
         if not self.duration:
             if self.placement["rotation"]["rotation_mode"] != "None":
                 script_text.append(
