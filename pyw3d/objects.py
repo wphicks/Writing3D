@@ -31,7 +31,7 @@ from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
     ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
     TextValidator, ValidFile
 from .names import generate_blender_object_name,\
-    generate_blender_material_name
+    generate_blender_material_name, generate_light_object_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
 import logging
@@ -567,6 +567,7 @@ class W3DLight(W3DContent):
         content_root = ET.SubElement(object_root, "Content")
         light_root = ET.SubElement(
             content_root, "Light")
+
         if not self.is_default("diffuse"):
             light_root.attrib["diffuse"] = bool2text(self["diffuse"])
         if not self.is_default("specular"):
@@ -591,6 +592,7 @@ class W3DLight(W3DContent):
         """
         new_light = light_class()
         light_root = content_root.find("Light")
+        
         if light_root is not None:
             if "diffuse" in light_root.attrib:
                 new_light["diffuse"] = text2bool(light_root.attrib["diffuse"])
@@ -627,6 +629,8 @@ class W3DLight(W3DContent):
         )
         # TODO: Why isn't the following working?
         # bpy.ops.object.transform_apply(rotation=True)
+        
+
         new_light_object = bpy.context.object
         new_light_object.data.use_diffuse = self["diffuse"]
         new_light_object.data.use_specular = self["specular"]
@@ -645,6 +649,7 @@ class W3DLight(W3DContent):
         # suspect, as is the distance.
         if self["light_type"] == "Spot":
             new_light_object.data.spot_size = math.radians(self["angle"])
+         
         return new_light_object
 
 
@@ -799,7 +804,7 @@ class W3DObject(W3DFeature):
             new_object["scale"] = (
                 new_object["scale"] * new_object["content"].blender_scaling)
         return new_object
-
+    
     def apply_material(self, blender_object):
         """Apply properties of object to material for Blender object"""
         if blender_object.active_material is None:
@@ -812,6 +817,8 @@ class W3DObject(W3DFeature):
         #    channel/255.0 for channel in self["color"]]
         #blender_object.active_material.specular_color = (
         #    blender_object.active_material.diffuse_color)
+        
+
         blender_object.active_material.use_shadeless = not self["lighting"]
         blender_object.active_material.use_transparency = True
         blender_object.active_material.use_nodes = False
@@ -821,8 +828,16 @@ class W3DObject(W3DFeature):
         color = [channel/255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
         blender_object.color = color
-        return blender_object
+        
+        if self["lighting"] is True:
+            blender_object.color = color
 
+        return blender_object
+    #added this method
+    def apply_lamp_color(self, new_light_object):
+        color = [channel/255.0 for channel in self["color"]]
+        bpy.data.lamps[new_light_object.name].color = color
+        return new_light_object
     def blend(self):
         """Create representation of W3DObject in Blender"""
         blender_object = self["content"].blend()
@@ -839,9 +854,14 @@ class W3DObject(W3DFeature):
             #TODO
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
-
-        self.apply_material(blender_object)
-        blender_object.layers = [layer == 0 for layer in range(20)]
+        
+        if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] is not 'light_object_':
+            blender_object = bpy.data.lamps[-1]
+            blender_object.name = generate_light_object_name(self["name"])
+            self.apply_lamp_color(blender_object)  
+        else:
+            self.apply_material(blender_object)
+            blender_object.layers = [layer == 0 for layer in range(20)]
 
         #TODO: Add around_own_axis
         #TODO: Add sound
