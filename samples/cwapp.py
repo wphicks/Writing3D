@@ -37,6 +37,7 @@ Unix-based systems, this can be done from terminal via::
 """
 
 import argparse
+import os
 from pyw3d import project, export_to_blender
 
 if __name__ == "__main__":
@@ -48,7 +49,12 @@ if __name__ == "__main__":
 
     # It's as simple as loading the project...
     my_project = project.W3DProject.fromXML_file(args.project_file)
+    blend_filename = ".".join(
+        os.path.splitext(args.project_file)[0],
+        "blend"
+    )
     # ...and exporting it!
     export_to_blender(
-        my_project, display=True, fullscreen=(args.config == "desktopfull")
+        my_project, filename=blend_filename, display=True,
+        fullscreen=(args.config == "desktopfull")
     )
