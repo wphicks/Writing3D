@@ -44,6 +44,7 @@ class Activator(object):
     def __init__(self, name_string, actions):
         self.name_string = name_string
         self.actions = actions
+        self.actuators = []
         self.script_header = """
 import bge
 from w3d_settings import *
@@ -211,7 +212,7 @@ def activate(cont):
     def create_actuators(self):
         """Create any Blender actuators"""
         for action in self.actions:
-            action.create_actuators(self.controller)
+            self.actuators.extend(action.actuators)
 
     def link_status_sensors(self):
         """Link the start, active, and stop sensors to the controller
@@ -230,6 +231,18 @@ def activate(cont):
             raise EBKAC(
                 "Sensors must be created before they can be linked")
         return controller
+
+    def link_actuators(self):
+        """Link actuators necessary to invoke actions"""
+        try:
+            controller = self.controller
+        except AttributeError:
+            raise EBKAC(
+                "Controller must be created before actuators can be linked")
+        for action in self.actions:
+            for actuator in action.actuators:
+                controller.link(actuator)
+
 
     def _create_base_object(self):
         """Create the object which controls the current status of the
@@ -294,6 +307,7 @@ def activate(cont):
     def link_logic_bricks(self):
         """Link together any Blender "logic bricks" for this activator"""
         self.link_status_sensors()
+        self.link_actuators()
 
     def write_python_logic(self):
         """Write any necessary Python controller scripts for this activator"""

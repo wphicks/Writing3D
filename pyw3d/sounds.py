@@ -213,3 +213,4 @@ class W3DSound(W3DFeature):
         actuator.volume = self["volume_scale"]
         if not self.is_default("pan"):
             LOGGER.info("Panning audio is not supported at this time")
+        return audio_playback_object()

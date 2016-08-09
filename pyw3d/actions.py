@@ -50,16 +50,16 @@ class W3DAction(W3DFeature, metaclass=SubRegisteredClass):
     Note: This is mostly a dummy class. Provides fromXML to pass XML nodes to
     appropriate subclasses"""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.actuators = []
+
     def __lt__(self, other):
         """Order based on __repr__ of self and other
 
         Defined to allow unambiguous ordering of timelines"""
 
         return repr(self) < repr(other)
-
-    def create_actuators(self, controller):
-        """Create actuators necessary for this action"""
-        pass
 
     @staticmethod
     def fromXML(action_root):
@@ -181,6 +181,19 @@ def generate_object_action_logic(
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
+    if "sound_change" in object_action:
+        action = SoundChange(
+            object_action["object_name"], object_action["sound_change"],
+            offset, object_name=object_action["object_name"]
+        )
+        start_text.append(action.start_string)
+        cont_text.append(action.continue_string)
+        end_text.append(action.end_string)
+        sound_actuator = bpy.data.objects[
+            generate_blender_object_name(object_action["object_name"])].actuators[
+                generate_blender_sound_name(object_action["object_name"])]
+        object_action.actuators.append(sound_actuator)
+
     end_text.append(
         "{}own['random_choice'] = None".format("    " * offset)
     )
@@ -235,6 +248,8 @@ class ObjectAction(W3DAction):
         "Enable": "link_on", "Disable": "link_off", "Activate": "activate",
         "Activate if enabled": "activate_if_on"}
 
+    sound_xml_tags = {"Start":"Play Sound", "Stop":"Stop Sound"}
+
     def toXML(self, parent_root):
         """Store ObjectAction as ObjectChange node within one of several node
         types
@@ -264,7 +279,9 @@ class ObjectAction(W3DAction):
             node.text = str(self["scale"])
         if "sound_change" in self:
             node = ET.SubElement(
-                trans_root, "Sound", attrib={"action", self["sound_change"]})
+                trans_root, "Sound",
+                attrib={"action": self.sound_xml_tags[self["sound_change"]]}
+            )
         if "link_change" in self:
             node = ET.SubElement(trans_root, "LinkChange")
             ET.SubElement(node, self.link_xml_tags[self["link_change"]])
@@ -314,7 +331,13 @@ class ObjectAction(W3DAction):
                 new_action["scale"] = 1
         node = trans_root.find("Sound")
         if node is not None:
-            new_action["sound_change"] = node.text.strip()
+            raw_sound_change = node.text.strip()
+            for key, value in new_action.sound_xml_tags.items():
+                if raw_sound_change == value:
+                    new_action["sound_change"] = key
+                    break
+            if "sound_change" not in new_action:
+                raise BadW3DXML("Bad value for 'Sound' node in xml")
         node = trans_root.find("LinkChange")
         if node is not None:
             for key, value in new_action.link_xml_tags.items():
@@ -671,17 +694,6 @@ class SoundAction(W3DAction):
 
         return new_action
 
-    def create_actuators(self, controller):
-        actuator_name = generate_blender_sound_name(self["sound_name"])
-        bpy.ops.logic.actuator_add(
-            type="SOUND",
-            name=actuator_name
-        )
-        controller.actuators[-1].name = actuator_name
-        actuator = controller.actuators[actuator_name]
-        # TODO: Actuator really needs to know what settings have been given for
-        # this sound, not just the sound action
-
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,
             click_condition=-1):
@@ -709,12 +721,15 @@ class SoundAction(W3DAction):
             self.end_time)
         )
 
-        action = SceneReset(
-            offset=(conditions.offset + 1)
+        action = SoundChange(
+            self["sound_name"], self["change"], offset
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
+        sound_actuator = bpy.data.objects["AUDIO"].actuators[
+            generate_blender_sound_name(self["sound_name"])]
+        object_action.actuators.append(sound_actuator)
         return start_text + cont_text + end_text
 
 class EventTriggerAction(W3DAction):

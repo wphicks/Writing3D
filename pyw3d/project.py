@@ -547,6 +547,10 @@ class W3DProject(W3DFeature):
         bpy.data.worlds["World"].horizon_color = self["background"]
         # bpy.data.worlds["World"].ambient_color = self["background"]
 
+        # Create assets
+        for sound in self["sounds"]:
+            sound.blend()
+
         # Create Objects
         for group in self["groups"]:
             group.blend_objects()
@@ -554,8 +558,6 @@ class W3DProject(W3DFeature):
             group.blend_groups()
         for object_ in self["objects"]:
             object_.blend()
-        for sound in self["sounds"]:
-            sound.blend()
 
         # Create Activators
         for timeline in self["timelines"]:
