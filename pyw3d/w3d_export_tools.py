@@ -53,7 +53,7 @@ def export_to_blender(
         bpy.ops.wm.save_as_mainfile(filepath=filename)
     except ImportError:
         pickle_w3dproject(input_project)
-        subprocess.call([
+        subprocess.check_call([
             BLENDER_EXEC, "--background", "--python", EXPORT_SCRIPT, "--", "-f"
             "pickle", "run.p", "-o", os.path.abspath(filename)]
         )
