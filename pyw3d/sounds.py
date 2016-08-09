@@ -36,8 +36,10 @@ except ImportError:
 def audio_playback_object():
     """Get empty used to coordinate audio playback in Blender"""
     try:
+        logging.debug("AUDIO object already exists")
         return bpy.data.objects["AUDIO"]
     except KeyError:
+        logging.debug("Creating AUDIO object")
         bpy.ops.object.add(
             type="EMPTY",
             layers=[layer == 20 for layer in range(1, 21)]
@@ -200,13 +202,13 @@ class W3DSound(W3DFeature):
             object="AUDIO",
             name=sound_name
         )
-        actuator = audio_playback_object().actuators[sound_name]
+        actuator = audio_playback_object().game.actuators[sound_name]
         actuator.sound = blender_sound
-        actuator.is3D = (self["movement_mode"] == "Positional")
+        actuator.use_sound_3d = (self["movement_mode"] == "Positional")
         if self["repetitions"] < 0:
-            actuator.mode = "Loop Stop"
+            actuator.mode = "LOOPSTOP"
         else:
-            actuator.mode = "Play Stop"
+            actuator.mode = "PLAYSTOP"
         # TODO: Deal with non-infinite loops
 
         actuator.pitch = 12 * math.log(self["frequency_scale"], 2)
