@@ -73,9 +73,12 @@ def find_existing_pyw3d():
     os.chdir(tempfile.gettempdir())
     old_sys_path = sys.path
     sys.path = [
-        path for path in old_sys_path if os.path.abspath(path) !=
-        os.path.abspath(os.getcwd())
+        path for path in old_sys_path if (
+            os.path.abspath(path) != os.path.abspath(cur_dir)
+            and os.path.abspath(path) != os.path.abspath(os.getcwd())
+        )
     ]
+    sys.modules.pop('pyw3d', None)
     try:
         import pyw3d
     except ImportError:
