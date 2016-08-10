@@ -827,13 +827,14 @@ class W3DObject(W3DFeature):
             not self["double_sided"])
         color = [channel/255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
+
         blender_object.color = color
         
         if self["lighting"] is True:
             blender_object.color = color
 
         return blender_object
-    #added this method
+
     def apply_lamp_color(self, new_light_object):
         color = [channel/255.0 for channel in self["color"]]
         bpy.data.lamps[new_light_object.name].color = color
@@ -856,9 +857,10 @@ class W3DObject(W3DFeature):
         blender_object.game.use_ghost = True
         
         if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] is not 'light_object_':
-            blender_object = bpy.data.lamps[-1]
-            blender_object.name = generate_light_object_name(self["name"])
-            self.apply_lamp_color(blender_object)  
+            blender_lamp = bpy.data.lamps[-1]
+            blender_lamp.name = generate_light_object_name(self["name"])
+            self.apply_lamp_color(blender_lamp)
+        
         else:
             self.apply_material(blender_object)
             blender_object.layers = [layer == 0 for layer in range(20)]
