@@ -42,7 +42,7 @@ def audio_playback_object():
         logging.debug("Creating AUDIO object")
         bpy.ops.object.add(
             type="EMPTY",
-            layers=[layer == 20 for layer in range(1, 21)]
+            layers=[layer == 1 for layer in range(1, 21)]
         )
         audio_object = bpy.context.scene.objects.active
         audio_object.name = "AUDIO"

@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for starting and stopping audio playback in Blender"""
+from pyw3d.names import generate_blender_sound_name
 
 
 class SoundChange(object):
@@ -30,6 +31,10 @@ class SoundChange(object):
     @property
     def start_string(self):
         script_text = [
+            "",
+            "W3D_LOG.debug('{}ing sound {}')".format(
+                self.change, self.sound_name
+            ),
             "sound_object = scene.objects['{}']".format(self.object_name),
             "sound_actuator = sound_object.actuators['{}']".format(
                 self.sound_name
@@ -60,3 +65,4 @@ class SoundChange(object):
         else:
             self.object_name = generate_blender_object_name(object_name)
         self.change = change
+        self.offset = offset

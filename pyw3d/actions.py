@@ -30,12 +30,14 @@ from .validators import OptionValidator, IsNumeric,\
     ValidPyString, IsInteger
 from .errors import BadW3DXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
-from .names import generate_blender_object_name, generate_group_name
+from .names import generate_blender_object_name, generate_group_name,\
+    generate_blender_sound_name
 from .metaclasses import SubRegisteredClass
 try:
+    import bpy
     from .blender_actions import ActionCondition, VisibilityAction,\
         MoveAction, ColorAction, LinkAction, TimelineStarter, TriggerEnabler,\
-        SceneReset, ScaleAction
+        SceneReset, ScaleAction, SoundChange
 except ImportError:
     logging.debug(
         "Could not import from blender_actions submodule. Loading"
@@ -722,14 +724,14 @@ class SoundAction(W3DAction):
         )
 
         action = SoundChange(
-            self["sound_name"], self["change"], offset
+            self["sound_name"], self["change"], conditions.offset + 1
         )
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
-        sound_actuator = bpy.data.objects["AUDIO"].actuators[
+        sound_actuator = bpy.data.objects["AUDIO"].game.actuators[
             generate_blender_sound_name(self["sound_name"])]
-        object_action.actuators.append(sound_actuator)
+        self.actuators.append(sound_actuator)
         return start_text + cont_text + end_text
 
 class EventTriggerAction(W3DAction):

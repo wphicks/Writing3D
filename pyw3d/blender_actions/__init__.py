@@ -24,3 +24,4 @@ from .timeline import TimelineStarter
 from .trigger import TriggerEnabler
 from .reset import SceneReset
 from .scale import ScaleAction
+from .sound import SoundChange
