@@ -195,7 +195,7 @@ class W3DSound(W3DFeature):
         blender_sound = bpy.data.sounds[-1]
         blender_sound.name = sound_name
 
-        LOGGER.debug("Adding actuator for {}".format(sound_name))
+        LOGGER.debug("Creating actuator for {}".format(sound_name))
         bpy.context.scene.objects.active = audio_playback_object()
         bpy.ops.logic.actuator_add(
             type="SOUND",

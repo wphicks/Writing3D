@@ -40,11 +40,11 @@ class SoundChange(object):
                 self.sound_name
             )
         ]
-        if self.change == "Play Sound":
+        if self.change == "Start":
             script_text.append(
                 "cont.activate(sound_actuator)"
             )
-        elif self.change == "Stop Sound":
+        elif self.change == "Stop":
             script_text.append(
                 "cont.deactivate(sound_actuator)"
             )

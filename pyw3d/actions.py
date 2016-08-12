@@ -21,6 +21,7 @@ Here, actions refer generically to any discrete change in elements of a W3D
 project
 """
 import logging
+LOGGER = logging.getLogger("pyw3d")
 import xml.etree.ElementTree as ET
 from functools import total_ordering
 from .features import W3DFeature
@@ -39,7 +40,7 @@ try:
         MoveAction, ColorAction, LinkAction, TimelineStarter, TriggerEnabler,\
         SceneReset, ScaleAction, SoundChange
 except ImportError:
-    logging.debug(
+    LOGGER.debug(
         "Could not import from blender_actions submodule. Loading"
         "pyw3d.actions as standalone."
     )
@@ -191,6 +192,9 @@ def generate_object_action_logic(
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
+        LOGGER.debug("Adding audio actuators for {} to action actuator list".format(
+            object_action["object_name"])
+        )
         sound_actuator = bpy.data.objects[
             generate_blender_object_name(object_action["object_name"])].actuators[
                 generate_blender_sound_name(object_action["object_name"])]
@@ -729,6 +733,11 @@ class SoundAction(W3DAction):
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
+        LOGGER.debug(
+            "Adding actuator for {} to sound action actuator list".format(
+                self["sound_name"]
+            )
+        )
         sound_actuator = bpy.data.objects["AUDIO"].game.actuators[
             generate_blender_sound_name(self["sound_name"])]
         self.actuators.append(sound_actuator)

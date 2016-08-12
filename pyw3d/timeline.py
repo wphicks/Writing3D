@@ -126,6 +126,9 @@ class W3DTimeline(W3DFeature):
 
     def write_blender_logic(self):
         """Write any necessary game engine logic for this W3DTimeline"""
+        LOGGER.debug(
+            "Writing game logic for {}".format(self["name"])
+        )
         try:
             self.activator.write_python_logic()
         except AttributeError:

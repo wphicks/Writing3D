@@ -155,6 +155,9 @@ def activate(cont):
         long as the status is set to "Continue", and "stop_sensor" which
         detects when the status is set to "Stop"
         """
+        LOGGER.debug(
+            "Creating status sensors for {}".format(self.name_string)
+        )
         self.select_base_object()
         # Create property sensor to initiate actions
         bpy.ops.logic.sensor_add(
@@ -198,6 +201,9 @@ def activate(cont):
     def create_controller(self):
         """Create a Python controller used to effect actions triggered by this
         Activator"""
+        LOGGER.debug(
+            "Creating controller for {}".format(self.name_string)
+        )
         self.select_base_object()
         bpy.ops.logic.controller_add(
             type='PYTHON',
@@ -211,6 +217,9 @@ def activate(cont):
 
     def create_actuators(self):
         """Create any Blender actuators"""
+        LOGGER.debug(
+            "Creating actuator list for {}".format(self.name_string)
+        )
         for key in self.actions:
             for action in self.actions[key]:
                 self.actuators.extend(action.actuators)
@@ -235,6 +244,9 @@ def activate(cont):
 
     def link_actuators(self):
         """Link actuators necessary to invoke actions"""
+        LOGGER.debug(
+            "Linking actuators for {}".format(self.name_string)
+        )
         try:
             controller = self.controller
         except AttributeError:
@@ -243,7 +255,7 @@ def activate(cont):
         for key in self.actions:
             for action in self.actions[key]:
                 for actuator in action.actuators:
-                    controller.link(actuator)
+                    actuator.link(controller)
 
 
     def _create_base_object(self):
@@ -308,11 +320,17 @@ def activate(cont):
 
     def link_logic_bricks(self):
         """Link together any Blender "logic bricks" for this activator"""
+        LOGGER.debug(
+            "Linking all logic bricks for {}".format(self.name_string)
+        )
         self.link_status_sensors()
         self.link_actuators()
 
     def write_python_logic(self):
         """Write any necessary Python controller scripts for this activator"""
+        LOGGER.debug(
+            "Writing controller script for {}".format(self.name_string)
+        )
         script_text = [
             self.script_header,
             self.generate_action_logic(),

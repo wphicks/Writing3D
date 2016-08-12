@@ -25,6 +25,7 @@ To run this script, use the following command::
 """
 
 
+import os
 from pyw3d import project, objects, placement, actions, export_to_blender,\
     sounds
 
@@ -35,14 +36,14 @@ my_project = project.W3DProject(
 # Next, make the test sound available in Writing3D
 my_sound = sounds.W3DSound(
     name="test",
-    filename="Front_Center.wav"
+    filename="sound/play.wav"
 )
 
 # Next, let's create a simple text object
 my_object = objects.W3DObject(
-    name="hello",  # Give it a name
+    name="base",  # Give it a name
     placement=placement.W3DPlacement(  # Specify position and orientation
-        position=(0, 1, 0),  # We'll leave rotation as default for now
+        position=(0, 5, 0),
     ),
     content=objects.W3DText(  # Specify that this is a text object
         text="Play Sound!"  # ...with text reading "Play Sound!"
