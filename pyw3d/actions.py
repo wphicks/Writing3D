@@ -196,7 +196,7 @@ def generate_object_action_logic(
             object_action["object_name"])
         )
         sound_actuator = bpy.data.objects[
-            generate_blender_object_name(object_action["object_name"])].actuators[
+            generate_blender_object_name(object_action["object_name"])].game.actuators[
                 generate_blender_sound_name(object_action["object_name"])]
         object_action.actuators.append(sound_actuator)
 

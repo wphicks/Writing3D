@@ -853,7 +853,7 @@ class W3DObject(W3DFeature):
                 name=sound_name
             )
             try:
-                actuator = blender_object.actuators[sound_name]
+                actuator = blender_object.game.actuators[sound_name]
                 central_actuator = audio_playback_object().actuators[
                     sound_name]
             except KeyError:

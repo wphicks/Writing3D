@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for starting and stopping audio playback in Blender"""
-from pyw3d.names import generate_blender_sound_name
+from pyw3d.names import generate_blender_sound_name, \
+    generate_blender_object_name
 
 
 class SoundChange(object):

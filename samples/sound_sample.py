@@ -33,26 +33,40 @@ from pyw3d import project, objects, placement, actions, export_to_blender,\
 my_project = project.W3DProject(
     allow_movement=True, debug=True)
 
-# Next, make the test sound available in Writing3D
-my_sound = sounds.W3DSound(
-    name="test",
+# Next, make the test sounds available in Writing3D
+play_sound = sounds.W3DSound(
+    name="basic",
     filename="sound/play.wav"
 )
+left_sound = sounds.W3DSound(
+    name="left",
+    filename="sound/left.wav",
+    movement_mode="Positional"  # Positional for 3D audio
+)
+right_sound = sounds.W3DSound(
+    name="right",
+    filename="sound/right.wav",
+    movement_mode="Positional"
+)
+long_sound = sounds.W3DSound(
+    name="long",
+    filename="sound/long.wav"
+)
 
-# Next, let's create a simple text object
-my_object = objects.W3DObject(
-    name="base",  # Give it a name
-    placement=placement.W3DPlacement(  # Specify position and orientation
-        position=(0, 5, 0),
+# Next, let's create link to play a basic sound
+play_object = objects.W3DObject(
+    name="play",
+    placement=placement.W3DPlacement(
+        position=(0, 10, 0),
     ),
-    content=objects.W3DText(  # Specify that this is a text object
-        text="Play Sound!"  # ...with text reading "Play Sound!"
+    content=objects.W3DText(
+        text="Play Sound!"
     ),
-    link=objects.W3DLink(  # Add a clickable link to the text object
+    link=objects.W3DLink(
         actions={
             -1: [  # On every click (negative number)...
                 actions.SoundAction(  # Affect the sound...
-                    sound_name="test",  # named "test"...
+                    sound_name="basic",  # named "basic"...
                     change="Start"  # by starting it.
                 )
             ]
@@ -60,9 +74,38 @@ my_object = objects.W3DObject(
     )
 )
 
+# An object to play a sound to the left
+play_object = objects.W3DObject(
+    name="left",
+    placement=placement.W3DPlacement(
+        position=(-10, 0, 0),
+        rotation=placement.W3DRotation(
+            rotation_mode = "LookAt",
+            rotation_vector = (0, 0, 0)
+        )
+    ),
+    content=objects.W3DText(
+        text="Left"
+    ),
+    sound="left",  # Attach the sound named left to this object
+    link=objects.W3DLink(
+        actions={
+            -1: [
+                actions.ObjectAction(  # Affect the object...
+                    object_name="left",  # named "left"...
+                    sound_change="Play Sound"  # by starting its sound file.
+                )
+            ]
+        }
+    )
+)
+
 # Now add this object to the project
-my_project["objects"].append(my_object)
-my_project["sounds"].append(my_sound)
+my_project["objects"].append(play_object)
+my_project["sounds"].append(play_sound)
+my_project["sounds"].append(left_sound)
+my_project["sounds"].append(right_sound)
+my_project["sounds"].append(long_sound)
 
 # Finally, we render the whole thing using Blender, export it, and display the
 # result
