@@ -75,8 +75,8 @@ play_object = objects.W3DObject(
 )
 
 # An object to play a sound to the left
-play_object = objects.W3DObject(
-    name="left",
+left_object = objects.W3DObject(
+    name="left_button",
     placement=placement.W3DPlacement(
         position=(-10, 0, 0),
         rotation=placement.W3DRotation(
@@ -92,8 +92,8 @@ play_object = objects.W3DObject(
         actions={
             -1: [
                 actions.ObjectAction(  # Affect the object...
-                    object_name="left",  # named "left"...
-                    sound_change="Play Sound"  # by starting its sound file.
+                    object_name="left_button",  # named "left_button"...
+                    sound_change="Start"  # by starting its sound file.
                 )
             ]
         }
@@ -102,6 +102,7 @@ play_object = objects.W3DObject(
 
 # Now add this object to the project
 my_project["objects"].append(play_object)
+my_project["objects"].append(left_object)
 my_project["sounds"].append(play_sound)
 my_project["sounds"].append(left_sound)
 my_project["sounds"].append(right_sound)

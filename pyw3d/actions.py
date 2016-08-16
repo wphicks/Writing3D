@@ -240,7 +240,7 @@ class ObjectAction(W3DAction):
             help_string="Red, Green, Blue values"),
         "scale": IsNumeric(min_value=0),
         # TODO
-        "sound_change": OptionValidator("Play Sound", "Stop Sound"),
+        "sound_change": OptionValidator("Start", "Stop"),
         "link_change": OptionValidator(
             "Enable", "Disable", "Activate", "Activate if enabled")
     }

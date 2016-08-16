@@ -846,15 +846,16 @@ class W3DObject(W3DFeature):
 
         # TODO: Add around_own_axis
         if self["sound"] is not None:
-            sound_name = generate_blender_sound_name(self["name"])
+            sound_name = generate_blender_sound_name(self["sound"])
+            sound_actuator_name = generate_blender_sound_name(self["name"])
             bpy.ops.logic.actuator_add(
                 type="SOUND",
-                object="AUDIO",
-                name=sound_name
+                object=blender_object.name,
+                name=sound_actuator_name
             )
             try:
-                actuator = blender_object.game.actuators[sound_name]
-                central_actuator = audio_playback_object().actuators[
+                actuator = blender_object.game.actuators[sound_actuator_name]
+                central_actuator = audio_playback_object().game.actuators[
                     sound_name]
             except KeyError:
                 LOGGER.warn(
@@ -864,7 +865,7 @@ class W3DObject(W3DFeature):
                 )
                 return blender_object
             actuator.sound = central_actuator.sound
-            actuator.is3D = central_actuator.is3D
+            actuator.use_sound_3d = central_actuator.use_sound_3d
             actuator.mode = central_actuator.mode
             actuator.pitch = central_actuator.pitch
             actuator.volume = central_actuator.volume
