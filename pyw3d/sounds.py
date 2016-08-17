@@ -192,7 +192,7 @@ class W3DSound(W3DFeature):
         sound_name = generate_blender_sound_name(self["name"])
         LOGGER.debug("Adding sound {} to blend file".format(sound_name))
         bpy.ops.sound.open(filepath=self["filename"])
-        blender_sound = bpy.data.sounds[-1]
+        blender_sound = bpy.data.sounds[0]
         blender_sound.name = sound_name
 
         LOGGER.debug("Creating actuator for {}".format(sound_name))
@@ -202,7 +202,8 @@ class W3DSound(W3DFeature):
             object="AUDIO",
             name=sound_name
         )
-        actuator = audio_playback_object().game.actuators[sound_name]
+        actuator = audio_playback_object().game.actuators[-1]
+        actuator.name = sound_name
         actuator.sound = blender_sound
         actuator.use_sound_3d = (self["movement_mode"] == "Positional")
         if self["repetitions"] < 0:
