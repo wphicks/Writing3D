@@ -57,7 +57,7 @@ long_sound = sounds.W3DSound(
 play_object = objects.W3DObject(
     name="play",
     placement=placement.W3DPlacement(
-        position=(0, 10, 0),
+        position=(0, 10, 1),
     ),
     content=objects.W3DText(
         text="Play Sound!"
@@ -100,9 +100,80 @@ left_object = objects.W3DObject(
     )
 )
 
+# An object to play a sound to the right
+right_object = objects.W3DObject(
+    name="right_button",
+    placement=placement.W3DPlacement(
+        position=(5, 0, 0),
+        rotation=placement.W3DRotation(
+            rotation_mode = "LookAt",
+            rotation_vector = (0, 0, 0)
+        )
+    ),
+    content=objects.W3DText(
+        text="Right"
+    ),
+    sound="right",  # Attach the sound named right to this object
+    link=objects.W3DLink(
+        actions={
+            -1: [
+                actions.ObjectAction(  # Affect the object...
+                    object_name="right_button",  # named "right_button"...
+                    sound_change="Start"  # by starting its sound file.
+                )
+            ]
+        }
+    )
+)
+
+# An object to play a long sound
+long_start = objects.W3DObject(
+    name="long_start",
+    content=objects.W3DText(
+        text="Start long sound"
+    ),
+    placement=placement.W3DPlacement(
+        position=(0, 10, 0),
+    ),
+    link=objects.W3DLink(
+        actions={
+            -1: [  # On every click (negative number)...
+                actions.SoundAction(  # Affect the sound...
+                    sound_name="long",  # named "basic"...
+                    change="Start"  # by starting it.
+                )
+            ]
+        }
+    )
+)
+
+# An object to stop a long sound
+long_stop = objects.W3DObject(
+    name="long_stop",
+    content=objects.W3DText(
+        text="Stop long sound"
+    ),
+    placement=placement.W3DPlacement(
+        position=(0, 10, -1),
+    ),
+    link=objects.W3DLink(
+        actions={
+            -1: [  # On every click (negative number)...
+                actions.SoundAction(  # Affect the sound...
+                    sound_name="long",  # named "basic"...
+                    change="Stop"  # by starting it.
+                )
+            ]
+        }
+    )
+)
+
 # Now add this object to the project
 my_project["objects"].append(play_object)
 my_project["objects"].append(left_object)
+my_project["objects"].append(right_object)
+my_project["objects"].append(long_start)
+my_project["objects"].append(long_stop)
 my_project["sounds"].append(play_sound)
 my_project["sounds"].append(left_sound)
 my_project["sounds"].append(right_sound)
