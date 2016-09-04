@@ -254,6 +254,26 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
             return W3DPSys.fromXML(content_root)
         raise BadW3DXML("No known child node found in Content node")
 
+class W3DSphere(W3DContent):
+    """ Create a sphere object in virtual space
+
+    :param int radius: radius of the sphere to be added
+    """
+    ui_order = ["radius"]
+    argument_validators = {
+        "radius": IsNumeric()
+    }
+    default_arguments = {
+        "radius": 1
+        
+    }
+    ui_order = ["radius"]
+
+    def blend(self):
+        bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"])
+        new_sphere_object = bpy.context.object
+        
+        return new_sphere_object
 
 class W3DText(W3DContent):
     """Represents text in virtual space
@@ -336,6 +356,7 @@ class W3DText(W3DContent):
 
     def blend(self):
         """Create representation of W3DText in Blender"""
+
         bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
@@ -841,12 +862,13 @@ class W3DObject(W3DFeature):
         return new_light_object
     def blend(self):
         """Create representation of W3DObject in Blender"""
+
         blender_object = self["content"].blend()
         blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
-
-        self["placement"].place(blender_object)
+        if "placement" in self:
+            self["placement"].place(blender_object)
         #TODO: Apply link
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
