@@ -25,10 +25,6 @@ To run this script, use the following command::
 """
 
 import sys
-# PATHSUBTAG
-# The above line is used to add local modules to the Blender Python path.
-# You should include this line at the beginning of all Writing3D scripts.
-
 from pyw3d import project, objects, placement, actions, export_to_blender
 
 # First, create a W3DProject to hold everything else you'll create
