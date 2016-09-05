@@ -193,6 +193,19 @@ class BlenderClickTrigger(BlenderTrigger):
         self.script_footer = self.script_footer.format(max_time=max_time)
         return "\n".join(action_logic)
 
+    def get_actions(self):
+        """Return a list of W3DActions that are controlled by this activator
+
+        This method is necessary because of a very bad design decision which
+        assigned different meanings to self.actions for different activators.
+        This *will* be corrected in an upcoming refactoring but must remain for
+        now in an effort to prepare for the next semester of the Writing3D
+        workshop as soon as possible."""
+        all_actions = []
+        for clicks, actions in self.actions.items():
+            all_actions.extend(actions)
+        return all_actions
+
     def __init__(
             self, name, actions, object_name,
             enable_immediately=True, remain_enabled=True,

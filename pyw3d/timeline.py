@@ -17,6 +17,8 @@
 
 """Tools for working with timelines in W3D projects
 """
+import logging
+LOGGER = logging.getLogger("pyw3d")
 import xml.etree.ElementTree as ET
 from .features import W3DFeature
 from .actions import W3DAction

@@ -220,9 +220,8 @@ def activate(cont):
         LOGGER.debug(
             "Creating actuator list for {}".format(self.name_string)
         )
-        for key in self.actions:
-            for action in self.actions[key]:
-                self.actuators.extend(action.actuators)
+        for action in self.get_actions():
+            self.actuators.extend(action.actuators)
 
     def link_status_sensors(self):
         """Link the start, active, and stop sensors to the controller
@@ -252,10 +251,9 @@ def activate(cont):
         except AttributeError:
             raise EBKAC(
                 "Controller must be created before actuators can be linked")
-        for key in self.actions:
-            for action in self.actions[key]:
-                for actuator in action.actuators:
-                    actuator.link(controller)
+        for action in self.get_actions():
+            for actuator in action.actuators:
+                actuator.link(controller)
 
 
     def _create_base_object(self):

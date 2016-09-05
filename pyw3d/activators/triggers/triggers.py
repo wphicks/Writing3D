@@ -73,6 +73,16 @@ class BlenderTrigger(Activator):
         return super(BlenderTrigger, self).create_enabled_property(
             self.enable_immediately)
 
+    def get_actions(self):
+        """Return a list of W3DActions that are controlled by this activator
+
+        This method is necessary because of a very bad design decision which
+        assigned different meanings to self.actions for different activators.
+        This *will* be corrected in an upcoming refactoring but must remain for
+        now in an effort to prepare for the next semester of the Writing3D
+        workshop as soon as possible."""
+        return self.actions
+
     def __init__(
             self, name, actions, duration=0, enable_immediately=True,
             remain_enabled=True):
