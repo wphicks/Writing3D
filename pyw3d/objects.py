@@ -53,7 +53,6 @@ def generate_material_from_image(filename, double_sided=True):
         (os.path.splitext(os.path.basename(filename))[0],
          "image_texture")
     )
-    #TODO: Get image directory
     image_texture = bpy.data.textures.new(name=texture_name, type="IMAGE")
     image_texture.image = bpy.data.images.load(filename)
     # NOTE: The above already raises a sensible RuntimeError if file is not
@@ -62,10 +61,10 @@ def generate_material_from_image(filename, double_sided=True):
     texture_slot.texture = image_texture
     texture_slot.texture_coords = 'UV'
 
-    #material.alpha = 0.0
-    #material.specular_alpha = 0.0
-    #texture_slot.use_map_alpha
-    #material.use_transparency = True
+    # material.alpha = 0.0
+    # material.specular_alpha = 0.0
+    # texture_slot.use_map_alpha
+    # material.use_transparency = True
     material.game_settings.use_backface_culling = not double_sided
 
     return material
@@ -184,8 +183,9 @@ class W3DLink(W3DFeature):
                                 "node")
                         try:
                             if text2bool(num_clicks_node.attrib["reset"]):
-                                if (num_clicks < link["reset"]
-                                        or link["reset"] == -1):
+                                if (
+                                        num_clicks < link["reset"] or
+                                        link["reset"] == -1):
                                     link["reset"] = num_clicks
                         except KeyError:
                             pass
@@ -340,7 +340,7 @@ class W3DText(W3DContent):
         bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
-        #TODO: Get proper font directory
+        # TODO: Get proper font directory
         if self["font"] is not None:
             new_text_object.data.font = bpy.data.fonts.load(self["font"])
         new_text_object.data.extrude = self["depth"]
@@ -361,7 +361,7 @@ class W3DImage(W3DContent):
     """Represent a flat image in 3D space
 
     :param str filename: Filename of image to be displayed"""
-    ui_order=["filename"]
+    ui_order = ["filename"]
     argument_validators = {
         "filename": ValidFile()}
 
@@ -422,7 +422,7 @@ class W3DStereoImage(W3DContent):
     :param str left_file: Filename of image to be displayed to left eye
     :param str right_file: Filename of image to be displayed to right eye
     """
-    ui_order=["left_file", "right_file"]
+    ui_order = ["left_file", "right_file"]
     argument_validators = {
         "left_file": ValidFile(help_string="Filename of left-eye image"),
         "right_file": ValidFile(help_string="Filename of right-eye image")}
@@ -473,8 +473,8 @@ class W3DModel(W3DContent):
     :param str filename: Filename of model to be displayed
     :param bool check_collisions: TODO Clarify what this does
     """
-    #TODO: Does not seem to play nice with GLSL shader. FIX THIS.
-    ui_order=["filename"]
+    # TODO: Does not seem to play nice with GLSL shader. FIX THIS.
+    ui_order = ["filename"]
     argument_validators = {
         "filename": ValidFile(),
         "check_collisions": IsBoolean()}
@@ -521,7 +521,7 @@ class W3DModel(W3DContent):
 
     def blend(self):
         """Create representation of W3DModel in Blender"""
-        #TODO: Get proper directory
+        # TODO: Get proper directory
         bpy.ops.import_scene.obj(filepath=self["filename"])
         model_pieces = bpy.context.selected_objects
         for piece in model_pieces:
@@ -618,7 +618,7 @@ class W3DLight(W3DContent):
 
     def blend(self):
         """Create representation of W3DLight in Blender"""
-        #TODO: Check default direction of lights in legacy
+        # TODO: Check default direction of lights in legacy
         light_type_conversion = {
             "Point": "POINT", "Directional": "SUN", "Spot": "SPOT"
         }
@@ -674,9 +674,10 @@ class W3DObject(W3DFeature):
     W3DStereoImage, W3DModel, W3DLight, W3DPSys
     """
 
-    ui_order = ["name", "placement", "scale", "visible", "lighting", "color",
-            "click_through", "around_own_axis", "content"]
-    #TODO: Add sound
+    ui_order = [
+        "name", "placement", "scale", "visible", "lighting", "color",
+        "click_through", "around_own_axis", "content"]
+    # TODO: Add sound
     argument_validators = {
         "name": ValidPyString(),
         "placement": FeatureValidator(
@@ -693,7 +694,7 @@ class W3DObject(W3DFeature):
         "scale": IsNumeric(min_value=0),
         "click_through":  IsBoolean(),
         "around_own_axis":  IsBoolean(),
-        "sound": TextValidator(),  #TODO: FIX THIS
+        "sound": TextValidator(),  # TODO: FIX THIS
         "content": FeatureValidator(W3DContent)}
 
     default_arguments = {
@@ -712,9 +713,7 @@ class W3DObject(W3DFeature):
         super(W3DObject, self).__init__(*args, **kwargs)
         self.ui_order = [
             "name", "visible", "color", "lighting", "scale", "click_through",
-            "around_own_axis",
-            #"sound",
-            "placement", "link", "content"
+            "around_own_axis", "sound", "placement", "link", "content"
         ]
 
     def toXML(self, all_objects_root):
@@ -809,9 +808,9 @@ class W3DObject(W3DFeature):
             if blender_object.active_material is None:
                 # Object cannot have active material
                 return blender_object
-        #blender_object.active_material.diffuse_color = [
+        # blender_object.active_material.diffuse_color = [
         #    channel/255.0 for channel in self["color"]]
-        #blender_object.active_material.specular_color = (
+        # blender_object.active_material.specular_color = (
         #    blender_object.active_material.diffuse_color)
         blender_object.active_material.use_shadeless = not self["lighting"]
         blender_object.active_material.use_transparency = True
