@@ -252,28 +252,94 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
             return W3DLight.fromXML(content_root)
         if content_root.find("ParticleSystem") is not None:
             return W3DPSys.fromXML(content_root)
+        if content_root.find("Shape") is not None:
+            return W3DShape.fromXML(content_root)
         raise BadW3DXML("No known child node found in Content node")
 
-class W3DSphere(W3DContent):
-    """ Create a sphere object in virtual space
+class W3DShape(W3DContent):
+    """ Create a shape object in virtual space
 
-    :param int radius: radius of the sphere to be added
+    :param str shape_type: type of shape to be created
+    :param int radius: radius of the shape to be added
+    :param tuple color: Three floats representing RGB color of object 
+    :param int depth: height of shape, if shape is cone/cylinder
     """
-    ui_order = ["radius", "placement"]
+    ui_order = ["shape_type","radius", "rotation", "depth"]
     argument_validators = {
-        "radius": IsNumeric()
+        "shape_type": OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey"),
+        "radius": IsNumeric(),
+        "rotation":ListValidator(IsInteger(min_value=0, max_value=255), required_length=3),
+        "depth": IsNumeric()
     }
     default_arguments = {
-        "radius": 1
-        
+        "radius": 1,
+        "rotation": (0,0,0),
+        "depth":2
     }
-    ui_order = ["radius", "placement"]
+    ui_order = ["shape_type","radius", "rotation", "depth"]
+
+    def toXML(self, object_root):
+
+        content_root = ET.SubElement(object_root, "Content")
+        attrib = {
+            "shape_type": self["shape_type"],
+            "radius": self["radius"],
+            "rotation": self["rotation"],
+            "depth": self["depth"]
+        }
+        content_root = ET.SubElement(object_root, "Content")
+        shape_root = ET.SubElement(
+            content_root, "Shape")
+        shape_root.attrib["rotation"]= "{},{},{}".format(*self["rotation"])
+        shape_root.attrib["radius"] = str(self["radius"])
+        shape_root.attrib["shape_type"] = str(self["shape_type"])
+        shape_root.attrib["depth"] = str(self["depth"])
+        
+
+        #if self["shape_type"] == "Sphere":
+         #   ET.SubElement(shape_root, "Sphere")
+        #if self["shape_type"] == "Cube":
+         #   ET.SubElement(shape_root, "Cube")  
+    @classmethod
+    def fromXML(shape_class, content_root):
+        new_shape = shape_class()
+        shape_root = content_root.find("Shape")
+        if shape_root is None:
+            raise BadW3DXML("ShapeRoot element has no Shape subelement")
+        if shape_root is not None:
+            if "radius" in shape_root.attrib:
+                new_shape["radius"] = float(shape_root.attrib["radius"])                   
+            if "shape_type" in shape_root.attrib:
+                new_shape["shape_type"] = str(shape_root.attrib["shape_type"])
+        #add a child for cylinder to account for depth
+            if "depth" in shape_root.attrib:
+                new_shape["depth"] = float(shape_root.attrib["depth"])
+            if "rotation" in shape_root.attrib:
+                new_shape["rotation"] = text2tuple(shape_root.attrib["rotation"], evaluator=int)
+        
+            return new_shape       
+
+        raise InvalidArgument(
+            "Content node must contain Light node to create W3DLight object")
+
 
     def blend(self):
-        bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"])
-        new_sphere_object = bpy.context.object
+        print(self)
+       # self["shape_type"] = "Cube"
+        if self["shape_type"] == "Sphere":
+            bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"], rotation = self["rotation"])
+        elif self["shape_type"] == "Cube":
+            bpy.ops.mesh.primitive_cube_add(radius = self["radius"], rotation = self["rotation"])
+        elif self["shape_type"] == "Cone":
+            bpy.ops.mesh.primitive_cone_add(radius1 = self["radius"], rotation = self["rotation"], depth = self["depth"])
+        elif self["shape_type"] == "Cylinder":
+            bpy.ops.mesh.primitive_cylinder_add(radius = self["radius"], rotation = self["rotation"], depth=self["depth"])
+        elif self["shape_type"] == "Monkey":
+            bpy.ops.mesh.primitive_monkey_add(radius = self["radius"], rotation = self["rotation"])
+
+        new_shape_object = bpy.context.object
         
-        return new_sphere_object
+        return new_shape_object
 
 class W3DText(W3DContent):
     """Represents text in virtual space
