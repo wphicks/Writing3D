@@ -259,7 +259,7 @@ class W3DSphere(W3DContent):
 
     :param int radius: radius of the sphere to be added
     """
-    ui_order = ["radius"]
+    ui_order = ["radius", "placement"]
     argument_validators = {
         "radius": IsNumeric()
     }
@@ -267,7 +267,7 @@ class W3DSphere(W3DContent):
         "radius": 1
         
     }
-    ui_order = ["radius"]
+    ui_order = ["radius", "placement"]
 
     def blend(self):
         bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"])
@@ -356,7 +356,6 @@ class W3DText(W3DContent):
 
     def blend(self):
         """Create representation of W3DText in Blender"""
-
         bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
@@ -848,7 +847,7 @@ class W3DObject(W3DFeature):
             not self["double_sided"])
         color = [channel/255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
-
+        print(color)
         blender_object.color = color
         
         if self["lighting"] is True:
@@ -858,17 +857,16 @@ class W3DObject(W3DFeature):
 
     def apply_lamp_color(self, new_light_object):
         color = [channel/255.0 for channel in self["color"]]
-        bpy.data.lamps[new_light_object.name].color = color
+        bpy.data.lamps[new_light_object.name].color = color      
         return new_light_object
     def blend(self):
         """Create representation of W3DObject in Blender"""
-
+        
         blender_object = self["content"].blend()
         blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
-        if "placement" in self:
-            self["placement"].place(blender_object)
+        self["placement"].place(blender_object)
         #TODO: Apply link
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
@@ -877,16 +875,20 @@ class W3DObject(W3DFeature):
             #TODO
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
+       
         
-        if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] is not 'light_object_':
-            blender_lamp = bpy.data.lamps[-1]
+        if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] != 'light_object_':
+            blender_lamp = bpy.data.lamps[-1]                    
             blender_lamp.name = generate_light_object_name(self["name"])
             self.apply_lamp_color(blender_lamp)
         
         else:
             self.apply_material(blender_object)
             blender_object.layers = [layer == 0 for layer in range(20)]
-
+        #if blender_object.name[0:13] is not 'light_object_':
+         #   self.apply_material(blender_object)
+          #  blender_object.layers = [layer == 0 for layer in range(20)]
+        
         #TODO: Add around_own_axis
         #TODO: Add sound
 
