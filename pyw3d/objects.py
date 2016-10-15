@@ -268,15 +268,12 @@ class W3DShape(W3DContent):
     argument_validators = {
         "shape_type": OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey"),
         "radius": IsNumeric(),
-        "rotation":ListValidator(IsInteger(min_value=0, max_value=255), required_length=3),
         "depth": IsNumeric()
     }
     default_arguments = {
         "radius": 1,
-        "rotation": (0,0,0),
         "depth":2
     }
-    ui_order = ["shape_type","radius", "rotation", "depth"]
 
     def toXML(self, object_root):
 
@@ -284,13 +281,10 @@ class W3DShape(W3DContent):
         attrib = {
             "shape_type": self["shape_type"],
             "radius": self["radius"],
-            "rotation": self["rotation"],
             "depth": self["depth"]
         }
-        content_root = ET.SubElement(object_root, "Content")
         shape_root = ET.SubElement(
             content_root, "Shape")
-        shape_root.attrib["rotation"]= "{},{},{}".format(*self["rotation"])
         shape_root.attrib["radius"] = str(self["radius"])
         shape_root.attrib["shape_type"] = str(self["shape_type"])
         shape_root.attrib["depth"] = str(self["depth"])
@@ -305,37 +299,27 @@ class W3DShape(W3DContent):
         new_shape = shape_class()
         shape_root = content_root.find("Shape")
         if shape_root is None:
-            raise BadW3DXML("ShapeRoot element has no Shape subelement")
-        if shape_root is not None:
-            if "radius" in shape_root.attrib:
-                new_shape["radius"] = float(shape_root.attrib["radius"])                   
-            if "shape_type" in shape_root.attrib:
-                new_shape["shape_type"] = str(shape_root.attrib["shape_type"])
+            raise BadW3DXML("Content node has no Shape child node")
+        if "radius" in shape_root.attrib:
+            new_shape["radius"] = float(shape_root.attrib["radius"])                   
+        if "shape_type" in shape_root.attrib:
+            new_shape["shape_type"] = str(shape_root.attrib["shape_type"])
         #add a child for cylinder to account for depth
-            if "depth" in shape_root.attrib:
-                new_shape["depth"] = float(shape_root.attrib["depth"])
-            if "rotation" in shape_root.attrib:
-                new_shape["rotation"] = text2tuple(shape_root.attrib["rotation"], evaluator=int)
-        
-            return new_shape       
-
-        raise InvalidArgument(
-            "Content node must contain Light node to create W3DLight object")
-
+        if "depth" in shape_root.attrib:
+            new_shape["depth"] = float(shape_root.attrib["depth"])
+        return new_shape       
 
     def blend(self):
-        print(self)
-       # self["shape_type"] = "Cube"
         if self["shape_type"] == "Sphere":
-            bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"], rotation = self["rotation"])
+            bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"])
         elif self["shape_type"] == "Cube":
-            bpy.ops.mesh.primitive_cube_add(radius = self["radius"], rotation = self["rotation"])
+            bpy.ops.mesh.primitive_cube_add(radius = self["radius"])
         elif self["shape_type"] == "Cone":
-            bpy.ops.mesh.primitive_cone_add(radius1 = self["radius"], rotation = self["rotation"], depth = self["depth"])
+            bpy.ops.mesh.primitive_cone_add(radius1 = self["radius"], depth = self["depth"])
         elif self["shape_type"] == "Cylinder":
-            bpy.ops.mesh.primitive_cylinder_add(radius = self["radius"], rotation = self["rotation"], depth=self["depth"])
+            bpy.ops.mesh.primitive_cylinder_add(radius = self["radius"], depth=self["depth"])
         elif self["shape_type"] == "Monkey":
-            bpy.ops.mesh.primitive_monkey_add(radius = self["radius"], rotation = self["rotation"])
+            bpy.ops.mesh.primitive_monkey_add(radius = self["radius"])
 
         new_shape_object = bpy.context.object
         
@@ -653,7 +637,6 @@ class W3DLight(W3DContent):
         content_root = ET.SubElement(object_root, "Content")
         light_root = ET.SubElement(
             content_root, "Light")
-
         if not self.is_default("diffuse"):
             light_root.attrib["diffuse"] = bool2text(self["diffuse"])
         if not self.is_default("specular"):
@@ -913,11 +896,10 @@ class W3DObject(W3DFeature):
             not self["double_sided"])
         color = [channel/255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
-        print(color)
         blender_object.color = color
         
-        if self["lighting"] is True:
-            blender_object.color = color
+        #if self["lighting"] is True:
+        blender_object.color = color
 
         return blender_object
 
@@ -925,6 +907,7 @@ class W3DObject(W3DFeature):
         color = [channel/255.0 for channel in self["color"]]
         bpy.data.lamps[new_light_object.name].color = color      
         return new_light_object
+
     def blend(self):
         """Create representation of W3DObject in Blender"""
         
@@ -943,14 +926,14 @@ class W3DObject(W3DFeature):
         blender_object.game.use_ghost = True
        
         
-        if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] != 'light_object_':
+        #if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] != 'light_object_':
+        if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name.startswith("light_object_", 0, 13) == False:
             blender_lamp = bpy.data.lamps[-1]                    
             blender_lamp.name = generate_light_object_name(self["name"])
             self.apply_lamp_color(blender_lamp)
         
-        else:
-            self.apply_material(blender_object)
-            blender_object.layers = [layer == 0 for layer in range(20)]
+        self.apply_material(blender_object)
+        blender_object.layers = [layer == 0 for layer in range(20)]
         #if blender_object.name[0:13] is not 'light_object_':
          #   self.apply_material(blender_object)
           #  blender_object.layers = [layer == 0 for layer in range(20)]

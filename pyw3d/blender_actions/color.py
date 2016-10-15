@@ -33,13 +33,11 @@ class ColorAction(object):
         script_text = []
         script_text.extend([
             "new_color = {}".format(self.color),
-            "W3D_LOG.debug('{}')".format(self.color),
             "blender_object['colorV'] = [",
             "    (new_color[i] - blender_object.color[i])/{}".format(
                 ("({}*bge.logic.getLogicTicRate())".format(self.duration), 1)[
                     self.duration == 0]),
-            "    for i in range(len(new_color))]",
-            "W3D_LOG.debug('{}'.format(blender_object.color))"]
+            "    for i in range(len(new_color))]"]
         )
 
         try:
@@ -54,8 +52,7 @@ class ColorAction(object):
             "new_color = blender_object.color",
             "for i in range(len(blender_object['colorV'])):",
             "    new_color[i] += blender_object['colorV'][i]",
-            "blender_object.color = new_color",
-            
+            "blender_object.color = new_color",           
         ]
         try:
             script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
@@ -69,9 +66,7 @@ class ColorAction(object):
             "new_color = {}".format(self.color),
             "if len(new_color) < 4 and len(blender_object.color) == 4:",
             "    new_color.append(blender_object.color[3])",
-            "blender_object.color = new_color",
-            "W3D_LOG.debug('{}'.format(blender_object.color))"
-            ]
+            "blender_object.color = new_color"]
         try:
             script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
         except IndexError:

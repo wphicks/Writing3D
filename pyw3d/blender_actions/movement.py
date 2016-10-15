@@ -194,7 +194,6 @@ class MoveAction(object):
                         ("({}*bge.logic.getLogicTicRate())".format(
                             self.duration), 1)[self.duration == 0])]
                 )
-            script_text.extend(["W3D_LOG.debug('linV is {} at start'.format(blender_object['linV']))"])
         try:
             script_text[0] = "{}{}".format(
                 "    " * self.offset, script_text[0])
@@ -205,7 +204,6 @@ class MoveAction(object):
     @property
     def continue_string(self):
         script_text = []
-        script_text.append("W3D_LOG.debug('within Continue string')")
         if self.placement["rotation"]["rotation_mode"] != "None":
             script_text.append(
                 "delta_rot = blender_object['angV']"
@@ -220,8 +218,7 @@ class MoveAction(object):
                 #"   W3D_LOG.debug('LINV NOW ZERO')",
                 "blender_object.position = [",
                 "    blender_object.position[i] + blender_object['linV'][i]",
-                "    for i in range(len(blender_object.position))]",
-                "W3D_LOG.debug('linV is {}'.format(blender_object['linV']))"]
+                "    for i in range(len(blender_object.position))]"]
             )
 
         try:
@@ -251,8 +248,7 @@ class MoveAction(object):
                     "blender_object.position = [",
                     "    blender_object.position[i] +",
                     "    blender_object['linV'][i]",
-                    "    for i in range(len(blender_object.position))]",
-                    "W3D_LOG.debug('linV is {}'.format(blender_object['linV']))"]
+                    "    for i in range(len(blender_object.position))]"]
                 )
 
         try:

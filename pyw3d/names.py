@@ -58,4 +58,5 @@ def generate_relative_to_name(string):
     return "relative_to_{}".format(string)
 
 def generate_light_object_name(string):
+    """Generate name used for light objects"""
     return "light_object_{}".format(string)
