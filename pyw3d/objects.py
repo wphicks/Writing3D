@@ -264,7 +264,7 @@ class W3DShape(W3DContent):
     :param tuple color: Three floats representing RGB color of object 
     :param int depth: height of shape, if shape is cone/cylinder
     """
-    ui_order = ["shape_type","radius", "rotation", "depth"]
+    ui_order = ["shape_type","radius", "depth"]
     argument_validators = {
         "shape_type": OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey"),
         "radius": IsNumeric(),
@@ -298,15 +298,16 @@ class W3DShape(W3DContent):
     def fromXML(shape_class, content_root):
         new_shape = shape_class()
         shape_root = content_root.find("Shape")
+        numberValidator = IsNumeric()
+        optionValidator = OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey")
         if shape_root is None:
             raise BadW3DXML("Content node has no Shape child node")
         if "radius" in shape_root.attrib:
-            new_shape["radius"] = float(shape_root.attrib["radius"])                   
+            new_shape["radius"] = numberValidator.coerce(shape_root.attrib["radius"])                   
         if "shape_type" in shape_root.attrib:
-            new_shape["shape_type"] = str(shape_root.attrib["shape_type"])
-        #add a child for cylinder to account for depth
+            new_shape["shape_type"] = optionValidator.coerce(shape_root.attrib["shape_type"])
         if "depth" in shape_root.attrib:
-            new_shape["depth"] = float(shape_root.attrib["depth"])
+            new_shape["depth"] = numberValidator.coerce(shape_root.attrib["depth"])
         return new_shape       
 
     def blend(self):
@@ -898,7 +899,6 @@ class W3DObject(W3DFeature):
         color.append(int(self["visible"]))
         blender_object.color = color
         
-        #if self["lighting"] is True:
         blender_object.color = color
 
         return blender_object
@@ -926,7 +926,6 @@ class W3DObject(W3DFeature):
         blender_object.game.use_ghost = True
        
         
-        #if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name[0:13] != 'light_object_':
         if bpy.data.lamps[-1] is not None and bpy.data.lamps[-1].name.startswith("light_object_", 0, 13) == False:
             blender_lamp = bpy.data.lamps[-1]                    
             blender_lamp.name = generate_light_object_name(self["name"])
