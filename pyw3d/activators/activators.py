@@ -18,8 +18,8 @@
 """Classes used to initiate actions in Blender
 """
 import logging
-LOGGER = logging.getLogger("pyw3d")
 from pyw3d.errors import EBKAC
+LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
 except ImportError:

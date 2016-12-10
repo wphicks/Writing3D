@@ -38,6 +38,11 @@ def generate_blender_material_name(string):
     return "material_{}".format(string)
 
 
+def generate_blender_psys_name(string):
+    """Generate name used for Blender particle system"""
+    return "psys_{}".format(string)
+
+
 def generate_trigger_name(string):
     """Generate name used for Blender trigger"""
     return "trigger_{}".format(string)

@@ -20,7 +20,6 @@
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 import logging
-LOGGER = logging.getLogger("pyw3d")
 import math
 import os
 import sys
@@ -30,12 +29,14 @@ from .validators import ListValidator, IsNumeric, OptionValidator,\
     IsBoolean, FeatureValidator, IsInteger, DictValidator
 from .xml_tools import bool2text, text2tuple, attrib2bool, text2bool
 from .objects import W3DObject
+from .psys import W3DPSys
 from .sounds import W3DSound
 from .timeline import W3DTimeline
 from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
+LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
 except ImportError:
@@ -107,6 +108,7 @@ class W3DProject(W3DFeature):
     :param list groups: Maps names of groups to lists of W3DObjects
     :param list timelines: List of W3DTimelines within project
     :param list sounds: List of W3DSounds within project
+    :param list particle_systems: List of W3DPSys within project
     :param list trigger_events: List of W3DEvents within project
     :param W3DPlacement camera_placement: Initial placement of camera
     :param W3DPlacement desktop_camera_placement: Initial placement of camera
@@ -135,6 +137,10 @@ class W3DProject(W3DFeature):
         "groups": ListValidator(
             FeatureValidator(W3DGroup),
             help_string="A list of W3DObjects in the project"
+        ),
+        "particle_systems": ListValidator(
+            FeatureValidator(W3DPSys),
+            help_string="A list of W3DPSys in the project"
         ),
         "timelines": ListValidator(
             FeatureValidator(W3DTimeline),
@@ -190,6 +196,8 @@ class W3DProject(W3DFeature):
             self["objects"] = []
         if "groups" not in self:
             self["groups"] = []
+        if "particle_systems" not in self:
+            self["particle_systems"] = []
         if "timelines" not in self:
             self["timelines"] = []
         if "sounds" not in self:
@@ -265,6 +273,9 @@ class W3DProject(W3DFeature):
         sound_root = ET.SubElement(project_root, "SoundRoot")
         for sound in self["sounds"]:
             sound.toXML(sound_root)
+        psys_root = ET.SubElement(project_root, "PSysRoot")
+        for psys in self["particle_systems"]:
+            psys.toXML(psys_root)
         event_root = ET.SubElement(project_root, "EventRoot")
         for trigger in self["trigger_events"]:
             trigger.toXML(event_root)
@@ -321,6 +332,10 @@ class W3DProject(W3DFeature):
         if sound_root is not None:
             for child in sound_root.findall("Sound"):
                 new_project["sounds"].append(W3DSound.fromXML(child))
+        psys_root = project_root.find("PSysRoot")
+        if psys_root is not None:
+            for child in psys_root.findall("PSys"):
+                new_project["particle_systems"].append(W3DPSys.fromXML(child))
         trigger_root = project_root.find("EventRoot")
         if trigger_root is not None:
             for child in trigger_root.findall("EventTrigger"):
@@ -558,6 +573,8 @@ class W3DProject(W3DFeature):
             group.blend_groups()
         for object_ in self["objects"]:
             object_.blend()
+        for psys in self["particle_systems"]:
+            psys.blend()
 
         # Create Activators
         for timeline in self["timelines"]:

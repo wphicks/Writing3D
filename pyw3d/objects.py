@@ -252,7 +252,7 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
         if content_root.find("Light") is not None:
             return W3DLight.fromXML(content_root)
         if content_root.find("ParticleSystem") is not None:
-            return W3DPSys.fromXML(content_root)
+            return None  # TODO
         raise BadW3DXML("No known child node found in Content node")
 
 
@@ -647,13 +647,6 @@ class W3DLight(W3DContent):
         if self["light_type"] == "Spot":
             new_light_object.data.spot_size = math.radians(self["angle"])
         return new_light_object
-
-
-class W3DPSys(W3DContent):
-    """Represents a particle system in virtual space
-
-    NOT YET IMPLEMENTED AT ALL"""
-    # TODO: everything
 
 
 class W3DObject(W3DFeature):
