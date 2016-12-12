@@ -31,7 +31,8 @@ from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
     ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
     TextValidator, ValidFile
 from .names import generate_blender_object_name,\
-    generate_blender_material_name, generate_blender_sound_name
+    generate_blender_material_name, generate_blender_sound_name,\
+    generate_light_object_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
 from .sounds import audio_playback_object
@@ -253,8 +254,79 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
             return W3DLight.fromXML(content_root)
         if content_root.find("ParticleSystem") is not None:
             return W3DPSys.fromXML(content_root)
+        if content_root.find("Shape") is not None:
+            return W3DShape.fromXML(content_root)
         raise BadW3DXML("No known child node found in Content node")
 
+class W3DShape(W3DContent):
+    """ Create a shape object in virtual space
+
+    :param str shape_type: type of shape to be created
+    :param int radius: radius of the shape to be added
+    :param tuple color: Three floats representing RGB color of object 
+    :param int depth: height of shape, if shape is cone/cylinder
+    """
+    ui_order = ["shape_type","radius", "depth"]
+    argument_validators = {
+        "shape_type": OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey"),
+        "radius": IsNumeric(),
+        "depth": IsNumeric()
+    }
+    default_arguments = {
+        "radius": 1,
+        "depth":2
+    }
+
+    def toXML(self, object_root):
+
+        content_root = ET.SubElement(object_root, "Content")
+        attrib = {
+            "shape_type": self["shape_type"],
+            "radius": self["radius"],
+            "depth": self["depth"]
+        }
+        shape_root = ET.SubElement(
+            content_root, "Shape")
+        shape_root.attrib["radius"] = str(self["radius"])
+        shape_root.attrib["shape_type"] = str(self["shape_type"])
+        shape_root.attrib["depth"] = str(self["depth"])
+        
+
+        #if self["shape_type"] == "Sphere":
+         #   ET.SubElement(shape_root, "Sphere")
+        #if self["shape_type"] == "Cube":
+         #   ET.SubElement(shape_root, "Cube")  
+    @classmethod
+    def fromXML(shape_class, content_root):
+        new_shape = shape_class()
+        shape_root = content_root.find("Shape")
+        numberValidator = IsNumeric()
+        optionValidator = OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey")
+        if shape_root is None:
+            raise BadW3DXML("Content node has no Shape child node")
+        if "radius" in shape_root.attrib:
+            new_shape["radius"] = numberValidator.coerce(shape_root.attrib["radius"])                   
+        if "shape_type" in shape_root.attrib:
+            new_shape["shape_type"] = optionValidator.coerce(shape_root.attrib["shape_type"])
+        if "depth" in shape_root.attrib:
+            new_shape["depth"] = numberValidator.coerce(shape_root.attrib["depth"])
+        return new_shape       
+
+    def blend(self):
+        if self["shape_type"] == "Sphere":
+            bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"])
+        elif self["shape_type"] == "Cube":
+            bpy.ops.mesh.primitive_cube_add(radius = self["radius"])
+        elif self["shape_type"] == "Cone":
+            bpy.ops.mesh.primitive_cone_add(radius1 = self["radius"], depth = self["depth"])
+        elif self["shape_type"] == "Cylinder":
+            bpy.ops.mesh.primitive_cylinder_add(radius = self["radius"], depth=self["depth"])
+        elif self["shape_type"] == "Monkey":
+            bpy.ops.mesh.primitive_monkey_add(radius = self["radius"])
+
+        new_shape_object = bpy.context.object
+        
+        return new_shape_object
 
 class W3DText(W3DContent):
     """Represents text in virtual space
@@ -592,6 +664,7 @@ class W3DLight(W3DContent):
         """
         new_light = light_class()
         light_root = content_root.find("Light")
+        
         if light_root is not None:
             if "diffuse" in light_root.attrib:
                 new_light["diffuse"] = text2bool(light_root.attrib["diffuse"])
@@ -646,6 +719,7 @@ class W3DLight(W3DContent):
         # suspect, as is the distance.
         if self["light_type"] == "Spot":
             new_light_object.data.spot_size = math.radians(self["angle"])
+         
         return new_light_object
 
 
@@ -674,10 +748,9 @@ class W3DObject(W3DFeature):
     W3DStereoImage, W3DModel, W3DLight, W3DPSys
     """
 
-    ui_order = [
-        "name", "placement", "scale", "visible", "lighting", "color",
+    ui_order = ["name", "placement", "scale", "visible", "lighting", "color",
         "click_through", "around_own_axis", "content"]
-    # TODO: Add sound
+    #TODO: Add sound
     argument_validators = {
         "name": ValidPyString(),
         "placement": FeatureValidator(
@@ -808,10 +881,7 @@ class W3DObject(W3DFeature):
             if blender_object.active_material is None:
                 # Object cannot have active material
                 return blender_object
-        # blender_object.active_material.diffuse_color = [
-        #    channel/255.0 for channel in self["color"]]
-        # blender_object.active_material.specular_color = (
-        #    blender_object.active_material.diffuse_color)
+
         blender_object.active_material.use_shadeless = not self["lighting"]
         blender_object.active_material.use_transparency = True
         blender_object.active_material.use_nodes = False
@@ -823,13 +893,17 @@ class W3DObject(W3DFeature):
         blender_object.color = color
         return blender_object
 
+    def apply_lamp_color(self, new_light_object):
+        color = [channel/255.0 for channel in self["color"]]
+        bpy.data.lamps[new_light_object.name].color = color      
+        return new_light_object
+
     def blend(self):
         """Create representation of W3DObject in Blender"""
         blender_object = self["content"].blend()
         blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
-
         self["placement"].place(blender_object)
         # TODO: Apply link
         if self["link"] is not None:
@@ -840,6 +914,11 @@ class W3DObject(W3DFeature):
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
 
+        if bpy.data.lamps[-1] is not None and not bpy.data.lamps[-1].name.startswith("light_object_"):
+            blender_lamp = bpy.data.lamps[-1]                    
+            blender_lamp.name = generate_light_object_name(self["name"])
+            self.apply_lamp_color(blender_lamp)
+        
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
