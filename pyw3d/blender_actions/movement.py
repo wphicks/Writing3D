@@ -194,7 +194,6 @@ class MoveAction(object):
                         ("({}*bge.logic.getLogicTicRate())".format(
                             self.duration), 1)[self.duration == 0])]
                 )
-
         try:
             script_text[0] = "{}{}".format(
                 "    " * self.offset, script_text[0])
@@ -214,6 +213,9 @@ class MoveAction(object):
 
         if "position" in self.placement:
             script_text.extend([
+                #"if 'linV' not in blender_object:",
+                #"   blender_object['linV'] = [0.0,0.0,0.0]",
+                #"   W3D_LOG.debug('LINV NOW ZERO')",
                 "blender_object.position = [",
                 "    blender_object.position[i] + blender_object['linV'][i]",
                 "    for i in range(len(blender_object.position))]"]
@@ -229,9 +231,11 @@ class MoveAction(object):
     @property
     def end_string(self):
         script_text = [
-            "W3D_LOG.debug('Ending movement in {}'.format(own.name))"
+            "W3D_LOG.debug('Ending movement in {}'.format(own.name))",
+            
         ]
         if not self.duration:
+
             if self.placement["rotation"]["rotation_mode"] != "None":
                 script_text.append(
                     "delta_rot = blender_object['angV']"

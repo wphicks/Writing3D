@@ -61,3 +61,7 @@ def generate_group_name(string):
 def generate_relative_to_name(string):
     """Generate name used for relative_to objects"""
     return "relative_to_{}".format(string)
+
+def generate_light_object_name(string):
+    """Generate name used for light objects"""
+    return "light_object_{}".format(string)
