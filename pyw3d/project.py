@@ -36,6 +36,7 @@ from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
 from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
+from .names import generate_light_object_name
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
@@ -49,6 +50,7 @@ def clear_blender_scene():
     for obj in bpy.context.scene.objects:
         obj.select = True
     bpy.ops.object.delete()
+    bpy.data.lamps[-1].name = generate_light_object_name("first")
 
 
 def setup_blender_layout():
