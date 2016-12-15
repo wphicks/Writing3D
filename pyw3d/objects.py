@@ -256,23 +256,25 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
             return None  # TODO
         raise BadW3DXML("No known child node found in Content node")
 
+
 class W3DShape(W3DContent):
     """ Create a shape object in virtual space
 
     :param str shape_type: type of shape to be created
     :param int radius: radius of the shape to be added
-    :param tuple color: Three floats representing RGB color of object 
+    :param tuple color: Three floats representing RGB color of object
     :param int depth: height of shape, if shape is cone/cylinder
     """
-    ui_order = ["shape_type","radius", "depth"]
+    ui_order = ["shape_type", "radius", "depth"]
     argument_validators = {
-        "shape_type": OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey"),
+        "shape_type": OptionValidator(
+            "Sphere", "Cube", "Cone", "Cylinder", "Monkey"),
         "radius": IsNumeric(),
         "depth": IsNumeric()
     }
     default_arguments = {
         "radius": 1,
-        "depth":2
+        "depth": 2
     }
 
     def toXML(self, object_root):
@@ -288,27 +290,26 @@ class W3DShape(W3DContent):
         shape_root.attrib["radius"] = str(self["radius"])
         shape_root.attrib["shape_type"] = str(self["shape_type"])
         shape_root.attrib["depth"] = str(self["depth"])
-        
 
-        #if self["shape_type"] == "Sphere":
-         #   ET.SubElement(shape_root, "Sphere")
-        #if self["shape_type"] == "Cube":
-         #   ET.SubElement(shape_root, "Cube")  
     @classmethod
     def fromXML(shape_class, content_root):
         new_shape = shape_class()
         shape_root = content_root.find("Shape")
         numberValidator = IsNumeric()
-        optionValidator = OptionValidator("Sphere", "Cube", "Cone", "Cylinder", "Monkey")
+        optionValidator = OptionValidator(
+            "Sphere", "Cube", "Cone", "Cylinder", "Monkey")
         if shape_root is None:
             raise BadW3DXML("Content node has no Shape child node")
         if "radius" in shape_root.attrib:
-            new_shape["radius"] = numberValidator.coerce(shape_root.attrib["radius"])                   
+            new_shape["radius"] = numberValidator.coerce(
+                shape_root.attrib["radius"])
         if "shape_type" in shape_root.attrib:
-            new_shape["shape_type"] = optionValidator.coerce(shape_root.attrib["shape_type"])
+            new_shape["shape_type"] = optionValidator.coerce(
+                shape_root.attrib["shape_type"])
         if "depth" in shape_root.attrib:
-            new_shape["depth"] = numberValidator.coerce(shape_root.attrib["depth"])
-        return new_shape       
+            new_shape["depth"] = numberValidator.coerce(
+                    shape_root.attrib["depth"])
+        return new_shape
 
     def blend(self):
         if self["shape_type"] == "Sphere":
@@ -886,7 +887,7 @@ class W3DObject(W3DFeature):
 
     def apply_lamp_color(self, new_light_object):
         color = [channel/255.0 for channel in self["color"]]
-        bpy.data.lamps[new_light_object.name].color = color      
+        bpy.data.lamps[new_light_object.name].color = color
         return new_light_object
 
     def blend(self):
@@ -905,11 +906,13 @@ class W3DObject(W3DFeature):
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
 
-        if bpy.data.lamps[-1] is not None and not bpy.data.lamps[-1].name.startswith("light_object_"):
-            blender_lamp = bpy.data.lamps[-1]                    
+        if (
+                bpy.data.lamps[-1] is not None and not
+                bpy.data.lamps[-1].name.startswith("light_object_")):
+            blender_lamp = bpy.data.lamps[-1]
             blender_lamp.name = generate_light_object_name(self["name"])
             self.apply_lamp_color(blender_lamp)
-        
+
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
@@ -938,6 +941,9 @@ class W3DObject(W3DFeature):
             actuator.mode = central_actuator.mode
             actuator.pitch = central_actuator.pitch
             actuator.volume = central_actuator.volume
+
+        bpy.ops.object.game_property_new(name="visible", type='BOOLEAN')
+        blender_object.game.properties["visible"] = self["visible"]
 
         return blender_object
 

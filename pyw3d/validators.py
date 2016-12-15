@@ -176,6 +176,20 @@ class ListValidator(Validator):
         :param int index: The validator index"""
         return self.base_validators[index % len(self.base_validators)]
 
+    def coerce(self, value):
+        if self(value):
+            return value
+
+        try:
+            value = value.strip()
+            value = value.strip("[]()")
+            all_values = value.split(",")
+            return [
+                self.get_base_validator(i).coerce(value) for i, value in
+                enumerate(all_values)]
+        except:
+            return value
+
     @property
     def def_value(self):
         if self.required_length is not None:

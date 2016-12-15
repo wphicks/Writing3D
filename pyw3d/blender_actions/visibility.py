@@ -41,6 +41,7 @@ class VisibilityAction(object):
             "        blender_object.name, delta_alpha > 0",
             "    )",
             ")",
+            "blender_object['visible'] = 'delta_alpha > 0'",
             "blender_object['visV'] = delta_alpha/{}".format(
                 ("({}*bge.logic.getLogicTicRate())".format(self.duration), 1)[
                     self.duration == 0])]
