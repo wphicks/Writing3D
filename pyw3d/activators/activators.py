@@ -255,7 +255,6 @@ def activate(cont):
             for actuator in action.actuators:
                 actuator.link(controller)
 
-
     def _create_base_object(self):
         """Create the object which controls the current status of the
         activator"""

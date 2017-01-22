@@ -29,7 +29,7 @@ from .validators import ListValidator, IsNumeric, OptionValidator,\
     IsBoolean, FeatureValidator, IsInteger, DictValidator
 from .xml_tools import bool2text, text2tuple, attrib2bool, text2bool
 from .objects import W3DObject
-from .psys import W3DPSys
+from .psys import W3DPSys, W3DPAction
 from .sounds import W3DSound
 from .timeline import W3DTimeline
 from .groups import W3DGroup
@@ -144,6 +144,10 @@ class W3DProject(W3DFeature):
             FeatureValidator(W3DPSys),
             help_string="A list of W3DPSys in the project"
         ),
+        "particle_actions": ListValidator(
+            FeatureValidator(W3DPAction),
+            help_string="A list of W3DPActions in the project"
+        ),
         "timelines": ListValidator(
             FeatureValidator(W3DTimeline),
             help_string="A list of W3DTimelines in the project"),
@@ -200,6 +204,8 @@ class W3DProject(W3DFeature):
             self["groups"] = []
         if "particle_systems" not in self:
             self["particle_systems"] = []
+        if "particle_actions" not in self:
+            self["particle_actions"] = []
         if "timelines" not in self:
             self["timelines"] = []
         if "sounds" not in self:
@@ -278,6 +284,9 @@ class W3DProject(W3DFeature):
         psys_root = ET.SubElement(project_root, "PSysRoot")
         for psys in self["particle_systems"]:
             psys.toXML(psys_root)
+        paction_root = ET.SubElement(project_root, "ParticleActionRoot")
+        for paction in self["particle_actions"]:
+            paction.toXML(paction_root)
         event_root = ET.SubElement(project_root, "EventRoot")
         for trigger in self["trigger_events"]:
             trigger.toXML(event_root)
@@ -338,6 +347,11 @@ class W3DProject(W3DFeature):
         if psys_root is not None:
             for child in psys_root.findall("PSys"):
                 new_project["particle_systems"].append(W3DPSys.fromXML(child))
+        paction_root = project_root.find("ParticleActionRoot")
+        if paction_root is not None:
+            for child in paction_root.findall("PSys"):
+                new_project["particle_actions"].append(
+                    W3DPAction.fromXML(child))
         trigger_root = project_root.find("EventRoot")
         if trigger_root is not None:
             for child in trigger_root.findall("EventTrigger"):
@@ -577,6 +591,10 @@ class W3DProject(W3DFeature):
             object_.blend()
         for psys in self["particle_systems"]:
             psys.blend()
+
+        # Create particle action logic
+        for paction in self["particle_actions"]:
+            paction.blend()
 
         # Create Activators
         for timeline in self["timelines"]:

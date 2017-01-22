@@ -19,9 +19,12 @@
 """Tools for creating particle systems in W3D Projects
 """
 import logging
-from .names import generate_blender_object_name, generate_blender_psys_name
+import xml.etree.ElementTree as ET
+from .names import generate_group_name, generate_paction_name
 from .features import W3DFeature
-from .validators import ValidPyString, ReferenceValidator, IsNumeric, IsInteger
+from .validators import ValidPyString, ReferenceValidator, IsNumeric,\
+    IsInteger, FeatureValidator, OptionValidator, ListValidator
+from .errors import BadW3DXML
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
@@ -93,7 +96,7 @@ class W3DPDomain(W3DFeature):
     def toXML(self, parent_root):
         """Store W3DPDomain as ParticleDomain node within parent node"""
         domain_node = ET.SubElement(parent_root, "ParticleDomain")
-        geom_node = ET.SubElement(domain_class, self["type"])
+        geom_node = ET.SubElement(domain_node, self["type"])
         for key in self:
             if key != "type":
                 try:
@@ -106,62 +109,244 @@ class W3DPDomain(W3DFeature):
 
     def generate_logic(self):
         if self["type"] == "Point":
-            return "return {}".format(self["point"])
+            return "    return {}".format(self["point"])
+        if self["type"] == "Line":
+            return """
+    line_vec = (
+        mathutils.Vector({}) - mathutils.Vector({})
+    )
+    while True:
+        yield random.random()*line_vec
+            """.format(self["p2"], self["p1"])
+
+
+class W3DPAction(W3DFeature):
+    """Represents the actions for a particle system
+    """
+
+    argument_validators = {
+        "name": ValidPyString(),
+        "source_domain": FeatureValidator(W3DPDomain),
+        "velocity_domain": FeatureValidator(W3DPDomain),
+        "rate": IsInteger(min_value=1)
+    }
+
+    default_arguments = {
+    }
+
+    logic_template = """
+import bge
+rate = max(int(bge.logic.getLogicTicRate()/{spec_rate}), 1)
+
+def get_source_vector():
+{source_domain_logic}
+
+def get_velocity_vector():
+{velocity_domain_logic}
+    """
+
+    @classmethod
+    def fromXML(paction_class, paction_root):
+        """Create W3DPAction from ParticleActionList root"""
+        paction = paction_class()
+        paction["name"] = paction_root["name"]
+
+        source_root = paction_root.find("Source")
+        if source_root is None:
+            raise BadW3DXML("ParticleActionList must have Source subelement")
+        try:
+            paction["rate"] = int(source_root["rate"])
+        except KeyError:
+            raise BadW3DXML("Source must specify rate attribute")
+        source_domain_root = source_root.find("ParticleDomain")
+        if source_domain_root is None:
+            raise BadW3DXML("Source must have ParticleDomain subelement")
+        paction["source_domain"] = W3DPDomain.fromXML(source_domain_root)
+
+        vel_root = paction_root.find("Vel")
+        if vel_root is None:
+            raise BadW3DXML("ParticleActionList must have Vel subelement")
+        vel_domain_root = vel_root.find("ParticleDomain")
+        if vel_domain_root is None:
+            raise BadW3DXML("Vel must have ParticleDomain subelement")
+        paction["velocity_domain"] = W3DPDomain.fromXML(vel_domain_root)
+        return paction
+
+    def toXML(self, parent_root):
+        """Store W3DPAction as ParticleActionList node within
+        ParticleActionRoot node"""
+        paction_node = ET.SubElement(parent_root, "ParticleActionList")
+        paction_node["name"] = self["name"]
+
+        source_node = ET.SubElement(paction_node, "Source")
+        source_node["rate"] = str(self["rate"])
+        self["source_domain"].toXML(source_node)
+
+        vel_node = ET.SubElement(paction_node, "Vel")
+        self["velocity_domain"].toXML(vel_node)
+
+    def generate_logic(self):
+        return self.template.format(
+            spec_rate=self["rate"],
+            source_domain_logic=self["source_domain"].generate_logic(),
+            velocity_domain_logic=self["velocity_domain"].generate_logic()
+        )
+
+    def blend(self):
+        """Create representation of W3DPSys in Blender"""
+        paction_name = generate_paction_name(self["name"])
+        bpy.data.texts.new(paction_name)
+        script = bpy.data.texts[paction_name]
+        script.write(self.generate_logic())
+
+        return script
 
 
 class W3DPSys(W3DFeature):
     """Represents a particle system in virtual space
 
-    Particle systems are specified primarily by two objects: the source object
-    and particle object. The source object specifies the region in which
-    particles for the particle system are created. The particle object
-    specifies what these particles look like. Thus, if one wanted to create a
-    particle system with copies of an image exploding outward from a W-shaped
-    region, one could specify a W3DText object as the source and a W3DImage
-    object as the particle.
-
-    :param str name: The name of this particle system
-    :param str source_name: The name of the source object for this particle
-    system
-    :param str particle_name: The name of the object to use as the particle
-    model for this system
+    :param str particle_group: The name of the group of objects to use as
+    particles in this system
     """
 
     argument_validators = {
-        "name": ValidPyString(),
-        "source": FeatureValidator(W3DPDomain),
         "particle_group": ReferenceValidator(
             ValidPyString(),
             ["group"],
             help_string="Must be the name of an object group"
         ),
-        "number": IsInteger(min_value=1),
-        "velocity": IsNumeric(min_value=0)
+        "particle_actions": ValidPyString(
+            help_string="Must be the name of a defined particle action set"),
+        "max_particles": IsInteger(min_value=1),
+        "max_age": IsInteger(min_value=0),
+        "speed": IsNumeric(min_value=0)
     }
     default_arguments = {
-        "number": 100,
-        "velocity": 1
+        "max_particles": 100,
+        "max_age": 1,
+        "speed": 1.0
     }
+    logic_template = """
+import mathutils
+import random
+from group_defs import *
+import bge
+from {particle_actions} import get_source_vector, get_velocity_vector, rate
+
+
+def get_particle_template():
+    return random.choice({group_name})
+
+
+def activate_particles(cont):
+    scene = bge.logic.getCurrentScene()
+    own = cont.owner
+    try:
+        particle_count = own["particle_count"]
+    except KeyError:
+        own["particle_count"] = 0
+        own["particle_tick"] = 0
+
+    max_age = bge.logic.getLogicTicRate()*{max_age}
+
+    if (
+            own["particle_tick"] % rate == 0 and
+            particle_count < {max_particles}):
+        new_particle = scene.addObject(
+            get_particle_template(),
+            own.name,
+            {max_age}
+        )
+        own["particle_count"] += 1
+        new_particle.color = own.color
+        new_particle.setLinearVelocity(get_velocity_vector())
+        new_particle.worldPosition = own.worldPosition + get_source_vector()
+
+    own["particle_tick"] += 1
+
+    if (
+            {max_age} and own["particle_tick"] % {max_age} == 0):
+        own["particle_count"] += -1
+    """
+
+    @classmethod
+    def fromXML(psys_class, psys_root):
+        """Create W3DPSys from ParticleSystem root"""
+        psys = psys_class()
+        try:
+            psys["particle_group"] = psys_root["particle-group"]
+        except KeyError:
+            raise BadW3DXML("ParticleSystem must specify particle-group")
+        try:
+            psys["particle_actions"] = psys_root["actions-name"]
+        except KeyError:
+            raise BadW3DXML("ParticleSystem must specify actions-name")
+        try:
+            psys["max_particles"] = psys_root["max-particles"]
+        except KeyError:
+            pass
+        try:
+            psys["speed"] = psys_root["speed"]
+        except KeyError:
+            pass
+        return psys
+
+    def toXML(self, parent_root):
+        """Store W3DPSys as ParticleSystem node within Content node"""
+        psys_node = ET.SubElement(parent_root, "ParticleSystem")
+        psys_node["particle-group"] = self["particle_group"]
+        psys_node["actions-name"] = self["particle_actions"]
+        if not self.is_default("max_particles"):
+            psys_node["max-particles"] = self["max_particles"]
+        if not self.is_default("speed"):
+            psys_node["speed"] = self["speed"]
+        return psys_node
 
     def generate_logic(self):
-        pass
+        return self.logic_template.format(
+            particle_actions=generate_paction_name(self["particle_actions"]),
+            group_name=generate_group_name(self["particle_group"]),
+            max_particles=self["max_particles"],
+            max_age=self["max_age"]
+        )
 
     def blend(self):
         """Create representation of W3DPSys in Blender"""
-        source_object_name = generate_blender_object_name(
-            self["source_name"])
-        part_object_name = generate_blender_object_name(
-            self["particle_name"])
-        psys_name = generate_blender_psys_name(self["name"])
+        bpy.ops.object.add(
+            type="EMPTY",
+            layers=[layer == 0 for layer in range(20)]
+        )
+        psys_object = bpy.context.scene.objects.active
 
-        bpy.context.scene.objects.active = bpy.data.objects[
-            source_object_name
-        ]
-        bpy.ops.object.particle_system_add()
-        psys = bpy.data.particles[-1]
-        psys.name = psys_name
-        psys.count = self["number"]
-        psys.render_type = "OBJECT"
-        psys.dupli_object = bpy.data.objects[part_object_name]
-        psys.particle_size = 1
-        psys.normal_factor = self["velocity"]
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=psys_object.name,
+            name="visible_sensor"
+        )
+        psys_object.game.sensors[-1].name = "visible_sensor"
+        visible_sensor = psys_object.game.sensors["visible_sensor"]
+        visible_sensor.property = "visible"
+        visible_sensor.value = True
+        visible_sensor.use_pulse_true_level = True
+
+        psys_name = "psys0"
+        psys_index = 0
+        while psys_name in bpy.data.texts:
+            psys_name = "psys{}".format(psys_index)
+
+        bpy.data.texts.new(psys_name)
+        script = bpy.data.texts[psys_name]
+
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=psys_name,
+            name="activate_particles"
+        )
+        controller = psys_object.game.controllers["activate_particles"]
+        controller.mode = "MODULE"
+        controller.module = "{}.activate_particles".format(psys_name)
+        controller.link(visible_sensor)
+
+        script.write(self.generate_logic())
+
+        return psys_object

@@ -43,6 +43,11 @@ def generate_blender_psys_name(string):
     return "psys_{}".format(string)
 
 
+def generate_paction_name(string):
+    """Generate name used for Blender particle system actions"""
+    return "paction_{}".format(string)
+
+
 def generate_trigger_name(string):
     """Generate name used for Blender trigger"""
     return "trigger_{}".format(string)
@@ -66,6 +71,7 @@ def generate_group_name(string):
 def generate_relative_to_name(string):
     """Generate name used for relative_to objects"""
     return "relative_to_{}".format(string)
+
 
 def generate_light_object_name(string):
     """Generate name used for light objects"""
