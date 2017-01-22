@@ -215,8 +215,7 @@ class W3DPSys(W3DFeature):
             ["group"],
             help_string="Must be the name of an object group"
         ),
-        "particle_actions": ValidPyString(
-            help_string="Must be the name of a defined particle action set"),
+        "particle_actions": ValidPyString(),
         "max_particles": IsInteger(min_value=1),
         "max_age": IsInteger(min_value=0),
         "speed": IsNumeric(min_value=0)

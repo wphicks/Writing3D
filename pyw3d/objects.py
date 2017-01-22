@@ -942,8 +942,8 @@ class W3DObject(W3DFeature):
             actuator.pitch = central_actuator.pitch
             actuator.volume = central_actuator.volume
 
-        bpy.ops.object.game_property_new(name="visible", type='BOOLEAN')
-        blender_object.game.properties["visible"] = self["visible"]
+        bpy.ops.object.game_property_new(name="visible", type='BOOL')
+        blender_object.game.properties["visible"].value = self["visible"]
 
         return blender_object
 

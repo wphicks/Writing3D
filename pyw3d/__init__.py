@@ -75,8 +75,9 @@ from . import groups
 
 from .features import W3DFeature
 from .project import W3DProject
+from .psys import W3DPSys, W3DPAction
 from .objects import W3DObject, W3DLink, W3DContent, W3DText, W3DImage, \
-    W3DStereoImage, W3DModel, W3DLight, W3DPSys, W3DShape
+    W3DStereoImage, W3DModel, W3DLight, W3DShape
 from .psys import W3DPSys
 from .timeline import W3DTimeline
 from .placement import W3DPlacement, W3DRotation, convert_to_blender_axes, \
