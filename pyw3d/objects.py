@@ -897,6 +897,10 @@ class W3DObject(W3DFeature):
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
         self["placement"].place(blender_object)
+        blender_object.select = True
+        bpy.context.scene.objects.active = blender_object
+        bpy.ops.object.game_property_new(type='BOOL', name="visible")
+        blender_object.game.properties["visible"].value = self["visible"]
         # TODO: Apply link
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
@@ -941,9 +945,6 @@ class W3DObject(W3DFeature):
             actuator.mode = central_actuator.mode
             actuator.pitch = central_actuator.pitch
             actuator.volume = central_actuator.volume
-
-        bpy.ops.object.game_property_new(name="visible", type='BOOL')
-        blender_object.game.properties["visible"].value = self["visible"]
 
         return blender_object
 
