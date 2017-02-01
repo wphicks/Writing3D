@@ -251,7 +251,7 @@ class BlenderInstaller(object):
         else:
             with zipfile.ZipFile(self.archive_name) as install_file:
                 self.blender_directory = os.path.splitext(self.archive_name)[0]
-                if self.platform in ("Mac,"):
+                if self.platform in ("Mac",):
                     install_file.extractall(path=self.blender_directory)
                 else:
                     install_file.extractall(path=self.install_directory)
@@ -404,7 +404,7 @@ class CustomInstall(distutils.command.install.install):
 if __name__ == "__main__":
     setup(
         name="Writing3D",
-        version="0.0.3",
+        version="0.1.0",
         author="William Hicks",
         author_email="william_hicks@alumni.brown.edu",
         description="A program for creating literary and artistic VR projects",

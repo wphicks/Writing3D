@@ -26,7 +26,7 @@ log_handler.setFormatter(
     logging.Formatter('%(asctime)-15s %(levelname)8s %(name)s %(message)s')
 )
 LOGGER.addHandler(log_handler)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.WARNING)
 
 
 class W3DConfigError(Exception):

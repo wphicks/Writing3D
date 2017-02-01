@@ -185,6 +185,14 @@ class W3DProject(W3DFeature):
         "debug": False
     }
 
+    def __setitem__(self, key, value):
+        if key == "debug":
+            if value:
+                LOGGER.setLevel(logging.DEBUG)
+            else:
+                LOGGER.setLevel(logging.WARNING)
+        super().__setitem__(key, value)
+
     def __init__(self, *args, **kwargs):
         self.call_directory = kwargs.pop("call_directory", None)
         if self.call_directory is None:
