@@ -47,6 +47,9 @@ class W3DFeature(dict):
     default_arguments = {}
     blender_scaling = 1
 
+    def __repr__(self):
+        return "< {}: {} >".format(type(self).__name__, super().__repr__())
+
     def __init__(self, *args, **kwargs):
         super(W3DFeature, self).__init__()
         self.update(args)

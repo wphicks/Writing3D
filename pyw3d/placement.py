@@ -25,6 +25,7 @@ from .errors import BadW3DXML, ConsistencyError
 from .xml_tools import text2tuple
 from .names import generate_relative_to_name
 import logging
+LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
     import mathutils
@@ -245,7 +246,10 @@ class W3DPlacement(W3DFeature):
                 "FloorWall": (-math.pi / 2, 0, 0)}):
         """Create Blender objects corresponding to relative_to options if
         necessary"""
-        if len(self.relative_to_objects) != len(
+        LOGGER.debug("***************************Relative objs: {}".format(
+            self.relative_to_objects)
+        )
+        if len(self.relative_to_objects) < len(
                 self.argument_validators["relative_to"].valid_options) - 1:
             for wall_name, position in wall_positions.items():
                 bpy.ops.object.add(

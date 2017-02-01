@@ -76,3 +76,8 @@ def generate_relative_to_name(string):
 def generate_light_object_name(string):
     """Generate name used for light objects"""
     return "light_object_{}".format(string)
+
+
+def generate_blender_particle_name(string):
+    """Generate name used for particle copies of objects"""
+    return "particle_{}".format(string)

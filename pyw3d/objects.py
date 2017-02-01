@@ -29,10 +29,11 @@ from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
 from .placement import W3DPlacement
 from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
     ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
-    TextValidator, ValidFile
+    TextValidator, ValidFile, ReferenceValidator
 from .names import generate_blender_object_name,\
     generate_blender_material_name, generate_blender_sound_name,\
-    generate_light_object_name
+    generate_light_object_name, generate_paction_name, generate_group_name, \
+    generate_blender_particle_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
 from .sounds import audio_playback_object
@@ -99,7 +100,7 @@ class W3DLink(W3DFeature):
             "W3DActions"
         ),
         "reset": IsInteger()
-        }
+    }
 
     default_arguments = {
         "enabled": True,
@@ -146,8 +147,8 @@ class W3DLink(W3DFeature):
                         attrib={
                             "num_clicks": str(clicks),
                             "reset": bool2text(self["reset"] == clicks)
-                            }
-                        )
+                        }
+                    )
 
         return linkroot_node
 
@@ -253,7 +254,7 @@ class W3DContent(W3DFeature, metaclass=SubRegisteredClass):
         if content_root.find("Light") is not None:
             return W3DLight.fromXML(content_root)
         if content_root.find("ParticleSystem") is not None:
-            return None  # TODO
+            return W3DPSys.fromXML(content_root)
         raise BadW3DXML("No known child node found in Content node")
 
 
@@ -308,24 +309,27 @@ class W3DShape(W3DContent):
                 shape_root.attrib["shape_type"])
         if "depth" in shape_root.attrib:
             new_shape["depth"] = numberValidator.coerce(
-                    shape_root.attrib["depth"])
+                shape_root.attrib["depth"])
         return new_shape
 
     def blend(self):
         if self["shape_type"] == "Sphere":
-            bpy.ops.mesh.primitive_uv_sphere_add(size = self["radius"])
+            bpy.ops.mesh.primitive_uv_sphere_add(size=self["radius"])
         elif self["shape_type"] == "Cube":
-            bpy.ops.mesh.primitive_cube_add(radius = self["radius"])
+            bpy.ops.mesh.primitive_cube_add(radius=self["radius"])
         elif self["shape_type"] == "Cone":
-            bpy.ops.mesh.primitive_cone_add(radius1 = self["radius"], depth = self["depth"])
+            bpy.ops.mesh.primitive_cone_add(
+                radius1=self["radius"], depth=self["depth"])
         elif self["shape_type"] == "Cylinder":
-            bpy.ops.mesh.primitive_cylinder_add(radius = self["radius"], depth=self["depth"])
+            bpy.ops.mesh.primitive_cylinder_add(
+                radius=self["radius"], depth=self["depth"])
         elif self["shape_type"] == "Monkey":
-            bpy.ops.mesh.primitive_monkey_add(radius = self["radius"])
+            bpy.ops.mesh.primitive_monkey_add(radius=self["radius"])
 
         new_shape_object = bpy.context.object
-        
+
         return new_shape_object
+
 
 class W3DText(W3DContent):
     """Represents text in virtual space
@@ -366,7 +370,7 @@ class W3DText(W3DContent):
         attrib = {
             "horiz-align": self["halign"],
             "vert-align": self["valign"],
-            "depth": str(self["depth"]/self.blender_depth_scaling)
+            "depth": str(self["depth"] / self.blender_depth_scaling)
         }
         if not self.is_default("font"):
             attrib["font"] = self["font"]
@@ -408,7 +412,7 @@ class W3DText(W3DContent):
 
     def blend(self):
         """Create representation of W3DText in Blender"""
-        bpy.ops.object.text_add(rotation=(math.pi/2, 0, 0))
+        bpy.ops.object.text_add(rotation=(math.pi / 2, 0, 0))
         new_text_object = bpy.context.object
         new_text_object.data.body = self["text"]
         # TODO: Get proper font directory
@@ -418,7 +422,7 @@ class W3DText(W3DContent):
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
         if self["valign"] == "center":
-            new_text_object.data.offset_y = -new_text_object.dimensions[1]/2
+            new_text_object.data.offset_y = -new_text_object.dimensions[1] / 2
         elif self["valign"] == "bottom":
             new_text_object.data.offset_y = -new_text_object.dimensions[1]
         new_text_object.select = True
@@ -445,8 +449,8 @@ class W3DImage(W3DContent):
         ET.SubElement(
             content_root, "Image", attrib={
                 "filename": self["filename"]
-                }
-            )
+            }
+        )
         return content_root
 
     @classmethod
@@ -468,7 +472,7 @@ class W3DImage(W3DContent):
 
     def blend(self):
         """Create representation of W3DImage in Blender"""
-        bpy.ops.mesh.primitive_plane_add(rotation=(math.pi/2, 0, 0))
+        bpy.ops.mesh.primitive_plane_add(rotation=(math.pi / 2, 0, 0))
         bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
 
@@ -508,8 +512,8 @@ class W3DStereoImage(W3DContent):
             content_root, "StereoImage", attrib={
                 "left_file": self["left-image"],
                 "right_file": self["right-image"]
-                }
-            )
+            }
+        )
         return content_root
 
     @classmethod
@@ -552,7 +556,7 @@ class W3DModel(W3DContent):
 
     default_arguments = {
         "check_collisions": False
-        }
+    }
 
     def toXML(self, object_root):
         """Store W3DModel as Content node within Object node
@@ -564,8 +568,8 @@ class W3DModel(W3DContent):
             content_root, "Model", attrib={
                 "filename": self["filename"],
                 "check-collisions": bool2text(self["check_collisions"])
-                }
-            )
+            }
+        )
         return content_root
 
     @classmethod
@@ -663,7 +667,7 @@ class W3DLight(W3DContent):
         """
         new_light = light_class()
         light_root = content_root.find("Light")
-        
+
         if light_root is not None:
             if "diffuse" in light_root.attrib:
                 new_light["diffuse"] = text2bool(light_root.attrib["diffuse"])
@@ -696,7 +700,7 @@ class W3DLight(W3DContent):
         }
         bpy.ops.object.lamp_add(
             type=light_type_conversion[self["light_type"]],
-            rotation=(-math.pi/2, 0, 0)
+            rotation=(-math.pi / 2, 0, 0)
         )
         # TODO: Why isn't the following working?
         # bpy.ops.object.transform_apply(rotation=True)
@@ -704,7 +708,7 @@ class W3DLight(W3DContent):
         new_light_object.data.use_diffuse = self["diffuse"]
         new_light_object.data.use_specular = self["specular"]
         new_light_object.data.energy = (
-            new_light_object.data.energy/self["attenuation"][0]
+            new_light_object.data.energy / self["attenuation"][0]
         )
         if self["light_type"] != "Directional":
             new_light_object.data.falloff_type = "LINEAR_QUADRATIC_WEIGHTED"
@@ -718,7 +722,7 @@ class W3DLight(W3DContent):
         # suspect, as is the distance.
         if self["light_type"] == "Spot":
             new_light_object.data.spot_size = math.radians(self["angle"])
-         
+
         return new_light_object
 
 
@@ -740,9 +744,11 @@ class W3DObject(W3DFeature):
     W3DStereoImage, W3DModel, W3DLight, W3DPSys
     """
 
-    ui_order = ["name", "placement", "scale", "visible", "lighting", "color",
-        "click_through", "around_own_axis", "content"]
-    #TODO: Add sound
+    ui_order = [
+        "name", "placement", "scale", "visible", "lighting", "color",
+        "click_through", "around_own_axis", "content"
+    ]
+    # TODO: Add sound
     argument_validators = {
         "name": ValidPyString(),
         "placement": FeatureValidator(
@@ -755,10 +761,10 @@ class W3DObject(W3DFeature):
             IsInteger(min_value=0, max_value=255), required_length=3),
         "double_sided": IsBoolean(),
         "visible": IsBoolean(),
-        "lighting":  IsBoolean(),
+        "lighting": IsBoolean(),
         "scale": IsNumeric(min_value=0),
-        "click_through":  IsBoolean(),
-        "around_own_axis":  IsBoolean(),
+        "click_through": IsBoolean(),
+        "around_own_axis": IsBoolean(),
         "sound": TextValidator(),  # TODO: FIX THIS
         "content": FeatureValidator(W3DContent)}
 
@@ -772,7 +778,7 @@ class W3DObject(W3DFeature):
         "around_own_axis": False,
         "sound": None,
         "double_sided": True
-        }
+    }
 
     def __init__(self, *args, **kwargs):
         super(W3DObject, self).__init__(*args, **kwargs)
@@ -880,13 +886,13 @@ class W3DObject(W3DFeature):
         blender_object.active_material.use_object_color = True
         blender_object.active_material.game_settings.use_backface_culling = (
             not self["double_sided"])
-        color = [channel/255.0 for channel in self["color"]]
+        color = [channel / 255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
         blender_object.color = color
         return blender_object
 
     def apply_lamp_color(self, new_light_object):
-        color = [channel/255.0 for channel in self["color"]]
+        color = [channel / 255.0 for channel in self["color"]]
         bpy.data.lamps[new_light_object.name].color = color
         return new_light_object
 
@@ -897,10 +903,26 @@ class W3DObject(W3DFeature):
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
         self["placement"].place(blender_object)
+        for object_ in bpy.context.selectable_objects:
+            object_.select = False
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
-        bpy.ops.object.game_property_new(type='BOOL', name="visible")
-        blender_object.game.properties["visible"].value = self["visible"]
+        particle_name = generate_blender_particle_name(blender_object.name)
+        bpy.ops.object.duplicate(
+            linked=False
+        )
+        bpy.data.objects[
+            "{}.001".format(blender_object.name)].name = particle_name
+        bpy.data.objects[particle_name].layers = [
+            layer == 5 for layer in range(20)
+        ]
+        bpy.data.objects[particle_name].game.physics_type = 'DYNAMIC'
+
+        blender_object.select = True
+        bpy.context.scene.objects.active = blender_object
+
+        bpy.ops.object.game_property_new(type='BOOL', name="visible_tag")
+        blender_object.game.properties["visible_tag"].value = self["visible"]
         # TODO: Apply link
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
@@ -956,3 +978,166 @@ class W3DObject(W3DFeature):
             LOGGER.debug(
                 "blend() method must be called before write_blender_logic()")
             return None
+
+
+class W3DPSys(W3DContent):
+    """Represents a particle system in virtual space
+
+    :param str particle_group: The name of the group of objects to use as
+    particles in this system
+    """
+
+    argument_validators = {
+        "particle_group": ReferenceValidator(
+            ValidPyString(),
+            ["group"],
+            help_string="Must be the name of an object group"
+        ),
+        "particle_actions": ValidPyString(),
+        "max_particles": IsInteger(min_value=1),
+        "max_age": IsInteger(min_value=0),
+        "speed": IsNumeric(min_value=0)
+    }
+    default_arguments = {
+        "max_particles": 100,
+        "max_age": 1,
+        "speed": 1.0
+    }
+    logic_template = """
+import mathutils
+import random
+from group_defs import *
+import bge
+from w3d_settings import *
+from {particle_actions} import get_source_vector, get_velocity_vector, rate
+
+
+def get_particle_template():
+    W3D_LOG.debug('Getting particle')
+    return "particle_{{}}".format(random.choice({group_name}))
+
+
+def activate_particles(cont):
+    scene = bge.logic.getCurrentScene()
+    own = cont.owner
+    try:
+        particle_count = own["particle_count"]
+    except KeyError:
+        own["particle_count"] = 0
+        own["particle_tick"] = 0
+        particle_count = 0
+
+    max_age = bge.logic.getLogicTicRate()*{max_age}
+
+    if (
+            own["particle_tick"] % rate == 0 and
+            particle_count < {max_particles}):
+        new_particle = scene.addObject(
+            get_particle_template(),
+            own.name,
+            {max_age}
+        )
+        W3D_LOG.debug('Particle generated')
+        own["particle_count"] += 1
+        new_particle.visible = True
+        new_particle.setLinearVelocity({speed}*get_velocity_vector())
+        new_particle.worldPosition = (
+            own.worldPosition + get_source_vector()
+        )
+        W3D_LOG.debug("Position: {{}}".format(new_particle.worldPosition))
+        W3D_LOG.debug("Parent: {{}}".format(new_particle.parent))
+        W3D_LOG.debug("Velocity: {{}}".format(new_particle.linearVelocity))
+
+    own["particle_tick"] += 1
+
+    if (
+            {max_age} and own["particle_tick"] % {max_age} == 0):
+        own["particle_count"] += -1
+    """
+
+    @classmethod
+    def fromXML(psys_class, psys_root):
+        """Create W3DPSys from ParticleSystem root"""
+        psys = psys_class()
+        try:
+            psys["particle_group"] = psys_root["particle-group"]
+        except KeyError:
+            raise BadW3DXML("ParticleSystem must specify particle-group")
+        try:
+            psys["particle_actions"] = psys_root["actions-name"]
+        except KeyError:
+            raise BadW3DXML("ParticleSystem must specify actions-name")
+        try:
+            psys["max_particles"] = psys_root["max-particles"]
+        except KeyError:
+            pass
+        try:
+            psys["speed"] = psys_root["speed"]
+        except KeyError:
+            pass
+        return psys
+
+    def toXML(self, parent_root):
+        """Store W3DPSys as ParticleSystem node within Content node"""
+        psys_node = ET.SubElement(parent_root, "ParticleSystem")
+        psys_node["particle-group"] = self["particle_group"]
+        psys_node["actions-name"] = self["particle_actions"]
+        if not self.is_default("max_particles"):
+            psys_node["max-particles"] = self["max_particles"]
+        if not self.is_default("speed"):
+            psys_node["speed"] = self["speed"]
+        return psys_node
+
+    def generate_logic(self):
+        return self.logic_template.format(
+            particle_actions=generate_paction_name(self["particle_actions"]),
+            group_name=generate_group_name(self["particle_group"]),
+            max_particles=self["max_particles"],
+            max_age=self["max_age"],
+            speed=self["speed"]
+        )
+
+    def blend(self):
+        """Create representation of W3DPSys in Blender"""
+        bpy.ops.object.add(
+            type="EMPTY",
+            layers=[layer == 0 for layer in range(20)]
+        )
+        psys_object = bpy.context.scene.objects.active
+
+        bpy.ops.logic.sensor_add(
+            type="PROPERTY",
+            object=psys_object.name,
+            name="visible_sensor"
+        )
+        psys_object.game.sensors[-1].name = "visible_sensor"
+        visible_sensor = psys_object.game.sensors["visible_sensor"]
+        visible_sensor.property = "visible_tag"
+        visible_sensor.value = "True"
+        visible_sensor.use_pulse_true_level = True
+
+        psys_name = "psys0"
+        psys_index = 0
+        psys_module = "{}.py".format(psys_name)
+        while psys_module in bpy.data.texts:
+            psys_name = "psys{}".format(psys_index)
+            psys_module = "{}.py".format(psys_name)
+
+        bpy.data.texts.new(psys_module)
+        script = bpy.data.texts[psys_module]
+
+        bpy.context.scene.objects.active = psys_object
+        bpy.ops.logic.controller_add(
+            type='PYTHON',
+            object=psys_object.name,
+            name="activate_particles"
+        )
+        psys_object.game.controllers[-1].name = "activate_particles"
+        controller = psys_object.game.controllers["activate_particles"]
+        controller.mode = "MODULE"
+        controller.module = "{}.activate_particles".format(psys_name)
+        controller.link(visible_sensor)
+
+        script.write(self.generate_logic())
+
+        return psys_object
