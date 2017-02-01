@@ -246,9 +246,6 @@ class W3DPlacement(W3DFeature):
                 "FloorWall": (-math.pi / 2, 0, 0)}):
         """Create Blender objects corresponding to relative_to options if
         necessary"""
-        LOGGER.debug("***************************Relative objs: {}".format(
-            self.relative_to_objects)
-        )
         if len(self.relative_to_objects) < len(
                 self.argument_validators["relative_to"].valid_options) - 1:
             for wall_name, position in wall_positions.items():

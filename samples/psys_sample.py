@@ -31,7 +31,8 @@ from pyw3d import project, objects, placement, export_to_blender,\
 my_project = project.W3DProject(
     allow_movement=True)
 
-# Next, let's create two simple text objects that will be emitted by our system
+# Next, let's create three simple text objects that will be emitted by our
+# system
 particles = []
 for index, char in enumerate(["W", "3", "D"]):
     particles.append(
@@ -41,7 +42,7 @@ for index, char in enumerate(["W", "3", "D"]):
             content=objects.W3DText(  # Specify that this is a text object
                 text=char
             ),
-            visible=True  # This object needn't be visible.
+            visible=False  # This object needn't be visible.
         )
     )
 # Now add these objects to the project
@@ -76,7 +77,9 @@ my_project["particle_actions"].append(
 my_project["objects"].append(
     objects.W3DObject(
         name="system",
-        placement=placement.W3DPlacement(),
+        placement=placement.W3DPlacement(
+            position=(0, 8, 0)
+        ),
         content=objects.W3DPSys(
             particle_group="particles",
             max_particles=100,

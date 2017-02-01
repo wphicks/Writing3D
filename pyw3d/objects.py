@@ -108,7 +108,7 @@ class W3DLink(W3DFeature):
         "enabled_color": (0, 128, 255),
         "selected_color": (255, 0, 0),
         "reset": -1
-        }
+    }
 
     def __init__(self, *args, **kwargs):
         super(W3DLink, self).__init__(*args, **kwargs)
@@ -903,6 +903,8 @@ class W3DObject(W3DFeature):
         blender_object.hide_render = not self["visible"]
         blender_object.scale = [self["scale"], ] * 3
         self["placement"].place(blender_object)
+        LOGGER.debug("Object: {}".format(blender_object.name))
+        LOGGER.debug("Position: {}".format(blender_object.location))
         for object_ in bpy.context.selectable_objects:
             object_.select = False
         blender_object.select = True
@@ -1013,7 +1015,6 @@ from {particle_actions} import get_source_vector, get_velocity_vector, rate
 
 
 def get_particle_template():
-    W3D_LOG.debug('Getting particle')
     return "particle_{{}}".format(random.choice({group_name}))
 
 
@@ -1035,18 +1036,20 @@ def activate_particles(cont):
         new_particle = scene.addObject(
             get_particle_template(),
             own.name,
-            {max_age}
+            int({max_age}*bge.logic.getLogicTicRate())
         )
-        W3D_LOG.debug('Particle generated')
         own["particle_count"] += 1
         new_particle.visible = True
         new_particle.setLinearVelocity({speed}*get_velocity_vector())
         new_particle.worldPosition = (
             own.worldPosition + get_source_vector()
         )
-        W3D_LOG.debug("Position: {{}}".format(new_particle.worldPosition))
-        W3D_LOG.debug("Parent: {{}}".format(new_particle.parent))
-        W3D_LOG.debug("Velocity: {{}}".format(new_particle.linearVelocity))
+        W3D_LOG.debug("System position: {{}}".format(
+            own.worldPosition)
+        )
+        W3D_LOG.debug("Particle position: {{}}".format(
+            new_particle.worldPosition)
+        )
 
     own["particle_tick"] += 1
 
@@ -1139,5 +1142,7 @@ def activate_particles(cont):
         controller.link(visible_sensor)
 
         script.write(self.generate_logic())
+
+        LOGGER.debug("Particle system created")
 
         return psys_object

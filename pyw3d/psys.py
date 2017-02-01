@@ -79,6 +79,12 @@ class W3DPDomain(W3DFeature):
         "stdev": IsNumeric(min_value=0),
     }
 
+    default_arguments = {
+        "radius": 1,
+        "center": (0, 0, 0),
+        "radius-inner": 0
+    }
+
     @classmethod
     def fromXML(domain_class, domain_root):
         """Create W3DPDomain from ParticleDomain root"""
@@ -111,16 +117,35 @@ class W3DPDomain(W3DFeature):
         if self["type"] == "Point":
             return """
     while True:
-        yield {}
+        yield mathutils.Vector({})
         """.format(self["point"])
         if self["type"] == "Line":
             return """
     line_vec = (
-        mathutils.Vector({}) - mathutils.Vector({})
+        mathutils.Vector({p2}) - mathutils.Vector({p1})
     )
     while True:
-        yield random.random()*line_vec
-            """.format(self["p2"], self["p1"])
+        yield mathutils.Vector({p1}) + random.random()*line_vec
+            """.format(p2=self["p2"], p1=self["p1"])
+
+        # if self["type"] == "Sphere":
+        else:
+            return """
+    while True:
+        radius = random.uniform({radius_inner}, {radius})
+        phi = random.uniform(0, 2*math.pi)
+        theta = random.uniform(0, math.pi)
+        vel_vec = mathutils.Vector(
+            (
+                radius*math.sin(theta)*math.cos(phi),
+                radius*math.sin(theta)*math.sin(phi),
+                radius*math.cos(theta)
+            )
+        )
+        yield vel_vec
+            """.format(
+                radius_inner=self["radius-inner"], radius=self["radius"]
+            )
 
 
 class W3DPAction(W3DFeature):
@@ -142,6 +167,7 @@ class W3DPAction(W3DFeature):
 import bge
 import mathutils
 import random
+import math
 import logging
 W3D_LOG = logging.getLogger('W3D')
 rate = max(int(bge.logic.getLogicTicRate()/{spec_rate}), 1)
@@ -152,7 +178,7 @@ def _get_source_vector():
 _source_gen = _get_source_vector()
 
 def get_source_vector():
-    W3D_LOG.debug("Getting source vector")
+    W3D_LOG.debug("Getting source vector...")
     return next(_source_gen)
 
 def _get_velocity_vector():
@@ -161,8 +187,8 @@ def _get_velocity_vector():
 _vel_gen = _get_velocity_vector()
 
 def get_velocity_vector():
-    W3D_LOG.debug("Getting velocity vector")
-    return next(_source_gen)
+    W3D_LOG.debug("Getting velocity vector...")
+    return next(_vel_gen)
     """
 
     @classmethod
