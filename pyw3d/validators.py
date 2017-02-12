@@ -105,6 +105,14 @@ class ValidFile(Validator):
         self.def_value = ""
 
     def __call__(self, value):
+        try:
+            self.help_string = "Could not find file {}".format(
+                os.path.abspath(value)
+            )
+        except:
+            self.help_string = "Could not find file {}".format(
+                value
+            )
         return os.path.isfile(value)
 
     def __repr__(self):

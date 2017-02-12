@@ -71,7 +71,9 @@ class W3DFeature(dict):
                     "{} is not a valid value for option {}".format(value, key))
         if not self.argument_validators[key](value):
             raise InvalidArgument(
-                "{} is not a valid value for option {}".format(value, key))
+                "{} is not a valid value for option {}\nAdditional Info: "
+                "{}".format(
+                    value, key, self.argument_validators[key].help_string))
         super(W3DFeature, self).__setitem__(key, value)
 
     def __missing__(self, key):
