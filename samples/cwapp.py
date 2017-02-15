@@ -38,21 +38,27 @@ Unix-based systems, this can be done from terminal via::
 
 import argparse
 import os
+import sys
+home_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(home_dir, os.pardir)))
+
 from pyw3d import project, export_to_blender
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config", choices=["desktop", "desktopfull"], help="run configuration")
     parser.add_argument("project_file")
-    args = parser.parse_args()
+    if "blender" in sys.argv[0]:
+        args = parser.parse_args(sys.argv[4:])
+    else:
+        args = parser.parse_args()
 
     # It's as simple as loading the project...
     my_project = project.W3DProject.fromXML_file(args.project_file)
-    blend_filename = ".".join([
-        os.path.splitext(args.project_file)[0],
-        "blend"]
-    )
+    blend_filename = "run.blend"
+
     # ...and exporting it!
     export_to_blender(
         my_project, filename=blend_filename, display=True,
