@@ -42,9 +42,10 @@ W3D_CONFIG_FILENAME = os.path.join(
 )
 try:
     with open(W3D_CONFIG_FILENAME) as w3d_config_file:
+        print("W3D Configuration loaded from {}".format(W3D_CONFIG_FILENAME))
         W3D_CONFIG = json.load(w3d_config_file)
 except FileNotFoundError:
-    LOGGER.debug("No W3D config file found. Creating default...")
+    print("No W3D config file found. Creating default...")
     W3D_CONFIG = {
         "Blender executable": "blender",
         "Blender player executable": "blenderplayer",

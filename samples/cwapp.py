@@ -42,7 +42,7 @@ import sys
 home_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(home_dir, os.pardir)))
 
-from pyw3d import project, export_to_blender
+from pyw3d import project, export_to_blender, W3D_CONFIG
 
 
 if __name__ == "__main__":
@@ -54,6 +54,8 @@ if __name__ == "__main__":
         args = parser.parse_args(sys.argv[4:])
     else:
         args = parser.parse_args()
+
+    print("Configuration information: ", W3D_CONFIG)
 
     # It's as simple as loading the project...
     my_project = project.W3DProject.fromXML_file(args.project_file)
