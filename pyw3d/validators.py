@@ -123,6 +123,20 @@ class ValidFile(Validator):
         return str(value)
 
 
+class ValidFontFile(ValidFile):
+    def __call__(self, value):
+        if super().__call__(value):
+            return True
+        try:
+            new_value = os.path.join("fonts", value)
+            help_string = self.help_string
+            validity = super().__call__(new_value)
+            self.help_string = help_string
+            return validity
+        except:
+            return False
+
+
 class OptionValidator(Validator):
     """Callable object that returns true if value is in given list of options
     """

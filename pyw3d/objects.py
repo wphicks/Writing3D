@@ -29,7 +29,7 @@ from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
 from .placement import W3DPlacement
 from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
     ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
-    TextValidator, ValidFile, ReferenceValidator
+    TextValidator, ValidFile, ValidFontFile, ReferenceValidator
 from .names import generate_blender_object_name,\
     generate_blender_material_name, generate_blender_sound_name,\
     generate_light_object_name, generate_paction_name, generate_group_name, \
@@ -347,7 +347,7 @@ class W3DText(W3DContent):
             "left", "right", "center"),
         "valign": OptionValidator(
             "top", "center", "bottom"),
-        "font": ValidFile("Filename of font"),
+        "font": ValidFontFile("Filename of font"),
         "depth": IsNumeric()}
 
     default_arguments = {
@@ -417,7 +417,12 @@ class W3DText(W3DContent):
         new_text_object.data.body = self["text"]
         # TODO: Get proper font directory
         if self["font"] is not None:
-            new_text_object.data.font = bpy.data.fonts.load(self["font"])
+            try:
+                new_text_object.data.font = bpy.data.fonts.load(self["font"])
+            except:
+                new_text_object.data.font = bpy.data.fonts.load(
+                    os.path.join("fonts", self["font"])
+                )
         new_text_object.data.extrude = self["depth"]
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
