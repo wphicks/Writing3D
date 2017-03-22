@@ -67,6 +67,8 @@ def display_blender_output(filename="run.blend", fullscreen=False):
     blender_play_call = [BLENDER_PLAY]
     if fullscreen:
         blender_play_call.append("-f")
+    else:
+        blender_play_call.extend(["-w", "768", "432"])
     blender_play_call.append(filename)
     subprocess.call(blender_play_call)
 

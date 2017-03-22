@@ -180,8 +180,8 @@ class W3DProject(W3DFeature):
     default_arguments = {
         "far_clip": 100,
         "background": (0, 0, 0),
-        "allow_movement": False,
-        "allow_rotation": False,
+        "allow_movement": True,
+        "allow_rotation": True,
         "debug": False
     }
 
@@ -218,7 +218,7 @@ class W3DProject(W3DFeature):
                 position=convert_to_blender_axes((0, 0, 6)))
         if "desktop_camera_placement" not in self:
             self["desktop_camera_placement"] = W3DPlacement(
-                position=convert_to_blender_axes((0, 0, 0)))
+                position=convert_to_blender_axes((0, 1.5, 6)))
         # NOTE: This currently does nothing. Need to call
         # _create_relative_to_objects for W3DPlacement in order to change
         # placements
@@ -363,8 +363,7 @@ class W3DProject(W3DFeature):
         place_node = camera_node.find("Placement")
         if camera_node is None:
             raise BadW3DXML("CameraPos node has no Placement child")
-        new_project["desktop_camera_placement"] = W3DPlacement.fromXML(
-            place_node)
+        new_project["camera_placement"] = W3DPlacement.fromXML(place_node)
 
         camera_node = global_root.find("CameraPos")
         if camera_node is None:
@@ -374,7 +373,8 @@ class W3DProject(W3DFeature):
         place_node = camera_node.find("Placement")
         if camera_node is None:
             raise BadW3DXML("CameraPos node has no Placement child")
-        new_project["camera_placement"] = W3DPlacement.fromXML(place_node)
+        new_project["desktop_camera_placement"] = W3DPlacement.fromXML(
+            place_node)
 
         bg_node = global_root.find("Background")
         if bg_node is None:

@@ -20,6 +20,7 @@
 import os
 import json
 import logging
+import platform
 LOGGER = logging.getLogger("pyw3d")
 log_handler = logging.StreamHandler()
 log_handler.setFormatter(
@@ -36,20 +37,59 @@ class W3DConfigError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+
 W3D_CONFIG_FILENAME = os.path.join(
     os.path.expanduser("~"),
     '.w3d.json'
 )
 try:
     with open(W3D_CONFIG_FILENAME) as w3d_config_file:
+        print("W3D Configuration loaded from {}".format(W3D_CONFIG_FILENAME))
         W3D_CONFIG = json.load(w3d_config_file)
 except FileNotFoundError:
-    LOGGER.debug("No W3D config file found. Creating default...")
-    W3D_CONFIG = {
-        "Blender executable": "blender",
-        "Blender player executable": "blenderplayer",
-        "Export script path": "/usr/bin/w3d_export_tools.py"
-    }
+    print("No W3D config file found. Creating default...")
+    base_path = os.path.dirname(__file__)
+    base_path = os.path.abspath(
+        os.path.join(base_path, os.path.pardir, os.path.pardir)
+    )
+    if platform.system() in ("Darwin",):
+        W3D_CONFIG = {
+            "Blender executable": os.path.join(
+                base_path, "blender", "blender.app", "Contents", "MacOS",
+                "blender"
+            ),
+            "Blender player executable": os.path.join(
+                base_path, "blender", "blenderplayer.app", "Contents", "MacOS",
+                "blenderplayer"
+            ),
+            "Export script path": os.path.join(
+                base_path, "Writing3D", "pyw3d", "w3d_export_tools.py"
+            )
+        }
+    elif platform.system() in ("Windows", "cygwin"):
+        W3D_CONFIG = {
+            "Blender executable": os.path.join(
+                base_path, "blender", "blender.exe"
+            ),
+            "Blender player executable": os.path.join(
+                base_path, "blender", "blenderplayer.exe"
+            ),
+            "Export script path": os.path.join(
+                base_path, "Writing3D", "pyw3d", "w3d_export_tools.py"
+            )
+        }
+    else:
+        W3D_CONFIG = {
+            "Blender executable": os.path.join(
+                base_path, "blender", "blender"
+            ),
+            "Blender player executable": os.path.join(
+                base_path, "blender", "blenderplayer"
+            ),
+            "Export script path": os.path.join(
+                base_path, "Writing3D", "pyw3d", "w3d_export_tools.py"
+            )
+        }
     with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
         json.dump(W3D_CONFIG, w3d_config_file)
 
