@@ -105,6 +105,7 @@ class BlenderClickTrigger(BlenderTrigger):
             click_object.game.sensors[-1].name = "mouse_over"
             self.over_sensor = click_object.game.sensors["mouse_over"]
             self.over_sensor.mouse_event = "MOUSEOVER"
+            self.over_sensor.use_pulse_true_level = True
         return (self.click_sensor, self.over_sensor)
 
     def link_detection_bricks(self):
@@ -131,15 +132,23 @@ class BlenderClickTrigger(BlenderTrigger):
             "    own = cont.owner",
             "    mouse_click = cont.sensors['mouse_click']",
             "    mouse_over = own.sensors['mouse_over']",
-            # TODO: Test the above
             "    trigger = scene.objects['{}']".format(self.name),
             "    select_color = {}".format(str(
                 [coord / 255. for coord in self.select_color])),
             "    enable_color = {}".format(str(
                 [coord / 255. for coord in self.enable_color])),
+            "    if (mouse_over.positive):",
+            "        W3D_LOG.debug('Mouse over {}'.format(own.name))",
+            "        W3D_LOG.debug('{} over visibility: {}'.format(own.name, own.visible))",
+            "        W3D_LOG.debug('{} over enabled: {}'.format(own.name, trigger['enabled']))",
+            "    if (mouse_click.positive and trigger['enabled']):",
+            "        W3D_LOG.debug('Mouse click {}'.format(own.name))",
+            "        W3D_LOG.debug('{} click visibility: {}'.format(own.name, own.visible))",
+            "        W3D_LOG.debug('{} click enabled: {}'.format(own.name, trigger['enabled']))",
             "    if (",
             "            mouse_click.positive and mouse_over.positive",
             "            and own.visible):",
+            "        W3D_LOG.debug('Click registered')",
             "        if 'old_color' not in own or own['old_color'] is None:",
             "            own['old_color'] = [coord for coord in own.color]",
             "        new_color = own.color",

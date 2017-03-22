@@ -157,6 +157,11 @@ class MoveAction(object):
             )
         # ...and now take care of object position
         if "position" in self.placement:
+            script_text.extend([
+                "W3D_LOG.debug(",
+                "    'Starting position of {}: {}'.format(",
+                "        blender_object.name, blender_object.position))",
+            ])
             if self.move_relative:
                 script_text.extend([
                     "blender_object['linV'] = [",
@@ -250,6 +255,11 @@ class MoveAction(object):
                     "    blender_object['linV'][i]",
                     "    for i in range(len(blender_object.position))]"]
                 )
+                script_text.extend([
+                    "W3D_LOG.debug(",
+                    "    'Ending position of {}: {}'.format(",
+                    "        blender_object.name, blender_object.position))",
+                ])
 
         try:
             script_text[0] = "{}{}".format(
