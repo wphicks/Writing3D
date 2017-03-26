@@ -951,7 +951,9 @@ class W3DObject(W3DFeature):
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
-        # TODO: Add around_own_axis
+        if self["around_own_axis"]:
+            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+
         if self["sound"] is not None:
             sound_name = generate_blender_sound_name(self["sound"])
             sound_actuator_name = generate_blender_sound_name(self["name"])
