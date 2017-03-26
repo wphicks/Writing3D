@@ -215,10 +215,10 @@ class W3DProject(W3DFeature):
             self["trigger_events"] = []
         if "camera_placement" not in self:
             self["camera_placement"] = W3DPlacement(
-                position=convert_to_blender_axes((0, 0, 6)))
+                position=convert_to_blender_axes((0, 0, 0)))
         if "desktop_camera_placement" not in self:
             self["desktop_camera_placement"] = W3DPlacement(
-                position=convert_to_blender_axes((0, 1.5, 6)))
+                position=convert_to_blender_axes((0, 1.25, 8)))
         # NOTE: This currently does nothing. Need to call
         # _create_relative_to_objects for W3DPlacement in order to change
         # placements
