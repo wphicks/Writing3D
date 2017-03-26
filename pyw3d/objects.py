@@ -477,7 +477,10 @@ class W3DImage(W3DContent):
 
     def blend(self):
         """Create representation of W3DImage in Blender"""
-        bpy.ops.mesh.primitive_plane_add(rotation=(math.pi / 2, 0, 0))
+        bpy.ops.mesh.primitive_plane_add(
+            rotation=(math.pi / 2, 0, 0),
+            radius=0.1524
+        )
         bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
 
@@ -487,7 +490,6 @@ class W3DImage(W3DContent):
 
         new_image_object.active_material = material
 
-        new_image_object.dimensions = image.size[0], image.size[1], 0
         new_image_object.data.uv_textures.new()
         new_image_object.data.materials.append(material)
         new_image_object.data.uv_textures[0].data[0].image = image
