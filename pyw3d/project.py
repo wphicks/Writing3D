@@ -455,6 +455,9 @@ class W3DProject(W3DFeature):
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
         bpy.data.scenes['Scene'].camera = self.main_camera
+        bpy.data.scenes['Scene'].game_settings.resolution_x = 800
+        bpy.data.scenes['Scene'].game_settings.resolution_y = 600
+        bpy.data.scenes['Scene'].game_settings.frame_type = "EXTEND"
 
     def setup_settings(self):
         """Put any global settings in w3d_settings.py"""
