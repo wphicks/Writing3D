@@ -427,9 +427,9 @@ class W3DText(W3DContent):
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
         if self["valign"] == "center":
-            new_text_object.data.offset_y = -new_text_object.dimensions[1] / 2
+            new_text_object.data.offset_y = -new_text_object.dimensions[1] / 4
         elif self["valign"] == "bottom":
-            new_text_object.data.offset_y = -new_text_object.dimensions[1]
+            new_text_object.data.offset_y = -new_text_object.dimensions[1] / 2
         new_text_object.select = True
         bpy.ops.object.convert(target='MESH', keep_original=False)
         bpy.ops.object.transform_apply(rotation=True)
