@@ -37,6 +37,7 @@ from .triggers import W3DTrigger
 from .errors import BadW3DXML
 from .blender_scripts import MOVE_TOGGLE_SCRIPT
 from .names import generate_light_object_name
+from .pointer import setup_mouselook, setup_click
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
@@ -459,6 +460,7 @@ class W3DProject(W3DFeature):
     def setup_camera(self):
         bpy.ops.object.camera_add(rotation=(math.pi / 2, 0, 0))
         bpy.data.cameras[-1].clip_end = self["far_clip"]
+        # TODO: Does this need to be converted to meters?
         self.main_camera = bpy.context.object
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
@@ -522,6 +524,8 @@ class W3DProject(W3DFeature):
         self.setup_settings()
         self.setup_camera()
         self.setup_controls()
+        setup_mouselook(self)
+        setup_click(self)
         self.sort_groups()
         bpy.data.texts.new("group_defs.py")  # Script for assigning group names
         bpy.data.worlds["World"].horizon_color = self["background"]

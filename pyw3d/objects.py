@@ -930,12 +930,10 @@ class W3DObject(W3DFeature):
 
         bpy.ops.object.game_property_new(type='BOOL', name="visible_tag")
         blender_object.game.properties["visible_tag"].value = self["visible"]
-        # TODO: Apply link
-        if self["link"] is not None:
-            self["link"].blend(generate_blender_object_name(self["name"]))
-        if self["click_through"]:
-            pass
-            # TODO
+        bpy.ops.object.game_property_new(type='BOOL', name="click_through")
+        blender_object.game.properties[
+            "click_through"].value = self["click_through"]
+
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
 
@@ -948,6 +946,9 @@ class W3DObject(W3DFeature):
 
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
+
+        if self["link"] is not None:
+            self["link"].blend(generate_blender_object_name(self["name"]))
 
         # TODO: Add around_own_axis
         if self["sound"] is not None:

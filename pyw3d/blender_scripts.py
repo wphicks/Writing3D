@@ -45,7 +45,39 @@ def look(cont):
 
         cont.activate(actuator_x)
         cont.activate(actuator_y)
-        bge.render.setMousePosition(*center)"""
+        bge.render.setMousePosition(*center)
+
+def click(cont):
+    camera = cont.owner
+    target = camera.worldPosition - camera.getScreenVect(
+        *bge.logic.mouse.position
+    )
+    mouse_click = cont.sensors['Click']
+    origin = camera.position
+    ray_object = False
+    all_ray_objects = set()
+    safety = 50
+    while ray_object is not None and safety:
+        ray_results = camera.rayCast(
+            target, origin, {far_clip}, 'clickable', 0, 1
+        )
+        ray_object = ray_results[0]
+        if ray_object:
+            del ray_object['clickable']  # Avoid object reselection
+            all_ray_objects.add(ray_object)
+            if not ray_object['click_through']:
+                break  # If no click_through, don't find any more items
+        safety += -1
+
+    for ray_object in all_ray_objects:
+        ray_object['clickable'] = True
+        if mouse_click.positive:
+            ray_object['click_status'] = 'selected'
+        else:
+            ray_object['click_status'] = 'activated'
+
+    print(all_ray_objects)
+"""
 
 MOVE_TOGGLE_SCRIPT = """
 import bge
@@ -55,4 +87,61 @@ def move_toggle(cont):
     if toggle_sensor.positive:
         cont.owner["toggle_movement"] = not cont.owner["toggle_movement"]
         bge.render.showMouse(not cont.owner["toggle_movement"])
+"""
+
+DISABLE_LINK_SCRIPT = """
+def disable_link(cont):
+    scene = bge.logic.getCurrentScene()
+    own = cont.owner
+    disabled = cont.sensors['disabled_sensor'].positive
+    if disabled:
+        print(">>>>>>>>>>>DISABLED")
+        try:
+            del own['clickable']
+        except KeyError:
+            pass  # Already unclickable
+        disabled_color = {disabled_color}
+        for i in range(len(disabled_color)):
+            own.color[i] = disabled_color[i]
+"""
+
+UNSELECT_LINK_SCRIPT = """
+def unselect_link(cont):
+    scene = bge.logic.getCurrentScene()
+    own = cont.owner
+    unselected = cont.sensors['unselected_sensor'].positive
+    if unselected:
+        print(">>>>>>>>>>>UNSELECTED")
+        own['clickable'] = True
+        enabled_color = {enabled_color}
+        for i in range(len(enabled_color)):
+            own.color[i] = enabled_color[i]
+"""
+
+SELECT_LINK_SCRIPT = """
+def select_link(cont):
+    scene = bge.logic.getCurrentScene()
+    own = cont.owner
+    selected = cont.sensors['selected_sensor'].positive
+    if selected:
+        print(">>>>>>>>>>>SELECTED")
+        selected_color = {selected_color}
+        for i in range(len(selected_color)):
+            own.color[i] = selected_color[i]
+"""
+
+ACTIVATE_LINK_SCRIPT = """
+def activate_link(cont):
+    scene = bge.logic.getCurrentScene()
+    own = cont.owner
+    activated = cont.sensors['activated_sensor'].positive
+    remain_enabled = {remain_enabled}
+    if activated and own['status'] == 'Stop':
+        own['status'] = 'Start'
+        own['clicks'] += 1
+        print(">>>>>>>>>>>ACTIVATED")
+        if remain_enabled:
+            own['click_status'] = 'unselected'
+        else:
+            own['click_status'] = 'disabled'
 """

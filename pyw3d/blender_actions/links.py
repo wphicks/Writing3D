@@ -33,7 +33,7 @@ class LinkAction(object):
     def start_string(self):
         script_text = [
             "trigger = scene.objects['{}']".format(self.link_name)
-            ]
+        ]
         if self.change == "Enable":
             script_text.append(
                 "trigger['enabled'] = True"
@@ -57,18 +57,20 @@ class LinkAction(object):
                 "'Activate if enabled'")
 
         try:
-            script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
+            script_text[0] = "{}{}".format(
+                "    " * self.offset, script_text[0]
+            )
         except IndexError:
             return ""
-        return "\n{}".format("    "*self.offset).join(script_text)
+        return "\n{}".format("    " * self.offset).join(script_text)
 
     @property
     def continue_string(self):
-        return "{}pass".format("    "*self.offset)
+        return "{}pass".format("    " * self.offset)
 
     @property
     def end_string(self):
-        return "{}pass".format("    "*self.offset)
+        return "{}pass".format("    " * self.offset)
 
     def __init__(self, object_name, change, offset=0):
         self.link_name = generate_link_name(

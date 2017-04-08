@@ -71,7 +71,7 @@ def setup_mouselook(project):
 
     bpy.data.texts.new("mouse.py")
     script = bpy.data.texts["mouse.py"]
-    script.write(MOUSE_LOOK_SCRIPT)
+    script.write(MOUSE_LOOK_SCRIPT.format(far_clip=project['far_clip']))
 
     return sensor
 
@@ -79,9 +79,20 @@ def setup_mouselook(project):
 def setup_click(project):
     bpy.ops.logic.sensor_add(
         type="MOUSE",
-        object=project.main_camera,
-        name="mouse_click"
+        object=project.main_camera.name,
+        name="Click"
     )
     project.main_camera.game.sensors[-1].name = "Click"
-    sensor = project.main_camera.game.sensors["Click"]
-    sensor.mouse_event = "LEFTCLICK"
+    click_sensor = project.main_camera.game.sensors["Click"]
+    click_sensor.mouse_event = "LEFTCLICK"
+
+    bpy.ops.logic.controller_add(
+        type='PYTHON',
+        object=project.main_camera.name,
+        name="Click"
+    )
+    project.main_camera.game.controllers[-1].name = "Click"
+    controller = project.main_camera.game.controllers["Click"]
+    controller.mode = "MODULE"
+    controller.module = "mouse.click"
+    controller.link(sensor=click_sensor)
