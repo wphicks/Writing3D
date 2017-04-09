@@ -35,14 +35,15 @@ from .timeline import W3DTimeline
 from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
-from .blender_scripts import MOUSE_LOOK_SCRIPT, MOVE_TOGGLE_SCRIPT
+from .blender_scripts import MOVE_TOGGLE_SCRIPT
 from .names import generate_light_object_name
+from .pointer import setup_mouselook, setup_click
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
 except ImportError:
     LOGGER.debug(
-        "Module bpy not found. Loading pyw3d.objects as standalone")
+        "Module bpy not found. Loading pyw3d.project as standalone")
 
 
 def clear_blender_scene():
@@ -447,9 +448,19 @@ class W3DProject(W3DFeature):
                 new_groups.append(group)
         self["groups"] = new_groups
 
+    def setup_controls(self):
+        self.add_move_toggle()
+
+        if self["allow_movement"]:
+            add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
+            add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
+            add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
+            add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
+
     def setup_camera(self):
         bpy.ops.object.camera_add(rotation=(math.pi / 2, 0, 0))
         bpy.data.cameras[-1].clip_end = self["far_clip"]
+        # TODO: Does this need to be converted to meters?
         self.main_camera = bpy.context.object
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
@@ -474,60 +485,6 @@ class W3DProject(W3DFeature):
             "%(message)s')",
         ]
         settings_script.write("\n".join(script_text))
-
-    def setup_controls(self):
-        bpy.context.scene.objects.active = self.main_camera
-        # TODO: if self["allow_rotation"]:
-        bpy.ops.logic.sensor_add(
-            type="MOUSE",
-            object=self.main_camera.name,
-            name="Look"
-        )
-        self.main_camera.game.sensors[-1].name = "Look"
-        sensor = self.main_camera.game.sensors["Look"]
-        sensor.mouse_event = "MOVEMENT"
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.main_camera.name,
-            name="Look")
-        self.main_camera.game.controllers[-1].name = "Look"
-        controller = self.main_camera.game.controllers["Look"]
-        controller.mode = "MODULE"
-        controller.module = "mouse.look"
-        controller.link(sensor=sensor)
-        bpy.ops.logic.actuator_add(
-            type="MOTION",
-            object=self.main_camera.name,
-            name="Look_x"
-        )
-        self.main_camera.game.actuators[-1].name = "Look_x"
-        actuator = self.main_camera.game.actuators["Look_x"]
-        actuator.mode = "OBJECT_NORMAL"
-        actuator.use_local_rotation = True
-        controller.link(actuator=actuator)
-
-        bpy.ops.logic.actuator_add(
-            type="MOTION",
-            object=self.main_camera.name,
-            name="Look_y"
-        )
-        self.main_camera.game.actuators[-1].name = "Look_y"
-        actuator = self.main_camera.game.actuators["Look_y"]
-        actuator.mode = "OBJECT_NORMAL"
-        actuator.use_local_rotation = False
-        controller.link(actuator=actuator)
-
-        bpy.data.texts.new("mouse.py")
-        script = bpy.data.texts["mouse.py"]
-        script.write(MOUSE_LOOK_SCRIPT)
-
-        self.add_move_toggle()
-
-        if self["allow_movement"]:
-            add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
-            add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
-            add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
-            add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
 
     def add_move_toggle(self):
         bpy.context.scene.objects.active = self.main_camera
@@ -570,6 +527,8 @@ class W3DProject(W3DFeature):
         self.setup_settings()
         self.setup_camera()
         self.setup_controls()
+        setup_mouselook(self)
+        setup_click(self)
         self.sort_groups()
         bpy.data.texts.new("group_defs.py")  # Script for assigning group names
         bpy.data.worlds["World"].horizon_color = self["background"]

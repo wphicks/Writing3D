@@ -173,25 +173,29 @@ class W3DLink(W3DFeature):
             link["selected_color"] = text2tuple(node.text, evaluator=int)
         for actions_node in link_node.findall("Actions"):
             num_clicks = -1
+            clicks_node = actions_node.find("Clicks")
+            if clicks_node is not None:
+                num_clicks_node = clicks_node.find("NumClicks")
+                if num_clicks_node is not None:
+                    try:
+                        num_clicks = int(
+                            num_clicks_node.attrib["num_clicks"]
+                        )
+                    except (KeyError, ValueError):
+                        raise BadW3DXML(
+                            "num_clicks attribute not set to an integer in"
+                            "NumClicks node"
+                        )
+                    try:
+                        if text2bool(num_clicks_node.attrib["reset"]):
+                            if (
+                                    num_clicks < link["reset"] or
+                                    link["reset"] == -1):
+                                link["reset"] = num_clicks
+                    except KeyError:
+                        pass
             for child in actions_node:
-                if child.tag == "Clicks":
-                    num_clicks_node = child.find("NumClicks")
-                    if num_clicks_node is not None:
-                        try:
-                            num_clicks = num_clicks_node.attrib["num_clicks"]
-                        except KeyError:
-                            raise BadW3DXML(
-                                "num_clicks attribute not set in NumClicks"
-                                "node")
-                        try:
-                            if text2bool(num_clicks_node.attrib["reset"]):
-                                if (
-                                        num_clicks < link["reset"] or
-                                        link["reset"] == -1):
-                                    link["reset"] = num_clicks
-                        except KeyError:
-                            pass
-                else:
+                if child.tag != "Clicks":
                     link["actions"][num_clicks].append(
                         W3DAction.fromXML(child))
 
@@ -207,7 +211,8 @@ class W3DLink(W3DFeature):
             enable_immediately=self["enabled"],
             remain_enabled=self["remain_enabled"],
             select_color=self["selected_color"],
-            enable_color=self["enabled_color"]
+            enable_color=self["enabled_color"],
+            reset_clicks=self['reset']
         )
         self.activator.create_blender_objects()
         return self.activator.base_object
@@ -932,12 +937,10 @@ class W3DObject(W3DFeature):
 
         bpy.ops.object.game_property_new(type='BOOL', name="visible_tag")
         blender_object.game.properties["visible_tag"].value = self["visible"]
-        # TODO: Apply link
-        if self["link"] is not None:
-            self["link"].blend(generate_blender_object_name(self["name"]))
-        if self["click_through"]:
-            pass
-            # TODO
+        bpy.ops.object.game_property_new(type='BOOL', name="click_through")
+        blender_object.game.properties[
+            "click_through"].value = self["click_through"]
+
         blender_object.game.physics_type = 'DYNAMIC'
         blender_object.game.use_ghost = True
 
@@ -953,6 +956,9 @@ class W3DObject(W3DFeature):
 
         if self["around_own_axis"]:
             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+
+        if self["link"] is not None:
+            self["link"].blend(generate_blender_object_name(self["name"]))
 
         if self["sound"] is not None:
             sound_name = generate_blender_sound_name(self["sound"])

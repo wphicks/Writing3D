@@ -57,8 +57,9 @@ def activate(cont):
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     status = own['status']
-    W3D_LOG.debug("activate called on {} with status {}".format(
-        own.name, own['status']))
+    if status != "Continue":
+        W3D_LOG.debug("activate called on {} with status {}".format(
+            own.name, own['status']))
     if status == 'Start':
         own['start_time'] = monotonic()
         if ('action_index' not in own
@@ -90,9 +91,9 @@ def activate(cont):
                 'Must start activator before continue is used')
         time = monotonic() - own['start_time']
         index = own['offset_index'] + own['action_index']
-        W3D_LOG.debug("Action Index {} at time {} on {}".format(
-            index, time, own.name)
-        )
+        #W3D_LOG.debug("Action Index {} at time {} on {}".format(
+        #    index, time, own.name)
+        #)
 """
         self.script_footer = """
         # FOOTER BEGINS HERE

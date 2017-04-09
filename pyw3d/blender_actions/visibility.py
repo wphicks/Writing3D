@@ -72,7 +72,16 @@ class VisibilityAction(object):
             "new_color = blender_object.color",
             "new_color[3] = {}".format(int(self.visible)),
             "blender_object.color = new_color",
-            "blender_object.setVisible({})".format(self.visible)]
+            "blender_object.setVisible({})".format(self.visible),
+            "if 'clicks' in blender_object:",
+            "    if blender_object.visible:",
+            "        blender_object['clickable'] = True",
+            "    else:",
+            "        try:",
+            "            del blender_object['clickable']",
+            "        except KeyError:",
+            "            pass # Already unclickable",
+        ]
         try:
             script_text[0] = "{}{}".format("    "*self.offset, script_text[0])
         except IndexError:
