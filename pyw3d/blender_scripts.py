@@ -75,8 +75,6 @@ def click(cont):
             ray_object['click_status'] = 'selected'
         else:
             ray_object['click_status'] = 'activated'
-
-    print(all_ray_objects)
 """
 
 MOVE_TOGGLE_SCRIPT = """
@@ -95,7 +93,6 @@ def disable_link(cont):
     own = cont.owner
     disabled = cont.sensors['disabled_sensor'].positive
     if disabled:
-        print(">>>>>>>>>>>DISABLED")
         try:
             del own['clickable']
         except KeyError:
@@ -111,7 +108,6 @@ def unselect_link(cont):
     own = cont.owner
     unselected = cont.sensors['unselected_sensor'].positive
     if unselected:
-        print(">>>>>>>>>>>UNSELECTED")
         own['clickable'] = True
         enabled_color = {enabled_color}
         for i in range(len(enabled_color)):
@@ -124,7 +120,6 @@ def select_link(cont):
     own = cont.owner
     selected = cont.sensors['selected_sensor'].positive
     if selected:
-        print(">>>>>>>>>>>SELECTED")
         selected_color = {selected_color}
         for i in range(len(selected_color)):
             own.color[i] = selected_color[i]
@@ -139,7 +134,6 @@ def activate_link(cont):
     if activated and own['status'] == 'Stop':
         own['status'] = 'Start'
         own['clicks'] += 1
-        print(">>>>>>>>>>>ACTIVATED")
         if remain_enabled:
             own['click_status'] = 'unselected'
         else:

@@ -196,11 +196,6 @@ class BlenderClickTrigger(BlenderTrigger):
                 )
                 action_index += 1
                 max_time = max(max_time, action.end_time)
-        if self.reset_clicks > 0:
-            action_logic.extend([
-                "        if own['clicks'] == {}".format(self.reset_clicks),
-                "            own['clicks'] = 0"]
-            )
         self.script_footer = self.script_footer.format(max_time=max_time)
         return "\n".join(action_logic)
 
@@ -243,6 +238,18 @@ class BlenderClickTrigger(BlenderTrigger):
     def name(self):
         return self.object_name
 
+    def _generate_end_condition(self):
+        end_condition = ["time >= {max_time}"]
+        for clicks, all_actions in self.actions.items():
+            duration = max(action["duration"] for action in all_actions)
+            end_condition.append(
+                "(own['clicks'] == {} and time >= {})".format(
+                    clicks, duration
+                )
+            )
+        return " or ".join(end_condition)
+
+
     def __init__(
             self, name, actions, object_name,
             enable_immediately=True, remain_enabled=True,
@@ -258,6 +265,21 @@ class BlenderClickTrigger(BlenderTrigger):
             name, actions, duration=0,
             enable_immediately=enable_immediately,
             remain_enabled=remain_enabled)
+        if reset_clicks > 0:
+            self.script_footer = """
+        # FOOTER BEGINS HERE
+        own['action_index'] = index
+        own['offset_index'] = 0
+        if {end_condition}:
+            if not stop_block:
+                own['status'] = 'Stop'
+            if own['clicks'] == {reset_clicks}:
+                own['action_index'] = 0
+                own['clicks'] = 0
+            """.format(
+                end_condition=self._generate_end_condition(),
+                reset_clicks=reset_clicks
+            )
         if enable_immediately:
             for i in range(len(self.enable_color)):
                 self.base_object.color[i] = self.enable_color[i]

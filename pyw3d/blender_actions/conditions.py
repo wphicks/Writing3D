@@ -76,6 +76,8 @@ class ActionCondition(object):
     def add_click_condition(self, click_value):
         """Add condition based on how many times object is clicked"""
         self.start.append("own['clicks'] == {}".format(click_value))
+        self.cont.append("own['clicks'] == {}".format(click_value))
+        self.end.append("own['clicks'] == {}".format(click_value))
 
     def __init__(self, offset=0):
         self.start = []

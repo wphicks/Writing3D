@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """Tools for dynamically changing clickable links in Blender"""
-from pyw3d.names import generate_link_name, generate_blender_object_name
+from pyw3d.names import generate_blender_object_name
 from pyw3d.errors import EBKAC
 
 
@@ -36,11 +36,11 @@ class LinkAction(object):
         ]
         if self.change == "Enable":
             script_text.append(
-                "trigger['enabled'] = True"
+                "trigger['click_status'] = 'unselected'"
             )
         elif self.change == "Disable":
             script_text.append(
-                "trigger['enabled'] = False"
+                "trigger['click_status'] = 'disabled'"
             )
         elif self.change == "Activate":
             script_text.append(
@@ -48,7 +48,7 @@ class LinkAction(object):
             )
         elif self.change == "Activate if enabled":
             script_text.extend([
-                "if trigger['enabled']:",
+                "if trigger['click_status'] == 'unselected':",
                 "    trigger['status'] = 'Start'"]
             )
         else:
@@ -73,7 +73,6 @@ class LinkAction(object):
         return "{}pass".format("    " * self.offset)
 
     def __init__(self, object_name, change, offset=0):
-        self.link_name = generate_link_name(
-            generate_blender_object_name(object_name))
+        self.link_name = generate_blender_object_name(object_name)
         self.change = change
         self.offset = offset
