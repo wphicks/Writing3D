@@ -41,9 +41,7 @@ class MoveAction(object):
 
     @property
     def start_string(self):
-        script_text = [
-            "W3D_LOG.debug('Starting movement in {}'.format(own.name))"
-        ]
+        script_text = ["pass"]
         # First take care of object rotation...
         if self.placement["rotation"]["rotation_mode"] != "None":
 
@@ -158,9 +156,12 @@ class MoveAction(object):
         # ...and now take care of object position
         if "position" in self.placement:
             script_text.extend([
-                "W3D_LOG.debug(",
-                "    'Starting position of {}: {}'.format(",
-                "        blender_object.name, blender_object.position))",
+                "W3D_LOG.debug("
+                "'Starting position of {}: {}'.format("
+                "blender_object.name, blender_object.position))",
+                "W3D_LOG.debug("
+                "'Target position of {{}}: {{}}'.format("
+                "blender_object.name, {}))".format(self.placement["position"]),
             ])
             if self.move_relative:
                 script_text.extend([
@@ -218,9 +219,9 @@ class MoveAction(object):
 
         if "position" in self.placement:
             script_text.extend([
-                #"if 'linV' not in blender_object:",
-                #"   blender_object['linV'] = [0.0,0.0,0.0]",
-                #"   W3D_LOG.debug('LINV NOW ZERO')",
+                # "if 'linV' not in blender_object:",
+                # "   blender_object['linV'] = [0.0,0.0,0.0]",
+                # "   W3D_LOG.debug('LINV NOW ZERO')",
                 "blender_object.position = [",
                 "    blender_object.position[i] + blender_object['linV'][i]",
                 "    for i in range(len(blender_object.position))]"]
@@ -237,7 +238,6 @@ class MoveAction(object):
     def end_string(self):
         script_text = [
             "W3D_LOG.debug('Ending movement in {}'.format(own.name))",
-            
         ]
         if not self.duration:
 
@@ -256,9 +256,13 @@ class MoveAction(object):
                     "    for i in range(len(blender_object.position))]"]
                 )
                 script_text.extend([
-                    "W3D_LOG.debug(",
-                    "    'Ending position of {}: {}'.format(",
-                    "        blender_object.name, blender_object.position))",
+                    "W3D_LOG.debug("
+                    "'Ending position of {}: {}'.format("
+                    "blender_object.name, blender_object.position))",
+                    "W3D_LOG.debug("
+                    "'Target position of {{}}: {{}}'.format("
+                    "blender_object.name, {}))".format(
+                        self.placement["position"]),
                 ])
 
         try:
