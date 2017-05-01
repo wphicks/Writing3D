@@ -23,7 +23,7 @@ may appear in such a project. This may be as sophisticated as a "Timeline" or
 as simple as a "Placement" for an object (since Placement features define
 position, and potentially multiple kinds of rotation).
 """
-from .errors import InvalidArgument
+from .errors import InvalidArgument, ConsistencyError
 
 
 class W3DFeature(dict):
@@ -77,7 +77,14 @@ class W3DFeature(dict):
         super(W3DFeature, self).__setitem__(key, value)
 
     def __missing__(self, key):
-        return self.default_arguments[key]
+        try:
+            return self.default_arguments[key]
+        except:
+            raise ConsistencyError(
+                "{} requires {} to be set for requested operation".format(
+                    type(self).__name__, key
+                )
+            )
 
     def __eq__(self, other):
         # TODO: Not sure if this is best OOP

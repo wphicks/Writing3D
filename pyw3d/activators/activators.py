@@ -54,6 +54,11 @@ from time import monotonic
 import random
 import logging
 def activate(cont):
+    try:  # UGLY HACK
+        activate.target_pos
+    except:
+        activate.target_pos = {}
+        activate.target_orientation = {}
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     status = own['status']

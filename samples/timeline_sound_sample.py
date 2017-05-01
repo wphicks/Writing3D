@@ -24,7 +24,6 @@ To run this script, use the following command::
     $ python3 timeline_sound_sample.py
 """
 
-import sys
 from pyw3d import project, objects, placement, actions, export_to_blender, \
     timeline, sounds
 
@@ -105,7 +104,7 @@ my_object = objects.W3DObject(
         text="Play"  # ...with text reading "Hello, World!"
     ),
     link=objects.W3DLink(  # Add a clickable link to the text object
-        actions = {
+        actions={
             0: [  # On first click (index 0)...
                 actions.TimelineAction(  # start the timeline
                     timeline_name="my_timeline", change="Start"
@@ -119,6 +118,7 @@ my_object = objects.W3DObject(
 my_project["objects"].append(my_object)
 my_project["debug"] = True
 
-#Finally, we render the whole thing using Blender, export it, and display the
-#result
-export_to_blender(my_project, filename="timeline_sound_sample.blend", display=True)
+# Finally, we render the whole thing using Blender, export it, and display the
+# result
+export_to_blender(
+    my_project, filename="timeline_sound_sample.blend", display=True)

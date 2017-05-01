@@ -96,18 +96,41 @@ class MoveAction(object):
                 script_text.append(
                     "orientation ="
                     "blender_object.orientation.to_quaternion()")
+                script_text.append(
+                    "orientation ="
+                    "blender_object.orientation.to_quaternion()")
 
                 if self.placement[
                         "rotation"]["rotation_mode"] == "Axis":
                     angle = math.radians(
-                        self.placement["rotation"]["rotation_angle"])
+                        self.placement["rotation"]["rotation_angle"]
+                    )
+                    if (
+                            int(self.placement[
+                                "rotation"]["rotation_angle"]) % 180 == 0):
+                        angle += math.pi
+                    vector[0] = -vector[0]
                     script_text.extend([
                         "target_orientation = mathutils.Quaternion(",
                         "    {}, {})".format(tuple(vector), -angle),
                         "rotation = (",
                         "    target_orientation.rotation_difference(",
-                        "        orientation))"]
-                    )
+                        "        orientation))",
+                        "print('@@@@@@@@@@', target_orientation.to_axis_angle())",
+                        "print('@@@@@@@@@@', target_orientation.to_euler())",
+                        "print('@@@@@@@@@@', target_orientation)",
+                        # "target_orientation = mathutils.Matrix.Rotation(",
+                        # "    {}, 4, {})".format(
+                        #     -angle, tuple(vector)),
+                        # "target_orientation ="
+                        # " target_orientation.to_quaternion()",
+                        # "rotation = (",
+                        # "    target_orientation.rotation_difference(",
+                        # "        orientation))",
+                        # "print('@@@@@@@@@@', target_orientation.to_axis_angle())",
+                        "print('@@@@@@@@@@', {}, {})".format(
+                            tuple(vector), -angle),
+                    ])
 
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "Normal":
@@ -151,17 +174,18 @@ class MoveAction(object):
                     ("({}*bge.logic.getLogicTicRate()) *".format(
                         self.duration), 1)[
                         self.duration == 0]),
-                "    rotation.axis)"]
-            )
+                "    rotation.axis)",
+                "activate.target_orientation[blender_object.name] ="
+                "blender_object.orientation.copy()",
+                "activate.target_orientation["
+                "blender_object.name].rotate(rotation)",
+            ])
         # ...and now take care of object position
         if "position" in self.placement:
             script_text.extend([
                 "W3D_LOG.debug("
                 "'Starting position of {}: {}'.format("
                 "blender_object.name, blender_object.position))",
-                "W3D_LOG.debug("
-                "'Target position of {{}}: {{}}'.format("
-                "blender_object.name, {}))".format(self.placement["position"]),
             ])
             if self.move_relative:
                 script_text.extend([
@@ -170,12 +194,17 @@ class MoveAction(object):
                         ("({}*bge.logic.getLogicTicRate())".format(
                             self.duration), 1)[self.duration == 0],
                         self.placement["position"]
-                    )]
-                )
+                    ),
+                    "activate.target_pos[blender_object.name] = [",
+                    "    blender_object.position[i] + {}[i]".format(
+                        list(self.placement["position"])
+                    ),
+                    "    for i in range(len(blender_object.position))]"
+                ])
             else:
                 if self.placement["relative_to"] == "Center":
                     script_text.append(
-                        "target_pos = {}".format(
+                        "activate.target_pos[blender_object.name] = {}".format(
                             list(self.placement["position"])
                         )
                     )
@@ -186,14 +215,16 @@ class MoveAction(object):
                                 self.placement["relative_to"]
                             )
                         ),
-                        "target_pos = [",
+                        "activate.target_pos[blender_object.name] = [",
                         "    relative_to.position[i] + {}[i] for i in ".format(
                             list(self.placement["position"])),
                         "    range(len(relative_to.position))",
                         "]"
                     ])
                 script_text.extend([
-                    "delta_pos = [target_pos[i] - blender_object.position[i]",
+                    "delta_pos = [",
+                    "    activate.target_pos[blender_object.name][i]"
+                    " - blender_object.position[i]",
                     "    for i in range(len(blender_object.position))]",
                     "blender_object['linV'] = [",
                     "    coord/{} for coord in delta_pos]".format(
@@ -211,11 +242,10 @@ class MoveAction(object):
     def continue_string(self):
         script_text = []
         if self.placement["rotation"]["rotation_mode"] != "None":
-            script_text.append(
-                "delta_rot = blender_object['angV']"
-            )
-            script_text.append(
-                "blender_object.applyRotation(delta_rot)")
+            script_text.extend([
+                "delta_rot = blender_object['angV']",
+                "blender_object.applyRotation(delta_rot)",
+            ])
 
         if "position" in self.placement:
             script_text.extend([
@@ -236,34 +266,36 @@ class MoveAction(object):
 
     @property
     def end_string(self):
-        script_text = [
-            "W3D_LOG.debug('Ending movement in {}'.format(own.name))",
-        ]
-        if not self.duration:
+        script_text = []
+        if self.placement["rotation"]["rotation_mode"] != "None":
+            script_text.extend([
+                "delta_rot = blender_object['angV']",
+                "blender_object.orientation ="
+                " activate.target_orientation[blender_object.name]",
+                "W3D_LOG.debug("
+                "'Target orientation of {}: {}'.format("
+                "blender_object.name, "
+                "activate.target_orientation["
+                "blender_object.name].to_quaternion()))",
+                "W3D_LOG.debug("
+                "'Ending orientation of {}: {}'.format("
+                "blender_object.name,"
+                "blender_object.orientation.to_quaternion()))",
+            ])
 
-            if self.placement["rotation"]["rotation_mode"] != "None":
-                script_text.append(
-                    "delta_rot = blender_object['angV']"
-                )
-                script_text.append(
-                    "blender_object.applyRotation(delta_rot)")
-
-            if "position" in self.placement:
-                script_text.extend([
-                    "blender_object.position = [",
-                    "    blender_object.position[i] +",
-                    "    blender_object['linV'][i]",
-                    "    for i in range(len(blender_object.position))]"]
-                )
-                script_text.extend([
-                    "W3D_LOG.debug("
-                    "'Ending position of {}: {}'.format("
-                    "blender_object.name, blender_object.position))",
-                    "W3D_LOG.debug("
-                    "'Target position of {{}}: {{}}'.format("
-                    "blender_object.name, {}))".format(
-                        self.placement["position"]),
-                ])
+            script_text.extend([
+                "blender_object.position = activate.target_pos["
+                "blender_object.name]",
+            ])
+            script_text.extend([
+                "W3D_LOG.debug("
+                "'Target position of {}: {}'.format("
+                "blender_object.name, activate.target_pos["
+                "blender_object.name]))",
+                "W3D_LOG.debug("
+                "'Ending position of {}: {}'.format("
+                "blender_object.name, blender_object.position))",
+            ])
 
         try:
             script_text[0] = "{}{}".format(
