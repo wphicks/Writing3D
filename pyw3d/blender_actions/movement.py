@@ -277,6 +277,7 @@ class MoveAction(object):
     def end_string(self):
         script_text = []
         if self.placement["rotation"]["rotation_mode"] != "None":
+            #TODO: Handle multiple moves on same object
             script_text.extend([
                 "delta_rot = blender_object['angV']",
                 "blender_object.orientation ="

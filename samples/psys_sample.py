@@ -93,7 +93,6 @@ my_project["objects"].append(
 
 my_project["debug"] = True
 
-
 # Finally, we render the whole thing using Blender, export it, and display the
 # result
 export_to_blender(my_project, filename="psys_sample.blend", display=True)

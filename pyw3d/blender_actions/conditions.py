@@ -28,33 +28,40 @@ class ActionCondition(object):
 
     @property
     def start_string(self):
-        start_string = "    "*self.offset
+        offset_string = "    " * self.offset
         if len(self.start):
-            start_string = "".join((start_string, "if {}:"))
+            start_string = "".join((offset_string, "if {}:"))
             start_string = start_string.format(" and ".join(self.start))
-            return start_string
         else:
-            return "".join((start_string, "if True:"))
+            start_string = "".join((offset_string, "if True:"))
+        index_increment = "{}    data['active_actions'][{}] = {{}}".format(
+            offset_string, self.action_index
+        )
+        return "\n".join((start_string, index_increment))
 
     @property
     def continue_string(self):
-        continue_string = "    "*self.offset
+        offset_string = "    " * self.offset
         if len(self.cont):
-            continue_string = "".join((continue_string, "if {}:"))
+            continue_string = "".join((offset_string, "if {}:"))
             continue_string = continue_string.format(" and ".join(self.cont))
-            return continue_string
         else:
-            return "".join((continue_string, "if True:"))
+            continue_string = "".join((offset_string, "if True:"))
+        index_increment = "{offset}    del data['active_actions'][{index}]" \
+            "\n{offset}    data['complete_actions'][{index}] = {{}}".format(
+                offset=offset_string, index=self.action_index
+            )
+        return "\n".join((continue_string, index_increment))
 
     @property
     def end_string(self):
-        end_string = "    "*self.offset
+        offset_string = "    " * self.offset
         if len(self.end):
-            end_string = "".join((end_string, "if {}:"))
+            end_string = "".join((offset_string, "if {}:"))
             end_string = end_string.format(" and ".join(self.end))
-            return end_string
         else:
-            return "".join((end_string, "if True:"))
+            end_string = "".join((offset_string, "if True:"))
+        return end_string
 
     def add_time_condition(self, start_time=None, end_time=None):
         """Add condition based on time since activation"""
@@ -70,8 +77,12 @@ class ActionCondition(object):
 
     def add_index_condition(self, index_value):
         """Add condition based on how many sub-actions have been completed"""
-        self.start.append("index == {}".format(index_value))
-        self.cont.append("index >= {}".format(index_value))
+        self.start.append(
+            "{index} not in data['active_actions'] and {index} not in"
+            " data['complete_actions']".format(index=index_value))
+        self.cont.append("{} in data['active_actions']".format(index_value))
+        self.end.append("{} in data['active_actions']".format(index_value))
+        self.action_index = index_value
 
     def add_click_condition(self, click_value):
         """Add condition based on how many times object is clicked"""
@@ -80,6 +91,7 @@ class ActionCondition(object):
         self.end.append("own['clicks'] == {}".format(click_value))
 
     def __init__(self, offset=0):
+        self.action_index = -1
         self.start = []
         self.cont = []
         self.end = []

@@ -23,13 +23,15 @@ To run this script, use the following command::
 
     $ python3 timeline_sound_sample.py
 """
-
+import os
 from pyw3d import project, objects, placement, actions, export_to_blender, \
     timeline, sounds
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
-    allow_movement=True)
+    call_directory=os.path.dirname(__file__),
+    allow_movement=True
+)
 
 # Next, make three test sounds available in Writing3D
 play_sound = sounds.W3DSound(

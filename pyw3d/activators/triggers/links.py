@@ -184,7 +184,6 @@ class BlenderClickTrigger(BlenderTrigger):
 
     def generate_action_logic(self):
         action_logic = ["        # ACTION LOGIC BEGINS HERE"]
-        max_time = 0
         action_index = 0
         for clicks, all_actions in self.actions.items():
             for action in all_actions:
@@ -195,8 +194,8 @@ class BlenderClickTrigger(BlenderTrigger):
                         offset=2)
                 )
                 action_index += 1
-                max_time = max(max_time, action.end_time)
-        self.script_footer = self.script_footer.format(max_time=max_time)
+        self.script_footer = self.script_footer.format(
+            action_count=action_index)
         return "\n".join(action_logic)
 
     def generate_detection_logic(self):
@@ -239,7 +238,14 @@ class BlenderClickTrigger(BlenderTrigger):
         return self.object_name
 
     def _generate_end_condition(self):
-        end_condition = ["time >= {max_time}"]
+        end_condition = [
+            "len(data['completed_actions']) == {}".format(
+                sum(
+                    len(all_actions) for clicks, all_actions in
+                    self.actions.items()
+                )
+            )
+        ]
         for clicks, all_actions in self.actions.items():
             duration = max(action["duration"] for action in all_actions)
             end_condition.append(
@@ -248,7 +254,6 @@ class BlenderClickTrigger(BlenderTrigger):
                 )
             )
         return " or ".join(end_condition)
-
 
     def __init__(
             self, name, actions, object_name,
@@ -274,7 +279,7 @@ class BlenderClickTrigger(BlenderTrigger):
             if not stop_block:
                 own['status'] = 'Stop'
             if own['clicks'] == {reset_clicks}:
-                own['action_index'] = 0
+                data['completed_actions'] = {}
                 own['clicks'] = 0
             """.format(
                 end_condition=self._generate_end_condition(),
