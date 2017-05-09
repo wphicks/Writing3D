@@ -49,19 +49,16 @@ def look(cont):
 
 def click(cont):
     camera = cont.owner
-    target = camera.worldPosition - camera.getScreenVect(
-        *bge.logic.mouse.position
-    )
     mouse_click = cont.sensors['Click']
     origin = camera.position
     ray_object = False
     all_ray_objects = set()
     safety = 50
     while ray_object is not None and safety:
-        ray_results = camera.rayCast(
-            target, origin, {far_clip}, 'clickable', 0, 1
+        ray_object = camera.getScreenRay(
+            bge.logic.mouse.position[0], bge.logic.mouse.position[1],
+            {far_clip}, 'clickable'
         )
-        ray_object = ray_results[0]
         if ray_object:
             del ray_object['clickable']  # Avoid object reselection
             all_ray_objects.add(ray_object)
