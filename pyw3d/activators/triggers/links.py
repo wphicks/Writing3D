@@ -195,7 +195,8 @@ class BlenderClickTrigger(BlenderTrigger):
                 )
                 action_index += 1
         self.script_footer = self.script_footer.format(
-            action_count=action_index)
+            action_count=action_index
+        )
         return "\n".join(action_logic)
 
     def generate_detection_logic(self):
@@ -239,7 +240,7 @@ class BlenderClickTrigger(BlenderTrigger):
 
     def _generate_end_condition(self):
         end_condition = [
-            "len(data['completed_actions']) == {}".format(
+            "len(data['complete_actions']) == {}".format(
                 sum(
                     len(all_actions) for clicks, all_actions in
                     self.actions.items()
@@ -273,13 +274,11 @@ class BlenderClickTrigger(BlenderTrigger):
         if reset_clicks > 0:
             self.script_footer = """
         # FOOTER BEGINS HERE
-        own['action_index'] = index
-        own['offset_index'] = 0
         if {end_condition}:
             if not stop_block:
                 own['status'] = 'Stop'
             if own['clicks'] == {reset_clicks}:
-                data['completed_actions'] = {}
+                data['complete_actions'].clear()
                 own['clicks'] = 0
             """.format(
                 end_condition=self._generate_end_condition(),

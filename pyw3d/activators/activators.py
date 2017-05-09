@@ -69,8 +69,6 @@ def activate(cont):
         own['start_time'] = monotonic()
         data["active_actions"] = {}
         data["complete_actions"] = {}
-        # action_index property is used to ensure that each action is activated
-        # exactly once
         own['offset_time'] = 0
         own['status'] = 'Continue'
     if status == 'Stop':

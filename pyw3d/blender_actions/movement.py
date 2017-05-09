@@ -74,8 +74,8 @@ class MoveAction(object):
                     script_text.extend([
                         "look_direction = (",
                         "mathutils.Vector("
-                        "activate.target_pos.get("
-                        "blender_object.name, blender_object.position +",
+                        "data['active_actions'][current_index].get("
+                        "'target_pos', blender_object.position +",
                         "    mathutils.Vector({})) -".format(
                             self.placement["position"]),
                         "    mathutils.Vector({})).normalized()".format(
@@ -119,9 +119,6 @@ class MoveAction(object):
                         "rotation = (",
                         "    target_orientation.rotation_difference(",
                         "        orientation))",
-                        "print('@@@@@@@@@@', target_orientation.to_axis_angle())",
-                        "print('@@@@@@@@@@', target_orientation.to_euler())",
-                        "print('@@@@@@@@@@', target_orientation)",
                         # "target_orientation = mathutils.Matrix.Rotation(",
                         # "    {}, 4, {})".format(
                         #     -angle, tuple(vector)),
@@ -130,9 +127,6 @@ class MoveAction(object):
                         # "rotation = (",
                         # "    target_orientation.rotation_difference(",
                         # "        orientation))",
-                        # "print('@@@@@@@@@@', target_orientation.to_axis_angle())",
-                        "print('@@@@@@@@@@', {}, {})".format(
-                            tuple(vector), -angle),
                     ])
 
                 elif self.placement[
@@ -151,8 +145,8 @@ class MoveAction(object):
                         "rotation"]["rotation_mode"] == "LookAt":
                     if self.placement.is_default("position"):
                         position_script = \
-                            "activate.target_pos.get(blender_object.name,"\
-                            "blender_object.position)"
+                            "data['active_actions'][current_index].get("\
+                            "'target_pos', blender_object.position)"
                     else:
                         position_script = "{}".format(
                             self.placement["position"])
@@ -184,10 +178,10 @@ class MoveAction(object):
                         self.duration), 1)[
                         self.duration == 0]),
                 "    rotation.axis)",
-                "activate.target_orientation[blender_object.name] ="
-                "blender_object.orientation.copy()",
-                "activate.target_orientation["
-                "blender_object.name].rotate(rotation)",
+                "data['active_actions'][current_index]['target_orientation'] ="
+                " blender_object.orientation.copy()",
+                "data['active_actions'][current_index]['target_orientation']"
+                ".rotate(rotation)",
             ])
         # ...and now take care of object position
         if "position" in self.placement:
@@ -204,7 +198,7 @@ class MoveAction(object):
                             self.duration), 1)[self.duration == 0],
                         self.placement["position"]
                     ),
-                    "activate.target_pos[blender_object.name] = [",
+                    "data['active_actions'][current_index]['target_pos'] = [",
                     "    blender_object.position[i] + {}[i]".format(
                         list(self.placement["position"])
                     ),
@@ -213,7 +207,8 @@ class MoveAction(object):
             else:
                 if self.placement["relative_to"] == "Center":
                     script_text.append(
-                        "activate.target_pos[blender_object.name] = {}".format(
+                        "data['active_actions']["
+                        "current_index]['target_pos']= {}".format(
                             list(self.placement["position"])
                         )
                     )
@@ -224,7 +219,8 @@ class MoveAction(object):
                                 self.placement["relative_to"]
                             )
                         ),
-                        "activate.target_pos[blender_object.name] = [",
+                        "data['active_actions']["
+                        "current_index]['target_pos']= [",
                         "    relative_to.position[i] + {}[i] for i in ".format(
                             list(self.placement["position"])),
                         "    range(len(relative_to.position))",
@@ -232,7 +228,8 @@ class MoveAction(object):
                     ])
                 script_text.extend([
                     "delta_pos = [",
-                    "    activate.target_pos[blender_object.name][i]"
+                    "    data['active_actions']["
+                    "current_index]['target_pos'][i]"
                     " - blender_object.position[i]",
                     "    for i in range(len(blender_object.position))]",
                     "blender_object['linV'] = [",
@@ -277,16 +274,15 @@ class MoveAction(object):
     def end_string(self):
         script_text = []
         if self.placement["rotation"]["rotation_mode"] != "None":
-            #TODO: Handle multiple moves on same object
             script_text.extend([
                 "delta_rot = blender_object['angV']",
                 "blender_object.orientation ="
-                " activate.target_orientation[blender_object.name]",
+                " data['complete_actions'][current_index]['target_orientation']",
             ])
 
             script_text.extend([
-                "blender_object.position = activate.target_pos["
-                "blender_object.name]",
+                "blender_object.position = data['complete_actions']["
+                "current_index]['target_pos']",
             ])
 
         try:

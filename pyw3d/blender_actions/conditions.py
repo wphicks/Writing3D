@@ -34,10 +34,18 @@ class ActionCondition(object):
             start_string = start_string.format(" and ".join(self.start))
         else:
             start_string = "".join((offset_string, "if True:"))
+        index_storage = "{}    current_index = {}".format(
+            offset_string, self.action_index
+        )
+        log_statement = "{}    W3D_LOG.debug('Starting action {}')".format(
+            offset_string, self.action_index
+        )
         index_increment = "{}    data['active_actions'][{}] = {{}}".format(
             offset_string, self.action_index
         )
-        return "\n".join((start_string, index_increment))
+        return "\n".join(
+            (start_string, index_storage, log_statement, index_increment)
+        )
 
     @property
     def continue_string(self):
@@ -47,11 +55,10 @@ class ActionCondition(object):
             continue_string = continue_string.format(" and ".join(self.cont))
         else:
             continue_string = "".join((offset_string, "if True:"))
-        index_increment = "{offset}    del data['active_actions'][{index}]" \
-            "\n{offset}    data['complete_actions'][{index}] = {{}}".format(
-                offset=offset_string, index=self.action_index
-            )
-        return "\n".join((continue_string, index_increment))
+        index_storage = "{}    current_index = {}".format(
+            offset_string, self.action_index
+        )
+        return "\n".join((continue_string, index_storage))
 
     @property
     def end_string(self):
@@ -61,7 +68,20 @@ class ActionCondition(object):
             end_string = end_string.format(" and ".join(self.end))
         else:
             end_string = "".join((offset_string, "if True:"))
-        return end_string
+        index_storage = "{}    current_index = {}".format(
+            offset_string, self.action_index
+        )
+        log_statement = "{}    W3D_LOG.debug('Ending action {}')".format(
+            offset_string, self.action_index
+        )
+        index_increment = "{offset}    data['complete_actions'][{index}] ="\
+            " data['active_actions'][{index}]" \
+            "\n{offset}    del data['active_actions'][{index}]".format(
+                offset=offset_string, index=self.action_index
+            )
+        return "\n".join(
+            (end_string, index_storage, log_statement, index_increment)
+        )
 
     def add_time_condition(self, start_time=None, end_time=None):
         """Add condition based on time since activation"""
