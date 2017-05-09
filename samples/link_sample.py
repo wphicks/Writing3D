@@ -24,12 +24,14 @@ To run this script, use the following command::
     $ python3 link_sample.py
 """
 
-import sys
+import os
 from pyw3d import project, objects, placement, actions, export_to_blender
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
-    allow_movement=True)
+    call_directory=os.path.dirname(__file__),
+    allow_movement=True
+)
 
 # Next, let's create a simple text object
 my_object = objects.W3DObject(
@@ -60,6 +62,9 @@ my_object = objects.W3DObject(
 
 # Now add this object to the project
 my_project["objects"].append(my_object)
+
+# Enable debugging output
+my_project["debug"] = True
 
 #Finally, we render the whole thing using Blender, export it, and display the
 #result

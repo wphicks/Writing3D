@@ -115,8 +115,6 @@ def generate_object_action_logic(
 
     offset = conditions.offset + 1
     start_text.append(conditions.start_string)
-    start_text.append("{}index += 1".format(
-        "    " * (offset)))
     start_text.extend(object_action._blender_object_selection(
         offset=offset)
     )
@@ -634,8 +632,6 @@ class TimelineAction(W3DAction):
         cont_text.append(conditions.continue_string)
         end_text.append(conditions.end_string)
 
-        start_text.append("{}index += 1".format(
-            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
             "    " * (conditions.offset + 1),
             self.end_time)
@@ -720,8 +716,6 @@ class SoundAction(W3DAction):
         cont_text.append(conditions.continue_string)
         end_text.append(conditions.end_string)
 
-        start_text.append("{}index += 1".format(
-            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
             "    " * (conditions.offset + 1),
             self.end_time)
@@ -817,8 +811,6 @@ class EventTriggerAction(W3DAction):
         cont_text.append(conditions.continue_string)
         end_text.append(conditions.end_string)
 
-        start_text.append("{}index += 1".format(
-            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
             "    " * (conditions.offset + 1),
             self.end_time)
@@ -956,8 +948,6 @@ class W3DResetAction(W3DAction):
         cont_text.append(conditions.continue_string)
         end_text.append(conditions.end_string)
 
-        start_text.append("{}index += 1".format(
-            "    " * (conditions.offset + 1)))
         cont_text.append("{}remaining_time = {} - time".format(
             "    " * (conditions.offset + 1),
             self.end_time)

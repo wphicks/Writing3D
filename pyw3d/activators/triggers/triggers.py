@@ -29,9 +29,8 @@ class BlenderTrigger(Activator):
 
     def generate_action_logic(self):
         action_logic = ["        # ACTION LOGIC BEGINS HERE"]
-        max_time = self.duration
-        # TODO: The above is not a full implementation of duration. Duration is
-        # actually a measure of how long a trigger must remain triggered
+        # TODO: Duration remains to be implemented. Duration is
+        # a measure of how long a trigger must remain triggered
         # before its actions begin
         action_index = 0
         for action in self.actions:
@@ -42,8 +41,9 @@ class BlenderTrigger(Activator):
                     offset=2)
             )
             action_index += 1
-            max_time = max(max_time, action.end_time)
-        self.script_footer = self.script_footer.format(max_time=max_time)
+        self.script_footer = self.script_footer.format(
+            action_count=action_index
+        )
         self.script_footer = "\n".join(
             [
                 self.script_footer,

@@ -35,10 +35,6 @@ class BlenderTimeline(Activator):
     def generate_action_logic(self):
         action_logic = ["        # ACTION LOGIC BEGINS HERE"]
         action_index = 0
-        if len(self.actions) == 0:
-            max_time = 0
-        else:
-            max_time = self.actions[-1][0]
         for time, action in self.actions:
             action_logic.extend(
                 action.generate_blender_logic(
@@ -47,8 +43,9 @@ class BlenderTimeline(Activator):
                     offset=2)
             )
             action_index += 1
-            max_time = max(max_time, action.end_time)
-        self.script_footer = self.script_footer.format(max_time=max_time)
+        self.script_footer = self.script_footer.format(
+            action_count=len(self.actions)
+        )
         return "\n".join(action_logic)
 
     def get_actions(self):

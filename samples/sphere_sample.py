@@ -25,14 +25,14 @@ blender --background --python link_sample.py
 where blender is your blender executable.
 """
 
-import sys
-#PATHSUBTAG
+import os
 from random import randint
 from math import pi, sin, cos
 from pyw3d import project, objects, placement, export_to_blender
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
+    call_directory=os.path.dirname(__file__),
     allow_movement=True)
 
 theta_div = 10

@@ -798,6 +798,8 @@ class W3DObject(W3DFeature):
             "name", "visible", "color", "lighting", "scale", "click_through",
             "around_own_axis", "sound", "placement", "link", "content"
         ]
+        if "placement" not in self:
+            self["placement"] = W3DPlacement()
 
     def toXML(self, all_objects_root):
         """Store W3DObject as Object node within ObjectRoot node

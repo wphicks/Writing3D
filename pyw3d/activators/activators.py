@@ -54,6 +54,11 @@ from time import monotonic
 import random
 import logging
 def activate(cont):
+    try:
+        data = activate.data
+    except:
+        activate.data = {}
+        data = activate.data
     scene = bge.logic.getCurrentScene()
     own = cont.owner
     status = own['status']
@@ -62,19 +67,13 @@ def activate(cont):
             own.name, own['status']))
     if status == 'Start':
         own['start_time'] = monotonic()
-        if ('action_index' not in own
-                or 'clicks' not in own
-                or own['clicks'] == 0):
-            own['action_index'] = 0
-        # action_index property is used to ensure that each action is activated
-        # exactly once
+        data["active_actions"] = {}
+        data["complete_actions"] = {}
         own['offset_time'] = 0
-        own['offset_index'] = 0
         own['status'] = 'Continue'
     if status == 'Stop':
         try:
             own['offset_time'] = monotonic() - own['start_time']
-            own['offset_index'] = own['action_index']
         except KeyError:
             pass
     if status == 'Continue':
@@ -90,19 +89,13 @@ def activate(cont):
             raise RuntimeError(
                 'Must start activator before continue is used')
         time = monotonic() - own['start_time']
-        index = own['offset_index'] + own['action_index']
-        #W3D_LOG.debug("Action Index {} at time {} on {}".format(
-        #    index, time, own.name)
-        #)
 """
         self.script_footer = """
         # FOOTER BEGINS HERE
-        own['action_index'] = index
-        own['offset_index'] = 0
-        if time >= {max_time}:
+        if len(data["complete_actions"]) == {action_count}:
             if not stop_block:
                 own['status'] = 'Stop'
-            own['action_index'] = 0
+            data["complete_actions"].clear()
 """
 
     @property
@@ -290,14 +283,8 @@ def activate(cont):
     def generate_action_logic(self):
         """Returns a string to be written into Python control script for
         activating W3DActions
-
-        .. note: This method is responsible for writing the max_time for
-        execution of actions into the script_footer. Failure to do this will
-        result in BGE complaining about attempting to compare a dictionary with
-        an integer or having the name max_time not defined"""
+        """
         action_logic = ["        # ACTION LOGIC BEGINS HERE"]
-        max_time = 0
-        self.script_footer = self.script_footer.format(max_time=max_time)
         return "\n".join(action_logic)
 
     def create_blender_objects(self):
