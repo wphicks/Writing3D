@@ -27,6 +27,44 @@ except ImportError:
         " standalone")
 
 
+def matrix_from_axis_angle(axis, angle):
+    """Return rows of rotation matrix given axis-angle representation"""
+    row1 = (
+        axis[0]**2 * (1 - math.cos(angle)) + math.cos(angle),
+        (
+            axis[0] * axis[1] * (1 - math.cos(angle)) -
+            axis[2] * math.sin(angle)
+        ),
+        (
+            axis[0] * axis[2] * (1 - math.cos(angle)) +
+            axis[1] * math.sin(angle)
+        ),
+    )
+    row2 = (
+        (
+            axis[0] * axis[1] * (1 - math.cos(angle)) +
+            axis[2] * math.sin(angle)
+        ),
+        axis[1]**2 * (1 - math.cos(angle)) + math.cos(angle),
+        (
+            axis[1] * axis[2] * (1 - math.cos(angle)) -
+            axis[0] * math.sin(angle)
+        ),
+    )
+    row3 = (
+        (
+            axis[0] * axis[2] * (1 - math.cos(angle)) -
+            axis[1] * math.sin(angle)
+        ),
+        (
+            axis[1] * axis[2] * (1 - math.cos(angle)) +
+            axis[0] * math.sin(angle)
+        ),
+        axis[2]**2 * (1 - math.cos(angle)) + math.cos(angle),
+    )
+    return (row1, row2, row3)
+
+
 # TODO: Handle moves relative to walls
 class MoveAction(object):
     """Generate Python logic for how object should move when action first
@@ -51,14 +89,15 @@ class MoveAction(object):
             if self.move_relative:
                 if self.placement[
                         "rotation"]["rotation_mode"] == "Axis":
-                    axis = mathutils.Vector(
-                        self.placement["rotation"]["rotation_vector"])
-                    axis.normalize()
                     angle = math.radians(
                         self.placement["rotation"]["rotation_angle"])
-                    script_text.append(
+                    script_text.extend([
                         "rotation = mathutils.Quaternion({}, {})".format(
-                            tuple(vector), -angle))
+                            tuple(vector), -angle),
+                        "target_orientation ="
+                        " blender_object.orientation.copy()",
+                        "target_orientation.rotate(rotation)",
+                    ])
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "Normal":
                     # TODO: Is this the legacy behavior?
@@ -67,8 +106,11 @@ class MoveAction(object):
                         "rotation = mathutils.Vector(",
                         "    {}).rotation_difference(".format(
                             tuple(vector)),
-                        "    current_normal)"]
-                    )
+                        "    current_normal)",
+                        "target_orientation ="
+                        " blender_object.orientation.copy()",
+                        "target_orientation.rotate(rotation)",
+                    ])
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "LookAt":
                     script_text.extend([
@@ -93,12 +135,11 @@ class MoveAction(object):
                         "rotation_matrix.col[1] = frame_y",
                         "rotation_matrix.col[2] = frame_z",
                         "rotation = rotation_matrix.to_quaternion()",
-                        "print(rotation)"]
-                    )
+                        "target_orientation ="
+                        " blender_object.orientation.copy()",
+                        "target_orientation.rotate(rotation)",
+                    ])
             else:  # Not move relative
-                script_text.append(
-                    "orientation ="
-                    "blender_object.orientation.to_quaternion()")
                 script_text.append(
                     "orientation ="
                     "blender_object.orientation.to_quaternion()")
@@ -108,25 +149,14 @@ class MoveAction(object):
                     angle = math.radians(
                         self.placement["rotation"]["rotation_angle"]
                     )
-                    if (
-                            int(self.placement[
-                                "rotation"]["rotation_angle"]) % 180 == 0):
-                        angle += math.pi
-                    vector[0] = -vector[0]
                     script_text.extend([
-                        "target_orientation = mathutils.Quaternion(",
-                        "    {}, {})".format(tuple(vector), -angle),
-                        "rotation = (",
-                        "    target_orientation.rotation_difference(",
-                        "        orientation))",
-                        # "target_orientation = mathutils.Matrix.Rotation(",
-                        # "    {}, 4, {})".format(
-                        #     -angle, tuple(vector)),
-                        # "target_orientation ="
-                        # " target_orientation.to_quaternion()",
-                        # "rotation = (",
-                        # "    target_orientation.rotation_difference(",
-                        # "        orientation))",
+                        "target_orientation = mathutils.Quaternion("
+                        "(0, 0, 1), {})".format(math.pi),
+                        "target_orientation.identity()",
+                        "target_orientation.rotate(mathutils.Quaternion("
+                        "{vector}, {angle}))".format(
+                            angle=angle, vector=tuple(vector)
+                        ),
                     ])
 
                 elif self.placement[
@@ -138,8 +168,11 @@ class MoveAction(object):
                         "rotation = mathutils.Vector(",
                         "    {}).rotation_difference(".format(
                             tuple(vector)),
-                        "    current_normal)"]
-                    )
+                        "    current_normal)",
+                        "target_orientation ="
+                        " blender_object.orientation.copy()",
+                        "target_orientation.rotate(rotation)",
+                    ])
 
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "LookAt":
@@ -167,21 +200,15 @@ class MoveAction(object):
                         "rotation_matrix.col[0] = frame_x",
                         "rotation_matrix.col[1] = frame_y",
                         "rotation_matrix.col[2] = frame_z",
-                        "rotation = rotation_matrix.to_quaternion()"]
-                    )
+                        "rotation = rotation_matrix.to_quaternion()",
+                        "target_orientation ="
+                        " blender_object.orientation.copy()",
+                        "target_orientation.rotate(rotation)",
+                    ])
 
             script_text.extend([
-                "blender_object['angV'] = (",
-                "    rotation.angle /",
-                "    {}".format(
-                    ("({}*bge.logic.getLogicTicRate()) *".format(
-                        self.duration), 1)[
-                        self.duration == 0]),
-                "    rotation.axis)",
                 "data['active_actions'][current_index]['target_orientation'] ="
-                " blender_object.orientation.copy()",
-                "data['active_actions'][current_index]['target_orientation']"
-                ".rotate(rotation)",
+                " target_orientation",
             ])
         # ...and now take care of object position
         if "position" in self.placement:
@@ -249,8 +276,14 @@ class MoveAction(object):
         script_text = []
         if self.placement["rotation"]["rotation_mode"] != "None":
             script_text.extend([
-                "delta_rot = blender_object['angV']",
-                "blender_object.applyRotation(delta_rot)",
+                "orientation = blender_object.orientation.to_quaternion()",
+                "new_orientation = orientation.slerp("
+                "data['active_actions'][current_index]['target_orientation'],"
+                " (1 - remaining_time/{duration})/10)".format(
+                    duration=self.duration),
+                # NOTE: I have less than zero idea why the factor of 10 is
+                # necessary in the above, but it is absolutely necessary.
+                "blender_object.orientation = new_orientation",
             ])
 
         if "position" in self.placement:
@@ -275,7 +308,6 @@ class MoveAction(object):
         script_text = []
         if self.placement["rotation"]["rotation_mode"] != "None":
             script_text.extend([
-                "delta_rot = blender_object['angV']",
                 "blender_object.orientation ="
                 " data['complete_actions'][current_index]['target_orientation']",
             ])

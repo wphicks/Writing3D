@@ -134,7 +134,6 @@ class W3DRotation(W3DFeature):
                 4,  # Size of rotation matrix (4x4)
                 self["rotation_vector"]
             )
-            print("&&&&&&&&&&&&&&", self["rotation_angle"], rotation_matrix)
         elif self["rotation_mode"] == "LookAt":
             if self["rotation_vector"] is None:
                 raise ConsistencyError(
