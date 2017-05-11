@@ -97,6 +97,8 @@ class MoveAction(object):
                         "target_orientation ="
                         " blender_object.orientation.copy()",
                         "target_orientation.rotate(rotation)",
+                        "target_orientation ="
+                        " target_orientation.to_quaternion()"
                     ])
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "Normal":
@@ -110,18 +112,21 @@ class MoveAction(object):
                         "target_orientation ="
                         " blender_object.orientation.copy()",
                         "target_orientation.rotate(rotation)",
+                        "target_orientation ="
+                        " target_orientation.to_quaternion()"
                     ])
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "LookAt":
                     script_text.extend([
                         "look_direction = (",
-                        "mathutils.Vector("
+                        "    mathutils.Vector("
                         "data['active_actions'][current_index].get("
                         "'target_pos', blender_object.position +",
                         "    mathutils.Vector({})) -".format(
                             self.placement["position"]),
                         "    mathutils.Vector({})).normalized()".format(
                             self.placement["rotation"]["rotation_vector"]),
+                        ")",
                         "up_direction = mathutils.Vector(",
                         "    {}).normalized()".format(
                             self.placement["rotation"]["up_vector"]),
@@ -135,8 +140,8 @@ class MoveAction(object):
                         "rotation_matrix.col[1] = frame_y",
                         "rotation_matrix.col[2] = frame_z",
                         "rotation = rotation_matrix.to_quaternion()",
-                        "target_orientation ="
-                        " blender_object.orientation.copy()",
+                        "target_orientation = mathutils.Quaternion()",
+                        "target_orientation.identity()",
                         "target_orientation.rotate(rotation)",
                     ])
             else:  # Not move relative
@@ -172,6 +177,8 @@ class MoveAction(object):
                         "target_orientation ="
                         " blender_object.orientation.copy()",
                         "target_orientation.rotate(rotation)",
+                        "target_orientation ="
+                        " target_orientation.to_quaternion()"
                     ])
 
                 elif self.placement[
@@ -201,8 +208,8 @@ class MoveAction(object):
                         "rotation_matrix.col[1] = frame_y",
                         "rotation_matrix.col[2] = frame_z",
                         "rotation = rotation_matrix.to_quaternion()",
-                        "target_orientation ="
-                        " blender_object.orientation.copy()",
+                        "target_orientation = mathutils.Quaternion()",
+                        "target_orientation.identity()",
                         "target_orientation.rotate(rotation)",
                     ])
 
@@ -309,9 +316,11 @@ class MoveAction(object):
         if self.placement["rotation"]["rotation_mode"] != "None":
             script_text.extend([
                 "blender_object.orientation ="
-                " data['complete_actions'][current_index]['target_orientation']",
+                " data['complete_actions'][current_index]["
+                "'target_orientation']",
             ])
 
+        if "position" in self.placement:
             script_text.extend([
                 "blender_object.position = data['complete_actions']["
                 "current_index]['target_pos']",
