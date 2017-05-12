@@ -1025,6 +1025,7 @@ class W3DPSys(W3DContent):
     logic_template = """
 import mathutils
 import random
+from angles import *
 from group_defs import *
 import bge
 from w3d_settings import *

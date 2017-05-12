@@ -86,63 +86,43 @@ class MoveAction(object):
             vector = mathutils.Vector(
                 self.placement["rotation"]["rotation_vector"])
             vector.normalize()
+            if self.placement.is_default("position"):
+                position_script = \
+                    "data['active_actions'][current_index].get("\
+                    "'target_pos', blender_object.position)"
+            else:
+                position_script = "{}".format(
+                    self.placement["position"])
+            angle = math.radians(
+                self.placement["rotation"]["rotation_angle"])
+
             if self.move_relative:
                 if self.placement[
                         "rotation"]["rotation_mode"] == "Axis":
-                    angle = math.radians(
-                        self.placement["rotation"]["rotation_angle"])
                     script_text.extend([
-                        "rotation = mathutils.Quaternion({}, {})".format(
-                            tuple(vector), -angle),
-                        "target_orientation ="
-                        " blender_object.orientation.copy()",
-                        "target_orientation.rotate(rotation)",
-                        "target_orientation ="
-                        " target_orientation.to_quaternion()"
+                        "target_orientation = target_from_axis("
+                        "{}, {}, initial_orientation="
+                        "blender_object.orientation.to_quaternion())".format(
+                            tuple(vector), angle
+                        ),
                     ])
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "Normal":
-                    # TODO: Is this the legacy behavior?
                     script_text.extend([
-                        "current_normal = mathutils.Vector((1, 0, 0))",
-                        "rotation = mathutils.Vector(",
-                        "    {}).rotation_difference(".format(
-                            tuple(vector)),
-                        "    current_normal)",
-                        "target_orientation ="
-                        " blender_object.orientation.copy()",
-                        "target_orientation.rotate(rotation)",
-                        "target_orientation ="
-                        " target_orientation.to_quaternion()"
+                        "target_orientation = target_from_normal("
+                        "{}, {})".format(
+                            tuple(vector), angle
+                        ),
                     ])
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "LookAt":
                     script_text.extend([
-                        "look_direction = (",
-                        "    mathutils.Vector("
-                        "data['active_actions'][current_index].get("
-                        "'target_pos', blender_object.position +",
-                        "    mathutils.Vector({})) -".format(
-                            self.placement["position"]),
-                        "    mathutils.Vector({})).normalized()".format(
-                            self.placement["rotation"]["rotation_vector"]),
-                        ")",
-                        "up_direction = mathutils.Vector(",
-                        "    {}).normalized()".format(
-                            self.placement["rotation"]["up_vector"]),
-                        "rotation_matrix = mathutils.Matrix.Rotation("
-                        "0, 4, (0, 0, 1))",
-                        "frame_y = look_direction",
-                        "frame_x = frame_y.cross(up_direction)",
-                        "frame_z = frame_x.cross(frame_y)",
-                        "rotation_matrix = mathutils.Matrix().to_3x3()",
-                        "rotation_matrix.col[0] = frame_x",
-                        "rotation_matrix.col[1] = frame_y",
-                        "rotation_matrix.col[2] = frame_z",
-                        "rotation = rotation_matrix.to_quaternion()",
-                        "target_orientation = mathutils.Quaternion()",
-                        "target_orientation.identity()",
-                        "target_orientation.rotate(rotation)",
+                        "target_orientation = target_from_look("
+                        "{}, {}, {})".format(
+                            self.placement["rotation"]["rotation_vector"],
+                            self.placement["rotation"]["up_vector"],
+                            position_script
+                        )
                     ])
             else:  # Not move relative
                 script_text.append(
@@ -155,62 +135,29 @@ class MoveAction(object):
                         self.placement["rotation"]["rotation_angle"]
                     )
                     script_text.extend([
-                        "target_orientation = mathutils.Quaternion("
-                        "(0, 0, 1), {})".format(math.pi),
-                        "target_orientation.identity()",
-                        "target_orientation.rotate(mathutils.Quaternion("
-                        "{vector}, {angle}))".format(
-                            angle=angle, vector=tuple(vector)
+                        "target_orientation = target_from_axis({}, {})".format(
+                            tuple(vector), angle
                         ),
                     ])
 
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "Normal":
                     script_text.extend([
-                        "current_normal = mathutils.Vector((1, 0, 0))",
-                        "current_normal.rotate(",
-                        "    blender_object.orientation)",
-                        "rotation = mathutils.Vector(",
-                        "    {}).rotation_difference(".format(
-                            tuple(vector)),
-                        "    current_normal)",
-                        "target_orientation ="
-                        " blender_object.orientation.copy()",
-                        "target_orientation.rotate(rotation)",
-                        "target_orientation ="
-                        " target_orientation.to_quaternion()"
+                        "target_orientation = target_from_normal("
+                        "{}, {})".format(
+                            tuple(vector), angle
+                        ),
                     ])
 
                 elif self.placement[
                         "rotation"]["rotation_mode"] == "LookAt":
-                    if self.placement.is_default("position"):
-                        position_script = \
-                            "data['active_actions'][current_index].get("\
-                            "'target_pos', blender_object.position)"
-                    else:
-                        position_script = "{}".format(
-                            self.placement["position"])
                     script_text.extend([
-                        "look_direction = (",
-                        "    mathutils.Vector({}) -".format(position_script),
-                        "    mathutils.Vector({})).normalized()".format(
-                            self.placement["rotation"]["rotation_vector"]),
-                        "up_direction = mathutils.Vector(",
-                        "    {}).normalized()".format(
-                            self.placement["rotation"]["up_vector"]),
-                        "rotation_matrix = mathutils.Matrix.Rotation("
-                        "0, 4, (0, 0, 1))",
-                        "frame_y = look_direction",
-                        "frame_x = frame_y.cross(up_direction)",
-                        "frame_z = frame_x.cross(frame_y)",
-                        "rotation_matrix = mathutils.Matrix().to_3x3()",
-                        "rotation_matrix.col[0] = frame_x",
-                        "rotation_matrix.col[1] = frame_y",
-                        "rotation_matrix.col[2] = frame_z",
-                        "rotation = rotation_matrix.to_quaternion()",
-                        "target_orientation = mathutils.Quaternion()",
-                        "target_orientation.identity()",
-                        "target_orientation.rotate(rotation)",
+                        "target_orientation = target_from_look("
+                        "{}, {}, {})".format(
+                            self.placement["rotation"]["rotation_vector"],
+                            self.placement["rotation"]["up_vector"],
+                            position_script
+                        )
                     ])
 
             script_text.extend([

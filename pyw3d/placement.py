@@ -55,7 +55,7 @@ def convert_to_legacy_axes(vector):
 def matrix_from_look(look_direction, up_direction=None):
     """Create rotation_matrix from look-at direction"""
     if up_direction is None:  # Gracefully handle no mathutils module
-        up_direction = mathutils.Vector((0, 1, 0))
+        up_direction = mathutils.Vector((0, 0, 1))
     rotation_matrix = mathutils.Matrix.Rotation(0, 4, (0, 0, 1))
     frame_y = look_direction
     frame_x = frame_y.cross(up_direction)
@@ -65,6 +65,10 @@ def matrix_from_look(look_direction, up_direction=None):
     rotation_matrix.col[1] = frame_y
     rotation_matrix.col[2] = frame_z
     return rotation_matrix
+
+
+def matrix_from_axis(axis, angle):
+    return mathutils.Matrix.Rotation(angle, 3, axis)
 
 
 class W3DRotation(W3DFeature):
@@ -129,11 +133,11 @@ class W3DRotation(W3DFeature):
     def get_rotation_matrix(self, blender_object):
         rotation_matrix = mathutils.Matrix.Rotation(0, 4, (0, 0, 1))
         if self["rotation_mode"] == "Axis":
-            rotation_matrix = mathutils.Matrix.Rotation(
+            rotation_matrix = matrix_from_axis(
+                self["rotation_vector"],
                 math.radians(self["rotation_angle"]),
-                4,  # Size of rotation matrix (4x4)
-                self["rotation_vector"]
             )
+
         elif self["rotation_mode"] == "LookAt":
             if self["rotation_vector"] is None:
                 raise ConsistencyError(
@@ -148,14 +152,14 @@ class W3DRotation(W3DFeature):
             rotation_matrix = matrix_from_look(look_direction, up_direction)
 
         elif self["rotation_mode"] == "Normal":
-            current_normal = mathutils.Vector((1, 0, 0))
-            current_normal.rotate(blender_object.rotation_euler)
-            # NOTE: Not absolutely sure that the above is sufficient to deal
-            # with previously rotated objects, but the behavior here is a
-            # little ambiguous anyway
-            difference = mathutils.Vector(
-                self["rotation_vector"]).rotation_difference(current_normal)
-            rotation_matrix = difference.to_matrix()
+            rotation_matrix = matrix_from_look(
+                -mathutils.Vector(self["rotation_vector"]).normalized(),
+                mathutils.Vector((0, 0, 1))
+            )
+            rotation_matrix = matrix_from_axis(
+                self["rotation_vector"],
+                math.radians(self["rotation_angle"]),
+            ) * rotation_matrix
 
         return rotation_matrix
 

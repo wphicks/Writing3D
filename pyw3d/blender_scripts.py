@@ -77,6 +77,58 @@ def click(cont):
             ray_object['click_status'] = 'activated'
 """
 
+ANGLES_SCRIPT = """
+import mathutils
+
+def target_from_axis(
+        axis, angle, initial_orientation=mathutils.Quaternion((1, 0, 0, 0))
+    ):
+    rotation = mathutils.Quaternion(axis, angle)
+    target_orientation = initial_orientation.copy()
+    target_orientation.rotate(rotation)
+    return target_orientation
+
+def matrix_from_look(look_direction, up_direction):
+    rotation_matrix = mathutils.Matrix.Rotation(
+        0, 4, (0, 0, 1)
+    )
+    frame_y = look_direction
+    frame_x = frame_y.cross(up_direction)
+    frame_z = frame_x.cross(frame_y)
+    rotation_matrix = mathutils.Matrix().to_3x3()
+    rotation_matrix.col[0] = frame_x
+    rotation_matrix.col[1] = frame_y
+    rotation_matrix.col[2] = frame_z
+    return rotation_matrix
+
+def target_from_look(
+        look_point, up_direction, position,
+        initial_orientation=mathutils.Quaternion((1, 0, 0, 0))
+    ):
+    look_direction = (
+        mathutils.Vector(position) - mathutils.Vector(look_point)
+    )
+    up_direction = mathutils.Vector(up_direction).normalized()
+    rotation_matrix = matrix_from_look(look_direction, up_direction)
+    target_orientation = initial_orientation.copy()
+    target_orientation.rotate(rotation_matrix)
+    return target_orientation
+
+def target_from_normal(
+        normal, angle, initial_orientation=mathutils.Quaternion((1, 0, 0, 0))
+    ):
+    normal = mathutils.Vector(normal).normalized()
+    rotation_matrix = matrix_from_look(
+        -normal, mathutils.Vector((0, 0 , 1))
+    )
+    rotation_matrix = (
+        mathutils.Matrix.Rotation(angle, 3, normal) * rotation_matrix
+    )
+    target_orientation = initial_orientation.copy()
+    target_orientation.rotate(rotation_matrix)
+    return target_orientation
+"""
+
 MOVE_TOGGLE_SCRIPT = """
 import bge
 import mathutils
