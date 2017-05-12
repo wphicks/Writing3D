@@ -47,6 +47,7 @@ class Activator(object):
         self.actuators = []
         self.script_header = """
 import bge
+from angles import *
 from w3d_settings import *
 from group_defs import *
 import mathutils

@@ -35,7 +35,7 @@ from .timeline import W3DTimeline
 from .groups import W3DGroup
 from .triggers import W3DTrigger
 from .errors import BadW3DXML
-from .blender_scripts import MOVE_TOGGLE_SCRIPT
+from .blender_scripts import MOVE_TOGGLE_SCRIPT, ANGLES_SCRIPT
 from .names import generate_light_object_name
 from .pointer import setup_mouselook, setup_click
 LOGGER = logging.getLogger("pyw3d")
@@ -457,6 +457,13 @@ class W3DProject(W3DFeature):
             add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
             add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
 
+    def setup_scripts(self):
+        """Load pre-written scripts into blend"""
+        bpy.data.texts.new("angles.py")
+        script = bpy.data.texts["angles.py"]
+        script.write(ANGLES_SCRIPT)
+        return script
+
     def setup_camera(self):
         bpy.ops.object.camera_add(rotation=(math.pi / 2, 0, 0))
         bpy.data.cameras[-1].clip_end = self["far_clip"]
@@ -527,6 +534,7 @@ class W3DProject(W3DFeature):
         self.setup_settings()
         self.setup_camera()
         self.setup_controls()
+        self.setup_scripts()
         setup_mouselook(self)
         setup_click(self)
         self.sort_groups()
