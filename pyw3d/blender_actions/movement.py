@@ -65,7 +65,6 @@ def matrix_from_axis_angle(axis, angle):
     return (row1, row2, row3)
 
 
-# TODO: Handle moves relative to walls
 class MoveAction(object):
     """Generate Python logic for how object should move when action first
     starts, as it continues, and when it ends
@@ -80,6 +79,24 @@ class MoveAction(object):
     @property
     def start_string(self):
         script_text = ["pass"]
+        if self.placement['relative_to'] != "Center":
+            script_text.extend([
+                "relative_object = scene.objects['{}']".format(
+                    generate_relative_to_name(
+                        self.placement['relative_to']
+                    )
+                ),
+                "initial_orientation ="
+                " relative_object.orientation.to_quaternion()",
+                "target_orientation = initial_orientation",
+                "data['active_actions'][current_index]['target_orientation'] ="
+                " target_orientation",
+            ])
+        else:
+            script_text.extend([
+                "initial_orientation = mathutils.Quaternion((1, 0, 0, 0))",
+            ])
+
         # First take care of object rotation...
         if self.placement["rotation"]["rotation_mode"] != "None":
 
@@ -135,7 +152,8 @@ class MoveAction(object):
                         self.placement["rotation"]["rotation_angle"]
                     )
                     script_text.extend([
-                        "target_orientation = target_from_axis({}, {})".format(
+                        "target_orientation = target_from_axis({}, {},"
+                        " initial_orientation=initial_orientation)".format(
                             tuple(vector), angle
                         ),
                     ])
@@ -144,7 +162,8 @@ class MoveAction(object):
                         "rotation"]["rotation_mode"] == "Normal":
                     script_text.extend([
                         "target_orientation = target_from_normal("
-                        "{}, {})".format(
+                        "{}, {},"
+                        "initial_orientation=initial_orientation)".format(
                             tuple(vector), angle
                         ),
                     ])
@@ -153,7 +172,8 @@ class MoveAction(object):
                         "rotation"]["rotation_mode"] == "LookAt":
                     script_text.extend([
                         "target_orientation = target_from_look("
-                        "{}, {}, {})".format(
+                        "{}, {}, {}, "
+                        "initial_orientation=initial_orientation)".format(
                             self.placement["rotation"]["rotation_vector"],
                             self.placement["rotation"]["up_vector"],
                             position_script
@@ -171,7 +191,9 @@ class MoveAction(object):
                 "'Starting position of {}: {}'.format("
                 "blender_object.name, blender_object.position))",
             ])
-            if self.move_relative:
+            if (
+                    self.move_relative and
+                    self.placement['relative_to'] == 'Center'):
                 script_text.extend([
                     "blender_object['linV'] = [",
                     "    coord/{} for coord in {}]".format(
@@ -195,16 +217,12 @@ class MoveAction(object):
                     )
                 else:
                     script_text.extend([
-                        "relative_to = scene.objects['{}']".format(
-                            generate_relative_to_name(
-                                self.placement["relative_to"]
-                            )
-                        ),
                         "data['active_actions']["
                         "current_index]['target_pos']= [",
-                        "    relative_to.position[i] + {}[i] for i in ".format(
+                        "    relative_object.position[i] + "
+                        "{}[i] for i in ".format(
                             list(self.placement["position"])),
-                        "    range(len(relative_to.position))",
+                        "    range(len(relative_object.position))",
                         "]"
                     ])
                 script_text.extend([
@@ -228,7 +246,9 @@ class MoveAction(object):
     @property
     def continue_string(self):
         script_text = []
-        if self.placement["rotation"]["rotation_mode"] != "None":
+        if (
+                self.placement["rotation"]["rotation_mode"] != "None" or
+                self.placement['relative_to'] != "Center"):
             script_text.extend([
                 "orientation = blender_object.orientation.to_quaternion()",
                 "new_orientation = orientation.slerp("
@@ -260,7 +280,9 @@ class MoveAction(object):
     @property
     def end_string(self):
         script_text = []
-        if self.placement["rotation"]["rotation_mode"] != "None":
+        if (
+                self.placement["rotation"]["rotation_mode"] != "None" or
+                self.placement['relative_to'] != "Center"):
             script_text.extend([
                 "blender_object.orientation ="
                 " data['complete_actions'][current_index]["

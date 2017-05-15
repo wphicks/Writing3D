@@ -153,4 +153,6 @@ my_project.save_XML("axis_rotations.xml")
 # Finally, we render the whole thing using Blender, export it, and display the
 # result
 export_to_blender(
-    my_project, filename="axis_rotations.blend", display=True, fullscreen=True)
+    my_project, filename="axis_rotations.blend", display=True,
+    fullscreen=False
+)
