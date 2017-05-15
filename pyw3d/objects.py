@@ -361,7 +361,7 @@ class W3DText(W3DContent):
         "font": None,
         "depth": 0}
 
-    blender_scaling = 0.2
+    blender_scaling = 0.169
     blender_depth_scaling = 0.01
 
     ui_order = ["text", "halign", "valign", "font", "depth"]
