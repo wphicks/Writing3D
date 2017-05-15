@@ -96,7 +96,7 @@ class W3DFeature(dict):
             try:
                 if self[key] != other[key]:
                     return False
-            except KeyError:
+            except (KeyError, ConsistencyError):
                 return False
         return True
 
