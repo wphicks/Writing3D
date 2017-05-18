@@ -366,7 +366,7 @@ class W3DText(W3DContent):
 
     ui_order = ["text", "halign", "valign", "font", "depth"]
 
-    _loaded_fonts = set()
+    _loaded_fonts = {}
 
     def toXML(self, object_root):
         """Store W3DText as Content node within Object node
@@ -431,7 +431,9 @@ class W3DText(W3DContent):
                 new_text_object.data.font = bpy.data.fonts.load(
                     os.path.join("fonts", self["font"])
                 )
-            self._loaded_fonts.add(self["font"])
+            self._loaded_fonts[self["font"]] = new_text_object.data.font
+        else:
+            new_text_object.data.font = self._loaded_fonts[self["font"]]
         new_text_object.data.extrude = self["depth"]
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
