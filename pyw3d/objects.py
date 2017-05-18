@@ -362,7 +362,7 @@ class W3DText(W3DContent):
         "depth": 0}
 
     blender_scaling = 0.169
-    blender_depth_scaling = 0.01
+    blender_depth_scaling = 0.004
 
     ui_order = ["text", "halign", "valign", "font", "depth"]
 
@@ -435,6 +435,7 @@ class W3DText(W3DContent):
         else:
             new_text_object.data.font = self._loaded_fonts[self["font"]]
         new_text_object.data.extrude = self["depth"]
+        new_text_object.location.y += new_text_object.data.extrude
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
         if self["valign"] == "center":
@@ -443,7 +444,7 @@ class W3DText(W3DContent):
             new_text_object.data.offset_y = -new_text_object.dimensions[1] / 2
         new_text_object.select = True
         bpy.ops.object.convert(target='MESH', keep_original=False)
-        bpy.ops.object.transform_apply(rotation=True)
+        bpy.ops.object.transform_apply(rotation=True, location=True)
         new_text_object.select = False
         return new_text_object
 
