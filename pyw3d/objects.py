@@ -46,6 +46,11 @@ except ImportError:
         "Module bpy not found. Loading pyw3d.objects as standalone")
 
 
+def line_count(string):
+    """Count lines in string"""
+    return string.count('\n') + 1
+
+
 def generate_material_from_image(filename, double_sided=True):
     """Generate Blender material from image for texturing"""
     material_name = bpy.path.display_name_from_filepath(filename)
@@ -421,7 +426,10 @@ class W3DText(W3DContent):
         """Create representation of W3DText in Blender"""
         bpy.ops.object.text_add(rotation=(math.pi / 2, 0, 0))
         new_text_object = bpy.context.object
-        new_text_object.data.body = self["text"]
+        text_content = self["text"].strip()
+        new_text_object.data.body = text_content
+        lines = line_count(text_content)
+        new_text_object.data.space_line = 0.6
         if (
                 self["font"] is not None and self["font"] not in
                 self._loaded_fonts):
@@ -438,14 +446,21 @@ class W3DText(W3DContent):
         new_text_object.location.y += new_text_object.data.extrude
         new_text_object.data.fill_mode = "BOTH"
         new_text_object.data.align = self["halign"].upper()
+
+        height = new_text_object.dimensions[1]
         if self["valign"] == "top":
             new_text_object.data.offset_y = (
-                - 3 * new_text_object.dimensions[1] / 4
+                - 3 * height / 4
             )
         elif self["valign"] == "center":
-            new_text_object.data.offset_y = - new_text_object.dimensions[1] / 4
+            new_text_object.data.offset_y = (
+                - height / 4 + (lines - 1) * height / 2
+            )
         elif self["valign"] == "bottom":
-            new_text_object.data.offset_y = new_text_object.dimensions[1] / 4
+            new_text_object.data.offset_y = (
+                height / 4 + 0.85 * height * (lines - 1)
+            )
+
         new_text_object.select = True
         bpy.ops.object.convert(target='MESH', keep_original=False)
         bpy.ops.object.transform_apply(rotation=True, location=True)
