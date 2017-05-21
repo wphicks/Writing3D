@@ -40,7 +40,8 @@ from .sounds import audio_playback_object
 import logging
 LOGGER = logging.getLogger("pyw3d")
 try:
-    import bpy, mathutils
+    import bpy
+    import mathutils
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
@@ -59,6 +60,36 @@ def add_text_object(name, text):
     new_object.data.body = text
     new_object.data.space_line = 0.6
     return new_object
+
+
+def apply_euler_rotation(blender_object, x, y, z):
+    """Apply euler rotation (radians) to object"""
+    blender_object.data.transform(
+        mathutils.Euler((x, y, z), 'XYZ').to_matrix().to_4x4()
+    )
+
+
+def find_object_midpoint(blender_object):
+    return (
+        sum(blender_object.data.vertices) / len(blender_object.data.vertices)
+    )
+
+
+def set_object_center(blender_object, center_vec):
+    blender_object.data.transform(
+        mathutils.Matrix.Translation(
+            blender_object.matrix_world.translation - center_vec
+        )
+    )
+
+
+def duplicate_object(original):
+    """Duplicate given object"""
+    new = original.copy()
+    new.data = original.data.copy()
+    new.animation_data_clear()
+    bpy.context.scene.objects.link(new)
+    return new
 
 
 def generate_material_from_image(filename, double_sided=True):
@@ -477,9 +508,7 @@ class W3DText(W3DContent):
             "mesh_text_{}".format(type(self).object_count), mesh
         )
         bpy.context.scene.objects.link(final_object)
-        final_object.data.transform(
-            mathutils.Euler((math.pi / 2, 0, 0), 'XYZ').to_matrix().to_4x4()
-        )
+        apply_euler_rotation(final_object, math.pi / 2, 0, 0)
         return final_object
 
 
@@ -964,16 +993,6 @@ class W3DObject(W3DFeature):
             object_.select = False
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
-        particle_name = generate_blender_particle_name(blender_object.name)
-        bpy.ops.object.duplicate(
-            linked=False
-        )
-        bpy.data.objects[
-            "{}.001".format(blender_object.name)].name = particle_name
-        bpy.data.objects[particle_name].layers = [
-            layer == 5 for layer in range(20)
-        ]
-        bpy.data.objects[particle_name].game.physics_type = 'DYNAMIC'
 
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
@@ -998,7 +1017,17 @@ class W3DObject(W3DFeature):
         blender_object.layers = [layer == 0 for layer in range(20)]
 
         if self["around_own_axis"]:
-            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+            set_object_center(
+                blender_object, find_object_center(blender_object)
+            )
+
+        particle_name = generate_blender_particle_name(blender_object.name)
+        particle_copy = duplicate_object(blender_object)
+        particle_copy.name = particle_name
+        bpy.data.objects[particle_name].layers = [
+            layer == 5 for layer in range(20)
+        ]
+        bpy.data.objects[particle_name].game.physics_type = 'DYNAMIC'
 
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
