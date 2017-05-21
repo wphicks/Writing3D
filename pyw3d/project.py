@@ -563,6 +563,7 @@ class W3DProject(W3DFeature):
             group.blend_groups()
         for object_ in self["objects"]:
             object_.blend()
+        bpy.context.scene.update()
 
         # Create particle action logic
         for paction in self["particle_actions"]:

@@ -33,14 +33,14 @@ from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
 from .names import generate_blender_object_name,\
     generate_blender_material_name, generate_blender_sound_name,\
     generate_light_object_name, generate_paction_name, generate_group_name, \
-    generate_blender_particle_name
+    generate_blender_particle_name, generate_blender_curve_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
 from .sounds import audio_playback_object
 import logging
 LOGGER = logging.getLogger("pyw3d")
 try:
-    import bpy
+    import bpy, mathutils
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
@@ -49,6 +49,16 @@ except ImportError:
 def line_count(string):
     """Count lines in string"""
     return string.count('\n') + 1
+
+
+def add_text_object(name, text):
+    font_curve = bpy.data.curves.new(
+        type="FONT", name=generate_blender_curve_name(name)
+    )
+    new_object = bpy.data.objects.new(name, font_curve)
+    new_object.data.body = text
+    new_object.data.space_line = 0.6
+    return new_object
 
 
 def generate_material_from_image(filename, double_sided=True):
@@ -368,6 +378,7 @@ class W3DText(W3DContent):
 
     blender_scaling = 0.169
     blender_depth_scaling = 0.004
+    object_count = 0
 
     ui_order = ["text", "halign", "valign", "font", "depth"]
 
@@ -424,12 +435,12 @@ class W3DText(W3DContent):
 
     def blend(self):
         """Create representation of W3DText in Blender"""
-        bpy.ops.object.text_add(rotation=(math.pi / 2, 0, 0))
-        new_text_object = bpy.context.object
+        type(self).object_count += 1
         text_content = self["text"].strip()
-        new_text_object.data.body = text_content
+        new_text_object = add_text_object(
+            "text_{}".format(type(self).object_count), text_content
+        )
         lines = line_count(text_content)
-        new_text_object.data.space_line = 0.6
         if (
                 self["font"] is not None and self["font"] not in
                 self._loaded_fonts):
@@ -461,11 +472,15 @@ class W3DText(W3DContent):
                 height / 4 + 0.85 * height * (lines - 1)
             )
 
-        new_text_object.select = True
-        bpy.ops.object.convert(target='MESH', keep_original=False)
-        bpy.ops.object.transform_apply(rotation=True, location=True)
-        new_text_object.select = False
-        return new_text_object
+        mesh = new_text_object.to_mesh(bpy.context.scene, False, 'PREVIEW')
+        final_object = bpy.data.objects.new(
+            "mesh_text_{}".format(type(self).object_count), mesh
+        )
+        bpy.context.scene.objects.link(final_object)
+        final_object.data.transform(
+            mathutils.Euler((math.pi / 2, 0, 0), 'XYZ').to_matrix().to_4x4()
+        )
+        return final_object
 
 
 class W3DImage(W3DContent):
