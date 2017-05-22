@@ -605,5 +605,7 @@ class W3DProject(W3DFeature):
                 object_["link"].link_blender_logic()
         for trigger in self["trigger_events"]:
             trigger.link_blender_logic()
+
+        bpy.context.scene.update()
         setup_blender_layout()
         bpy.ops.file.pack_all()

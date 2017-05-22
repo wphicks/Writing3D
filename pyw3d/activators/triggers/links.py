@@ -24,6 +24,8 @@ from pyw3d.blender_scripts import DISABLE_LINK_SCRIPT, UNSELECT_LINK_SCRIPT,\
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.timeline as standalone")
@@ -39,9 +41,9 @@ class BlenderClickTrigger(BlenderTrigger):
         """Add property to track if link is disabled, unselected, selected, or
         activated"""
         click_object = self.select_base_object()
-        bpy.ops.object.game_property_new(
-            type='STRING',
-            name='click_status'
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'STRING', 'name': 'click_status'}
         )
         click_object.game.properties["click_status"].value = "False"
         return click_object.game.properties["click_status"]
@@ -49,10 +51,12 @@ class BlenderClickTrigger(BlenderTrigger):
     def create_click_status_sensors(self):
         """Add property sensors for click status"""
         self.select_base_object()
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="disabled_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'disabled_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "disabled_sensor"
         click_sensor = self.base_object.game.sensors["disabled_sensor"]
@@ -61,10 +65,12 @@ class BlenderClickTrigger(BlenderTrigger):
         self.disabled_sensor = click_sensor
 
         self.select_base_object()
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="unselected_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'unselected_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "unselected_sensor"
         click_sensor = self.base_object.game.sensors["unselected_sensor"]
@@ -72,10 +78,12 @@ class BlenderClickTrigger(BlenderTrigger):
         click_sensor.value = "unselected"
         self.unselected_sensor = click_sensor
 
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="selected_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'selected_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "selected_sensor"
         click_sensor = self.base_object.game.sensors["selected_sensor"]
@@ -83,10 +91,12 @@ class BlenderClickTrigger(BlenderTrigger):
         click_sensor.value = "selected"
         self.selected_sensor = click_sensor
 
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="activated_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'activated_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "activated_sensor"
         click_sensor = self.base_object.game.sensors["activated_sensor"]
@@ -101,40 +111,52 @@ class BlenderClickTrigger(BlenderTrigger):
         """Add controllers to handle when click status changes
         """
         click_object = self.select_base_object()
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.object_name,
-            name="disabled_controller")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': self.name,
+                'name': 'disabled_controller'
+            }
+        )
         controller = click_object.game.controllers["disabled_controller"]
         controller.mode = "MODULE"
         controller.module = "{}.disable_link".format(self.name)
         controller.link(sensor=self.disabled_sensor)
         self.disabled_controller = controller
 
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.object_name,
-            name="unselected_controller")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': self.name,
+                'name': 'unselected_controller'
+            }
+        )
         controller = click_object.game.controllers["unselected_controller"]
         controller.mode = "MODULE"
         controller.module = "{}.unselect_link".format(self.name)
         controller.link(sensor=self.unselected_sensor)
         self.unselected_controller = controller
 
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.object_name,
-            name="selected_controller")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': self.name,
+                'name': 'selected_controller'
+            }
+        )
         controller = click_object.game.controllers["selected_controller"]
         controller.mode = "MODULE"
         controller.module = "{}.select_link".format(self.name)
         controller.link(sensor=self.selected_sensor)
         self.selected_controller = controller
 
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.object_name,
-            name="activated_controller")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': self.name,
+                'name': 'activated_controller'
+            }
+        )
         controller = click_object.game.controllers["activated_controller"]
         controller.mode = "MODULE"
         controller.module = "{}.activate_link".format(self.name)
@@ -150,9 +172,9 @@ class BlenderClickTrigger(BlenderTrigger):
         """Add property to keep track of how many times link has been
         clicked"""
         self.select_base_object()
-        bpy.ops.object.game_property_new(
-            type='INT',
-            name='clicks'
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'INT', 'name': 'clicks'}
         )
         self.base_object.game.properties["clicks"].value = 0
         return self.base_object.game.properties["clicks"]
@@ -166,9 +188,9 @@ class BlenderClickTrigger(BlenderTrigger):
         if (
                 (not click_object.hide_render) and
                 self.base_object.game.properties['enabled']):
-            bpy.ops.object.game_property_new(
-                type='BOOL',
-                name='clickable'
+            BPY_OPS_CALL(
+                "object.game_property_new", None,
+                {'type': 'BOOL', 'name': 'clickable'}
             )
             click_object.game.properties["clickable"].value = True
             return click_object.game.properties["clickable"]
