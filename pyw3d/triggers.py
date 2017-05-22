@@ -56,10 +56,10 @@ class W3DTrigger(W3DFeature):
     def __getitem__(self, key):
         try:
             return super(W3DTrigger, self).__getitem__(key)
-        except KeyError as not_found_error:
+        except (KeyError, ConsistencyError) as not_found_error:
             try:
                 return self.base_trigger.__getitem__(key)
-            except KeyError:
+            except (KeyError, ConsistencyError):
                 raise not_found_error
 
     @staticmethod

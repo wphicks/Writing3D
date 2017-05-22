@@ -46,7 +46,7 @@ class BlenderPositionTrigger(BlenderTrigger):
         base_object.game.sensors[-1].name = self.name
         enable_sensor = base_object.game.sensors[self.name]
         enable_sensor.use_pulse_true_level = True
-        enable_sensor.frequency = 1
+        enable_sensor.tick_skip = 0
         enable_sensor.property = "enabled"
         enable_sensor.value = "True"
         self.enable_sensor = enable_sensor
