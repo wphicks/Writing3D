@@ -24,7 +24,7 @@ import time
 from random import randint
 from math import pi, sin, cos
 from pyw3d import project, objects, placement, export_to_blender, sounds,\
-    psys, groups
+    psys, groups, timeline, actions
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
@@ -39,7 +39,7 @@ play_sound = sounds.W3DSound(
 )
 my_project["sounds"].append(play_sound)
 
-theta_div = 10
+theta_div = 20
 phi_div = 10
 radius = 10
 for i in range(1, theta_div):
@@ -148,6 +148,16 @@ for i in range(1, theta_div):
             sound="basic"
         )
         my_project["objects"].append(my_object)
+
+        my_timeline = timeline.W3DTimeline(
+            name="timeline{}x{}".format(i, j),
+            start_immediately=False,
+            actions=[
+                (0, actions.ObjectAction(
+                    object_name="elem{}x{}".format(i, j), visible=True)),
+            ]
+        )
+        my_project["timelines"].append(my_timeline)
 
 my_project["groups"].append(
     groups.W3DGroup(
