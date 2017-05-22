@@ -96,28 +96,53 @@ def duplicate_object(original):
 
 def generate_material_from_image(filename, double_sided=True):
     """Generate Blender material from image for texturing"""
-    material_name = bpy.path.display_name_from_filepath(filename)
-    material = bpy.data.materials.new(name=material_name)
-    texture_slot = material.texture_slots.add()
-    texture_name = '_'.join(
-        (os.path.splitext(os.path.basename(filename))[0],
-         "image_texture")
-    )
-    image_texture = bpy.data.textures.new(name=texture_name, type="IMAGE")
-    image_texture.image = bpy.data.images.load(filename)
-    # NOTE: The above already raises a sensible RuntimeError if file is not
-    # found
-    image_texture.image.use_alpha = True
-    texture_slot.texture = image_texture
-    texture_slot.texture_coords = 'UV'
+    try:
+        return generate_material_from_image._materials[
+            filename][double_sided]
+    except AttributeError:
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        generate_material_from_image._materials = {}
+    except KeyError:
+        print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+        material_name = bpy.path.display_name_from_filepath(filename)
 
-    # material.alpha = 0.0
-    # material.specular_alpha = 0.0
-    # texture_slot.use_map_alpha
-    # material.use_transparency = True
-    material.game_settings.use_backface_culling = not double_sided
+        material_single = bpy.data.materials.new(
+            name="{}{}".format(material_name, 0)
+        )
+        material_double = bpy.data.materials.new(
+            name="{}{}".format(material_name, 1)
+        )
+        texture_slot_single = material_single.texture_slots.add()
+        texture_slot_double = material_double.texture_slots.add()
 
-    return material
+        texture_name = '_'.join(
+            (os.path.splitext(os.path.basename(filename))[0],
+             "image_texture")
+        )
+        image_texture = bpy.data.textures.new(name=texture_name, type="IMAGE")
+        image_texture.image = bpy.data.images.load(filename)
+        # NOTE: The above already raises a sensible RuntimeError if file is not
+        # found
+        image_texture.image.use_alpha = True
+
+        texture_slot_single.texture = image_texture
+        texture_slot_double.texture = image_texture
+        texture_slot_single.texture_coords = 'UV'
+        texture_slot_double.texture_coords = 'UV'
+
+        # material.alpha = 0.0
+        # material.specular_alpha = 0.0
+        # texture_slot.use_map_alpha
+        # material.use_transparency = True
+        material_single.game_settings.use_backface_culling = True
+        material_double.game_settings.use_backface_culling = False
+
+        generate_material_from_image._materials[filename] = (
+            material_single, material_double
+        )
+
+    return generate_material_from_image(
+        filename, double_sided=double_sided)
 
 
 class W3DLink(W3DFeature):
@@ -567,12 +592,17 @@ class W3DImage(W3DContent):
 
     def blend(self):
         """Create representation of W3DImage in Blender"""
-        bpy.ops.mesh.primitive_plane_add(
-            rotation=(math.pi / 2, 0, 0),
-            radius=0.1524
+        BPY_OPS_CALL(
+            "mesh.primitive_plane_add", None,
+            {'radius': 0.1524}
         )
-        bpy.ops.object.transform_apply(rotation=True)
+        #bpy.ops.mesh.primitive_plane_add(
+        #    rotation=(math.pi / 2, 0, 0),
+        #    radius=0.1524
+        #)
+        #bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
+        apply_euler_rotation(new_image_object, math.pi / 2, 0, 0)
 
         material = generate_material_from_image(self["filename"])
         material.use_nodes = False
