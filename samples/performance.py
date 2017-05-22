@@ -33,11 +33,6 @@ my_project = project.W3DProject(
 
 shapes = objects.W3DShape.argument_validators['shape_type'].valid_options
 lights = objects.W3DLight.argument_validators['light_type'].valid_options
-play_sound = sounds.W3DSound(
-    name="basic",
-    filename="sound/play.wav"
-)
-my_project["sounds"].append(play_sound)
 
 theta_div = 20
 phi_div = 10
@@ -46,6 +41,12 @@ for i in range(1, theta_div):
     for j in range(phi_div):
         theta = pi / theta_div * i
         phi = 2 * pi / phi_div * j
+
+        play_sound = sounds.W3DSound(
+            name="basic{}x{}".format(i, j),
+            filename="sound/play.wav"
+        )
+        my_project["sounds"].append(play_sound)
 
         my_object = objects.W3DObject(
             name="elem{}x{}".format(i, j),
@@ -159,7 +160,7 @@ for i in range(1, theta_div):
                 ),
             ),
             visible=True,
-            sound="basic"
+            sound="basic{}x{}".format(i, j)
         )
         my_project["objects"].append(my_object)
 
