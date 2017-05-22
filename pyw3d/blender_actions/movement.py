@@ -78,24 +78,34 @@ class MoveAction(object):
 
     @property
     def start_string(self):
-        script_text = ["pass"]
-        if self.placement['relative_to'] != "Center":
+        script_text = [
+            "pos_vector = mathutils.Vector({})".format(
+                self.placement["position"]),
+            "relative_object = scene.objects['{}']".format(
+                generate_relative_to_name(
+                    self.placement['relative_to']
+                )
+            ),
+        ]
+        if self.move_relative:
             script_text.extend([
-                "relative_object = scene.objects['{}']".format(
-                    generate_relative_to_name(
-                        self.placement['relative_to']
-                    )
-                ),
                 "initial_orientation ="
-                " relative_object.orientation.to_quaternion()",
-                "target_orientation = initial_orientation",
-                "data['active_actions'][current_index]['target_orientation'] ="
-                " target_orientation",
+                " blender_object.orientation.to_quaternion()",
+                "target_orientation = initial_orientation"
             ])
         else:
             script_text.extend([
-                "initial_orientation = mathutils.Quaternion((1, 0, 0, 0))",
+                "initial_orientation ="
+                " relative_object.orientation.to_quaternion()",
+                "target_orientation = initial_orientation",
             ])
+        script_text.extend([
+            "data['active_actions'][current_index]['target_orientation'] ="
+            " target_orientation",
+            "pos_vector.rotate(relative_object.orientation.to_quaternion()"
+            ".rotation_difference(scene.objects['VRCENTER']"
+            ".orientation.to_quaternion()))",
+        ])
 
         # First take care of object rotation...
         if self.placement["rotation"]["rotation_mode"] != "None":
@@ -108,8 +118,7 @@ class MoveAction(object):
                     "data['active_actions'][current_index].get("\
                     "'target_pos', blender_object.position)"
             else:
-                position_script = "{}".format(
-                    self.placement["position"])
+                position_script = "pos_vector"
             angle = math.radians(
                 self.placement["rotation"]["rotation_angle"])
 
@@ -119,7 +128,7 @@ class MoveAction(object):
                     script_text.extend([
                         "target_orientation = target_from_axis("
                         "{}, {}, initial_orientation="
-                        "blender_object.orientation.to_quaternion())".format(
+                        "initial_orientation".format(
                             tuple(vector), angle
                         ),
                     ])
@@ -196,36 +205,22 @@ class MoveAction(object):
                     self.placement['relative_to'] == 'Center'):
                 script_text.extend([
                     "blender_object['linV'] = [",
-                    "    coord/{} for coord in {}]".format(
+                    "    coord/{} for coord in pos_vector]".format(
                         ("({}*bge.logic.getLogicTicRate())".format(
                             self.duration), 1)[self.duration == 0],
-                        self.placement["position"]
                     ),
                     "data['active_actions'][current_index]['target_pos'] = [",
-                    "    blender_object.position[i] + {}[i]".format(
-                        list(self.placement["position"])
-                    ),
+                    "    blender_object.position[i] + pos_vector[i]",
                     "    for i in range(len(blender_object.position))]"
                 ])
             else:
-                if self.placement["relative_to"] == "Center":
-                    script_text.append(
-                        "data['active_actions']["
-                        "current_index]['target_pos']= {}".format(
-                            list(self.placement["position"])
-                        )
-                    )
-                else:
-                    script_text.extend([
-                        "data['active_actions']["
-                        "current_index]['target_pos']= [",
-                        "    relative_object.position[i] + "
-                        "{}[i] for i in ".format(
-                            list(self.placement["position"])),
-                        "    range(len(relative_object.position))",
-                        "]"
-                    ])
                 script_text.extend([
+                    "data['active_actions']["
+                    "current_index]['target_pos']= [",
+                    "    relative_object.position[i] + "
+                    "pos_vector[i] for i in ",
+                    "    range(len(relative_object.position))",
+                    "]",
                     "delta_pos = [",
                     "    data['active_actions']["
                     "current_index]['target_pos'][i]"
@@ -246,25 +241,19 @@ class MoveAction(object):
     @property
     def continue_string(self):
         script_text = []
-        if (
-                self.placement["rotation"]["rotation_mode"] != "None" or
-                self.placement['relative_to'] != "Center"):
-            script_text.extend([
-                "orientation = blender_object.orientation.to_quaternion()",
-                "new_orientation = orientation.slerp("
-                "data['active_actions'][current_index]['target_orientation'],"
-                " (1 - remaining_time/{duration})/10)".format(
-                    duration=self.duration),
-                # NOTE: I have less than zero idea why the factor of 10 is
-                # necessary in the above, but it is absolutely necessary.
-                "blender_object.orientation = new_orientation",
-            ])
+        script_text.extend([
+            "orientation = blender_object.orientation.to_quaternion()",
+            "new_orientation = orientation.slerp("
+            "data['active_actions'][current_index]['target_orientation'],"
+            " (1 - remaining_time/{duration})/10)".format(
+                duration=self.duration),
+            # NOTE: I have less than zero idea why the factor of 10 is
+            # necessary in the above, but it is absolutely necessary.
+            "blender_object.orientation = new_orientation",
+        ])
 
         if "position" in self.placement:
             script_text.extend([
-                # "if 'linV' not in blender_object:",
-                # "   blender_object['linV'] = [0.0,0.0,0.0]",
-                # "   W3D_LOG.debug('LINV NOW ZERO')",
                 "blender_object.position = [",
                 "    blender_object.position[i] + blender_object['linV'][i]",
                 "    for i in range(len(blender_object.position))]"]
@@ -280,14 +269,11 @@ class MoveAction(object):
     @property
     def end_string(self):
         script_text = []
-        if (
-                self.placement["rotation"]["rotation_mode"] != "None" or
-                self.placement['relative_to'] != "Center"):
-            script_text.extend([
-                "blender_object.orientation ="
-                " data['complete_actions'][current_index]["
-                "'target_orientation']",
-            ])
+        script_text.extend([
+            "blender_object.orientation ="
+            " data['complete_actions'][current_index]["
+            "'target_orientation']",
+        ])
 
         if "position" in self.placement:
             script_text.extend([

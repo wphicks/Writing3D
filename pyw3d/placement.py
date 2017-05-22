@@ -184,7 +184,9 @@ class W3DPlacement(W3DFeature):
     ui_order = ["position", "relative_to", "rotation"]
     argument_validators = {
         "relative_to": OptionValidator(
-            "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
+            "Camera", "Center", "FrontWall", "LeftWall", "RightWall",
+            "FloorWall"
+        ),
         "position": ListValidator(
             IsNumeric(), required_length=3),
         "rotation": FeatureValidator(W3DRotation)}
@@ -254,15 +256,17 @@ class W3DPlacement(W3DFeature):
                 place_class.argument_validators[
                     "relative_to"].valid_options) - 1:
             for wall_name, position in wall_positions.items():
-                bpy.ops.object.add(
-                    type="EMPTY",
-                    location=position,
-                    rotation=wall_rotations[wall_name],
-                    layers=[layer == 3 for layer in range(1, 21)]
-                )
-                place_class.relative_to_objects[wall_name] = bpy.context.object
-                place_class.relative_to_objects[
-                    wall_name].name = generate_relative_to_name(wall_name)
+                if wall_name not in ("Camera"):
+                    bpy.ops.object.add(
+                        type="EMPTY",
+                        location=position,
+                        rotation=wall_rotations[wall_name],
+                        layers=[layer == 3 for layer in range(1, 21)]
+                    )
+                    place_class.relative_to_objects[
+                        wall_name] = bpy.context.object
+                    place_class.relative_to_objects[
+                        wall_name].name = generate_relative_to_name(wall_name)
 
         for name, obj in place_class.relative_to_objects.items():
             if name != "Center":

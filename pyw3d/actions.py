@@ -895,8 +895,8 @@ class MoveVRAction(W3DAction):
 
     def _blender_object_selection(self, offset=0):
         self.selection_offset = 0
-        return ["{}blender_object = scene.objects['{}']".format(
-            "    " * offset, generate_relative_to_name("Center"))]
+        return ["{}blender_object = scene.objects['VRCENTER']".format(
+            "    " * offset)]
 
     def generate_blender_logic(
             self, offset=0, time_condition=0, index_condition=None,

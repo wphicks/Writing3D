@@ -472,7 +472,14 @@ class W3DProject(W3DFeature):
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
-        self.main_camera.parent = W3DPlacement.relative_to_objects["Center"]
+        bpy.ops.object.add(
+            type="EMPTY",
+            location=(0, 0, 0),
+            layers=[layer == 3 for layer in range(1, 21)]
+        )
+        vr_center = bpy.context.object
+        vr_center.name = "VRCENTER"
+        self.main_camera.parent = vr_center
         bpy.data.scenes['Scene'].camera = self.main_camera
         bpy.data.scenes['Scene'].game_settings.resolution_x = 800
         bpy.data.scenes['Scene'].game_settings.resolution_y = 600
