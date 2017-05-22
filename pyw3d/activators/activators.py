@@ -22,6 +22,8 @@ from pyw3d.errors import EBKAC
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.timeline as standalone")
@@ -119,9 +121,9 @@ def activate(cont):
         and Start is used to initially start the actions associated with this
         activator"""
         self.select_base_object()
-        bpy.ops.object.game_property_new(
-            type='STRING',
-            name='status'
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'STRING', 'name': 'status'}
         )
         self.base_object.game.properties["status"].value = initial_value
         return self.base_object.game.properties["status"]
@@ -135,9 +137,9 @@ def activate(cont):
         to allow the activator to be immediately disabled after activation but
         still process the remainder of its actions"""
         self.select_base_object()
-        bpy.ops.object.game_property_new(
-            type='BOOL',
-            name='enabled'
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'BOOL', 'name': 'enabled'}
         )
         self.base_object.game.properties["enabled"].value = initial_value
         return self.base_object.game.properties["enabled"]
@@ -155,10 +157,12 @@ def activate(cont):
         )
         self.select_base_object()
         # Create property sensor to initiate actions
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="start_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'start_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "start_sensor"
         start_sensor = self.base_object.game.sensors["start_sensor"]
@@ -166,10 +170,12 @@ def activate(cont):
         start_sensor.value = "Start"
 
         # Create property sensor to activate actions
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="active_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'active_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "active_sensor"
         active_sensor = self.base_object.game.sensors["active_sensor"]
@@ -178,10 +184,12 @@ def activate(cont):
         active_sensor.value = "Continue"
 
         # Create property sensor to pause actions
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="stop_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'stop_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "stop_sensor"
         stop_sensor = self.base_object.game.sensors["stop_sensor"]
@@ -200,10 +208,13 @@ def activate(cont):
             "Creating controller for {}".format(self.name_string)
         )
         self.select_base_object()
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.name,
-            name="activate")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': self.name,
+                'name': 'activate'
+            }
+        )
         controller = self.base_object.game.controllers["activate"]
         controller.mode = "MODULE"
         controller.module = "{}.activate".format(self.name)
@@ -250,14 +261,12 @@ def activate(cont):
             for actuator in action.actuators:
                 actuator.link(controller)
 
-    def _create_base_object(self):
+    def _create_base_object(self, name):
         """Create the object which controls the current status of the
         activator"""
-        bpy.ops.object.add(
-            type="EMPTY",
-            layers=[layer == 20 for layer in range(1, 21)]
-        )
-        return bpy.context.scene.objects.active
+        base_object = bpy.data.objects.new(name, None)
+        bpy.context.scene.objects.link(base_object)
+        return base_object
 
     @property
     def base_object(self):
@@ -266,7 +275,7 @@ def activate(cont):
         try:
             return bpy.data.objects[self.name]
         except KeyError:
-            blender_object = self._create_base_object()
+            blender_object = self._create_base_object(self.name)
             blender_object.name = self.name
             return blender_object
 

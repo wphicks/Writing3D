@@ -42,11 +42,11 @@ LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
     import mathutils
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
-from _bpy import ops as ops_module
-BPY_OPS_CALL = ops_module.call
 
 
 def line_count(string):
