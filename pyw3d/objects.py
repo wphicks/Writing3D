@@ -45,6 +45,8 @@ try:
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
+from _bpy import ops as ops_module
+BPY_OPS_CALL = ops_module.call
 
 
 def line_count(string):
@@ -997,9 +999,15 @@ class W3DObject(W3DFeature):
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
 
-        bpy.ops.object.game_property_new(type='BOOL', name="visible_tag")
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'BOOL', 'name': 'visible_tag'}
+        )
         blender_object.game.properties["visible_tag"].value = self["visible"]
-        bpy.ops.object.game_property_new(type='BOOL', name="click_through")
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'BOOL', 'name': 'click_through'}
+        )
         blender_object.game.properties[
             "click_through"].value = self["click_through"]
 

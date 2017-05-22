@@ -121,6 +121,7 @@ class W3DProject(W3DFeature):
     :param bool allow_movement: Allow user to navigate within project?
     :param bool allow_rotation: Allow user to rotate withing project?
     :param bool debug: Turn on debug-level logging
+    :param bool profile: Turn on performance profiling
     :param dict wall_placements: Dictionary mapping names of walls to
     W3DPlacements specifying their position and orientation
     """
@@ -171,6 +172,7 @@ class W3DProject(W3DFeature):
         "allow_movement": IsBoolean(),
         "allow_rotation": IsBoolean(),
         "debug": IsBoolean(),
+        "profile": IsBoolean(),
         "wall_placements": DictValidator(
             OptionValidator(
                 "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
@@ -183,7 +185,8 @@ class W3DProject(W3DFeature):
         "background": (0, 0, 0),
         "allow_movement": True,
         "allow_rotation": True,
-        "debug": False
+        "debug": False,
+        "profile": False,
     }
 
     def __setitem__(self, key, value):
@@ -290,9 +293,6 @@ class W3DProject(W3DFeature):
         for trigger in self["trigger_events"]:
             trigger.toXML(event_root)
         global_node = ET.SubElement(project_root, "Global")
-        # CameraPos corresponds to position when run in Cave mode
-        # CaveCameraPos corresponds to position when run in Desktop mode
-        # Editorial aside: I can't even...
         camera_node = ET.SubElement(
             global_node, "CameraPos", attrib={
                 "far-clip": str(self["far_clip"])})
@@ -312,6 +312,8 @@ class W3DProject(W3DFeature):
         )
         debug_node = ET.SubElement(global_node, "Debug")
         debug_node.text = bool2text(self["debug"])
+        profile_node = ET.SubElement(global_node, "Profile")
+        profile_node.text = bool2text(self["profile"])
         wall_root = ET.SubElement(project_root, "PlacementRoot")
         for wall, placement in self["wall_placements"].items():
             place_root = placement.toXML(wall_root)
@@ -397,6 +399,9 @@ class W3DProject(W3DFeature):
         debug_node = global_root.find("Debug")
         if debug_node is not None:
             new_project["debug"] = text2bool(debug_node.text)
+        profile_node = global_root.find("Profile")
+        if profile_node is not None:
+            new_project["profile"] = text2bool(profile_node.text)
 
         wall_root = project_root.find("PlacementRoot")
         for placement in wall_root.findall("Placement"):
@@ -492,6 +497,7 @@ class W3DProject(W3DFeature):
         script_text = [
             "import logging",
             "W3D_DEBUG = {}".format(self["debug"]),
+            "W3D_PROFILE = {}".format(self["profile"]),
             "W3D_LOG = logging.getLogger('W3D')",
             "if W3D_DEBUG:",
             "    logging.basicConfig(",
@@ -534,6 +540,15 @@ class W3DProject(W3DFeature):
 
     def blend(self):
         """Create representation of W3DProject in Blender"""
+        if self["profile"]:
+            import cProfile
+            cProfile.runctx(
+                'self._blend()', {}, {"self": self}, "profile.out"
+            )
+        else:
+            self._blend()
+
+    def _blend(self):
         clear_blender_scene()
         bpy.data.scenes["Scene"].game_settings.physics_gravity = 0
         bpy.data.scenes["Scene"].game_settings.material_mode = "MULTITEXTURE"
