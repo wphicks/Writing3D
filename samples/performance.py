@@ -23,7 +23,7 @@ import os
 import time
 from random import randint
 from math import pi, sin, cos
-from pyw3d import project, objects, placement, export_to_blender
+from pyw3d import project, objects, placement, export_to_blender, sounds
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
@@ -32,6 +32,11 @@ my_project = project.W3DProject(
 
 shapes = objects.W3DShape.argument_validators['shape_type'].valid_options
 lights = objects.W3DLight.argument_validators['light_type'].valid_options
+play_sound = sounds.W3DSound(
+    name="basic",
+    filename="sound/play.wav"
+)
+my_project["sounds"].append(play_sound)
 
 theta_div = 10
 phi_div = 10
@@ -102,11 +107,6 @@ for i in range(1, theta_div):
         )
         my_project["objects"].append(my_object)
 
-theta_div = 10
-phi_div = 10
-radius = 10
-for i in range(1, theta_div):
-    for j in range(phi_div):
 
         my_object = objects.W3DObject(
             name="room{}x{}".format(i, j),
@@ -128,6 +128,12 @@ for i in range(1, theta_div):
         )
         my_project["objects"].append(my_object)
 
+theta_div = 50
+phi_div = 10
+radius = 10
+for i in range(1, theta_div):
+    for j in range(phi_div):
+
         my_object = objects.W3DObject(
             name="light{}x{}".format(i, j),
             content=objects.W3DLight(
@@ -145,6 +151,7 @@ for i in range(1, theta_div):
                 ),
             ),
             visible=True,
+            sound="basic"
         )
         my_project["objects"].append(my_object)
 

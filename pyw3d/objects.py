@@ -1101,10 +1101,13 @@ class W3DObject(W3DFeature):
         if self["sound"] is not None:
             sound_name = generate_blender_sound_name(self["sound"])
             sound_actuator_name = generate_blender_sound_name(self["name"])
-            bpy.ops.logic.actuator_add(
-                type="SOUND",
-                object=blender_object.name,
-                name=sound_actuator_name
+            BPY_OPS_CALL(
+                "logic.actuator_add", None,
+                {
+                    'type': 'SOUND',
+                    'object': blender_object.name,
+                    'name': sound_actuator_name
+                }
             )
             try:
                 actuator = blender_object.game.actuators[sound_actuator_name]
