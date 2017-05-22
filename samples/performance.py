@@ -24,7 +24,7 @@ import time
 from random import randint
 from math import pi, sin, cos
 from pyw3d import project, objects, placement, export_to_blender, sounds,\
-    psys, groups, timeline, actions
+    psys, groups, timeline, actions, triggers
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
@@ -226,6 +226,19 @@ for i in range(1, theta_div):
                     particle_actions="my_actions"
                 ),
                 visible=True
+            )
+        )
+        my_project["trigger_events"].append(
+            triggers.HeadPositionTrigger(
+                name="trigger{}x{}".format(i, j),
+                box=triggers.EventBox(
+                    direction="Inside",
+                    corner1=(i, j, i + j),
+                    corner2=(j, i + 5, i + j)
+                ),
+                actions=[actions.ObjectAction(
+                    object_name="system{}x{}".format(i, j), visible=False)
+                ]
             )
         )
 
