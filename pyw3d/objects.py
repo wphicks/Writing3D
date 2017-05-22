@@ -94,16 +94,43 @@ def duplicate_object(original):
     return new
 
 
+def generate_object_from_model(filename):
+    """Generate Blender object from model file"""
+    try:
+        return duplicate_object(
+            generate_object_from_model._models[filename]
+        )
+    except AttributeError:
+        generate_object_from_model._models = {}
+    except KeyError:
+        BPY_OPS_CALL(
+            "import_scene.obj", None,
+            {'filepath': filename}
+        )
+        model_pieces = bpy.context.selected_objects
+        for piece in model_pieces:
+            bpy.context.scene.objects.active = piece
+            BPY_OPS_CALL(
+                "object.convert", None,
+                {'target': 'MESH', 'keep_original': False}
+            )
+        BPY_OPS_CALL("object.join", None, {})
+        new_model = bpy.context.object
+        generate_object_from_model._models[filename] = new_model
+
+        return new_model
+
+    return generate_object_from_model(filename)
+
+
 def generate_material_from_image(filename, double_sided=True):
     """Generate Blender material from image for texturing"""
     try:
         return generate_material_from_image._materials[
             filename][double_sided]
     except AttributeError:
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         generate_material_from_image._materials = {}
     except KeyError:
-        print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
         material_name = bpy.path.display_name_from_filepath(filename)
 
         material_single = bpy.data.materials.new(
@@ -596,11 +623,6 @@ class W3DImage(W3DContent):
             "mesh.primitive_plane_add", None,
             {'radius': 0.1524}
         )
-        #bpy.ops.mesh.primitive_plane_add(
-        #    rotation=(math.pi / 2, 0, 0),
-        #    radius=0.1524
-        #)
-        #bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
         apply_euler_rotation(new_image_object, math.pi / 2, 0, 0)
 
@@ -723,15 +745,7 @@ class W3DModel(W3DContent):
 
     def blend(self):
         """Create representation of W3DModel in Blender"""
-        # TODO: Get proper directory
-        bpy.ops.import_scene.obj(filepath=self["filename"])
-        model_pieces = bpy.context.selected_objects
-        for piece in model_pieces:
-            bpy.context.scene.objects.active = piece
-            bpy.ops.object.convert(target='MESH', keep_original=False)
-        bpy.ops.object.join()
-        new_model = bpy.context.object
-        return new_model
+        return generate_object_from_model(self["filename"])
 
 
 class W3DLight(W3DContent):
