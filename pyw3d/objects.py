@@ -367,17 +367,30 @@ class W3DShape(W3DContent):
 
     def blend(self):
         if self["shape_type"] == "Sphere":
-            bpy.ops.mesh.primitive_uv_sphere_add(size=self["radius"])
+            BPY_OPS_CALL(
+                "mesh.primitive_uv_sphere_add", None,
+                {'size': self["radius"]}
+            )
         elif self["shape_type"] == "Cube":
-            bpy.ops.mesh.primitive_cube_add(radius=self["radius"])
+            BPY_OPS_CALL(
+                "mesh.primitive_cube_add", None,
+                {'radius': self["radius"]}
+            )
         elif self["shape_type"] == "Cone":
-            bpy.ops.mesh.primitive_cone_add(
-                radius1=self["radius"], depth=self["depth"])
+            BPY_OPS_CALL(
+                "mesh.primitive_cone_add", None,
+                {'radius1': self["radius"], 'depth': self["depth"]}
+            )
         elif self["shape_type"] == "Cylinder":
-            bpy.ops.mesh.primitive_cylinder_add(
-                radius=self["radius"], depth=self["depth"])
+            BPY_OPS_CALL(
+                "mesh.primitive_cylinder_add", None,
+                {'radius': self["radius"], 'depth': self["depth"]}
+            )
         elif self["shape_type"] == "Monkey":
-            bpy.ops.mesh.primitive_monkey_add(radius=self["radius"])
+            BPY_OPS_CALL(
+                "mesh.primitive_monkey_add", None,
+                {'radius': self["radius"]}
+            )
 
         new_shape_object = bpy.context.object
 
