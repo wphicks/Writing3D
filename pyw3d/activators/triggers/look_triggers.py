@@ -19,12 +19,14 @@
 """
 import math
 import logging
-LOGGER = logging.getLogger("pyw3d")
 from pyw3d.names import generate_blender_object_name
 from pyw3d.errors import EBKAC
 from .triggers import BlenderTrigger
+LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading "
@@ -51,10 +53,12 @@ class BlenderLookAtTrigger(BlenderTrigger):
         when the trigger is enabled.
         """
         self.select_base_object()
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="enabled_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'enabled_sensor'
+            }
         )
         self.base_object.game.sensors[-1].name = "enabled_sensor"
         enabled_sensor = self.base_object.game.sensors["enabled_sensor"]
@@ -62,17 +66,22 @@ class BlenderLookAtTrigger(BlenderTrigger):
         enabled_sensor.evaluation_type = "PROPCHANGED"
 
         self.select_base_object()
-        bpy.ops.logic.controller_add(
-            type='LOGIC_AND',
-            object=self.name,
-            name="enable")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'LOGIC_AND', 'object': self.name,
+                'name': 'enable'
+            }
+        )
         controller = self.base_object.game.controllers["enable"]
 
         camera_object = self.select_camera()
-        bpy.ops.logic.actuator_add(
-            type="PROPERTY",
-            object="CAMERA",
-            name=self.name
+        BPY_OPS_CALL(
+            "logic.actuator_add", None,
+            {
+                'type': 'PROPERTY', 'object': 'CAMERA',
+                'name': self.name
+            }
         )
         camera_object.game.actuators[-1].name = self.name
         property_copier = camera_object.game.actuators[self.name]
@@ -93,32 +102,37 @@ class BlenderLookAtTrigger(BlenderTrigger):
         """
         camera_object = self.select_camera()
         # Property on camera to keep track of when trigger is enabled
-        bpy.ops.object.game_property_new(
-            type='BOOL',
-            name=self.name
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'BOOL', 'name': self.name}
         )
         camera_object.game.properties[
             self.name].value = self.enable_immediately
         # Sensor to fire continuously while trigger is enabled
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object="CAMERA",
-            name=self.name
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': 'CAMERA',
+                'name': self.name
+            }
         )
         camera_object.game.sensors[-1].name = self.name
         camera_enable_sensor = camera_object.game.sensors[self.name]
         camera_enable_sensor.use_pulse_true_level = True
-        camera_enable_sensor.frequency = 1
+        camera_enable_sensor.tick_skip = 0
         camera_enable_sensor.property = self.name
         camera_enable_sensor.value = str(self.enable_immediately)
         self.camera_enable_sensor = camera_enable_sensor
 
         # Create controller to detect trigger events
         camera_object = self.select_camera()
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object="CAMERA",
-            name=self.name)
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': 'CAMERA',
+                'name': self.name
+            }
+        )
         camera_object.game.controllers[-1].name = self.name
         controller = camera_object.game.controllers[self.name]
         controller.mode = "MODULE"

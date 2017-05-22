@@ -24,6 +24,8 @@ from pyw3d.errors import EBKAC
 from .triggers import BlenderTrigger
 try:
     import bpy
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading "
@@ -38,10 +40,12 @@ class BlenderPositionTrigger(BlenderTrigger):
     def create_enabled_sensor(self):
         """Add a sensor to fire continuously while trigger is enabled"""
         base_object = self.select_base_object()
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=self.name,
-            name="enabled_sensor"
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': self.name,
+                'name': 'enabled_sensor'
+            }
         )
         base_object.game.sensors[-1].name = self.name
         enable_sensor = base_object.game.sensors[self.name]
@@ -55,10 +59,13 @@ class BlenderPositionTrigger(BlenderTrigger):
     def create_detection_controller(self):
         """Add a controller for detecting specified event"""
 
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=self.name,
-            name="detect")
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': self.name,
+                'name': 'detect'
+            }
+        )
         controller = self.base_object.game.controllers["detect"]
         controller.mode = "MODULE"
         controller.module = "{}.detect_event".format(self.name)
