@@ -64,6 +64,20 @@ for i in range(1, theta_div):
             content=objects.W3DText(
                 text="W3D"
             ),
+            link=objects.W3DLink(
+                actions={
+                    -1: [
+                        actions.ObjectAction(
+                            object_name="elem{}x{}".format(i, j),
+                            duration=1,
+                            move_relative=True,
+                            placement=placement.W3DPlacement(
+                                position=(0, 0.5, 0)  # ...back half a meter.
+                            )
+                        )
+                    ]
+                }
+            ),
         )
 
         my_project["objects"].append(my_object)
