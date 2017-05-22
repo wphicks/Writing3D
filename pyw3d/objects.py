@@ -88,7 +88,8 @@ def set_object_center(blender_object, center_vec):
 def duplicate_object(original):
     """Duplicate given object"""
     new = original.copy()
-    new.data = original.data.copy()
+    if original.data is not None:
+        new.data = original.data.copy()
     new.animation_data_clear()
     bpy.context.scene.objects.link(new)
     return new
@@ -1259,16 +1260,28 @@ def activate_particles(cont):
 
     def blend(self):
         """Create representation of W3DPSys in Blender"""
-        bpy.ops.object.add(
-            type="EMPTY",
-            layers=[layer == 0 for layer in range(20)]
-        )
-        psys_object = bpy.context.scene.objects.active
+        psys_name = "psys0"
+        psys_index = 0
+        psys_module = "{}.py".format(psys_name)
+        while psys_module in bpy.data.texts:
+            psys_name = "psys{}".format(psys_index)
+            psys_module = "{}.py".format(psys_name)
+            psys_index += 1
 
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=psys_object.name,
-            name="visible_sensor"
+        bpy.data.texts.new(psys_module)
+        script = bpy.data.texts[psys_module]
+
+        psys_object = bpy.data.objects.new(psys_name, None)
+        bpy.context.scene.objects.link(psys_object)
+
+        bpy.context.scene.objects.active = psys_object
+
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': psys_object.name,
+                'name': 'visible_sensor'
+            }
         )
         psys_object.game.sensors[-1].name = "visible_sensor"
         visible_sensor = psys_object.game.sensors["visible_sensor"]
@@ -1276,21 +1289,13 @@ def activate_particles(cont):
         visible_sensor.value = "True"
         visible_sensor.use_pulse_true_level = True
 
-        psys_name = "psys0"
-        psys_index = 0
-        psys_module = "{}.py".format(psys_name)
-        while psys_module in bpy.data.texts:
-            psys_name = "psys{}".format(psys_index)
-            psys_module = "{}.py".format(psys_name)
-
-        bpy.data.texts.new(psys_module)
-        script = bpy.data.texts[psys_module]
-
         bpy.context.scene.objects.active = psys_object
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=psys_object.name,
-            name="activate_particles"
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': psys_object.name,
+                'name': 'activate_particles'
+            }
         )
         psys_object.game.controllers[-1].name = "activate_particles"
         controller = psys_object.game.controllers["activate_particles"]

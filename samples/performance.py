@@ -23,7 +23,8 @@ import os
 import time
 from random import randint
 from math import pi, sin, cos
-from pyw3d import project, objects, placement, export_to_blender, sounds
+from pyw3d import project, objects, placement, export_to_blender, sounds,\
+    psys, groups
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
@@ -107,7 +108,6 @@ for i in range(1, theta_div):
         )
         my_project["objects"].append(my_object)
 
-
         my_object = objects.W3DObject(
             name="room{}x{}".format(i, j),
             content=objects.W3DModel(
@@ -127,12 +127,6 @@ for i in range(1, theta_div):
             visible=True,
         )
         my_project["objects"].append(my_object)
-
-theta_div = 50
-phi_div = 10
-radius = 10
-for i in range(1, theta_div):
-    for j in range(phi_div):
 
         my_object = objects.W3DObject(
             name="light{}x{}".format(i, j),
@@ -154,6 +148,63 @@ for i in range(1, theta_div):
             sound="basic"
         )
         my_project["objects"].append(my_object)
+
+my_project["groups"].append(
+    groups.W3DGroup(
+        name="particles",
+        objects=[
+            "elem{}x{}".format(i, j)
+            for i in range(1, theta_div)
+            for j in range(phi_div)
+        ]
+    )
+)
+
+my_project["particle_actions"].append(
+    psys.W3DPAction(
+        name="my_actions",
+        source_domain=psys.W3DPDomain(
+            type="Line",
+            p1=(-1, -1, 0),
+            p2=(1, -1, 0)
+        ),
+        velocity_domain=psys.W3DPDomain(
+            type="Point",
+            point=(0, 0, -1)
+        )
+    )
+)
+
+theta_div = 10
+phi_div = 10
+radius = 10
+for i in range(1, theta_div):
+    for j in range(phi_div):
+        my_project["objects"].append(
+            objects.W3DObject(
+                name="system{}x{}".format(i, j),
+                placement=placement.W3DPlacement(
+                    rotation=placement.W3DRotation(
+                        rotation_mode="LookAt",
+                        rotation_vector=(0, 0, 0)
+                    ),
+                    position=(
+                        (radius + 8) * sin(theta) * cos(phi),
+                        (radius + 8) * sin(theta) * sin(phi),
+                        (radius + 8) * cos(theta)
+                    ),
+                ),
+                content=objects.W3DPSys(
+                    particle_group="particles",
+                    max_particles=100,
+                    max_age=3,
+                    speed=1,
+                    particle_actions="my_actions"
+                ),
+                visible=True
+            )
+        )
+
 
 my_project["profile"] = True
 my_project["debug"] = True
