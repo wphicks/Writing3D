@@ -30,10 +30,12 @@ my_project = project.W3DProject(
     call_directory=os.path.dirname(__file__),
     allow_movement=True)
 
-theta_div = 50
+shapes = objects.W3DShape.argument_validators['shape_type'].valid_options
+lights = objects.W3DLight.argument_validators['light_type'].valid_options
+
+theta_div = 10
 phi_div = 10
 radius = 10
-shapes = objects.W3DShape.argument_validators['shape_type'].valid_options
 for i in range(1, theta_div):
     for j in range(phi_div):
         theta = pi / theta_div * i
@@ -100,6 +102,12 @@ for i in range(1, theta_div):
         )
         my_project["objects"].append(my_object)
 
+theta_div = 10
+phi_div = 10
+radius = 10
+for i in range(1, theta_div):
+    for j in range(phi_div):
+
         my_object = objects.W3DObject(
             name="room{}x{}".format(i, j),
             content=objects.W3DModel(
@@ -114,6 +122,26 @@ for i in range(1, theta_div):
                     (radius + 5) * sin(theta) * cos(phi),
                     (radius + 5) * sin(theta) * sin(phi),
                     (radius + 5) * cos(theta)
+                ),
+            ),
+            visible=True,
+        )
+        my_project["objects"].append(my_object)
+
+        my_object = objects.W3DObject(
+            name="light{}x{}".format(i, j),
+            content=objects.W3DLight(
+                light_type=lights[(i + j) % len(lights)]
+            ),
+            placement=placement.W3DPlacement(
+                rotation=placement.W3DRotation(
+                    rotation_mode="LookAt",
+                    rotation_vector=(0, 0, 0)
+                ),
+                position=(
+                    (radius - 2) * sin(theta) * cos(phi),
+                    (radius - 2) * sin(theta) * sin(phi),
+                    (radius - 2) * cos(theta)
                 ),
             ),
             visible=True,

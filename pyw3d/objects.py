@@ -839,12 +839,13 @@ class W3DLight(W3DContent):
         light_type_conversion = {
             "Point": "POINT", "Directional": "SUN", "Spot": "SPOT"
         }
-        bpy.ops.object.lamp_add(
-            type=light_type_conversion[self["light_type"]],
-            rotation=(-math.pi / 2, 0, 0)
+        BPY_OPS_CALL(
+            "object.lamp_add", None,
+            {
+                'type': light_type_conversion[self["light_type"]],
+                'rotation': (-math.pi / 2, 0, 0)
+            }
         )
-        # TODO: Why isn't the following working?
-        # bpy.ops.object.transform_apply(rotation=True)
         new_light_object = bpy.context.object
         new_light_object.data.use_diffuse = self["diffuse"]
         new_light_object.data.use_specular = self["specular"]
