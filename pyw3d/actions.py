@@ -32,7 +32,7 @@ from .validators import OptionValidator, IsNumeric,\
 from .errors import BadW3DXML, InvalidArgument, ConsistencyError
 from .xml_tools import bool2text, text2bool, text2tuple
 from .names import generate_blender_object_name, generate_group_name,\
-    generate_blender_sound_name
+    generate_blender_sound_name, generate_relative_to_name
 from .metaclasses import SubRegisteredClass
 try:
     import bpy
@@ -895,7 +895,7 @@ class MoveVRAction(W3DAction):
 
     def _blender_object_selection(self, offset=0):
         self.selection_offset = 0
-        return ["{}blender_object = scene.objects['CAMERA']".format(
+        return ["{}blender_object = scene.objects['VRCENTER']".format(
             "    " * offset)]
 
     def generate_blender_logic(

@@ -472,6 +472,14 @@ class W3DProject(W3DFeature):
         self.main_camera.name = "CAMERA"
         self.main_camera.layers = [layer == 1 for layer in range(1, 21)]
         self["desktop_camera_placement"].place(self.main_camera)
+        bpy.ops.object.add(
+            type="EMPTY",
+            location=(0, 0, 0),
+            layers=[layer == 3 for layer in range(1, 21)]
+        )
+        vr_center = bpy.context.object
+        vr_center.name = "VRCENTER"
+        self.main_camera.parent = vr_center
         bpy.data.scenes['Scene'].camera = self.main_camera
         bpy.data.scenes['Scene'].game_settings.resolution_x = 800
         bpy.data.scenes['Scene'].game_settings.resolution_y = 600
@@ -531,6 +539,8 @@ class W3DProject(W3DFeature):
         bpy.data.scenes["Scene"].game_settings.material_mode = "MULTITEXTURE"
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
+        # TODO: Handle non-standard wall placements
+        W3DPlacement._create_relative_to_objects()
         self.setup_settings()
         self.setup_camera()
         self.setup_controls()

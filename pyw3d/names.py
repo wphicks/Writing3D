@@ -70,6 +70,8 @@ def generate_group_name(string):
 
 def generate_relative_to_name(string):
     """Generate name used for relative_to objects"""
+    if string == "Camera":
+        return "CAMERA"
     return "relative_to_{}".format(string)
 
 

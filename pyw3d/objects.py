@@ -440,7 +440,7 @@ class W3DText(W3DContent):
                     os.path.join("fonts", self["font"])
                 )
             self._loaded_fonts[self["font"]] = new_text_object.data.font
-        else:
+        elif self["font"] is not None:
             new_text_object.data.font = self._loaded_fonts[self["font"]]
         new_text_object.data.extrude = self["depth"]
         new_text_object.location.y += new_text_object.data.extrude

@@ -184,7 +184,9 @@ class W3DPlacement(W3DFeature):
     ui_order = ["position", "relative_to", "rotation"]
     argument_validators = {
         "relative_to": OptionValidator(
-            "Center", "FrontWall", "LeftWall", "RightWall", "FloorWall"),
+            "Camera", "Center", "FrontWall", "LeftWall", "RightWall",
+            "FloorWall"
+        ),
         "position": ListValidator(
             IsNumeric(), required_length=3),
         "rotation": FeatureValidator(W3DRotation)}
@@ -233,9 +235,9 @@ class W3DPlacement(W3DFeature):
                 return placement
         return placement
 
-    # TODO: Deal with non-standard wall placements
+    @classmethod
     def _create_relative_to_objects(
-            self,
+            place_class,
             wall_positions={
                 "Center": convert_to_blender_axes((0, 0, 0)),
                 "FrontWall": convert_to_blender_axes((0, 0, -4)),
@@ -250,20 +252,27 @@ class W3DPlacement(W3DFeature):
                 "FloorWall": (-math.pi / 2, 0, 0)}):
         """Create Blender objects corresponding to relative_to options if
         necessary"""
-        if len(self.relative_to_objects) < len(
-                self.argument_validators["relative_to"].valid_options) - 1:
+        if len(place_class.relative_to_objects) < len(
+                place_class.argument_validators[
+                    "relative_to"].valid_options) - 1:
             for wall_name, position in wall_positions.items():
-                bpy.ops.object.add(
-                    type="EMPTY",
-                    location=position,
-                    rotation=wall_rotations[wall_name],
-                    layers=[layer == 3 for layer in range(1, 21)]
-                )
-                self.relative_to_objects[wall_name] = bpy.context.object
-                self.relative_to_objects[
-                    wall_name].name = generate_relative_to_name(wall_name)
+                if wall_name not in ("Camera"):
+                    bpy.ops.object.add(
+                        type="EMPTY",
+                        location=position,
+                        rotation=wall_rotations[wall_name],
+                        layers=[layer == 3 for layer in range(1, 21)]
+                    )
+                    place_class.relative_to_objects[
+                        wall_name] = bpy.context.object
+                    place_class.relative_to_objects[
+                        wall_name].name = generate_relative_to_name(wall_name)
 
-        return self.relative_to_objects
+        for name, obj in place_class.relative_to_objects.items():
+            if name != "Center":
+                obj.parent = place_class.relative_to_objects["Center"]
+
+        return place_class.relative_to_objects
 
     def place(self, blender_object):
         """Place Blender object in specified position and orientation

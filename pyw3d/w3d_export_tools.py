@@ -72,6 +72,7 @@ def display_blender_output(filename="run.blend", fullscreen=False):
     blender_play_call.append(filename)
     subprocess.call(blender_play_call)
 
+
 if __name__ == "__main__":
     argv = sys.argv
     if "--" in argv:
