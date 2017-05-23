@@ -205,10 +205,9 @@ class W3DSound(W3DFeature):
         """Create representation of W3DSound in Blender"""
         sound_name = generate_blender_sound_name(self["name"])
         LOGGER.debug("Adding sound {} to blend file".format(sound_name))
-        BPY_OPS_CALL(
-            "sound.open", None, {'filepath': self['filename']}
+        blender_sound = generate_blender_audio_from_file(
+            self["filename"]
         )
-        blender_sound = bpy.data.sounds[0]
         blender_sound.name = sound_name
 
         LOGGER.debug("Creating actuator for {}".format(sound_name))
