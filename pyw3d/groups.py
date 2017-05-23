@@ -95,12 +95,22 @@ class W3DGroup(W3DFeature):
         for child in group_node.getchildren():
             if child.tag == "Objects":
                 try:
-                    group["objects"].append(child.attrib["name"])
+                    group["objects"].append(
+                        group.argument_validators[
+                            "objects"].get_base_validator(0).coerce(
+                                child.attrib["name"]
+                        )
+                    )
                 except KeyError:
                     raise BadW3DXML("Objects node has no name attrib")
             if child.tag == "Groups":
                 try:
-                    group["groups"].append(child.attrib["name"])
+                    group["groups"].append(
+                        group.argument_validators[
+                            "groups"].get_base_validator(0).coerce(
+                                child.attrib["name"]
+                        )
+                    )
                 except KeyError:
                     raise BadW3DXML("Groups node has no name attrib")
         return group
