@@ -552,6 +552,8 @@ class W3DText(W3DContent):
             self._loaded_fonts[self["font"]] = new_text_object.data.font
         elif self["font"] is not None:
             new_text_object.data.font = self._loaded_fonts[self["font"]]
+        new_text_object.data.resolution_u = 1
+        new_text_object.data.resolution_v = 1
         new_text_object.data.extrude = self["depth"]
         new_text_object.location.y += new_text_object.data.extrude
         new_text_object.data.fill_mode = "BOTH"
