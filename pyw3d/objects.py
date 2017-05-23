@@ -33,7 +33,7 @@ from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
 from .names import generate_blender_object_name,\
     generate_blender_material_name, generate_blender_sound_name,\
     generate_light_object_name, generate_paction_name, generate_group_name, \
-    generate_blender_particle_name
+    generate_blender_particle_name, generate_blender_curve_name
 from .metaclasses import SubRegisteredClass
 from .activators import BlenderClickTrigger
 from .sounds import audio_playback_object
@@ -41,6 +41,9 @@ import logging
 LOGGER = logging.getLogger("pyw3d")
 try:
     import bpy
+    import mathutils
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     LOGGER.debug(
         "Module bpy not found. Loading pyw3d.objects as standalone")
@@ -51,30 +54,123 @@ def line_count(string):
     return string.count('\n') + 1
 
 
+def add_text_object(name, text):
+    font_curve = bpy.data.curves.new(
+        type="FONT", name=generate_blender_curve_name(name)
+    )
+    new_object = bpy.data.objects.new(name, font_curve)
+    new_object.data.body = text
+    new_object.data.space_line = 0.6
+    return new_object
+
+
+def apply_euler_rotation(blender_object, x, y, z):
+    """Apply euler rotation (radians) to object"""
+    blender_object.data.transform(
+        mathutils.Euler((x, y, z), 'XYZ').to_matrix().to_4x4()
+    )
+
+
+def find_object_midpoint(blender_object):
+    return (
+        sum(blender_object.data.vertices) / len(blender_object.data.vertices)
+    )
+
+
+def set_object_center(blender_object, center_vec):
+    blender_object.data.transform(
+        mathutils.Matrix.Translation(
+            blender_object.matrix_world.translation - center_vec
+        )
+    )
+
+
+def duplicate_object(original):
+    """Duplicate given object"""
+    new = original.copy()
+    if original.data is not None:
+        new.data = original.data.copy()
+    new.animation_data_clear()
+    bpy.context.scene.objects.link(new)
+    return new
+
+
+def generate_object_from_model(filename):
+    """Generate Blender object from model file"""
+    try:
+        return duplicate_object(
+            generate_object_from_model._models[filename]
+        )
+    except AttributeError:
+        generate_object_from_model._models = {}
+    except KeyError:
+        BPY_OPS_CALL(
+            "import_scene.obj", None,
+            {'filepath': filename}
+        )
+        model_pieces = bpy.context.selected_objects
+        for piece in model_pieces:
+            bpy.context.scene.objects.active = piece
+            BPY_OPS_CALL(
+                "object.convert", None,
+                {'target': 'MESH', 'keep_original': False}
+            )
+        BPY_OPS_CALL("object.join", None, {})
+        new_model = bpy.context.object
+        generate_object_from_model._models[filename] = new_model
+
+        return new_model
+
+    return generate_object_from_model(filename)
+
+
 def generate_material_from_image(filename, double_sided=True):
     """Generate Blender material from image for texturing"""
-    material_name = bpy.path.display_name_from_filepath(filename)
-    material = bpy.data.materials.new(name=material_name)
-    texture_slot = material.texture_slots.add()
-    texture_name = '_'.join(
-        (os.path.splitext(os.path.basename(filename))[0],
-         "image_texture")
-    )
-    image_texture = bpy.data.textures.new(name=texture_name, type="IMAGE")
-    image_texture.image = bpy.data.images.load(filename)
-    # NOTE: The above already raises a sensible RuntimeError if file is not
-    # found
-    image_texture.image.use_alpha = True
-    texture_slot.texture = image_texture
-    texture_slot.texture_coords = 'UV'
+    try:
+        return generate_material_from_image._materials[
+            filename][double_sided]
+    except AttributeError:
+        generate_material_from_image._materials = {}
+    except KeyError:
+        material_name = bpy.path.display_name_from_filepath(filename)
 
-    # material.alpha = 0.0
-    # material.specular_alpha = 0.0
-    # texture_slot.use_map_alpha
-    # material.use_transparency = True
-    material.game_settings.use_backface_culling = not double_sided
+        material_single = bpy.data.materials.new(
+            name="{}{}".format(material_name, 0)
+        )
+        material_double = bpy.data.materials.new(
+            name="{}{}".format(material_name, 1)
+        )
+        texture_slot_single = material_single.texture_slots.add()
+        texture_slot_double = material_double.texture_slots.add()
 
-    return material
+        texture_name = '_'.join(
+            (os.path.splitext(os.path.basename(filename))[0],
+             "image_texture")
+        )
+        image_texture = bpy.data.textures.new(name=texture_name, type="IMAGE")
+        image_texture.image = bpy.data.images.load(filename)
+        # NOTE: The above already raises a sensible RuntimeError if file is not
+        # found
+        image_texture.image.use_alpha = True
+
+        texture_slot_single.texture = image_texture
+        texture_slot_double.texture = image_texture
+        texture_slot_single.texture_coords = 'UV'
+        texture_slot_double.texture_coords = 'UV'
+
+        # material.alpha = 0.0
+        # material.specular_alpha = 0.0
+        # texture_slot.use_map_alpha
+        # material.use_transparency = True
+        material_single.game_settings.use_backface_culling = True
+        material_double.game_settings.use_backface_culling = False
+
+        generate_material_from_image._materials[filename] = (
+            material_single, material_double
+        )
+
+    return generate_material_from_image(
+        filename, double_sided=double_sided)
 
 
 class W3DLink(W3DFeature):
@@ -324,17 +420,30 @@ class W3DShape(W3DContent):
 
     def blend(self):
         if self["shape_type"] == "Sphere":
-            bpy.ops.mesh.primitive_uv_sphere_add(size=self["radius"])
+            BPY_OPS_CALL(
+                "mesh.primitive_uv_sphere_add", None,
+                {'size': self["radius"]}
+            )
         elif self["shape_type"] == "Cube":
-            bpy.ops.mesh.primitive_cube_add(radius=self["radius"])
+            BPY_OPS_CALL(
+                "mesh.primitive_cube_add", None,
+                {'radius': self["radius"]}
+            )
         elif self["shape_type"] == "Cone":
-            bpy.ops.mesh.primitive_cone_add(
-                radius1=self["radius"], depth=self["depth"])
+            BPY_OPS_CALL(
+                "mesh.primitive_cone_add", None,
+                {'radius1': self["radius"], 'depth': self["depth"]}
+            )
         elif self["shape_type"] == "Cylinder":
-            bpy.ops.mesh.primitive_cylinder_add(
-                radius=self["radius"], depth=self["depth"])
+            BPY_OPS_CALL(
+                "mesh.primitive_cylinder_add", None,
+                {'radius': self["radius"], 'depth': self["depth"]}
+            )
         elif self["shape_type"] == "Monkey":
-            bpy.ops.mesh.primitive_monkey_add(radius=self["radius"])
+            BPY_OPS_CALL(
+                "mesh.primitive_monkey_add", None,
+                {'radius': self["radius"]}
+            )
 
         new_shape_object = bpy.context.object
 
@@ -368,6 +477,7 @@ class W3DText(W3DContent):
 
     blender_scaling = 0.169
     blender_depth_scaling = 0.004
+    object_count = 0
 
     ui_order = ["text", "halign", "valign", "font", "depth"]
 
@@ -424,12 +534,12 @@ class W3DText(W3DContent):
 
     def blend(self):
         """Create representation of W3DText in Blender"""
-        bpy.ops.object.text_add(rotation=(math.pi / 2, 0, 0))
-        new_text_object = bpy.context.object
+        type(self).object_count += 1
         text_content = self["text"].strip()
-        new_text_object.data.body = text_content
+        new_text_object = add_text_object(
+            "text_{}".format(type(self).object_count), text_content
+        )
         lines = line_count(text_content)
-        new_text_object.data.space_line = 0.6
         if (
                 self["font"] is not None and self["font"] not in
                 self._loaded_fonts):
@@ -461,11 +571,13 @@ class W3DText(W3DContent):
                 height / 4 + 0.85 * height * (lines - 1)
             )
 
-        new_text_object.select = True
-        bpy.ops.object.convert(target='MESH', keep_original=False)
-        bpy.ops.object.transform_apply(rotation=True, location=True)
-        new_text_object.select = False
-        return new_text_object
+        mesh = new_text_object.to_mesh(bpy.context.scene, False, 'PREVIEW')
+        final_object = bpy.data.objects.new(
+            "mesh_text_{}".format(type(self).object_count), mesh
+        )
+        bpy.context.scene.objects.link(final_object)
+        apply_euler_rotation(final_object, math.pi / 2, 0, 0)
+        return final_object
 
 
 class W3DImage(W3DContent):
@@ -508,12 +620,12 @@ class W3DImage(W3DContent):
 
     def blend(self):
         """Create representation of W3DImage in Blender"""
-        bpy.ops.mesh.primitive_plane_add(
-            rotation=(math.pi / 2, 0, 0),
-            radius=0.1524
+        BPY_OPS_CALL(
+            "mesh.primitive_plane_add", None,
+            {'radius': 0.1524}
         )
-        bpy.ops.object.transform_apply(rotation=True)
         new_image_object = bpy.context.object
+        apply_euler_rotation(new_image_object, math.pi / 2, 0, 0)
 
         material = generate_material_from_image(self["filename"])
         material.use_nodes = False
@@ -634,15 +746,7 @@ class W3DModel(W3DContent):
 
     def blend(self):
         """Create representation of W3DModel in Blender"""
-        # TODO: Get proper directory
-        bpy.ops.import_scene.obj(filepath=self["filename"])
-        model_pieces = bpy.context.selected_objects
-        for piece in model_pieces:
-            bpy.context.scene.objects.active = piece
-            bpy.ops.object.convert(target='MESH', keep_original=False)
-        bpy.ops.object.join()
-        new_model = bpy.context.object
-        return new_model
+        return generate_object_from_model(self["filename"])
 
 
 class W3DLight(W3DContent):
@@ -736,12 +840,13 @@ class W3DLight(W3DContent):
         light_type_conversion = {
             "Point": "POINT", "Directional": "SUN", "Spot": "SPOT"
         }
-        bpy.ops.object.lamp_add(
-            type=light_type_conversion[self["light_type"]],
-            rotation=(-math.pi / 2, 0, 0)
+        BPY_OPS_CALL(
+            "object.lamp_add", None,
+            {
+                'type': light_type_conversion[self["light_type"]],
+                'rotation': (-math.pi / 2, 0, 0)
+            }
         )
-        # TODO: Why isn't the following working?
-        # bpy.ops.object.transform_apply(rotation=True)
         new_light_object = bpy.context.object
         new_light_object.data.use_diffuse = self["diffuse"]
         new_light_object.data.use_specular = self["specular"]
@@ -949,23 +1054,19 @@ class W3DObject(W3DFeature):
             object_.select = False
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
-        particle_name = generate_blender_particle_name(blender_object.name)
-        bpy.ops.object.duplicate(
-            linked=False
-        )
-        bpy.data.objects[
-            "{}.001".format(blender_object.name)].name = particle_name
-        bpy.data.objects[particle_name].layers = [
-            layer == 5 for layer in range(20)
-        ]
-        bpy.data.objects[particle_name].game.physics_type = 'DYNAMIC'
 
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
 
-        bpy.ops.object.game_property_new(type='BOOL', name="visible_tag")
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'BOOL', 'name': 'visible_tag'}
+        )
         blender_object.game.properties["visible_tag"].value = self["visible"]
-        bpy.ops.object.game_property_new(type='BOOL', name="click_through")
+        BPY_OPS_CALL(
+            "object.game_property_new", None,
+            {'type': 'BOOL', 'name': 'click_through'}
+        )
         blender_object.game.properties[
             "click_through"].value = self["click_through"]
 
@@ -983,7 +1084,17 @@ class W3DObject(W3DFeature):
         blender_object.layers = [layer == 0 for layer in range(20)]
 
         if self["around_own_axis"]:
-            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+            set_object_center(
+                blender_object, find_object_center(blender_object)
+            )
+
+        particle_name = generate_blender_particle_name(blender_object.name)
+        particle_copy = duplicate_object(blender_object)
+        particle_copy.name = particle_name
+        bpy.data.objects[particle_name].layers = [
+            layer == 5 for layer in range(20)
+        ]
+        bpy.data.objects[particle_name].game.physics_type = 'DYNAMIC'
 
         if self["link"] is not None:
             self["link"].blend(generate_blender_object_name(self["name"]))
@@ -991,10 +1102,13 @@ class W3DObject(W3DFeature):
         if self["sound"] is not None:
             sound_name = generate_blender_sound_name(self["sound"])
             sound_actuator_name = generate_blender_sound_name(self["name"])
-            bpy.ops.logic.actuator_add(
-                type="SOUND",
-                object=blender_object.name,
-                name=sound_actuator_name
+            BPY_OPS_CALL(
+                "logic.actuator_add", None,
+                {
+                    'type': 'SOUND',
+                    'object': blender_object.name,
+                    'name': sound_actuator_name
+                }
             )
             try:
                 actuator = blender_object.game.actuators[sound_actuator_name]
@@ -1146,16 +1260,28 @@ def activate_particles(cont):
 
     def blend(self):
         """Create representation of W3DPSys in Blender"""
-        bpy.ops.object.add(
-            type="EMPTY",
-            layers=[layer == 0 for layer in range(20)]
-        )
-        psys_object = bpy.context.scene.objects.active
+        psys_name = "psys0"
+        psys_index = 0
+        psys_module = "{}.py".format(psys_name)
+        while psys_module in bpy.data.texts:
+            psys_name = "psys{}".format(psys_index)
+            psys_module = "{}.py".format(psys_name)
+            psys_index += 1
 
-        bpy.ops.logic.sensor_add(
-            type="PROPERTY",
-            object=psys_object.name,
-            name="visible_sensor"
+        bpy.data.texts.new(psys_module)
+        script = bpy.data.texts[psys_module]
+
+        psys_object = bpy.data.objects.new(psys_name, None)
+        bpy.context.scene.objects.link(psys_object)
+
+        bpy.context.scene.objects.active = psys_object
+
+        BPY_OPS_CALL(
+            "logic.sensor_add", None,
+            {
+                'type': 'PROPERTY', 'object': psys_object.name,
+                'name': 'visible_sensor'
+            }
         )
         psys_object.game.sensors[-1].name = "visible_sensor"
         visible_sensor = psys_object.game.sensors["visible_sensor"]
@@ -1163,21 +1289,13 @@ def activate_particles(cont):
         visible_sensor.value = "True"
         visible_sensor.use_pulse_true_level = True
 
-        psys_name = "psys0"
-        psys_index = 0
-        psys_module = "{}.py".format(psys_name)
-        while psys_module in bpy.data.texts:
-            psys_name = "psys{}".format(psys_index)
-            psys_module = "{}.py".format(psys_name)
-
-        bpy.data.texts.new(psys_module)
-        script = bpy.data.texts[psys_module]
-
         bpy.context.scene.objects.active = psys_object
-        bpy.ops.logic.controller_add(
-            type='PYTHON',
-            object=psys_object.name,
-            name="activate_particles"
+        BPY_OPS_CALL(
+            "logic.controller_add", None,
+            {
+                'type': 'PYTHON', 'object': psys_object.name,
+                'name': 'activate_particles'
+            }
         )
         psys_object.game.controllers[-1].name = "activate_particles"
         controller = psys_object.game.controllers["activate_particles"]

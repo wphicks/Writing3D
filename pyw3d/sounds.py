@@ -29,6 +29,8 @@ from .xml_tools import bool2text, text2bool
 from .names import generate_blender_sound_name
 try:
     import bpy
+    from _bpy import ops as ops_module
+    BPY_OPS_CALL = ops_module.call
 except ImportError:
     pass
 
@@ -40,13 +42,25 @@ def audio_playback_object():
         return bpy.data.objects["AUDIO"]
     except KeyError:
         logging.debug("Creating AUDIO object")
-        bpy.ops.object.add(
-            type="EMPTY",
-            layers=[layer == 1 for layer in range(1, 21)]
-        )
-        audio_object = bpy.context.scene.objects.active
+        audio_object = bpy.data.objects.new("AUDIO", None)
+        bpy.context.scene.objects.link(audio_object)
         audio_object.name = "AUDIO"
         return audio_object
+
+
+def generate_blender_audio_from_file(filename):
+    try:
+        return generate_blender_audio_from_file._sounds[
+            filename]
+    except AttributeError:
+        generate_blender_audio_from_file._sounds = {}
+    except KeyError:
+        BPY_OPS_CALL(
+            "sound.open", None, {'filepath': filename}
+        )
+        generate_blender_audio_from_file._sounds[
+            filename] = bpy.data.sounds[0]
+    return generate_blender_audio_from_file(filename)
 
 
 class W3DSound(W3DFeature):
@@ -191,16 +205,20 @@ class W3DSound(W3DFeature):
         """Create representation of W3DSound in Blender"""
         sound_name = generate_blender_sound_name(self["name"])
         LOGGER.debug("Adding sound {} to blend file".format(sound_name))
-        bpy.ops.sound.open(filepath=self["filename"])
-        blender_sound = bpy.data.sounds[0]
+        blender_sound = generate_blender_audio_from_file(
+            self["filename"]
+        )
         blender_sound.name = sound_name
 
         LOGGER.debug("Creating actuator for {}".format(sound_name))
         bpy.context.scene.objects.active = audio_playback_object()
-        bpy.ops.logic.actuator_add(
-            type="SOUND",
-            object="AUDIO",
-            name=sound_name
+        BPY_OPS_CALL(
+            "logic.actuator_add", None,
+            {
+                'type': 'SOUND',
+                'object': "AUDIO",
+                'name': sound_name
+            }
         )
         actuator = audio_playback_object().game.actuators[-1]
         actuator.name = sound_name

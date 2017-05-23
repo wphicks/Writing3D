@@ -83,3 +83,8 @@ def generate_light_object_name(string):
 def generate_blender_particle_name(string):
     """Generate name used for particle copies of objects"""
     return "particle_{}".format(string)
+
+
+def generate_blender_curve_name(string):
+    """Generate name used for Blender curves"""
+    return "curve_{}".format(string)

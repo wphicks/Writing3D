@@ -128,7 +128,7 @@ class MoveAction(object):
                     script_text.extend([
                         "target_orientation = target_from_axis("
                         "{}, {}, initial_orientation="
-                        "initial_orientation".format(
+                        "initial_orientation)".format(
                             tuple(vector), angle
                         ),
                     ])

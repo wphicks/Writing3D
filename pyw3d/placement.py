@@ -256,7 +256,7 @@ class W3DPlacement(W3DFeature):
                 place_class.argument_validators[
                     "relative_to"].valid_options) - 1:
             for wall_name, position in wall_positions.items():
-                if wall_name not in ("Camera"):
+                if wall_name not in ("Camera",):
                     bpy.ops.object.add(
                         type="EMPTY",
                         location=position,
