@@ -21,6 +21,7 @@ import logging
 LOGGER = logging.getLogger("pyw3d")
 import math
 import xml.etree.ElementTree as ET
+from functools import total_ordering
 from .features import W3DFeature
 from .validators import IsNumeric, OptionValidator, ValidPyString, IsBoolean,\
     ValidFile
@@ -63,6 +64,7 @@ def generate_blender_audio_from_file(filename):
     return generate_blender_audio_from_file(filename)
 
 
+@total_ordering
 class W3DSound(W3DFeature):
     """Store data on a sound to be used in the W3D
 

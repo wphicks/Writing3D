@@ -34,7 +34,7 @@ from .sounds import W3DSound
 from .timeline import W3DTimeline
 from .groups import W3DGroup
 from .triggers import W3DTrigger
-from .errors import BadW3DXML
+from .errors import BadW3DXML, ValidationError
 from .blender_scripts import MOVE_TOGGLE_SCRIPT, ANGLES_SCRIPT
 from .names import generate_light_object_name
 from .pointer import setup_mouselook, setup_click
@@ -540,6 +540,10 @@ class W3DProject(W3DFeature):
 
     def blend(self):
         """Create representation of W3DProject in Blender"""
+        LOGGER.debug("Validating project")
+        if self["debug"]:
+            self.validate(project=self)
+        LOGGER.debug("Project validation complete")
         if self["profile"]:
             import cProfile
             cProfile.runctx(

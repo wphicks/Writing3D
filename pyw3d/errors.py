@@ -45,6 +45,12 @@ class ConsistencyError(Exception):
         super(ConsistencyError, self).__init__(message)
 
 
+class ValidationError(Exception):
+    """Exception thrown if validation fails in an unrecoverable manner"""
+    def __init__(self, message):
+        super().__init__(message)
+
+
 class EBKAC(Exception):
     """Exception thrown when methods are called in a logically nonsensical
     order or given obviously nonsensical input
