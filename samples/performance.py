@@ -245,7 +245,7 @@ for i in range(1, theta_div):
 
 
 my_project["profile"] = True
-my_project["debug"] = True
+my_project["debug"] = False
 
 start_time = time.time()
 export_to_blender(

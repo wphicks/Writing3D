@@ -23,7 +23,7 @@ may appear in such a project. This may be as sophisticated as a "Timeline" or
 as simple as a "Placement" for an object (since Placement features define
 position, and potentially multiple kinds of rotation).
 """
-from .errors import InvalidArgument, ConsistencyError
+from .errors import InvalidArgument, ConsistencyError, ValidationError
 
 
 class W3DFeature(dict):
@@ -49,6 +49,13 @@ class W3DFeature(dict):
 
     def __repr__(self):
         return "< {}: {} >".format(type(self).__name__, super().__repr__())
+
+    def __lt__(self, other):
+        """Order based on __repr__ of self and other
+
+        Defined to allow unambiguous ordering of features"""
+
+        return repr(self) < repr(other)
 
     def __init__(self, *args, **kwargs):
         super(W3DFeature, self).__init__()
@@ -104,6 +111,46 @@ class W3DFeature(dict):
         for key, value in other:
             self.__setitem__(key, value)
 
+    def validate(self, project=None):
+        """Validate all values for this feature, coercing if necessary"""
+        identifier = [type(self).__name__]
+        if "name" in self:
+            identifier.append(self["name"])
+        identifier = " ".join(identifier)
+
+        for key, validator in self.argument_validators.items():
+            if project is not None:
+                validator.set_project(project)
+            if self.is_default(key):
+                continue
+            try:
+                if not validator(self[key], fallback=False):
+                    try:
+                        self[key] = validator.coerce(self[key])
+                    except Exception as initial_error:
+                        raise ValidationError(
+                            "\n\n{}\n\nValue {} is not valid for attribute {}"
+                            " of {}".format(
+                                "\n".join(
+                                    str(arg) for arg in initial_error.args
+                                ),
+                                self[key], key, identifier,
+                            )
+                        )
+                    if not validator(self[key], fallback=False):
+                        raise ValidationError(
+                            "\n\nValue {} for attribute {} of {} is not"
+                            " consistent with rest of project".format(
+                                self[key], key, identifier
+                            )
+                        )
+            except ConsistencyError:
+                raise ValidationError(
+                    "\n\nAttribute {} must be set for {}".format(
+                        key, identifier)
+                )
+        return True
+
     def toXML(self, parent_root):
         """Store data in W3D XML format within parent_root
 
@@ -128,6 +175,5 @@ class W3DFeature(dict):
         raise NotImplementedError("fromXML not defined for this feature")
 
     def is_default(self, key):
-        """Return true if value has not been set for key and default exists,
-        false otherwise"""
-        return (key not in self and key in self.default_arguments)
+        """Return true if value has not been set for key"""
+        return key not in self

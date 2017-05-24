@@ -20,8 +20,8 @@
 import re
 import os
 import logging
+from .path import ProjectPath
 LOGGER = logging.getLogger("pyw3d")
-from .path import ProjectPath, UnsetValueError
 
 
 PY_ID_REGEX = re.compile(r"^[A-Za-z0-9_]+$")
@@ -35,17 +35,26 @@ class Validator(object):
         elements of the project."""
 
     def __init__(self):
+        self.validation_errors = []
         self.help_string = "No help available for this option"
         # def_value is an attribute used to provide some guidance on a
         # reasonable value to default to when first creating an instance of
         # this option for editing
-        self.def_value = ""
+        try:
+            self.def_value = ""
+        except AttributeError:
+            pass  # @property
+        self.project = None
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         return False
 
     def __repr__(self):
         return self.__class__.__name__
+
+    def set_project(self, project):
+        """Set project to given value for consistency validation"""
+        self.project = project
 
     def coerce(self, value):
         """Attempt to coerce input to a valid value for this validator"""
@@ -60,10 +69,11 @@ class TextValidator(Validator):
     """Callable object for checking if value is valid text"""
 
     def __init__(self):
+        super().__init__()
         self.help_string = "Must be text"
         self.def_value = ""
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         return True
 
     def __repr__(self):
@@ -79,11 +89,12 @@ class ValidPyString(Validator):
     variable name"""
 
     def __init__(self):
+        super().__init__()
         self.help_string = "Name must be unique and contain only alphanumeric"
         " characters or underscore"
         self.def_value = ""
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         return bool(PY_ID_REGEX.match(str(value))) or not len(str(value))
 
     def __repr__(self):
@@ -98,13 +109,14 @@ class ValidPyString(Validator):
 class ValidFile(Validator):
 
     def __init__(self, help_string=None):
+        super().__init__()
         if help_string is None:
             self.help_string = "Must be an existing file"
         else:
             self.help_string = help_string
         self.def_value = ""
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         try:
             self.help_string = "Could not find file {}".format(
                 os.path.abspath(value)
@@ -124,13 +136,13 @@ class ValidFile(Validator):
 
 
 class ValidFontFile(ValidFile):
-    def __call__(self, value):
-        if super().__call__(value):
+    def __call__(self, value, fallback=True):
+        if super().__call__(value, fallback=fallback):
             return True
         try:
             new_value = os.path.join("fonts", value)
             help_string = self.help_string
-            validity = super().__call__(new_value)
+            validity = super().__call__(new_value, fallback=fallback)
             self.help_string = help_string
             return validity
         except:
@@ -142,6 +154,7 @@ class OptionValidator(Validator):
     """
 
     def __init__(self, *valid_options):
+        super().__init__()
         self.valid_options = valid_options
         self.valid_menu_items = [
             str(option) for option in self.valid_options]
@@ -152,7 +165,7 @@ class OptionValidator(Validator):
         except IndexError:
             self.def_value = ""
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         return value in self.valid_options
 
     def __repr__(self):
@@ -181,6 +194,7 @@ class ListValidator(Validator):
     def __init__(
             self, base_validators, item_label="Item", help_string=None,
             required_length=None):
+        super().__init__()
         try:
             self.base_validators = list(base_validators)
         except TypeError:
@@ -191,6 +205,11 @@ class ListValidator(Validator):
         else:
             self.help_string = help_string
         self.required_length = required_length
+
+    def set_project(self, project):
+        super().set_project(project)
+        for validator in self.base_validators:
+            validator.set_project(self.project)
 
     def get_base_validator(self, index):
         """Get the validator associated with the given index
@@ -203,12 +222,15 @@ class ListValidator(Validator):
             return value
 
         try:
-            value = value.strip()
-            value = value.strip("[]()")
-            all_values = value.split(",")
+            try:
+                value = value.strip()
+                value = value.strip("[]()")
+                all_values = value.split(",")
+            except AttributeError:
+                all_values = value
             return [
-                self.get_base_validator(i).coerce(value) for i, value in
-                enumerate(all_values)]
+                self.get_base_validator(i).coerce(cur_value) for i, cur_value
+                in enumerate(all_values)]
         except:
             return value
 
@@ -226,9 +248,9 @@ class ListValidator(Validator):
             self.required_length
         )
 
-    def __call__(self, iterable):
+    def __call__(self, iterable, fallback=True):
         for i in range(len(iterable)):
-            if not self.get_base_validator(i)(iterable[i]):
+            if not self.get_base_validator(i)(iterable[i], fallback=fallback):
                 return False
         return True
 
@@ -236,9 +258,9 @@ class ListValidator(Validator):
 class SortedListValidator(ListValidator):
     """Check if input is sorted iterable"""
 
-    def __call__(self, iterable):
+    def __call__(self, iterable, fallback=True):
         for i in range(len(iterable)):
-            if not self.get_base_validator(i)(iterable[i]):
+            if not self.get_base_validator(i)(iterable[i], fallback=fallback):
                 return False
             if i > 0 and iterable[i] > iterable[i - 1]:
                 return False
@@ -259,12 +281,18 @@ class DictValidator(Validator):
 
     def __init__(
             self, key_validator, value_validator, help_string=None):
+        super().__init__()
         self.key_validator = key_validator
         self.value_validator = value_validator
         if help_string is None:
             self.help_string = "No help available for this option"
         else:
             self.help_string = help_string
+
+    def set_project(self, project):
+        super().set_project(project)
+        for validator in (self.key_validator, self.value_validator):
+            validator.set_project(self.project)
 
     @property
     def def_value(self):
@@ -274,11 +302,11 @@ class DictValidator(Validator):
         return "{}<{}, {}>".format(
             super().__repr__(), self.key_validator, self.value_validator)
 
-    def __call__(self, dictionary):
+    def __call__(self, dictionary, fallback=True):
         for key, value in dictionary.items():
             if (
-                    not self.key_validator(key) or
-                    not self.value_validator(value)):
+                    not self.key_validator(key, fallback=fallback) or
+                    not self.value_validator(value, fallback=fallback)):
                 return False
         return True
 
@@ -297,6 +325,7 @@ class ReferenceValidator(Validator):
     def __init__(
             self, fallback_validator, reference_path, project=None,
             help_string=None):
+        super().__init__()
         if help_string is None:
             self.help_string = "No help available for this option"
         else:
@@ -309,38 +338,31 @@ class ReferenceValidator(Validator):
         return "{}<{}, {}>".format(
             super().__repr__(), self.ref_path, self.fallback_validator)
 
-    def __call__(self, value):
-        if self.ref_path.project is None:
+    def __call__(self, value, fallback=True):
+        if self.ref_path.project is None and fallback:
             LOGGER.info("Cannot check relative reference to {}".format(
                 value))
             return self.fallback_validator(value)
-        return value in self.valid_options
+        return value in self.valid_menu_items
 
     def coerce(self, value):
-        try:
-            if value in self.valid_options:
-                return value
-            else:
-                return self.valid_options[
-                    self.valid_menu_items.index(value)]
-        except UnsetValueError:
-            LOGGER.debug("Cannot check relative reference to {}".format(
-                value))
-            return self.fallback_validator.coerce(value)
+        return self.fallback_validator.coerce(value)
 
     def set_project(self, project):
         """Set project to given value"""
-        self.ref_path.project = project
+        super().set_project(project)
+        self.ref_path.project = self.project
+        self.fallback_validator.set_project(self.project)
 
     @property
     def valid_menu_items(self):
         menu = []
-        project_element = self.path.get_element()
         for option in self.valid_options:
             try:
-                menu.append(project_element[option]["name"])
+                menu.append(option["name"])
             except KeyError:
-                menu.append(str(project_element[option]))
+                menu.append(str(option))
+        return menu
 
     @property
     def valid_options(self):
@@ -366,7 +388,7 @@ class IsBoolean(OptionValidator):
     def __repr__(self):
         return "{}()".format(self.__class__.__name__)
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         return True
 
 
@@ -380,6 +402,7 @@ class IsNumeric(Validator):
     """
 
     def __init__(self, min_value=None, max_value=None):
+        super().__init__()
         self.min_value = min_value
         self.max_value = max_value
 
@@ -402,7 +425,7 @@ class IsNumeric(Validator):
         return "{}<{}, {}>".format(
             super().__repr__(), self.min_value, self.max_value)
 
-    def __call__(self, value):
+    def __call__(self, value, fallback=True):
         try:
             value = float(value)
             if ((self.min_value is None or value >= self.min_value) and
@@ -424,8 +447,8 @@ class IsNumeric(Validator):
 class IsInteger(IsNumeric):
     """Check if value is an integer"""
 
-    def __call__(self, value):
-        if not super(IsInteger, self).__call__(value):
+    def __call__(self, value, fallback=True):
+        if not super(IsInteger, self).__call__(value, fallback=fallback):
             return False
         return value == int(value)
 
@@ -434,6 +457,7 @@ class FeatureValidator(Validator):
     """Check if value is a W3DFeature of specified type"""
 
     def __init__(self, correct_class, help_string=None):
+        super().__init__()
         self.correct_class = correct_class
         if help_string is None:
             self.help_string = "Value must be of type {}".format(
@@ -445,8 +469,14 @@ class FeatureValidator(Validator):
         return "{}<{}>".format(
             super().__repr__(), self.correct_class.__name__)
 
-    def __call__(self, value):
-        return isinstance(value, self.correct_class)
+    def __call__(self, value, fallback=True):
+        if fallback:
+            return isinstance(value, self.correct_class)
+        else:
+            return (
+                isinstance(value, self.correct_class) and
+                value.validate(project=self.project)
+            )
 
     def coerce(self, value):
         return self.correct_class(**value)

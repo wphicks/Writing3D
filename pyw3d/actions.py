@@ -57,13 +57,6 @@ class W3DAction(W3DFeature, metaclass=SubRegisteredClass):
         super().__init__(*args, **kwargs)
         self.actuators = []
 
-    def __lt__(self, other):
-        """Order based on __repr__ of self and other
-
-        Defined to allow unambiguous ordering of timelines"""
-
-        return repr(self) < repr(other)
-
     @staticmethod
     def fromXML(action_root):
         """Create W3DAction of appropriate subclass given xml root for any
@@ -135,7 +128,7 @@ def generate_object_action_logic(
         object_action.end_time)
     )
 
-    if "visible" in object_action:
+    if not object_action.is_default("visible"):
         action = VisibilityAction(
             object_action["visible"], object_action["duration"],
             offset=(offset)
@@ -144,7 +137,7 @@ def generate_object_action_logic(
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
-    if "placement" in object_action:
+    if not object_action.is_default("placement"):
         action = MoveAction(
             object_action["placement"],
             object_action["duration"],
@@ -155,7 +148,7 @@ def generate_object_action_logic(
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
-    if "color" in object_action:
+    if not object_action.is_default("color"):
         action = ColorAction(
             object_action["color"], object_action["duration"],
             offset=(offset)
@@ -164,7 +157,7 @@ def generate_object_action_logic(
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
-    if "scale" in object_action:
+    if not object_action.is_default("scale"):
         action = ScaleAction(
             object_action["scale"], object_action["duration"],
             offset=(offset)
@@ -173,7 +166,7 @@ def generate_object_action_logic(
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
-    if "link_change" in object_action:
+    if not object_action.is_default("link_change"):
         action = LinkAction(
             object_action["object_name"], object_action["link_change"],
             offset=(offset)
@@ -182,7 +175,7 @@ def generate_object_action_logic(
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
 
-    if "sound_change" in object_action:
+    if not object_action.is_default("sound_change"):
         action = SoundChange(
             object_action["object_name"], object_action["sound_change"],
             offset, object_name=object_action["object_name"]
@@ -190,12 +183,14 @@ def generate_object_action_logic(
         start_text.append(action.start_string)
         cont_text.append(action.continue_string)
         end_text.append(action.end_string)
-        LOGGER.debug("Adding audio actuators for {} to action actuator list".format(
-            object_action["object_name"])
+        LOGGER.debug(
+            "Adding audio actuators for {} to action actuator list".format(
+                object_action["object_name"])
         )
         sound_actuator = bpy.data.objects[
-            generate_blender_object_name(object_action["object_name"])].game.actuators[
-                generate_blender_sound_name(object_action["object_name"])]
+            generate_blender_object_name(
+                object_action["object_name"])].game.actuators[
+                    generate_blender_sound_name(object_action["object_name"])]
         object_action.actuators.append(sound_actuator)
 
     end_text.append(
@@ -245,14 +240,20 @@ class ObjectAction(W3DAction):
 
     default_arguments = {
         "duration": 1,
-        "move_relative": False
+        "move_relative": False,
+        "placement": None,
+        "color": None,
+        "visible": None,
+        "scale": None,
+        "sound_change": None,
+        "link_change": None,
     }
 
     link_xml_tags = {
         "Enable": "link_on", "Disable": "link_off", "Activate": "activate",
         "Activate if enabled": "activate_if_on"}
 
-    sound_xml_tags = {"Start":"Play Sound", "Stop":"Stop Sound"}
+    sound_xml_tags = {"Start": "Play Sound", "Stop": "Stop Sound"}
 
     def toXML(self, parent_root):
         """Store ObjectAction as ObjectChange node within one of several node
@@ -392,7 +393,9 @@ class GroupAction(W3DAction):
         "choose_random": IsBoolean(),
         "duration": IsNumeric(min_value=0),
         "visible": IsBoolean(),
-        "placement": IsBoolean(),
+        "placement": FeatureValidator(
+            W3DPlacement,
+            help_string="Orientation and position for movement"),
         "move_relative": IsBoolean(),
         "color": ListValidator(
             IsInteger(min_value=0, max_value=255),
@@ -406,7 +409,14 @@ class GroupAction(W3DAction):
 
     default_arguments = {
         "duration": 1,
-        "choose_random": False
+        "move_relative": False,
+        "placement": None,
+        "choose_random": False,
+        "color": None,
+        "scale": None,
+        "visible": None,
+        "sound_change": None,
+        "link_change": None,
     }
 
     link_xml_tags = {

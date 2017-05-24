@@ -96,10 +96,7 @@ class W3DGroup(W3DFeature):
             if child.tag == "Objects":
                 try:
                     group["objects"].append(
-                        group.argument_validators[
-                            "objects"].get_base_validator(0).coerce(
                                 child.attrib["name"]
-                        )
                     )
                 except KeyError:
                     raise BadW3DXML("Objects node has no name attrib")
