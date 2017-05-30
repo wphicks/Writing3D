@@ -72,8 +72,11 @@ def apply_euler_rotation(blender_object, x, y, z):
 
 
 def find_object_midpoint(blender_object):
+    midpoint = mathutils.Vector((0, 0, 0))
+    for vert in blender_object.data.vertices:
+        midpoint += vert.co
     return (
-        sum(blender_object.data.vertices) / len(blender_object.data.vertices)
+        midpoint / len(blender_object.data.vertices)
     )
 
 
@@ -1021,19 +1024,24 @@ class W3DObject(W3DFeature):
 
     def apply_material(self, blender_object):
         """Apply properties of object to material for Blender object"""
-        if blender_object.active_material is None:
+        if not len(blender_object.material_slots):
             blender_object.active_material = bpy.data.materials.new(
                 generate_blender_material_name(self["name"]))
-            if blender_object.active_material is None:
-                # Object cannot have active material
-                return blender_object
+            if blender_object.active_material is not None:
+                blender_object.active_material.game_settings.\
+                    use_backface_culling = (
+                        not self["double_sided"]
+                    )
+        else:
+            for slot in blender_object.material_slots:
+                slot.material = slot.material.copy()
 
-        blender_object.active_material.use_shadeless = not self["lighting"]
-        blender_object.active_material.use_transparency = True
-        blender_object.active_material.use_nodes = False
-        blender_object.active_material.use_object_color = True
-        blender_object.active_material.game_settings.use_backface_culling = (
-            not self["double_sided"])
+        for slot in blender_object.material_slots:
+            material = slot.material
+            material.use_shadeless = not self["lighting"]
+        #    material.use_transparency = True
+        #    material.use_nodes = False
+            material.use_object_color = True
         color = [channel / 255.0 for channel in self["color"]]
         color.append(int(self["visible"]))
         blender_object.color = color
@@ -1088,7 +1096,7 @@ class W3DObject(W3DFeature):
 
         if self["around_own_axis"]:
             set_object_center(
-                blender_object, find_object_center(blender_object)
+                blender_object, find_object_midpoint(blender_object)
             )
 
         particle_name = generate_blender_particle_name(blender_object.name)

@@ -34,7 +34,7 @@ from .sounds import W3DSound
 from .timeline import W3DTimeline
 from .groups import W3DGroup
 from .triggers import W3DTrigger
-from .errors import BadW3DXML, ValidationError
+from .errors import BadW3DXML
 from .blender_scripts import MOVE_TOGGLE_SCRIPT, ANGLES_SCRIPT
 from .names import generate_light_object_name
 from .pointer import setup_mouselook, setup_click
@@ -540,10 +540,10 @@ class W3DProject(W3DFeature):
 
     def blend(self):
         """Create representation of W3DProject in Blender"""
-        LOGGER.debug("Validating project")
-        if self["debug"]:
-            self.validate(project=self)
-        LOGGER.debug("Project validation complete")
+        # if self["debug"]:
+        #     LOGGER.debug("Validating project")
+        #     self.validate(project=self)
+        #     LOGGER.debug("Project validation complete")
         if self["profile"]:
             import cProfile
             cProfile.runctx(
@@ -555,7 +555,7 @@ class W3DProject(W3DFeature):
     def _blend(self):
         clear_blender_scene()
         bpy.data.scenes["Scene"].game_settings.physics_gravity = 0
-        bpy.data.scenes["Scene"].game_settings.material_mode = "MULTITEXTURE"
+        bpy.data.scenes["Scene"].game_settings.material_mode = "GLSL"
         bpy.data.scenes["Scene"].layers = [
             layer in (1, 3, 20) for layer in range(1, 21)]
         # TODO: Handle non-standard wall placements
