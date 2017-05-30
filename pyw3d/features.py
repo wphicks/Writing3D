@@ -61,6 +61,7 @@ class W3DFeature(dict):
         super(W3DFeature, self).__init__()
         self.update(args)
         self.update(kwargs.items())
+        self._validation_hashes = {}
         try:
             self.ui_order
         except AttributeError:
