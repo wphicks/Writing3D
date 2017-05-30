@@ -568,8 +568,12 @@ class W3DProject(W3DFeature):
         setup_click(self)
         self.sort_groups()
         bpy.data.texts.new("group_defs.py")  # Script for assigning group names
-        bpy.data.worlds["World"].horizon_color = self["background"]
-        # bpy.data.worlds["World"].ambient_color = self["background"]
+        bpy.data.worlds["World"].horizon_color = [
+            value / 255.0 for value in self["background"]
+        ]
+        # bpy.data.worlds["World"].ambient_color = [
+        #     value / 255.0 for value in self["background"]
+        # ]
 
         # Create assets
         for sound in self["sounds"]:
