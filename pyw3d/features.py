@@ -88,9 +88,14 @@ class W3DFeature(dict):
         try:
             return self.default_arguments[key]
         except:
+            name = type(self).__name__
+            try:
+                name = " ".join((name, super().get("name")))
+            except:
+                pass
             raise ConsistencyError(
                 "{} requires {} to be set for requested operation".format(
-                    type(self).__name__, key
+                    name, key
                 )
             )
 

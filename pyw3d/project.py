@@ -346,7 +346,7 @@ class W3DProject(W3DFeature):
                 new_project["sounds"].append(W3DSound.fromXML(child))
         paction_root = project_root.find("ParticleActionRoot")
         if paction_root is not None:
-            for child in paction_root.findall("PSys"):
+            for child in paction_root.findall("ParticleActionList"):
                 new_project["particle_actions"].append(
                     W3DPAction.fromXML(child))
         trigger_root = project_root.find("EventRoot")

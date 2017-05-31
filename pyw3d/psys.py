@@ -97,7 +97,8 @@ class W3DPDomain(W3DFeature):
                     key: domain_class.argument_validators[key].coerce(value)
                     for key, value in child.attrib.items()
                 }
-                return domain_class(child.tag, **options)
+                options["type"] = child.tag
+                return domain_class(**options)
 
     def toXML(self, parent_root):
         """Store W3DPDomain as ParticleDomain node within parent node"""
@@ -331,13 +332,13 @@ def get_velocity_vector():
     def fromXML(paction_class, paction_root):
         """Create W3DPAction from ParticleActionList root"""
         paction = paction_class()
-        paction["name"] = paction_root["name"]
+        paction["name"] = paction_root.attrib["name"]
 
         source_root = paction_root.find("Source")
         if source_root is None:
             raise BadW3DXML("ParticleActionList must have Source subelement")
         try:
-            paction["rate"] = int(source_root["rate"])
+            paction["rate"] = int(source_root.attrib["rate"])
         except KeyError:
             raise BadW3DXML("Source must specify rate attribute")
         source_domain_root = source_root.find("ParticleDomain")
@@ -358,10 +359,10 @@ def get_velocity_vector():
         """Store W3DPAction as ParticleActionList node within
         ParticleActionRoot node"""
         paction_node = ET.SubElement(parent_root, "ParticleActionList")
-        paction_node["name"] = self["name"]
+        paction_node.attrib["name"] = self["name"]
 
         source_node = ET.SubElement(paction_node, "Source")
-        source_node["rate"] = str(self["rate"])
+        source_node.attrib["rate"] = str(self["rate"])
         self["source_domain"].toXML(source_node)
 
         vel_node = ET.SubElement(paction_node, "Vel")
