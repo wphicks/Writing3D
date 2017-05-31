@@ -1074,6 +1074,7 @@ class W3DObject(W3DFeature):
             {'type': 'BOOL', 'name': 'visible_tag'}
         )
         blender_object.game.properties["visible_tag"].value = self["visible"]
+        print(blender_object.game.properties["visible_tag"].value)
         BPY_OPS_CALL(
             "object.game_property_new", None,
             {'type': 'BOOL', 'name': 'click_through'}
@@ -1099,9 +1100,13 @@ class W3DObject(W3DFeature):
                 blender_object, find_object_midpoint(blender_object)
             )
 
+        # TODO: It is *ridiculous* to duplicate every single object to get
+        # particle copies. This should be handled smartly in psys.py
         particle_name = generate_blender_particle_name(blender_object.name)
         particle_copy = duplicate_object(blender_object)
         particle_copy.name = particle_name
+        particle_copy.hide_render = False
+        particle_copy.color[3] = 1
         bpy.data.objects[particle_name].layers = [
             layer == 5 for layer in range(20)
         ]
@@ -1196,6 +1201,7 @@ def activate_particles(cont):
         own["particle_count"] = 0
         own["particle_tick"] = 0
         particle_count = 0
+        activate_particles.particle_list =[]
 
     max_age = bge.logic.getLogicTicRate()*{max_age}
 
@@ -1207,6 +1213,7 @@ def activate_particles(cont):
             own.name,
             int({max_age}*bge.logic.getLogicTicRate())
         )
+        activate_particles.particle_list.append(new_particle)
         own["particle_count"] += 1
         new_particle.visible = True
         new_particle.setLinearVelocity({speed}*get_velocity_vector())
@@ -1222,9 +1229,13 @@ def activate_particles(cont):
 
     own["particle_tick"] += 1
 
-    if (
-            {max_age} and own["particle_tick"] % {max_age} == 0):
-        own["particle_count"] += -1
+    activate_particles.particle_list = [
+        particle for particle in activate_particles.particle_list if
+        particle.life > 0.1
+    ]
+    own["particle_count"] = len(activate_particles.particle_list)
+    for particle in activate_particles.particle_list:
+        particle.color[3] = own.color[3]
     """
 
     @classmethod

@@ -26,7 +26,7 @@ To run this script, use the following command::
 
 import os
 from pyw3d import project, objects, placement, export_to_blender,\
-    psys, groups
+    psys, groups, actions, timeline
 
 # First, create a W3DProject to hold everything else you'll create
 my_project = project.W3DProject(
@@ -42,6 +42,7 @@ for index, char in enumerate(["W", "3", "D"]):
         objects.W3DObject(
             name="part{}".format(index),  # Give it a name
             placement=placement.W3DPlacement(),
+            color=(255, 0, 0),
             content=objects.W3DText(  # Specify that this is a text object
                 text=char
             ),
@@ -90,9 +91,39 @@ my_project["objects"].append(
             speed=1,
             particle_actions="my_actions"
         ),
-        visible=True
+        visible=False
     )
 )
+
+visibility_actions = [
+    (
+        0, actions.ObjectAction(
+            object_name="system",
+            visible=True,
+            duration=5,
+        )
+    ),
+    (
+        10, actions.ObjectAction(
+            object_name="system",
+            visible=False,
+            duration=5,
+        )
+    ),
+    (
+        16, actions.TimelineAction(
+            timeline_name="visify",
+            change="Start"
+        )
+    ),
+]
+vis_timeline = timeline.W3DTimeline(
+    name="visify",
+    start_immediately=True,
+    actions=visibility_actions
+)
+
+my_project["timelines"].append(vis_timeline)
 
 my_project["debug"] = True
 
