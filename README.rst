@@ -9,32 +9,22 @@ documentation website.
 
 Quickstart Guide
 ----------------
-We strongly encourage you to read the complete `Getting Started
-<https://wphicks.github.io/Writing3D/getting_started.html#getting-started>`_ guide,
-but for the impatient, the following should get you up and running. 
+The easiest way to get started with Writing3D is to download a zipfile install
+from one of the following locations:
 
-To quickly get started with Writing3D, you may download it as a `zip file
-<https://github.com/wphicks/Writing3D/archive/master.zip>`_ and extract it to a
-desired directory on your computer. Alternatively, you may clone it using git
-to stay up to date on all the latest changes:
+* `Linux <https://drive.google.com/open?id=0B-L9I5ef3FLWV3lDdU1McDRRRkU>`_
+* `Windows <https://drive.google.com/open?id=0B-L9I5ef3FLWd1luR1N0MHlVMjQ>`_
+* `Mac <https://drive.google.com/open?id=0B-L9I5ef3FLWRGttR1U2WmFBaE0>`_
 
-.. code:: bash
+Note that this includes the old (non-FOSS, Java-based) cwapp editor and a copy
+of the appropriate version of Blender. You can then launch CWEditor.jar to
+begin creating Writing3D projects.
 
-    $ git clone https://github.com/wphicks/Writing3D.git
+.. Warning::
+    The first time you open CWEditor.jar, you may need to open the Run menu,
+    select "Configure Paths" and then simply click "OK" to get CWEditor to
+    recognize the Writing3D backend.
 
-Once you have a copy, run setup.py with Python3, and you should have everything
-you need.
-
-.. code:: bash
-
-    $ cd Writing3D
-    $ python3 setup.py install --user
-
-.. warning::
-    You **must** use Python3 with Writing3D. Python2 is **not** supported.
-
-Once you've run setup.py, take a look at the samples directory to see some
-simple Writing3D examples.
 
 Overview
 --------
