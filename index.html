@@ -26,11 +26,14 @@
     <link rel="top" title="Writing3D 0.0.1 documentation" href="#" />
     <link rel="next" title="Getting Started" href="getting_started.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -45,26 +48,22 @@ up development time) for producing VR games, literature, and artwork. Click
 documentation website.</p>
 <div class="section" id="quickstart-guide">
 <h2>Quickstart Guide<a class="headerlink" href="#quickstart-guide" title="Permalink to this headline">¶</a></h2>
-<p>We strongly encourage you to read the complete <a class="reference external" href="https://wphicks.github.io/Writing3D/getting_started.html#getting-started">Getting Started</a> guide,
-but for the impatient, the following should get you up and running.</p>
-<p>To quickly get started with Writing3D, you may download it as a <a class="reference external" href="https://github.com/wphicks/Writing3D/archive/master.zip">zip file</a> and extract it to a
-desired directory on your computer. Alternatively, you may clone it using git
-to stay up to date on all the latest changes:</p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/wphicks/Writing3D.git
-</pre></div>
-</div>
-<p>Once you have a copy, run setup.py with Python3, and you should have everything
-you need.</p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span>$ cd Writing3D
-$ python3 setup.py install --user
-</pre></div>
-</div>
+<p>The easiest way to get started with Writing3D is to download a zipfile install
+from one of the following locations:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://drive.google.com/open?id=0B-L9I5ef3FLWV3lDdU1McDRRRkU">Linux</a></li>
+<li><a class="reference external" href="https://drive.google.com/open?id=0B-L9I5ef3FLWd1luR1N0MHlVMjQ">Windows</a></li>
+<li><a class="reference external" href="https://drive.google.com/open?id=0B-L9I5ef3FLWRGttR1U2WmFBaE0">Mac</a></li>
+</ul>
+<p>Note that this includes the old (non-FOSS, Java-based) cwapp editor and a copy
+of the appropriate version of Blender. You can then launch CWEditor.jar to
+begin creating Writing3D projects.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">You <strong>must</strong> use Python3 with Writing3D. Python2 is <strong>not</strong> supported.</p>
+<p class="last">The first time you open CWEditor.jar, you may need to open the Run menu,
+select &#8220;Configure Paths&#8221; and then simply click &#8220;OK&#8221; to get CWEditor to
+recognize the Writing3D backend.</p>
 </div>
-<p>Once you&#8217;ve run setup.py, take a look at the samples directory to see some
-simple Writing3D examples.</p>
 </div>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
@@ -193,9 +192,9 @@ issue on <a class="reference external" href="https://github.com/wphicks/Writing3
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
 </ul>
 </div>
 
@@ -246,6 +245,9 @@ issue on <a class="reference external" href="https://github.com/wphicks/Writing3
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -256,8 +258,8 @@ issue on <a class="reference external" href="https://github.com/wphicks/Writing3
       &copy;2016, William Hicks.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="_sources/index.txt"

@@ -26,11 +26,14 @@
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../../index.html" />
     <link rel="up" title="pyw3d" href="../pyw3d.html" />
    
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -38,7 +41,7 @@
           <div class="body" role="main">
             
   <h1>Source code for pyw3d.project</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span class="c1"># Copyright (C) 2016 William Hicks</span>
 <span class="c1">#</span>
 <span class="c1"># This file is part of Writing3D.</span>
 <span class="c1">#</span>
@@ -60,7 +63,6 @@
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
 <span class="kn">import</span> <span class="nn">xml.dom.minidom</span> <span class="kn">as</span> <span class="nn">minidom</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pyw3d&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -70,12 +72,15 @@
     <span class="n">IsBoolean</span><span class="p">,</span> <span class="n">FeatureValidator</span><span class="p">,</span> <span class="n">IsInteger</span><span class="p">,</span> <span class="n">DictValidator</span>
 <span class="kn">from</span> <span class="nn">.xml_tools</span> <span class="kn">import</span> <span class="n">bool2text</span><span class="p">,</span> <span class="n">text2tuple</span><span class="p">,</span> <span class="n">attrib2bool</span><span class="p">,</span> <span class="n">text2bool</span>
 <span class="kn">from</span> <span class="nn">.objects</span> <span class="kn">import</span> <span class="n">W3DObject</span>
+<span class="kn">from</span> <span class="nn">.psys</span> <span class="kn">import</span> <span class="n">W3DPAction</span>
 <span class="kn">from</span> <span class="nn">.sounds</span> <span class="kn">import</span> <span class="n">W3DSound</span>
 <span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">W3DTimeline</span>
 <span class="kn">from</span> <span class="nn">.groups</span> <span class="kn">import</span> <span class="n">W3DGroup</span>
 <span class="kn">from</span> <span class="nn">.triggers</span> <span class="kn">import</span> <span class="n">W3DTrigger</span>
 <span class="kn">from</span> <span class="nn">.errors</span> <span class="kn">import</span> <span class="n">BadW3DXML</span>
 <span class="kn">from</span> <span class="nn">.blender_scripts</span> <span class="kn">import</span> <span class="n">MOUSE_LOOK_SCRIPT</span><span class="p">,</span> <span class="n">MOVE_TOGGLE_SCRIPT</span>
+<span class="kn">from</span> <span class="nn">.names</span> <span class="kn">import</span> <span class="n">generate_light_object_name</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pyw3d&quot;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">bpy</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -84,9 +89,11 @@
 
 
 <div class="viewcode-block" id="clear_blender_scene"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.clear_blender_scene">[docs]</a><span class="k">def</span> <span class="nf">clear_blender_scene</span><span class="p">():</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Clearing all objects from Blender scene...&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">bpy</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="p">:</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">select</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">lamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">generate_light_object_name</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="setup_blender_layout"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.project.setup_blender_layout">[docs]</a><span class="k">def</span> <span class="nf">setup_blender_layout</span><span class="p">():</span>
@@ -175,6 +182,10 @@
             <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DGroup</span><span class="p">),</span>
             <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DObjects in the project&quot;</span>
         <span class="p">),</span>
+        <span class="s2">&quot;particle_actions&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
+            <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DPAction</span><span class="p">),</span>
+            <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DPActions in the project&quot;</span>
+        <span class="p">),</span>
         <span class="s2">&quot;timelines&quot;</span><span class="p">:</span> <span class="n">ListValidator</span><span class="p">(</span>
             <span class="n">FeatureValidator</span><span class="p">(</span><span class="n">W3DTimeline</span><span class="p">),</span>
             <span class="n">help_string</span><span class="o">=</span><span class="s2">&quot;A list of W3DTimelines in the project&quot;</span><span class="p">),</span>
@@ -212,10 +223,18 @@
     <span class="n">default_arguments</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;far_clip&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
         <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="s2">&quot;allow_movement&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-        <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+        <span class="s2">&quot;allow_movement&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s2">&quot;allow_rotation&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
         <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="bp">False</span>
     <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;debug&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">call_directory</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;call_directory&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -229,6 +248,8 @@
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;groups&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;particle_actions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;particle_actions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;timelines&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;sounds&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
@@ -240,7 +261,7 @@
                 <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
         <span class="k">if</span> <span class="s2">&quot;desktop_camera_placement&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="p">(</span>
-                <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">convert_to_blender_axes</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
         <span class="c1"># NOTE: This currently does nothing. Need to call</span>
         <span class="c1"># _create_relative_to_objects for W3DPlacement in order to change</span>
         <span class="c1"># placements</span>
@@ -304,6 +325,9 @@
         <span class="n">sound_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;SoundRoot&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sound</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]:</span>
             <span class="n">sound</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">sound_root</span><span class="p">)</span>
+        <span class="n">paction_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;ParticleActionRoot&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">paction</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;particle_actions&quot;</span><span class="p">]:</span>
+            <span class="n">paction</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">paction_root</span><span class="p">)</span>
         <span class="n">event_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="s2">&quot;EventRoot&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
             <span class="n">trigger</span><span class="o">.</span><span class="n">toXML</span><span class="p">(</span><span class="n">event_root</span><span class="p">)</span>
@@ -360,6 +384,11 @@
         <span class="k">if</span> <span class="n">sound_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">sound_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;Sound&quot;</span><span class="p">):</span>
                 <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">W3DSound</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
+        <span class="n">paction_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;ParticleActionRoot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">paction_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">paction_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;PSys&quot;</span><span class="p">):</span>
+                <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;particle_actions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">W3DPAction</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">child</span><span class="p">))</span>
         <span class="n">trigger_root</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;EventRoot&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">trigger_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">trigger_root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;EventTrigger&quot;</span><span class="p">):</span>
@@ -377,8 +406,7 @@
         <span class="n">place_node</span> <span class="o">=</span> <span class="n">camera_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;CameraPos node has no Placement child&quot;</span><span class="p">)</span>
-        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span>
-            <span class="n">place_node</span><span class="p">)</span>
+        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">place_node</span><span class="p">)</span>
 
         <span class="n">camera_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;CameraPos&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -388,7 +416,8 @@
         <span class="n">place_node</span> <span class="o">=</span> <span class="n">camera_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Placement&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">camera_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">BadW3DXML</span><span class="p">(</span><span class="s2">&quot;CameraPos node has no Placement child&quot;</span><span class="p">)</span>
-        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span><span class="n">place_node</span><span class="p">)</span>
+        <span class="n">new_project</span><span class="p">[</span><span class="s2">&quot;desktop_camera_placement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">W3DPlacement</span><span class="o">.</span><span class="n">fromXML</span><span class="p">(</span>
+            <span class="n">place_node</span><span class="p">)</span>
 
         <span class="n">bg_node</span> <span class="o">=</span> <span class="n">global_root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Background&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">bg_node</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -586,6 +615,10 @@
         <span class="n">bpy</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">worlds</span><span class="p">[</span><span class="s2">&quot;World&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">horizon_color</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">]</span>
         <span class="c1"># bpy.data.worlds[&quot;World&quot;].ambient_color = self[&quot;background&quot;]</span>
 
+        <span class="c1"># Create assets</span>
+        <span class="k">for</span> <span class="n">sound</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]:</span>
+            <span class="n">sound</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+
         <span class="c1"># Create Objects</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;groups&quot;</span><span class="p">]:</span>
             <span class="n">group</span><span class="o">.</span><span class="n">blend_objects</span><span class="p">()</span>
@@ -593,22 +626,16 @@
             <span class="n">group</span><span class="o">.</span><span class="n">blend_groups</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
             <span class="n">object_</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">sound</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;sounds&quot;</span><span class="p">]:</span>
-            <span class="n">sound</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
+
+        <span class="c1"># Create particle action logic</span>
+        <span class="k">for</span> <span class="n">paction</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;particle_actions&quot;</span><span class="p">]:</span>
+            <span class="n">paction</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
 
         <span class="c1"># Create Activators</span>
         <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
             <span class="n">timeline</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
             <span class="n">trigger</span><span class="o">.</span><span class="n">blend</span><span class="p">()</span>
-        <span class="c1"># Link game engine logic bricks for Activators</span>
-        <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
-            <span class="n">timeline</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
-            <span class="n">trigger</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
         <span class="c1"># Write any necessary game engine logic for Activators</span>
         <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
             <span class="n">timeline</span><span class="o">.</span><span class="n">write_blender_logic</span><span class="p">()</span>
@@ -617,6 +644,14 @@
                 <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">write_blender_logic</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
             <span class="n">trigger</span><span class="o">.</span><span class="n">write_blender_logic</span><span class="p">()</span>
+        <span class="c1"># Link game engine logic bricks for Activators</span>
+        <span class="k">for</span> <span class="n">timeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;timelines&quot;</span><span class="p">]:</span>
+            <span class="n">timeline</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">object_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">object_</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trigger</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;trigger_events&quot;</span><span class="p">]:</span>
+            <span class="n">trigger</span><span class="o">.</span><span class="n">link_blender_logic</span><span class="p">()</span>
         <span class="n">setup_blender_layout</span><span class="p">()</span>
         <span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">pack_all</span><span class="p">()</span></div></div>
 </pre></div>
@@ -644,6 +679,9 @@
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -654,8 +692,8 @@
       &copy;2016, William Hicks.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
     </div>
 

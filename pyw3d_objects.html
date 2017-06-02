@@ -25,11 +25,14 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -46,8 +49,8 @@ and then specify that the W3DObject contains &#8220;my_awesome_selfie.jpg&#8221;
 whatever image you want. If you later decide that selfies are lame, and you&#8217;d
 rather just put your name in giant block letters at the same point in space,
 you can swap out &#8220;my_awesome_selfie.jpg&#8221; for a <a class="reference internal" href="#pyw3d.W3DText" title="pyw3d.W3DText"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.W3DText</span></code></a> object. See
-<a class="reference internal" href="#pyw3d-docs-object-content"><span class="std std-ref">W3DContent</span></a> for more details on this.</p>
-<p>You can also interact with W3DObjects by adding a <a class="reference internal" href="#pyw3d-docs-links"><span class="std std-ref">W3DLink</span></a> to them.</p>
+<a class="reference internal" href="#pyw3d-docs-object-content"><span>W3DContent</span></a> for more details on this.</p>
+<p>You can also interact with W3DObjects by adding a <a class="reference internal" href="#pyw3d-docs-links"><span>W3DLink</span></a> to them.</p>
 <dl class="class">
 <dt id="pyw3d.W3DObject">
 <em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DObject" title="Permalink to this definition">¶</a></dt>
@@ -60,7 +63,7 @@ you can swap out &#8220;my_awesome_selfie.jpg&#8221; for a <a class="reference i
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the object</li>
 <li><strong>placement</strong> (<a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; Position and orientation of object</li>
-<li><strong>link</strong> (<a class="reference internal" href="#pyw3d.W3DLink" title="pyw3d.W3DLink"><em>W3DLink</em></a>) &#8211; Clickable link for object</li>
+<li><strong>link</strong> (<a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DLink" title="pyw3d.objects.W3DLink"><em>W3DLink</em></a>) &#8211; Clickable link for object</li>
 <li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; Three floats representing RGB color of object</li>
 <li><strong>double_sided</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Is object visible from both sides?</li>
 <li><strong>visible</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Is object visible?</li>
@@ -338,7 +341,33 @@ source</p>
 <em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DPSys</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DPSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DPSys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents a particle system in virtual space</p>
-<p>NOT YET IMPLEMENTED AT ALL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>particle_group</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the group of objects to use as</td>
+</tr>
+</tbody>
+</table>
+<p>particles in this system</p>
+<dl class="method">
+<dt id="pyw3d.W3DPSys.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DPSys.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DPSys.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DPSys in Blender</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.W3DPSys.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>psys_class</em>, <em>psys_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DPSys.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DPSys.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create W3DPSys from ParticleSystem root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.W3DPSys.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DPSys.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DPSys.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store W3DPSys as ParticleSystem node within Content node</p>
+</dd></dl>
+
 </dd></dl>
 
 <div class="admonition warning">
@@ -350,7 +379,7 @@ source</p>
 <span id="pyw3d-docs-links"></span><h2>Object Links<a class="headerlink" href="#object-links" title="Permalink to this headline">¶</a></h2>
 <p>In order to interact with an object, you may add a clickable link to it. This
 link is implemented using the W3DLink class and may trigger a series of
-<a class="reference internal" href="pyw3d_actions.html#pyw3d-docs-actions"><span class="std std-ref">W3DActions</span></a>.</p>
+<a class="reference internal" href="pyw3d_actions.html#pyw3d-docs-actions"><span>W3DActions</span></a>.</p>
 <dl class="class">
 <dt id="pyw3d.W3DLink">
 <em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DLink</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/objects.html#W3DLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DLink" title="Permalink to this definition">¶</a></dt>
@@ -418,6 +447,9 @@ value to never reset)</li>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -428,8 +460,8 @@ value to never reset)</li>
       &copy;2016, William Hicks.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="_sources/pyw3d_objects.txt"

@@ -1,0 +1,1068 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A Writing3D Tutorial &mdash; Writing3D 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="a-writing3d-tutorial">
+<h1>A Writing3D Tutorial<a class="headerlink" href="#a-writing3d-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Writing3D! This software is a tool for programmers and artists alike, enabling its users to easily create stunning displays of text, shape, and color within a virtual reality atmosphere. Projects are based on the open source 3D rendering engine Blender, allowing users to have full creative control over their work. These docs will provide an introduction to the software as a whole, installation, and the process of creating a project, as well as some of the features at your fingertips.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Before getting into installation and projects, ensure that you have Python3 downloaded. This is necessary because Writing3D is based in Blender, which uses Python3 as a scripting language. Regardless of whether you intend to code new features for Writing3D or create projects, installation of Python3 is absolutely necessary. After this is complete, simply run the following script from your terminal:</p>
+<p><code class="docutils literal"><span class="pre">python3</span> <span class="pre">setup.py</span> <span class="pre">–install</span> <span class="pre">–user</span></code></p>
+<p>This will install Blender onto your computer, and give you access to the world of Writing3D!</p>
+</div>
+<div class="section" id="roots-and-set-up">
+<h2>Roots and Set-up<a class="headerlink" href="#roots-and-set-up" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>User input is provided to Writing3D through the use of XML documents. At the highest point in the tag hierarchy is the <code class="docutils literal"><span class="pre">&lt;Story&gt;</span></code> tag. Within these, we have the <code class="docutils literal"><span class="pre">&lt;ObjectRoot&gt;</span></code> tags, in which we will define all objects in the scene (continue reading for more on how to do that!) We also have <code class="docutils literal"><span class="pre">&lt;PlacementRoot&gt;</span></code> in which we define the Center and Walls of the specific virtual reality theater we are using. For Brown&#8217;s CAVE, we have the following:</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;PlacementRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement</span> <span class="pre">name=&quot;Center&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&lt;/Position&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Axis</span> <span class="pre">rotation=&quot;(0.0,</span> <span class="pre">1.0,</span> <span class="pre">0.0)&quot;</span> <span class="pre">angle=&quot;0.0&quot;/&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement</span> <span class="pre">name=&quot;FrontWall&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">-4.0)&lt;/Position&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;LookAt</span> <span class="pre">target=&quot;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&quot;</span> <span class="pre">up=&quot;(0.0,</span> <span class="pre">1.0,</span> <span class="pre">0.0)&quot;/&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement</span> <span class="pre">name=&quot;LeftWall&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(-4.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&lt;/Position&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;LookAt</span> <span class="pre">target=&quot;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&quot;</span> <span class="pre">up=&quot;(0.0,</span> <span class="pre">1.0,</span> <span class="pre">0.0)&quot;/&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement</span> <span class="pre">name=&quot;RightWall&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(4.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&lt;/Position&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;LookAt</span> <span class="pre">target=&quot;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&quot;</span> <span class="pre">up=&quot;(0.0,</span> <span class="pre">1.0,</span> <span class="pre">0.0)&quot;/&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement</span> <span class="pre">name=&quot;FloorWall&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,</span> <span class="pre">-4.0,</span> <span class="pre">0.0)&lt;/Position&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;LookAt</span> <span class="pre">target=&quot;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&quot;</span> <span class="pre">up=&quot;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">-1.0)&quot;/&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/PlacementRoot&gt;</span></code></p>
+<p>The contents of the <code class="docutils literal"><span class="pre">&lt;PlacementRoot&gt;</span></code> tags are unique to the VR theater, but once determined, they can be copy and pasted onto your XML!</p>
+<p>We also have the option to create <code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code> and <code class="docutils literal"><span class="pre">&lt;GroupRoot&gt;</span></code> tags, which we&#8217;ll get into later.</p>
+<p>At the end of our file at the same indentation of the <code class="docutils literal"><span class="pre">Roots</span></code>, before the closing <code class="docutils literal"><span class="pre">&lt;/Story&gt;</span></code> tag, we define several housekeeping options for setting up the scene, such as if the user can rotate or move, the camera position, and the background color, within <code class="docutils literal"><span class="pre">&lt;Global&gt;</span></code> tags.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Global&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;CameraPos</span> <span class="pre">far-clip=&quot;100.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">6.0)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/CameraPos&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;CaveCameraPos</span> <span class="pre">far-clip=&quot;100.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/CaveCameraPos&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Background</span> <span class="pre">color=&quot;0,</span> <span class="pre">0,</span> <span class="pre">0&quot;/&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;WandNavigation</span> <span class="pre">allow-rotation=&quot;true&quot;</span> <span class="pre">allow-movement=&quot;true&quot;/&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Global&gt;</span></code></p>
+<p>So, the high-level tags of a program will look a bit like this:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Story&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectRoot&gt;</span></code></p>
+<blockquote>
+<div>`` //Create objects here!``</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectRoot&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;GroupRoot&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//Put</span> <span class="pre">objects</span> <span class="pre">into</span> <span class="pre">groups</span> <span class="pre">here!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRoot&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//Set</span> <span class="pre">up</span> <span class="pre">timelines</span> <span class="pre">here!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimelineRoot&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;PlacementRoot&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//Define</span> <span class="pre">walls</span> <span class="pre">here!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/PlacementRoot&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Global&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//Housekeeping</span> <span class="pre">options</span> <span class="pre">here!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Global&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Story&gt;</span></code></p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-object-class">
+<h3>The Object Class<a class="headerlink" href="#the-object-class" title="Permalink to this headline">¶</a></h3>
+<p>Writing3D is coded with an overarching W3DObject superclass that controls several characteristics available to objects: visibility, color, lighting, scale, and so on. We’ll go over creating an object and setting all of these values and more. First, we’ll give the Object a name so we and Writing3D can reference it later.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>Color, Visibility, and Scale:</p>
+<p>Within these tags, we can set our objects visibility to True or False, and Color based on red, green, and blue values between 0 and 255. The Scale feature allows us to define a size of the object, with 1.0 referring to the normal size and higher numbers increasing the size based on the inputted number.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>Placement:</p>
+<p>Next, we choose a  starting position for our object in the scene. The Placement option comes with two sub-options, “RelativeTo” and “Position.” Essentially, we choose a specific wall of the 3D scene (LeftWall, RightWall, etc.) or the Center of the scene, to input into RelativeTo. The Position is an ordered pair of the form (x, y, z) to place the object in relation to the selected RelativeTo position.</p>
+<p>Let’s have our object be -2 units away horizontally from the center of the scene, but on the same y and z axes. This can be represented by the location: (-2.0, 0.0, 0.0). We add this to our growing object tag.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>And lastly, we handle three options: ClickThrough, AroundSelfAxis, and Lighting. If two objects overlap, setting ClickThrough to true allows a click the top object to also register for the bottom object. Setting AroundSelfAxis to true will allow the object to rotate around its own midpoint axis rather than its top left corner. Lighting determines if an object responds to external lighting; if set to false, an object will emit its own light and be visible even in the presence of no external light source.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>Content:</p>
+<p>The last step is to actually define what we’re creating. We do this with the content option, and have several choices: text, lamps, linked objects, models, images, shapes—all of which will be discussed in detail. For now, let’s elide the specifics and simply add Content tags to our code.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//elided</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>The next section will discuss what we can do by inputting into that elided space between the content tags!</p>
+</div>
+<div class="section" id="the-content-class">
+<h3>The Content Class<a class="headerlink" href="#the-content-class" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="text">
+<h4>Text<a class="headerlink" href="#text" title="Permalink to this headline">¶</a></h4>
+<p>You can add strings of text to the 3D scene using this feature. The Text call relies on five changeable options: the actual text, the horizontal alignment, the vertical alignment, the type of font, and the depth. In the following example, we replicate the basic example that comes with Writing3D by creating a text object of the string “Hello World!”</p>
+<p>We will set horizontal and vertical alignment simply to “center”, and choose our font to be Courier.tff. Within &lt;text&gt; and &lt;/text&gt; tags, we add the actual string that we’re writing, as so:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Hello</span> <span class="pre">World!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+<p>A depth of 0.0 sets the text to be created on a 2D plane. To make the text three dimensional, we can set depth at a higher number. If we shine a lamp on the object created in the following code, we’ll be able to see light and shadow reacting to the edges of the text:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“3.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Hello</span> <span class="pre">World!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+<p>By adding this to our object code, we’ve created our first object!</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“3.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Hello</span> <span class="pre">World!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+</div>
+<div class="section" id="lamps-and-light-sources">
+<h4>Lamps and Light Sources<a class="headerlink" href="#lamps-and-light-sources" title="Permalink to this headline">¶</a></h4>
+<p>The Blender interface used to create the immersive Writing3D projects begins by creating an initial lamp. Additional light sources are easy to add and can lead to some beautiful effects when rendered! We begin with some choices. Writing3D allows us to specify if our light is specular or diffuse, the angle in degrees, and its constant, linear, and quadratic attenuations. If the light is a Spotlight (more on that in a second), we can also specify the angle in degrees specifying its spread.</p>
+<p>Let’s create a basic light source.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Light</span> <span class="pre">diffuse=&quot;true&quot;</span> <span class="pre">specular=&quot;true&quot;</span> <span class="pre">const_atten=&quot;1.0&quot;</span> <span class="pre">lin_atten=&quot;0.0&quot;</span> <span class="pre">quad_atten=&quot;0.0&quot;&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;/Light&gt;</span></code></p>
+<p>The only thing left to do is decide what type of light source we want. The Blender game engine offers us three options: Point Light, Directional Light, and Spot Light. We specify this in a tag within the &lt;Light&gt;&lt;/Light&gt; tags, like so:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Light</span> <span class="pre">diffuse=&quot;true&quot;</span> <span class="pre">specular=&quot;true&quot;</span> <span class="pre">const_atten=&quot;1.0&quot;</span> <span class="pre">lin_atten=&quot;0.0&quot;</span> <span class="pre">quad_atten=&quot;0.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Point/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Light&gt;</span></code></p>
+<p>Alternatively, we can use <code class="docutils literal"><span class="pre">&lt;Spot/&gt;</span></code> or <code class="docutils literal"><span class="pre">&lt;Directional/&gt;</span></code> to create the other types of light as well.</p>
+<p>Lamps are created with the same options as the basic object. So, we can specify color, position, visibility, and so on much in the same way as we did while creating text. If we want to create a red point light positioned near the center of the scene, for instance, we simply make those adjustments to the object’s color option in the following manner.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Light</span> <span class="pre">diffuse=&quot;true&quot;</span> <span class="pre">specular=&quot;true&quot;</span> <span class="pre">const_atten=&quot;1.0&quot;</span> <span class="pre">lin_atten=&quot;0.0&quot;</span> <span class="pre">quad_atten=&quot;0.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Point/&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Light&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+</div>
+<div class="section" id="shapes">
+<h4>Shapes<a class="headerlink" href="#shapes" title="Permalink to this headline">¶</a></h4>
+<p>Next step, adding 3D shapes to the scene. Writing3D allows us to create Spheres, Cubes, Cones, Cylinders, and—interestingly—a Monkey Head. The process is very similar to creating a light source.</p>
+<p>We begin by deciding the shape that we want, and it’s size, defined as it’s radius. If our shape is a Cone or a Cylinder, we can also define it’s depth—how long it will be. To create a Cube, we have:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Shape</span> <span class="pre">shape_type=</span> <span class="pre">“Cube”</span> <span class="pre">radius</span> <span class="pre">=</span> <span class="pre">“0.5”/&gt;</span></code></p>
+<p>To create a Cylinder with a height of 4, we have:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Shape</span> <span class="pre">shape_type=</span> <span class="pre">“Cylinder”</span> <span class="pre">radius=</span> <span class="pre">“0.5”</span> <span class="pre">depth=</span> <span class="pre">“4”/&gt;</span></code></p>
+<p>Each shape goes within the <code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code> tags of its own <code class="docutils literal"><span class="pre">&lt;Object&gt;</span></code> tag. So to add our cube to the scene, we have:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Shape</span> <span class="pre">shape_type=</span> <span class="pre">“Cube”</span> <span class="pre">radius</span> <span class="pre">=</span> <span class="pre">“0.5”/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>Our choices for shapes are <code class="docutils literal"><span class="pre">Cube</span></code>, <code class="docutils literal"><span class="pre">Cylinder</span></code>, <code class="docutils literal"><span class="pre">Sphere</span></code>, <code class="docutils literal"><span class="pre">Cone</span></code>, and <code class="docutils literal"><span class="pre">Monkey</span></code>.</p>
+</div>
+<div class="section" id="imported-images">
+<h4>Imported Images<a class="headerlink" href="#imported-images" title="Permalink to this headline">¶</a></h4>
+<p>Writing3D supports imported images of type .jpg. Simply adding the file path name to an Image tag will do the trick.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Image</span> <span class="pre">filename=”./pictures/MyVirtualPic.jpg”/&gt;</span></code></p>
+<p>Placing this between the content tags, we can complete the process! Note that the color tags here will not affect the picture, and are simply there for formality.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Image</span> <span class="pre">filename=”./pictures/MyVirtualPic.jpg”/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+</div>
+<div class="section" id="imported-models">
+<h4>Imported Models<a class="headerlink" href="#imported-models" title="Permalink to this headline">¶</a></h4>
+<p><strong>check collisions</strong></p>
+<p>To display imported three-dimensional models, we follow a process similar to importing pictures, but add detail about checking collisions. So, we have:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Model</span> <span class="pre">filename=”./models/myModel.obj”</span> <span class="pre">check-collisions=</span> <span class="pre">“false”/&gt;</span></code></p>
+<p>And, of course, we add the rest of the object code. Again, the color tags are simply here as formality and are not necessary.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“My</span> <span class="pre">Object”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;</span> <span class="pre">false</span> <span class="pre">&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Model</span> <span class="pre">filename=”./models/myModel.obj”</span> <span class="pre">check-collisions=</span> <span class="pre">“false”/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>Now we’ve got the object class spelled out. These are the building blocks for anything we create in Writing3D. In the next section, we’ll run through a simple tutorial showing just what we can do with these objects; using Links and/or Timelines, we bring all our objects to life.</p>
+</div>
+<div class="section" id="links-linkroots">
+<h4>Links/LinkRoots<a class="headerlink" href="#links-linkroots" title="Permalink to this headline">¶</a></h4>
+<p>Links can be used to add movement and transitions to Writing3D projects. We&#8217;ll get into a more in depth example in a second. For now, this is the general set-up for a <code class="docutils literal"><span class="pre">Text</span></code> object that has been into a <code class="docutils literal"><span class="pre">Link</span></code>. Notice that <code class="docutils literal"><span class="pre">&lt;LinkRoot&gt;</span></code>, which makes an <code class="docutils literal"><span class="pre">Object</span></code> a <code class="docutils literal"><span class="pre">Link</span></code>, is at the same hierarchy as the <code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code> tags.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“MyLink”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">255</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;false&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;false&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;false&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Link</span> <span class="pre">Text!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;LinkRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Link&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//code</span> <span class="pre">to</span> <span class="pre">make</span> <span class="pre">object</span> <span class="pre">move!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Link&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/LinkRoot&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+</div>
+</div>
+</div>
+<div class="section" id="hello-world-an-extended-example">
+<h2>Hello World, an Extended Example<a class="headerlink" href="#hello-world-an-extended-example" title="Permalink to this headline">¶</a></h2>
+<p>Here, we’ll make a “Hello World” text object that sits on the left wall of the virtual reality theater. On the click of a link, the text will move to the front wall. We start with the same Object code as before to create our “Hello World” object:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“movingtext”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">153,</span> <span class="pre">153,</span> <span class="pre">153</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;false&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;false&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;false&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">6.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;LeftWall&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Hello</span> <span class="pre">World!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>Notice that this is positioned on the Left Wall, its starting position.
+Next, we rewrite our code for Links in the following way:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“frontlink”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">255</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;false&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;false&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;false&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Fly</span> <span class="pre">Front!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;LinkRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Link&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//code</span> <span class="pre">to</span> <span class="pre">make</span> <span class="pre">object</span> <span class="pre">move!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Link&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/LinkRoot&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>We fill in the Link code to give it instructions on what to do when clicked. First, we must enable the Link. We can also choose a color for the link to turn when being hovered over within the “Enabled Color” tags, and a color for the link to turn when selected in the “Selected Color” tags.</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Link&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;Enabled&gt;true&lt;/Enabled&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Remain</span> <span class="pre">Enabled&gt;true&lt;/Remain</span> <span class="pre">Enabled&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;EnabledColor&gt;0,128,255&lt;/EnabledColor&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;SelectedColor&gt;255,0,0&lt;/SelectedColor&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">//further</span> <span class="pre">code</span> <span class="pre">coming</span> <span class="pre">up!</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Link&gt;</span></code></p>
+<p>Within “Action” tags, we specify just how the link can change the scene. Within these tags, we specify what object will be changed in the “ObjectChange” tag—in this case, it’s our “Hello World” object, which we named “moving text.” We specify a duration for our change, the type of change, and specifics to the type of change.</p>
+<p><code class="docutils literal"><span class="pre">&lt;Actions&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“movingtext”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration</span> <span class="pre">=</span> <span class="pre">“1.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//Type</span> <span class="pre">of</span> <span class="pre">change!</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Actions&gt;</span></code></p>
+<p>We want the “movingtext” object to move when this link is selected. So, the type of change will be recorded within “Movement” tags. We then specify where the object will move to within “Placement” tags, in a very similar way to how we initially set up placement when creating our objects. It looks like this:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Actions&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“movingtext”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration</span> <span class="pre">=</span> <span class="pre">“1.0”&gt;</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Movement&gt;</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;FrontWall&lt;/RelativeTo&gt;</span></code></p>
+<blockquote class="last">
+<div><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;/Movement&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Actions&gt;</span></code></p>
+<p>We can add additional actions that will take place at the same time the link is clicked. These would go in action tags and each <code class="docutils literal"><span class="pre">&lt;Action&gt;</span></code> would be listed one after the other. So, we can add another <code class="docutils literal"><span class="pre">&lt;Action&gt;</span></code> to, say, change the color of the text as well to (0,100,0).</p>
+<p>Putting it all together:</p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“movingtext”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">153,</span> <span class="pre">153,</span> <span class="pre">153</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;false&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;false&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;false&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">6.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;LeftWall&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Hello</span> <span class="pre">World!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“frontlink”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">255</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Lighting&gt;false&lt;/Lighting&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;ClickThrough&gt;false&lt;/ClickThrough&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;AroundSelfAxis&gt;false&lt;/AroundSelfAxis&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Text</span> <span class="pre">horiz-align=</span> <span class="pre">“center”</span> <span class="pre">vert-align</span> <span class="pre">=</span> <span class="pre">“center”</span> <span class="pre">font=</span> <span class="pre">“Courier.ttf”</span> <span class="pre">depth</span> <span class="pre">=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;text&gt;Fly</span> <span class="pre">Front!&lt;/text&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Text&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;LinkRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Link&gt;</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Enabled&gt;true&lt;/Enabled&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Remain</span> <span class="pre">Enabled&gt;true&lt;/Remain</span> <span class="pre">Enabled&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;EnabledColor&gt;0,128,255&lt;/EnabledColor&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;SelectedColor&gt;255,0,0&lt;/SelectedColor&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Actions&gt;</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“movingtext”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration</span> <span class="pre">=</span> <span class="pre">“1.0”&gt;</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Movement&gt;</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></dt>
+<dd><p class="first"><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;FrontWall&lt;/RelativeTo&gt;</span></code></p>
+<blockquote class="last">
+<div><code class="docutils literal"><span class="pre">&lt;Position&gt;(0.0,0.0,0.0)&lt;/Position&gt;</span></code></div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;/Movement&gt;</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Actions&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Actions&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name=</span> <span class="pre">“frontlink”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=</span> <span class="pre">“1.0”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Color&gt;0,100,0&lt;/Color&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Actions&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;/Link&gt;</span></code></p>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/LinkRoot&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p>All of this code defines the <code class="docutils literal"><span class="pre">Objects</span></code> of the scene, and so would go within <code class="docutils literal"><span class="pre">&lt;ObjectRoot&gt;</span> <span class="pre">&lt;/ObjectRoot&gt;</span></code> tags.</p>
+<p>Let’s stop for a checkpoint here. By now, you should have a good understanding of how to use the Object class, how to set up several objects in a scene, and how to apply links to change the state of a scene. In the next bit, we’ll move on to more complex items: Timelines and Groups.</p>
+<div class="section" id="timelines">
+<h3>Timelines<a class="headerlink" href="#timelines" title="Permalink to this headline">¶</a></h3>
+<p>In our Hello World example, we used a links to achieve two ObjectChanges in order. Another way to handle changing objects is through Timelines. Unlike links, Timelines can begin right at the start of the program. They can also facilitate random movement and changes that happen in continuous or numbered loops. Additionally, they create sequential <code class="docutils literal"><span class="pre">&lt;ObjectChange&gt;``s</span> <span class="pre">while</span> <span class="pre">link</span> <span class="pre">``&lt;Actions&gt;</span></code> will all occur at the same time that the link is clicked.</p>
+<p>We start by setting up <code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code> tags. These will be at the same level in hierarchy as <code class="docutils literal"><span class="pre">&lt;ObjectRoot&gt;</span></code>. Within these, we set up <code class="docutils literal"><span class="pre">&lt;Timeline&gt;</span></code> tags where we name our timeline and have the option to start the timeline immediately. For now, we’ll have the timeline start right from the start of the program. Timelines can also start within other timelines, or when clicking a link.</p>
+<p>The next step is to choose the delay from the moment the timeline begins that the transition will begin. This will come in handy when stringing many transitions together in one timeline. Let’s choose to wait 0.5 seconds.</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Timeline</span> <span class="pre">name=“MyTimeline”</span> <span class="pre">start-immediately=“true”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.5”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">//elided</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Timeline&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<p>We now have to define which object we are changing within &lt;ObjectChange&gt; tags, a duration, and a type of change. This is very similar to the Link code we wrote in our Hello World example. Let’s extend that example to this, and have our “Hello World!” text change color from the original gray (153, 153, 153) to bright yellow (255, 255, 0). Recall that the name of our “Hello World!” text object was “movingtext”.</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Timeline</span> <span class="pre">name=“MyTimeline”</span> <span class="pre">start-immediately=“true”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name=&quot;movingtext&gt;&quot;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=&quot;1.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Color&gt;255,255,0&lt;/Color&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Timeline&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<p>This simple Timeline will change the color of “Hello World!” from gray to yellow the moment the program starts.</p>
+<p>Now, let’s try something else. Instead of having “Hello World!” change color, we’ll have it change position as we did in the example. This time, however, it’ll change position relative to its old position, and will loop through this movement for the duration of the project. Let’s set up our Timeline again. In this case, the type of object change is Movement, but more specifically, <code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code>, which tells Writing3D to move the object relative to its old position. The first movement will be relative to the area of the scene we will label within <code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code> tags (RightWall, FrontWall, Center, etc); further movements will be incremented from the previous position by the number in <code class="docutils literal"><span class="pre">&lt;Position&gt;</span></code> tags.</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Timeline</span> <span class="pre">name=“MyTimeline”</span> <span class="pre">start-immediately=“true”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name=&quot;movingtext&gt;&quot;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=&quot;1.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0,0,2)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Timeline&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<p>This will set up the very first movement, where “Hello World!” will move 2 units forward from the Center. Since we’re taking advantage of &lt;MoveRel&gt;, we’d like this to happen several more times by looping the Timeline. This is another type of TimedAction. The delay in this case should be the time it takes for the previous Transition to occur: 1 second, plus that 0.5 second delay we stacked on at the beginning.
+Rather than an ObjectChange, we use a TimerChange and indicate the name of the timeline that we are changing. Then we invoke a &lt;start/&gt; command to start or restart the timeline.</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=”1.5”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimerChange</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“Looping</span> <span class="pre">Timeline”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;start/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimerChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+<p>Putting it all together, we have:</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Timeline</span> <span class="pre">name=“MyTimeline”</span> <span class="pre">start-immediately=“true”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;ObjectChange</span> <span class="pre">name=&quot;movingtext&gt;&quot;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=&quot;1.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0,0,2)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=”1.5”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimerChange</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“Looping</span> <span class="pre">Timeline”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;start/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimerChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Timeline&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+</div>
+<div class="section" id="groups">
+<h3>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h3>
+<p>We’ve finished how objects are created and changed. The Grouping feature allows us to control objects’ relationships to each other, allowing us to enact an ObjectChange on several objects at once, or on one chosen randomly.</p>
+<p>Let’s say we have two objects placed next to each other. One is our <code class="docutils literal"><span class="pre">“moving</span> <span class="pre">text”</span></code> Hello World! object from before, and one is a sphere called <code class="docutils literal"><span class="pre">“my-sphere.”</span></code> As before, we want an object to move forward by 2 units each time, as we did in our previous <code class="docutils literal"><span class="pre">Looping</span> <span class="pre">Timeline</span></code> example. However, rather than just applying this to “movingtext” we’d like Writing3D to randomly choose either “movingtext” or “my-sphere” then move the selected object.</p>
+<p>The first thing to do is put the objects in our selection pool within their own group. This occurs at the same hierarchy as <code class="docutils literal"><span class="pre">&lt;ObjectRoot&gt;</span></code> and <code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code>: we define all our groups within <code class="docutils literal"><span class="pre">&lt;GroupRoot&gt;</span></code>. We then give the Group a name within <code class="docutils literal"><span class="pre">&lt;Group&gt;</span></code> tags and we use &lt;Object&gt; tags to add whatever objects we’d like to “MyGroup” by name.</p>
+<p><code class="docutils literal"><span class="pre">&lt;GroupRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Group</span> <span class="pre">name=</span> <span class="pre">“MyGroup”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Objects</span> <span class="pre">name=</span> <span class="pre">“movingtext”/&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Objects</span> <span class="pre">name=</span> <span class="pre">“my-sphere”/&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Group&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRoot&gt;</span></code></p>
+<p>Now, let’s repurpose the code we wrote to loop timelines, with a key difference. Here, instead of an <code class="docutils literal"><span class="pre">&lt;ObjectChange&gt;</span></code>, we are using a <code class="docutils literal"><span class="pre">GroupChange</span></code>, defined within the <code class="docutils literal"><span class="pre">&lt;GroupRef&gt;</span></code> tags. We also indicate that we’d like one object from the group to be selected randomly as target for the transition with <code class="docutils literal"><span class="pre">“Select</span> <span class="pre">One</span> <span class="pre">Randomly”</span></code> under the “random” title.</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;GroupRef</span> <span class="pre">name=&quot;MyGroup&quot;</span> <span class="pre">random=&quot;SelectOneRandomly&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=&quot;1.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0,0,2)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/MoveRel&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRef&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+<p>If we had defined random as <code class="docutils literal"><span class="pre">“None”</span></code> rather than <code class="docutils literal"><span class="pre">“Select</span> <span class="pre">One</span> <span class="pre">Randomly,”</span></code> this change would occur for every object in the group at once rather than just one. Putting this all together, we finish with the following code.</p>
+<p><code class="docutils literal"><span class="pre">&lt;GroupRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Group</span> <span class="pre">name=</span> <span class="pre">“MyGroup”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Objects</span> <span class="pre">name=</span> <span class="pre">“movingtext”/&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Objects</span> <span class="pre">name=</span> <span class="pre">“my-sphere”/&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Group&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRoot&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Timeline</span> <span class="pre">name=&quot;Looping</span> <span class="pre">Timeline&quot;</span> <span class="pre">start-immediately=&quot;true&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;GroupRef</span> <span class="pre">name=&quot;MyGroup&quot;</span> <span class="pre">random=&quot;SelectOneRandomly&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=&quot;1.0&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0,0,2)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/MoveRel&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRef&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=&quot;1.5&quot;&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimerChange</span> <span class="pre">name=&quot;Looping</span> <span class="pre">Timeline&quot;&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;start/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimerChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Timeline&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+</div>
+</div>
+<div class="section" id="another-example">
+<h2>Another Example<a class="headerlink" href="#another-example" title="Permalink to this headline">¶</a></h2>
+<p>We’ve now finished going over most of the basic features Writing3D currently has to offer! Let’s wrap it all together by going through another full example. Here, we’ll have a sphere and a cube. We’ll choose one randomly to move forward relative to its old position, then choose one to move backwards relative to its old position, and then loop the timeline.</p>
+<p>We already know how to set up <code class="docutils literal"><span class="pre">Shape</span> <span class="pre">Objects</span></code>. Let’s make one yellow(255,255,0) and one white (255,255,255).</p>
+<p><code class="docutils literal"><span class="pre">&lt;ObjectRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“MySphere”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">0</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Shape</span> <span class="pre">shape_type=</span> <span class="pre">“Sphere”</span> <span class="pre">radius</span> <span class="pre">=</span> <span class="pre">“0.5”/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Object</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“MyCube”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Visible&gt;</span> <span class="pre">true</span> <span class="pre">&lt;/Visible&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Color&gt;</span> <span class="pre">255,</span> <span class="pre">255,</span> <span class="pre">255</span> <span class="pre">&lt;/Color&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Scale&gt;</span> <span class="pre">1.0</span> <span class="pre">&lt;/Scale&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(-2.0,0.0,0.0)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Content&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;Shape</span> <span class="pre">shape_type=</span> <span class="pre">“Sphere”</span> <span class="pre">radius</span> <span class="pre">=</span> <span class="pre">“0.5”/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Content&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Object&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/ObjectRoot&gt;</span></code></p>
+<p>We’ll place these in a group so we can select one randomly.</p>
+<p><code class="docutils literal"><span class="pre">&lt;GroupRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Group</span> <span class="pre">name=</span> <span class="pre">“MyGroup”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Objects</span> <span class="pre">name=</span> <span class="pre">“MySphere”/&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Objects</span> <span class="pre">name=</span> <span class="pre">“MyCube”/&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Group&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRoot&gt;</span></code></p>
+<p>We reference our earlier examples in the Timelines to set up movement of a randomly chosen object, adding a second &lt;TimedAction&gt; to move a randomly chosen object backwards and adjusting durations and delays accordingly.</p>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Timeline</span> <span class="pre">name=“Looping</span> <span class="pre">Timeline”</span> <span class="pre">start-immediately=“true”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“0.5”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;GroupRef</span> <span class="pre">name=</span> <span class="pre">“MyGroup”</span> <span class="pre">random=</span> <span class="pre">“Select</span> <span class="pre">One</span> <span class="pre">Randomly”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=</span> <span class="pre">“1.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0,0,2)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/MoveRel&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRef&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=</span> <span class="pre">“1.5”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;GroupRef</span> <span class="pre">name=</span> <span class="pre">“MyGroup”</span> <span class="pre">random=</span> <span class="pre">“Select</span> <span class="pre">One</span> <span class="pre">Randomly”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Transition</span> <span class="pre">duration=</span> <span class="pre">“1.0”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;MoveRel&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;Placement&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;RelativeTo&gt;Center&lt;/RelativeTo&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;Position&gt;(0,0,-2)&lt;/Position&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Placement&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/MoveRel&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Transition&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/GroupRef&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+<p><code class="docutils literal"><span class="pre">&lt;TimedActions</span> <span class="pre">seconds-time=”2.5”&gt;</span></code></p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">&lt;TimerChange</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">“Looping</span> <span class="pre">Timeline”&gt;</span></code></p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">&lt;start/&gt;</span></code></div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimerChange&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/TimedActions&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;/Timeline&gt;</span></code></p>
+</div></blockquote>
+<p><code class="docutils literal"><span class="pre">&lt;TimelineRoot&gt;</span></code></p>
+<p>And that’s all it takes! We just add the path and <code class="docutils literal"><span class="pre">&lt;Story&gt;</span></code> tags to the beginning, and the <code class="docutils literal"><span class="pre">&lt;Global&gt;</span></code> and <code class="docutils literal"><span class="pre">&lt;PlacementRoot&gt;</span></code> information to the end, and we’ve already got ourselves a working project! What comes next is innumerable in possibilities, and—even better—completely up to you!</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">A Writing3D Tutorial</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#roots-and-set-up">Roots and Set-up</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#the-object-class">The Object Class</a></li>
+<li><a class="reference internal" href="#the-content-class">The Content Class</a><ul>
+<li><a class="reference internal" href="#text">Text</a></li>
+<li><a class="reference internal" href="#lamps-and-light-sources">Lamps and Light Sources</a></li>
+<li><a class="reference internal" href="#shapes">Shapes</a></li>
+<li><a class="reference internal" href="#imported-images">Imported Images</a></li>
+<li><a class="reference internal" href="#imported-models">Imported Models</a></li>
+<li><a class="reference internal" href="#links-linkroots">Links/LinkRoots</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hello-world-an-extended-example">Hello World, an Extended Example</a><ul>
+<li><a class="reference internal" href="#timelines">Timelines</a></li>
+<li><a class="reference internal" href="#groups">Groups</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#another-example">Another Example</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/xml_format.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Hicks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/xml_format.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

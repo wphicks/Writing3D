@@ -25,11 +25,14 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="../index.html" />
    
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -78,10 +81,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pyw3d.w3d_logic.html">pyw3d.w3d_logic package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#module-pyw3d.w3d_logic.blender_action">pyw3d.w3d_logic.blender_action module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#module-pyw3d.w3d_logic.blender_timeline">pyw3d.w3d_logic.blender_timeline module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#module-pyw3d.w3d_logic.blender_trigger">pyw3d.w3d_logic.blender_trigger module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#module-pyw3d.w3d_logic">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#pyw3d-w3d-logic-blender-action-module">pyw3d.w3d_logic.blender_action module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#pyw3d-w3d-logic-blender-timeline-module">pyw3d.w3d_logic.blender_timeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#pyw3d-w3d-logic-blender-trigger-module">pyw3d.w3d_logic.blender_trigger module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.w3d_logic.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -114,7 +117,7 @@ project</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.actions.EventTriggerAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'trigger_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f55cf8&gt;, ValidPyString()&gt;, 'enable': IsBoolean()}</em><a class="headerlink" href="#pyw3d.actions.EventTriggerAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'enable': IsBoolean(), 'trigger_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8bffeb8&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.EventTriggerAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -174,12 +177,12 @@ play or stop sound associated with this group
 if enabled&#8221;, which will affect this object&#8217;s link</p>
 <dl class="attribute">
 <dt id="pyw3d.actions.GroupAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled'), 'sound_change': OptionValidator('Play Sound', 'Stop Sound'), 'choose_random': IsBoolean(), 'group_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f557b8&gt;, ValidPyString()&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'placement': IsBoolean(), 'move_relative': IsBoolean(), 'visible': IsBoolean(), 'scale': IsNumeric&lt;0, None&gt;, 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled'), 'placement': IsBoolean(), 'duration': IsNumeric&lt;0, None&gt;, 'choose_random': IsBoolean(), 'scale': IsNumeric&lt;0, None&gt;, 'sound_change': OptionValidator('Play Sound', 'Stop Sound'), 'visible': IsBoolean(), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'move_relative': IsBoolean(), 'group_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8bff898&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.GroupAction.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'choose_random': False, 'duration': 1}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'duration': 1, 'choose_random': False}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -196,7 +199,7 @@ if enabled&#8221;, which will affect this object&#8217;s link</p>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.GroupAction.link_xml_tags">
-<code class="descname">link_xml_tags</code><em class="property"> = {'Disable': 'link_off', 'Activate': 'activate', 'Activate if enabled': 'activate_if_on', 'Enable': 'link_on'}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">link_xml_tags</code><em class="property"> = {'Activate if enabled': 'activate_if_on', 'Activate': 'activate', 'Enable': 'link_on', 'Disable': 'link_off'}</em><a class="headerlink" href="#pyw3d.actions.GroupAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -228,12 +231,12 @@ if enabled&#8221;, which will affect this object&#8217;s link</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.actions.MoveVRAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'move_relative': IsBoolean(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'duration': IsNumeric&lt;0, None&gt;}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'placement': FeatureValidator&lt;W3DPlacement&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'move_relative': IsBoolean()}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.MoveVRAction.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'move_relative': False, 'duration': 0}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'duration': 0, 'move_relative': False}</em><a class="headerlink" href="#pyw3d.actions.MoveVRAction.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -286,7 +289,7 @@ types</p>
 if enabled&#8221;, which will affect this object&#8217;s link</p>
 <dl class="attribute">
 <dt id="pyw3d.actions.ObjectAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled'), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'object_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f84fd0&gt;, ValidPyString()&gt;, 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'move_relative': IsBoolean(), 'visible': IsBoolean(), 'scale': IsNumeric&lt;0, None&gt;, 'sound_change': OptionValidator('Play Sound', 'Stop Sound')}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'object_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8bff550&gt;, ValidPyString()&gt;, 'link_change': OptionValidator('Enable', 'Disable', 'Activate', 'Activate if enabled'), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'duration': IsNumeric&lt;0, None&gt;, 'sound_change': OptionValidator('Start', 'Stop'), 'scale': IsNumeric&lt;0, None&gt;, 'visible': IsBoolean(), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'move_relative': IsBoolean()}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -308,7 +311,12 @@ if enabled&#8221;, which will affect this object&#8217;s link</p>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.ObjectAction.link_xml_tags">
-<code class="descname">link_xml_tags</code><em class="property"> = {'Disable': 'link_off', 'Activate': 'activate', 'Activate if enabled': 'activate_if_on', 'Enable': 'link_on'}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">link_xml_tags</code><em class="property"> = {'Activate if enabled': 'activate_if_on', 'Activate': 'activate', 'Enable': 'link_on', 'Disable': 'link_off'}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.link_xml_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.actions.ObjectAction.sound_xml_tags">
+<code class="descname">sound_xml_tags</code><em class="property"> = {'Start': 'Play Sound', 'Stop': 'Stop Sound'}</em><a class="headerlink" href="#pyw3d.actions.ObjectAction.sound_xml_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -340,14 +348,8 @@ types</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.actions.SoundAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'sound_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f55be0&gt;, ValidPyString()&gt;, 'change': OptionValidator('Start', 'Stop')}</em><a class="headerlink" href="#pyw3d.actions.SoundAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'change': OptionValidator('Start', 'Stop'), 'sound_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8bffd68&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.SoundAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.actions.SoundAction.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/actions.html#SoundAction.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.actions.SoundAction.blend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create representation of change in Blender</p>
-</dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.SoundAction.default_arguments">
@@ -360,6 +362,11 @@ types</p>
 <dd><p>Create SoundAction from SoundRef node</p>
 <p>:param :py:class:xml.etree.ElementTree.Element soundref_root</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.actions.SoundAction.generate_blender_logic">
+<code class="descname">generate_blender_logic</code><span class="sig-paren">(</span><em>offset=0</em>, <em>time_condition=0</em>, <em>index_condition=None</em>, <em>click_condition=-1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/actions.html#SoundAction.generate_blender_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.actions.SoundAction.generate_blender_logic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="pyw3d.actions.SoundAction.toXML">
@@ -391,12 +398,12 @@ types</p>
 <p>started&#8221;</p>
 <dl class="attribute">
 <dt id="pyw3d.actions.TimelineAction.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'timeline_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f55ac8&gt;, ValidPyString()&gt;, 'change': OptionValidator('Start', 'Stop', 'Continue', 'Start if not started')}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'change': OptionValidator('Start', 'Stop', 'Continue', 'Start if not started'), 'timeline_name': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8bffc18&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.actions.TimelineAction.change_xml_tags">
-<code class="descname">change_xml_tags</code><em class="property"> = {'Continue': 'continue', 'Start': 'start', 'Start if not started': 'start_if_not_started', 'Stop': 'stop'}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.change_xml_tags" title="Permalink to this definition">¶</a></dt>
+<code class="descname">change_xml_tags</code><em class="property"> = {'Start': 'start', 'Continue': 'continue', 'Start if not started': 'start_if_not_started', 'Stop': 'stop'}</em><a class="headerlink" href="#pyw3d.actions.TimelineAction.change_xml_tags" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -478,7 +485,7 @@ types</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>object_action</strong> (<a class="reference internal" href="../pyw3d_actions.html#pyw3d.W3DAction" title="pyw3d.W3DAction"><em>W3DAction</em></a>) &#8211; An ObjectAction or GroupAction</li>
+<li><strong>object_action</strong> (<a class="reference internal" href="#pyw3d.actions.W3DAction" title="pyw3d.actions.W3DAction"><em>W3DAction</em></a>) &#8211; An ObjectAction or GroupAction</li>
 <li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; A number of tabs (4 spaces) to add before Python logic</li>
 </ul>
 </td>
@@ -561,12 +568,12 @@ easily validate input and provide sensible default arguments.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="#pyw3d.placement.W3DRotation.argument_validators" title="pyw3d.placement.W3DRotation.argument_validators"><strong>argument_validators</strong></a> &#8211; Dictionary mapping names of valid arguments to
+<li><a class="reference internal" href="#pyw3d.objects.W3DImage.argument_validators" title="pyw3d.objects.W3DImage.argument_validators"><strong>argument_validators</strong></a> &#8211; Dictionary mapping names of valid arguments to
 callable objects that return true if a given value is valid for that
 argument</li>
-<li><a class="reference internal" href="#pyw3d.triggers.LookAtDirection.default_arguments" title="pyw3d.triggers.LookAtDirection.default_arguments"><strong>default_arguments</strong></a> &#8211; Dictionary mapping names of arguments to their
+<li><a class="reference internal" href="#pyw3d.actions.MoveVRAction.default_arguments" title="pyw3d.actions.MoveVRAction.default_arguments"><strong>default_arguments</strong></a> &#8211; Dictionary mapping names of arguments to their
 default values</li>
-<li><a class="reference internal" href="../pyw3d.html#pyw3d.W3DFeature.blender_scaling" title="pyw3d.W3DFeature.blender_scaling"><strong>blender_scaling</strong></a> &#8211; Scaling factor used to convert back and forth
+<li><a class="reference internal" href="#pyw3d.objects.W3DText.blender_scaling" title="pyw3d.objects.W3DText.blender_scaling"><strong>blender_scaling</strong></a> &#8211; Scaling factor used to convert back and forth
 between Blender and legacy units</li>
 </ul>
 </td>
@@ -648,8 +655,8 @@ this function.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of this group</li>
-<li><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of names of objects in this group</li>
-<li><strong>groups</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of names of groups in this group</li>
+<li><strong>objects</strong> (<em>list</em>) &#8211; List of names of objects in this group</li>
+<li><strong>groups</strong> (<em>list</em>) &#8211; List of names of groups in this group</li>
 </ul>
 </td>
 </tr>
@@ -657,7 +664,7 @@ this function.</p>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.groups.W3DGroup.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'name': ValidPyString(), 'groups': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f117f0&gt;, ValidPyString()&gt;|None&gt;, 'objects': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7f11710&gt;, ValidPyString()&gt;|None&gt;}</em><a class="headerlink" href="#pyw3d.groups.W3DGroup.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'groups': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8baab00&gt;, ValidPyString()&gt;|None&gt;, 'objects': ListValidator&lt;ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8baaa20&gt;, ValidPyString()&gt;|None&gt;, 'name': ValidPyString()}</em><a class="headerlink" href="#pyw3d.groups.W3DGroup.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -724,6 +731,24 @@ this function.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pyw3d.names.generate_blender_particle_name">
+<code class="descclassname">pyw3d.names.</code><code class="descname">generate_blender_particle_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_blender_particle_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_blender_particle_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate name used for particle copies of objects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyw3d.names.generate_blender_psys_name">
+<code class="descclassname">pyw3d.names.</code><code class="descname">generate_blender_psys_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_blender_psys_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_blender_psys_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate name used for Blender particle system</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyw3d.names.generate_blender_sound_name">
+<code class="descclassname">pyw3d.names.</code><code class="descname">generate_blender_sound_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_blender_sound_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_blender_sound_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate name used for Blender sound</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="pyw3d.names.generate_blender_timeline_name">
 <code class="descclassname">pyw3d.names.</code><code class="descname">generate_blender_timeline_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_blender_timeline_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_blender_timeline_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate name used for Blender timeline</p>
@@ -742,9 +767,21 @@ this function.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pyw3d.names.generate_light_object_name">
+<code class="descclassname">pyw3d.names.</code><code class="descname">generate_light_object_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_light_object_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_light_object_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate name used for light objects</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="pyw3d.names.generate_link_name">
 <code class="descclassname">pyw3d.names.</code><code class="descname">generate_link_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_link_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_link_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate name used for Blender trigger</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyw3d.names.generate_paction_name">
+<code class="descclassname">pyw3d.names.</code><code class="descname">generate_paction_name</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/names.html#generate_paction_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.names.generate_paction_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate name used for Blender particle system actions</p>
 </dd></dl>
 
 <dl class="function">
@@ -855,7 +892,7 @@ quadratic attenuation of light source respectively
 source</p>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLight.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'light_type': OptionValidator('Point', 'Directional', 'Spot'), 'specular': IsBoolean(), 'attenuation': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'angle': IsNumeric&lt;None, None&gt;, 'diffuse': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'diffuse': IsBoolean(), 'light_type': OptionValidator('Point', 'Directional', 'Spot'), 'angle': IsNumeric&lt;None, None&gt;, 'attenuation': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'specular': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -866,7 +903,7 @@ source</p>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLight.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'specular': True, 'attenuation': (1, 0, 0), 'angle': 30, 'diffuse': True}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'diffuse': True, 'angle': 30, 'attenuation': (1, 0, 0), 'specular': True}</em><a class="headerlink" href="#pyw3d.objects.W3DLight.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -915,7 +952,7 @@ value to never reset)</li>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLink.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'reset': IsInteger&lt;None, None&gt;, 'enabled_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'actions': DictValidator&lt;IsInteger&lt;None, None&gt;, ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;&gt;, 'selected_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'remain_enabled': IsBoolean(), 'enabled': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'remain_enabled': IsBoolean(), 'enabled_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'actions': DictValidator&lt;IsInteger&lt;None, None&gt;, ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;&gt;, 'enabled': IsBoolean(), 'selected_color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'reset': IsInteger&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -935,7 +972,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DLink.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'selected_color': (255, 0, 0), 'remain_enabled': True, 'enabled_color': (0, 128, 255), 'enabled': True, 'reset': -1}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'enabled': True, 'selected_color': (255, 0, 0), 'remain_enabled': True, 'enabled_color': (0, 128, 255), 'reset': -1}</em><a class="headerlink" href="#pyw3d.objects.W3DLink.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1054,6 +1091,11 @@ value to never reset)</li>
 </table>
 <p>W3DStereoImage, W3DModel, W3DLight, W3DPSys</p>
 <dl class="method">
+<dt id="pyw3d.objects.W3DObject.apply_lamp_color">
+<code class="descname">apply_lamp_color</code><span class="sig-paren">(</span><em>new_light_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DObject.apply_lamp_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DObject.apply_lamp_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="pyw3d.objects.W3DObject.apply_material">
 <code class="descname">apply_material</code><span class="sig-paren">(</span><em>blender_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DObject.apply_material"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DObject.apply_material" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply properties of object to material for Blender object</p>
@@ -1061,7 +1103,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DObject.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'around_own_axis': IsBoolean(), 'click_through': IsBoolean(), 'link': FeatureValidator&lt;W3DLink&gt;, 'content': FeatureValidator&lt;W3DContent&gt;, 'name': ValidPyString(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'scale': IsNumeric&lt;0, None&gt;, 'double_sided': IsBoolean(), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'sound': TextValidator(), 'lighting': IsBoolean(), 'visible': IsBoolean()}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'name': ValidPyString(), 'placement': FeatureValidator&lt;W3DPlacement&gt;, 'click_through': IsBoolean(), 'color': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'lighting': IsBoolean(), 'double_sided': IsBoolean(), 'around_own_axis': IsBoolean(), 'scale': IsNumeric&lt;0, None&gt;, 'content': FeatureValidator&lt;W3DContent&gt;, 'visible': IsBoolean(), 'link': FeatureValidator&lt;W3DLink&gt;, 'sound': TextValidator()}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1072,7 +1114,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DObject.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'around_own_axis': False, 'color': (255, 255, 255), 'click_through': False, 'sound': None, 'lighting': False, 'link': None, 'visible': True, 'double_sided': True, 'scale': 1}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'lighting': False, 'color': (255, 255, 255), 'around_own_axis': False, 'click_through': False, 'double_sided': True, 'scale': 1, 'visible': True, 'link': None, 'sound': None}</em><a class="headerlink" href="#pyw3d.objects.W3DObject.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1107,7 +1149,104 @@ value to never reset)</li>
 <em class="property">class </em><code class="descclassname">pyw3d.objects.</code><code class="descname">W3DPSys</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DPSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DPSys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
 <p>Represents a particle system in virtual space</p>
-<p>NOT YET IMPLEMENTED AT ALL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>particle_group</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the group of objects to use as</td>
+</tr>
+</tbody>
+</table>
+<p>particles in this system</p>
+<dl class="attribute">
+<dt id="pyw3d.objects.W3DPSys.argument_validators">
+<code class="descname">argument_validators</code><em class="property"> = {'max_particles': IsInteger&lt;1, None&gt;, 'max_age': IsInteger&lt;0, None&gt;, 'speed': IsNumeric&lt;0, None&gt;, 'particle_group': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8c1bfd0&gt;, ValidPyString()&gt;, 'particle_actions': ValidPyString()}</em><a class="headerlink" href="#pyw3d.objects.W3DPSys.argument_validators" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.objects.W3DPSys.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DPSys.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DPSys.blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create representation of W3DPSys in Blender</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.objects.W3DPSys.default_arguments">
+<code class="descname">default_arguments</code><em class="property"> = {'max_age': 1, 'speed': 1.0, 'max_particles': 100}</em><a class="headerlink" href="#pyw3d.objects.W3DPSys.default_arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.objects.W3DPSys.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>psys_class</em>, <em>psys_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DPSys.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DPSys.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create W3DPSys from ParticleSystem root</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.objects.W3DPSys.generate_logic">
+<code class="descname">generate_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DPSys.generate_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DPSys.generate_logic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.objects.W3DPSys.logic_template">
+<code class="descname">logic_template</code><em class="property"> = '\nimport mathutils\nimport random\nfrom group_defs import *\nimport bge\nfrom w3d_settings import *\nfrom {particle_actions} import get_source_vector, get_velocity_vector, rate\n\n\ndef get_particle_template():\n    return &quot;particle_{{}}&quot;.format(random.choice({group_name}))\n\n\ndef activate_particles(cont):\n    scene = bge.logic.getCurrentScene()\n    own = cont.owner\n    try:\n        particle_count = own[&quot;particle_count&quot;]\n    except KeyError:\n        own[&quot;particle_count&quot;] = 0\n        own[&quot;particle_tick&quot;] = 0\n        particle_count = 0\n\n    max_age = bge.logic.getLogicTicRate()*{max_age}\n\n    if (\n            own[&quot;particle_tick&quot;] % rate == 0 and\n            particle_count &lt; {max_particles}):\n        new_particle = scene.addObject(\n            get_particle_template(),\n            own.name,\n            int({max_age}*bge.logic.getLogicTicRate())\n        )\n        own[&quot;particle_count&quot;] += 1\n        new_particle.visible = True\n        new_particle.setLinearVelocity({speed}*get_velocity_vector())\n        new_particle.worldPosition = (\n            own.worldPosition + get_source_vector()\n        )\n        W3D_LOG.debug(&quot;System position: {{}}&quot;.format(\n            own.worldPosition)\n        )\n        W3D_LOG.debug(&quot;Particle position: {{}}&quot;.format(\n            new_particle.worldPosition)\n        )\n\n    own[&quot;particle_tick&quot;] += 1\n\n    if (\n            {max_age} and own[&quot;particle_tick&quot;] % {max_age} == 0):\n        own[&quot;particle_count&quot;] += -1\n    '</em><a class="headerlink" href="#pyw3d.objects.W3DPSys.logic_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.objects.W3DPSys.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DPSys.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DPSys.toXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store W3DPSys as ParticleSystem node within Content node</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.objects.W3DShape">
+<em class="property">class </em><code class="descclassname">pyw3d.objects.</code><code class="descname">W3DShape</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DShape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DShape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.objects.W3DContent" title="pyw3d.objects.W3DContent"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.objects.W3DContent</span></code></a></p>
+<p>Create a shape object in virtual space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>shape_type</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; type of shape to be created</li>
+<li><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; radius of the shape to be added</li>
+<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; Three floats representing RGB color of object</li>
+<li><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; height of shape, if shape is cone/cylinder</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pyw3d.objects.W3DShape.argument_validators">
+<code class="descname">argument_validators</code><em class="property"> = {'shape_type': OptionValidator('Sphere', 'Cube', 'Cone', 'Cylinder', 'Monkey'), 'depth': IsNumeric&lt;None, None&gt;, 'radius': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.objects.W3DShape.argument_validators" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.objects.W3DShape.blend">
+<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DShape.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DShape.blend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.objects.W3DShape.default_arguments">
+<code class="descname">default_arguments</code><em class="property"> = {'radius': 1, 'depth': 2}</em><a class="headerlink" href="#pyw3d.objects.W3DShape.default_arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyw3d.objects.W3DShape.fromXML">
+<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>shape_class</em>, <em>content_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DShape.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DShape.fromXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyw3d.objects.W3DShape.toXML">
+<code class="descname">toXML</code><span class="sig-paren">(</span><em>object_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/objects.html#W3DShape.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.objects.W3DShape.toXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyw3d.objects.W3DShape.ui_order">
+<code class="descname">ui_order</code><em class="property"> = ['shape_type', 'radius', 'depth']</em><a class="headerlink" href="#pyw3d.objects.W3DShape.ui_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1129,7 +1268,7 @@ value to never reset)</li>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DStereoImage.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'left_file': ValidFile(), 'right_file': ValidFile()}</em><a class="headerlink" href="#pyw3d.objects.W3DStereoImage.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'right_file': ValidFile(), 'left_file': ValidFile()}</em><a class="headerlink" href="#pyw3d.objects.W3DStereoImage.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1181,7 +1320,7 @@ value to never reset)</li>
 </table>
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DText.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'depth': IsNumeric&lt;None, None&gt;, 'font': ValidFile(), 'text': TextValidator(), 'halign': OptionValidator('left', 'right', 'center'), 'valign': OptionValidator('top', 'center', 'bottom')}</em><a class="headerlink" href="#pyw3d.objects.W3DText.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'text': TextValidator(), 'font': ValidFontFile(), 'valign': OptionValidator('top', 'center', 'bottom'), 'halign': OptionValidator('left', 'right', 'center'), 'depth': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.objects.W3DText.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1202,7 +1341,7 @@ value to never reset)</li>
 
 <dl class="attribute">
 <dt id="pyw3d.objects.W3DText.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'depth': 0, 'font': None, 'halign': 'center', 'valign': 'center'}</em><a class="headerlink" href="#pyw3d.objects.W3DText.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'font': None, 'valign': 'center', 'halign': 'center', 'depth': 0}</em><a class="headerlink" href="#pyw3d.objects.W3DText.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1409,12 +1548,12 @@ overridden to provide additional functionality</p>
 <p>Stores data on rotation of objects within W3D</p>
 <dl class="attribute">
 <dt id="pyw3d.placement.W3DRotation.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'rotation_angle': IsNumeric&lt;None, None&gt;, 'rotation_mode': OptionValidator('None', 'Axis', 'LookAt', 'Normal'), 'up_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'up_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation_angle': IsNumeric&lt;None, None&gt;, 'rotation_vector': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'rotation_mode': OptionValidator('None', 'Axis', 'LookAt', 'Normal')}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.placement.W3DRotation.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'rotation_angle': 0, 'rotation_mode': 'None', 'up_vector': [0.0, 0.0, 0.3048], 'rotation_vector': None}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'up_vector': [0.0, 0.0, 0.3048], 'rotation_angle': 0, 'rotation_vector': None, 'rotation_mode': 'None'}</em><a class="headerlink" href="#pyw3d.placement.W3DRotation.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1479,11 +1618,11 @@ overridden to provide additional functionality</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of W3DObjects to be displayed</li>
-<li><strong>groups</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Maps names of groups to lists of W3DObjects</li>
-<li><strong>timelines</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of W3DTimelines within project</li>
-<li><strong>sounds</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of W3DSounds within project</li>
-<li><strong>trigger_events</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of W3DEvents within project</li>
+<li><strong>objects</strong> (<em>list</em>) &#8211; List of W3DObjects to be displayed</li>
+<li><strong>groups</strong> (<em>list</em>) &#8211; Maps names of groups to lists of W3DObjects</li>
+<li><strong>timelines</strong> (<em>list</em>) &#8211; List of W3DTimelines within project</li>
+<li><strong>sounds</strong> (<em>list</em>) &#8211; List of W3DSounds within project</li>
+<li><strong>trigger_events</strong> (<em>list</em>) &#8211; List of W3DEvents within project</li>
 <li><strong>camera_placement</strong> (<a class="reference internal" href="#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; Initial placement of camera</li>
 <li><strong>desktop_camera_placement</strong> (<a class="reference internal" href="#pyw3d.placement.W3DPlacement" title="pyw3d.placement.W3DPlacement"><em>W3DPlacement</em></a>) &#8211; Initial placement of camera</li>
 </ul>
@@ -1507,7 +1646,7 @@ W3DPlacements specifying their position and orientation</p>
 
 <dl class="attribute">
 <dt id="pyw3d.project.W3DProject.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'wall_placements': DictValidator&lt;OptionValidator('Center', 'FrontWall', 'LeftWall', 'RightWall', 'FloorWall'), FeatureValidator&lt;W3DPlacement&gt;&gt;, 'trigger_events': ListValidator&lt;FeatureValidator&lt;W3DTrigger&gt;|None&gt;, 'allow_rotation': IsBoolean(), 'debug': IsBoolean(), 'camera_placement': FeatureValidator&lt;W3DPlacement&gt;, 'groups': ListValidator&lt;FeatureValidator&lt;W3DGroup&gt;|None&gt;, 'objects': ListValidator&lt;FeatureValidator&lt;W3DObject&gt;|None&gt;, 'timelines': ListValidator&lt;FeatureValidator&lt;W3DTimeline&gt;|None&gt;, 'background': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'allow_movement': IsBoolean(), 'sounds': ListValidator&lt;FeatureValidator&lt;W3DSound&gt;|None&gt;, 'far_clip': IsNumeric&lt;0, None&gt;, 'desktop_camera_placement': FeatureValidator&lt;W3DPlacement&gt;}</em><a class="headerlink" href="#pyw3d.project.W3DProject.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'desktop_camera_placement': FeatureValidator&lt;W3DPlacement&gt;, 'far_clip': IsNumeric&lt;0, None&gt;, 'objects': ListValidator&lt;FeatureValidator&lt;W3DObject&gt;|None&gt;, 'camera_placement': FeatureValidator&lt;W3DPlacement&gt;, 'allow_rotation': IsBoolean(), 'background': ListValidator&lt;IsInteger&lt;0, 255&gt;|3&gt;, 'allow_movement': IsBoolean(), 'particle_actions': ListValidator&lt;FeatureValidator&lt;W3DPAction&gt;|None&gt;, 'groups': ListValidator&lt;FeatureValidator&lt;W3DGroup&gt;|None&gt;, 'wall_placements': DictValidator&lt;OptionValidator('Center', 'FrontWall', 'LeftWall', 'RightWall', 'FloorWall'), FeatureValidator&lt;W3DPlacement&gt;&gt;, 'trigger_events': ListValidator&lt;FeatureValidator&lt;W3DTrigger&gt;|None&gt;, 'timelines': ListValidator&lt;FeatureValidator&lt;W3DTimeline&gt;|None&gt;, 'debug': IsBoolean(), 'sounds': ListValidator&lt;FeatureValidator&lt;W3DSound&gt;|None&gt;}</em><a class="headerlink" href="#pyw3d.project.W3DProject.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1518,7 +1657,7 @@ W3DPlacements specifying their position and orientation</p>
 
 <dl class="attribute">
 <dt id="pyw3d.project.W3DProject.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'debug': False, 'far_clip': 100, 'allow_movement': False, 'background': (0, 0, 0), 'allow_rotation': False}</em><a class="headerlink" href="#pyw3d.project.W3DProject.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'debug': False, 'allow_rotation': True, 'far_clip': 100, 'background': (0, 0, 0), 'allow_movement': True}</em><a class="headerlink" href="#pyw3d.project.W3DProject.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1646,13 +1785,13 @@ Blender object</p>
 <p>sound is ambient or coming from an apparent position
 :param int repetitions: Number of times to repeat sound. Negative value
 indicates sound should loop forever
-:param float frequency_scale: Factor by which to scale frequency
+:param float frequency_scale: Factor by which to scale frequency (0.5 to 2)
 :param float volume_scale: Factor by which to scale volume (must be
 0.0-1.0)
 :param float pan: Stereo panning left to right (-1.0 to 1.0)</p>
 <dl class="attribute">
 <dt id="pyw3d.sounds.W3DSound.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'volume_scale': IsNumeric&lt;0, 1&gt;, 'movement_mode': OptionValidator('Positional', 'Fixed'), 'autostart': IsBoolean(), 'pan': IsNumeric&lt;-1, 1&gt;, 'filename': ValidFile(), 'frequency_scale': IsNumeric&lt;0, None&gt;, 'repetitions': IsNumeric&lt;None, None&gt;, 'name': ValidPyString()}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'volume_scale': IsNumeric&lt;0, 2&gt;, 'movement_mode': OptionValidator('Positional', 'Fixed'), 'frequency_scale': IsNumeric&lt;0.5, 2&gt;, 'filename': ValidFile(), 'name': ValidPyString(), 'autostart': IsBoolean(), 'repetitions': IsNumeric&lt;None, None&gt;, 'pan': IsNumeric&lt;-1, 1&gt;}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1663,7 +1802,7 @@ indicates sound should loop forever
 
 <dl class="attribute">
 <dt id="pyw3d.sounds.W3DSound.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'volume_scale': 1, 'autostart': False, 'pan': 0, 'frequency_scale': 1, 'repetitions': 0, 'movement_mode': 'Positional'}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'volume_scale': 1, 'movement_mode': 'Positional', 'frequency_scale': 1, 'autostart': False, 'repetitions': 0, 'pan': 0}</em><a class="headerlink" href="#pyw3d.sounds.W3DSound.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1680,6 +1819,12 @@ indicates sound should loop forever
 <p>:param :py:class:xml.etree.ElementTree.Element all_sounds_root</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="pyw3d.sounds.audio_playback_object">
+<code class="descclassname">pyw3d.sounds.</code><code class="descname">audio_playback_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/sounds.html#audio_playback_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.sounds.audio_playback_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get empty used to coordinate audio playback in Blender</p>
 </dd></dl>
 
 </div>
@@ -1752,7 +1897,7 @@ indicates sound should loop forever
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of timeline</li>
 <li><strong>start_immediately</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Start timeline when project starts?</li>
-<li><strong>actions</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; A list of two-element tuples specifying (start time</li>
+<li><strong>actions</strong> (<em>list</em>) &#8211; A list of two-element tuples specifying (start time</li>
 </ul>
 </td>
 </tr>
@@ -1832,12 +1977,12 @@ can be started.</p>
 :param actions: List of W3DActions to be triggered</p>
 <dl class="attribute">
 <dt id="pyw3d.triggers.BareTrigger.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'remain_enabled': IsBoolean(), 'name': ValidPyString(), 'actions': ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;, 'enabled': IsBoolean(), 'duration': IsNumeric&lt;0, None&gt;}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'actions': ListValidator&lt;FeatureValidator&lt;W3DAction&gt;|None&gt;, 'enabled': IsBoolean(), 'remain_enabled': IsBoolean(), 'duration': IsNumeric&lt;0, None&gt;, 'name': ValidPyString()}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="pyw3d.triggers.BareTrigger.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {'remain_enabled': True, 'enabled': True, 'duration': 0}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.default_arguments" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default_arguments</code><em class="property"> = {'enabled': True, 'remain_enabled': True, 'duration': 0}</em><a class="headerlink" href="#pyw3d.triggers.BareTrigger.default_arguments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1875,7 +2020,7 @@ true.
 :param tuple corner2: Second corner specifying box location</p>
 <dl class="attribute">
 <dt id="pyw3d.triggers.EventBox.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'direction': OptionValidator('Inside', 'Outside'), 'ignore_y': IsBoolean(), 'corner1': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'corner2': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.triggers.EventBox.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'corner2': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;, 'direction': OptionValidator('Inside', 'Outside'), 'ignore_y': IsBoolean(), 'corner1': ListValidator&lt;IsNumeric&lt;None, None&gt;|3&gt;}</em><a class="headerlink" href="#pyw3d.triggers.EventBox.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2027,7 +2172,7 @@ true.
 </table>
 <dl class="attribute">
 <dt id="pyw3d.triggers.LookAtObject.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {'angle': IsNumeric&lt;None, None&gt;, 'object': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x2b46a7eefa58&gt;, ValidPyString()&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtObject.argument_validators" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument_validators</code><em class="property"> = {'object': ReferenceValidator&lt;&lt;pyw3d.path.ProjectPath object at 0x7fefe8bb8d30&gt;, ValidPyString()&gt;, 'angle': IsNumeric&lt;None, None&gt;}</em><a class="headerlink" href="#pyw3d.triggers.LookAtObject.argument_validators" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2189,490 +2334,8 @@ of specified box</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-pyw3d.ui">
-<span id="pyw3d-ui-module"></span><h2>pyw3d.ui module<a class="headerlink" href="#module-pyw3d.ui" title="Permalink to this headline">¶</a></h2>
-<p>Tk widgets for inputting W3DProject options</p>
-<dl class="class">
-<dt id="pyw3d.ui.ActionListUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">ActionListUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em>, <em>item_label='Action'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ActionListUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ActionListUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for building a dictionary with lists of W3DFeatures as
-values</p>
-<dl class="method">
-<dt id="pyw3d.ui.ActionListUI.add_feature">
-<code class="descname">add_feature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ActionListUI.add_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ActionListUI.add_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.ActionListUI.create_add_button">
-<code class="descname">create_add_button</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ActionListUI.create_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ActionListUI.create_add_button" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.ActionListUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ActionListUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ActionListUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.BaseUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">BaseUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#BaseUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.BaseUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for inputting &#8220;primitive&#8221; values</p>
-<p>(e.g. ints, floats, strings, etc.)</p>
-<dl class="method">
-<dt id="pyw3d.ui.BaseUI.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#BaseUI.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.BaseUI.destroy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.BaseUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#BaseUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.BaseUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.DictEntryUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">DictEntryUI</code><span class="sig-paren">(</span><em>parent</em>, <em>dictionary</em>, <em>key_label</em>, <em>key_validator</em>, <em>value_validator</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#DictEntryUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.DictEntryUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for inputting dictionary key-value pairs</p>
-<dl class="method">
-<dt id="pyw3d.ui.DictEntryUI.create_value_entry">
-<code class="descname">create_value_entry</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#DictEntryUI.create_value_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.DictEntryUI.create_value_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.DictEntryUI.destroy_entry">
-<code class="descname">destroy_entry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#DictEntryUI.destroy_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.DictEntryUI.destroy_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.DictEntryUI.evaluate_key">
-<code class="descname">evaluate_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#DictEntryUI.evaluate_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.DictEntryUI.evaluate_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.DictEntryUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#DictEntryUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.DictEntryUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.DictEntryUI.update_key">
-<code class="descname">update_key</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#DictEntryUI.update_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.DictEntryUI.update_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.FeatureDictUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">FeatureDictUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em>, <em>item_label='Item'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureDictUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureDictUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for building a dictionary with lists of W3DFeatures as
-values</p>
-<dl class="method">
-<dt id="pyw3d.ui.FeatureDictUI.add_feature">
-<code class="descname">add_feature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureDictUI.add_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureDictUI.add_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FeatureDictUI.create_add_button">
-<code class="descname">create_add_button</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureDictUI.create_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureDictUI.create_add_button" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FeatureDictUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureDictUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureDictUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.FeatureListUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">FeatureListUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em>, <em>item_label='Item'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureListUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureListUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.ttk.Labelframe</span></code></p>
-<p>Tkinter widget for inputting a list of W3DFeatures</p>
-<dl class="method">
-<dt id="pyw3d.ui.FeatureListUI.add_feature">
-<code class="descname">add_feature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureListUI.add_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureListUI.add_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FeatureListUI.create_add_button">
-<code class="descname">create_add_button</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureListUI.create_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureListUI.create_add_button" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FeatureListUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureListUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureListUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FeatureListUI.remove_feature">
-<code class="descname">remove_feature</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureListUI.remove_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureListUI.remove_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.FeatureUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">FeatureUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.ttk.Labelframe</span></code></p>
-<p>Tkinter widget for creating a W3DFeature</p>
-<dl class="method">
-<dt id="pyw3d.ui.FeatureUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FeatureUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FeatureUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.FileUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">FileUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FileUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FileUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<dl class="method">
-<dt id="pyw3d.ui.FileUI.file_dialog">
-<code class="descname">file_dialog</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FileUI.file_dialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FileUI.file_dialog" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FileUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FileUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FileUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.FileUI.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#FileUI.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.FileUI.validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.InputUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">InputUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Dummy base class for building Tkinter input widgets</p>
-<p>Classes that inherit from InputUI should also inherit from a TK widget
-:param parent: The parent widget for this widget
-:param str title: A title to label this widget,
-:param W3DFeature feature: The feature whose options are being modified
-:param feature_key: The key for the particular option being modified</p>
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.create_label">
-<code class="descname">create_label</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.create_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.create_label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create element to label this widget</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert input from TK widget to appropriate type</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.help_bubble">
-<code class="descname">help_bubble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.help_bubble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.help_bubble" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.initTK">
-<code class="descname">initTK</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.initTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.initTK" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call base TK widget __init__ method</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all elements to build up this widget</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.noneUI">
-<code class="descname">noneUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.noneUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.noneUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to handle features defaulted to None</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>factory</strong> &#8211; A callable that will return a new sensible default for</td>
-</tr>
-</tbody>
-</table>
-<p>feature</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.reset_label">
-<code class="descname">reset_label</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.reset_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.reset_label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset label with new title_string</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.set_project">
-<code class="descname">set_project</code><span class="sig-paren">(</span><em>project</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.set_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.set_project" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the current W3DProject for this UI widget</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>project</strong> (<a class="reference internal" href="#pyw3d.project.W3DProject" title="pyw3d.project.W3DProject"><em>W3DProject</em></a>) &#8211; The project for this widget</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.InputUI.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>value</em>, <em>silent=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#InputUI.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.InputUI.validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.IterableUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">IterableUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#IterableUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.IterableUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for inputting several of the same type of value</p>
-<dl class="method">
-<dt id="pyw3d.ui.IterableUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#IterableUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.IterableUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.ListUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">ListUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em>, <em>item_label='Item'</em>, <em>pop_out=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ListUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ListUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.ttk.Labelframe</span></code></p>
-<dl class="method">
-<dt id="pyw3d.ui.ListUI.add_item">
-<code class="descname">add_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ListUI.add_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ListUI.add_item" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.ListUI.create_add_button">
-<code class="descname">create_add_button</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ListUI.create_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ListUI.create_add_button" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.ListUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ListUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ListUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.ListUI.remove_feature">
-<code class="descname">remove_feature</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ListUI.remove_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ListUI.remove_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.MultiFeatureListUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">MultiFeatureListUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em>, <em>item_label='Item'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureListUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureListUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for inputting a list of W3DFeatures of multiple types</p>
-<dl class="method">
-<dt id="pyw3d.ui.MultiFeatureListUI.add_feature">
-<code class="descname">add_feature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureListUI.add_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureListUI.add_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.MultiFeatureListUI.create_add_button">
-<code class="descname">create_add_button</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureListUI.create_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureListUI.create_add_button" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.MultiFeatureListUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureListUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureListUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.MultiFeatureListUI.remove_feature">
-<code class="descname">remove_feature</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureListUI.remove_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureListUI.remove_feature" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.MultiFeatureUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">MultiFeatureUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.ttk.Labelframe</span></code></p>
-<p>Tkinter widget for creating one of several subclasses of W3DFeature</p>
-<dl class="method">
-<dt id="pyw3d.ui.MultiFeatureUI.create_editor">
-<code class="descname">create_editor</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureUI.create_editor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureUI.create_editor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.MultiFeatureUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#MultiFeatureUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.MultiFeatureUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.NonFeatureUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">NonFeatureUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>default_value=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for input and validation of values that are not
-associated with a W3DFeature option</p>
-<dl class="method">
-<dt id="pyw3d.ui.NonFeatureUI.create_label">
-<code class="descname">create_label</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI.create_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI.create_label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create element to label this widget</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.NonFeatureUI.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI.destroy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.NonFeatureUI.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.NonFeatureUI.help_bubble">
-<code class="descname">help_bubble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI.help_bubble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI.help_bubble" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.NonFeatureUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add all elements to build up this widget</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.NonFeatureUI.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>silent=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#NonFeatureUI.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.NonFeatureUI.validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.OptionUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">OptionUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#OptionUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.OptionUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for selecting from a limited list of options</p>
-<dl class="method">
-<dt id="pyw3d.ui.OptionUI.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#OptionUI.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.OptionUI.destroy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.OptionUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#OptionUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.OptionUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.PairUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">PairUI</code><span class="sig-paren">(</span><em>parent</em>, <em>dictionary</em>, <em>key_label</em>, <em>key_validator</em>, <em>value_validator</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PairUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PairUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for inputting pairs of values</p>
-<dl class="method">
-<dt id="pyw3d.ui.PairUI.create_value_entry">
-<code class="descname">create_value_entry</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PairUI.create_value_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PairUI.create_value_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.PairUI.destroy_entry">
-<code class="descname">destroy_entry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PairUI.destroy_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PairUI.destroy_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.PairUI.evaluate_key">
-<code class="descname">evaluate_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PairUI.evaluate_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PairUI.evaluate_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.PairUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PairUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PairUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.PairUI.update_key">
-<code class="descname">update_key</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PairUI.update_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PairUI.update_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.PopOutUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">PopOutUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PopOutUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PopOutUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<dl class="method">
-<dt id="pyw3d.ui.PopOutUI.edit">
-<code class="descname">edit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PopOutUI.edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PopOutUI.edit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.PopOutUI.exit_editor">
-<code class="descname">exit_editor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PopOutUI.exit_editor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PopOutUI.exit_editor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.PopOutUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#PopOutUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.PopOutUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.ScrollableFrame">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">ScrollableFrame</code><span class="sig-paren">(</span><em>parent</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#ScrollableFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.ScrollableFrame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Scrollable frame widget</p>
-<p>This implementation based on the one presented at
-<a class="reference external" href="http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame">http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame</a></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.TextUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">TextUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#TextUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.TextUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<dl class="method">
-<dt id="pyw3d.ui.TextUI.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#TextUI.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.TextUI.destroy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.TextUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#TextUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.TextUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.TextUI.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>silent=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#TextUI.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.TextUI.validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.ui.UpdateOptionUI">
-<em class="property">class </em><code class="descclassname">pyw3d.ui.</code><code class="descname">UpdateOptionUI</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>validator</em>, <em>feature</em>, <em>feature_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#UpdateOptionUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.UpdateOptionUI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.ui.InputUI" title="pyw3d.ui.InputUI"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.ui.InputUI</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
-<p>Tkinter widget for selecting from an updateable list of options</p>
-<dl class="method">
-<dt id="pyw3d.ui.UpdateOptionUI.create_entry">
-<code class="descname">create_entry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#UpdateOptionUI.create_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.UpdateOptionUI.create_entry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.UpdateOptionUI.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#UpdateOptionUI.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.UpdateOptionUI.destroy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.ui.UpdateOptionUI.initUI">
-<code class="descname">initUI</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/ui.html#UpdateOptionUI.initUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.ui.UpdateOptionUI.initUI" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="pyw3d-ui-module">
+<h2>pyw3d.ui module<a class="headerlink" href="#pyw3d-ui-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-pyw3d.validators">
 <span id="pyw3d-validators-module"></span><h2>pyw3d.validators module<a class="headerlink" href="#module-pyw3d.validators" title="Permalink to this headline">¶</a></h2>
@@ -2787,6 +2450,11 @@ should be None.</li>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="pyw3d.validators.ListValidator.coerce">
+<code class="descname">coerce</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/validators.html#ListValidator.coerce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.validators.ListValidator.coerce" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="pyw3d.validators.ListValidator.def_value">
 <code class="descname">def_value</code><a class="headerlink" href="#pyw3d.validators.ListValidator.def_value" title="Permalink to this definition">¶</a></dt>
@@ -2882,6 +2550,12 @@ ProjectPath pointing to the element used to populate available options</p>
 <code class="descname">coerce</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/validators.html#ValidFile.coerce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.validators.ValidFile.coerce" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="pyw3d.validators.ValidFontFile">
+<em class="property">class </em><code class="descclassname">pyw3d.validators.</code><code class="descname">ValidFontFile</code><span class="sig-paren">(</span><em>help_string=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/validators.html#ValidFontFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.validators.ValidFontFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyw3d.validators.ValidFile" title="pyw3d.validators.ValidFile"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.validators.ValidFile</span></code></a></p>
 </dd></dl>
 
 <dl class="class">
@@ -3029,7 +2703,7 @@ installation of Writing3D</p>
 <li><a class="reference internal" href="#module-pyw3d.structs">pyw3d.structs module</a></li>
 <li><a class="reference internal" href="#module-pyw3d.timeline">pyw3d.timeline module</a></li>
 <li><a class="reference internal" href="#module-pyw3d.triggers">pyw3d.triggers module</a></li>
-<li><a class="reference internal" href="#module-pyw3d.ui">pyw3d.ui module</a></li>
+<li><a class="reference internal" href="#pyw3d-ui-module">pyw3d.ui module</a></li>
 <li><a class="reference internal" href="#module-pyw3d.validators">pyw3d.validators module</a></li>
 <li><a class="reference internal" href="#module-pyw3d.xml_tools">pyw3d.xml_tools module</a></li>
 <li><a class="reference internal" href="#module-pyw3d">Module contents</a></li>
@@ -3058,6 +2732,9 @@ installation of Writing3D</p>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -3068,8 +2745,8 @@ installation of Writing3D</p>
       &copy;2016, William Hicks.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="../_sources/pyw3d_api/pyw3d.txt"
