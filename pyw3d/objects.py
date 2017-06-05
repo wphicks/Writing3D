@@ -546,12 +546,27 @@ class W3DText(W3DContent):
         if (
                 self["font"] is not None and self["font"] not in
                 self._loaded_fonts):
-            try:
-                new_text_object.data.font = bpy.data.fonts.load(self["font"])
-            except:
-                new_text_object.data.font = bpy.data.fonts.load(
-                    os.path.join("fonts", self["font"])
-                )
+            if not os.path.isabs(self["font"]):
+                font_file = os.path.join(os.getcwd(), self["font"])
+                try:
+                    new_text_object.data.font = bpy.data.fonts.load(font_file)
+                except:
+                    try:
+                        new_text_object.data.font = bpy.data.fonts.load(
+                            os.path.join(os.getcwd(), "fonts", self["font"])
+                        )
+                    except:
+                        raise ConsistencyError(
+                            "Font file {} could not be found".format(font_file)
+                        )
+            else:
+                font_file = self["font"]
+                try:
+                    new_text_object.data.font = bpy.data.fonts.load(font_file)
+                except:
+                    raise ConsistencyError(
+                        "Font file {} could not be found".format(font_file)
+                    )
             self._loaded_fonts[self["font"]] = new_text_object.data.font
         elif self["font"] is not None:
             new_text_object.data.font = self._loaded_fonts[self["font"]]
