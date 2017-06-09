@@ -31,12 +31,14 @@ Samples
 After installing, try opening up any xml file in the ``Writing3D/samples/xml_samples``
 directory from within CWEditor. If you then click "Desktop Preview" at the
 bottom of the page, the sample should run. If it does not, please
-:ref:`contact` us.
+`contact <https://wphicks.github.io/Writing3D/#id1>`_ us.
 
 For Developers
 ^^^^^^^^^^^^^^
 For developers or those who prefer to work from the command line, check out the
-:ref:`developer_guide` for install information.
+`Developer's Guide
+<https://wphicks.github.io/Writing3D/developer_guide.html#developer-guide>`_
+for install information.
 
 .. _development_status:
 Current Development Status
