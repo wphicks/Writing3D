@@ -45,7 +45,6 @@ via your package manager or run the following from terminal:
     $ ./configure
     $ make; make altinstall
 
-TODO: Add tkinter installation instructions
 
 Downloading Writing3D
 ---------------------
@@ -162,12 +161,3 @@ with link_sample.py, shown here:
 
 TODO: Example with export to Oculus and Brown University Cave
 
-Module Documentation
-^^^^^^^^^^^^^^^^^^^^
-Complete documentation of all classes, methods, functions, etc. of the pyw3d
-module is available :ref:`here <pyw3d_docs>`.
-
-.. toctree::
-   :maxdepth: 2
-
-        pyw3d Documentation <pyw3d.rst>

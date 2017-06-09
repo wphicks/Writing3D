@@ -3,10 +3,92 @@
 Developer's Guide
 =================
 
-.. warning::
-    This is *very much* still a work in progress, but please don't let that
-    keep you from contributing. The maintainer is happy to sort out any style
-    issues or workflow problems that are not addressed by this guide.
+To Begin
+--------
+1. Begin by `forking <https://help.github.com/articles/fork-a-repo/>`_ the
+   `Writing3D repo <https://github.com/wphicks/Writing3D>`_ on Github.
+
+2. Download and install `Blender <https://www.blender.org/download/>`_ on your
+   system.
+
+    .. warning::
+        Writing3D has only been tested with Blender 2.76. You are welcome to try a
+        later version and let us know the results, but only 2.76 is supported at
+        the moment.
+
+3. `Clone <https://help.github.com/articles/cloning-a-repository/>`_ your fork
+   of the repo to your computer, and `checkout
+   <https://git-scm.com/docs/git-checkout>`_ the ``develop`` branch.
+
+4. Create a `configuration file <https://en.wikipedia.org/wiki/JSON#Example>`_
+   in your `home directory
+   <https://docs.python.org/3/library/os.path.html#os.path.expanduser>`_ called
+   .w3d.json with the following fields:
+
+   * ``Blender executable``: The (absolute) path to your Blender executable.
+
+   * ``Blender player executable``: The (absolute) path to your Blender player
+     executable.
+
+You should now be able to `add <https://git-scm.com/docs/git-add>`_ and `commit
+<https://git-scm.com/docs/git-commit>`_ changes to your local repo and `push
+<https://help.github.com/articles/pushing-to-a-remote/>`_ those changes to your
+fork. When you're ready to share those changes with the rest of the Writing3D
+community, open a `pull request
+<https://help.github.com/articles/about-pull-requests/>`_ against the develop
+branch of the Writing3D repo.
+
+Samples
+-------
+The Writing3D repo includes sample projects written both in archival xml format
+and as Python scripts. To test that your install is working properly, try
+running at least some of these samples.
+
+Python Samples
+^^^^^^^^^^^^^^
+To make it easier to run the Python samples, a script called ``w3dpy.sh`` or
+``w3dpy.bat`` is included in the scripts directory for your platform. Execute
+this script with the Python sample file as argument. Example (for Linux):
+
+.. code-block:: bash
+    
+    $ cd Writing3D
+    $ ./scripts/Linux/w3dpy.sh samples/link_sample.py
+
+XML Samples
+^^^^^^^^^^^
+To run xml samples, we use ``cwapp.sh`` or ``cwapp.bat`` from the script
+directory for your platform. These scripts take two arguments: either
+``desktop`` or ``desktopfull`` to run in windowed or fullscreen mode
+respectively and the name of the xml file to run. Example (for Linux):
+
+.. code-block:: bash
+    
+    $ cd Writing3D
+    $ ./scripts/Linux/cwapp.sh desktop samples/xml_samples/random_sample.xml
+
+
+Documentation and Getting Help
+------------------------------
+pyw3d Documentation
+^^^^^^^^^^^^^^^^^^^
+Complete documentation of all classes, methods, functions, etc. of the pyw3d
+module is available here:
+
+.. toctree::
+   :maxdepth: 2
+
+        pyw3d Documentation <pyw3d.rst>
+
+Getting Help
+~~~~~~~~~~~~
+If you have questions on where to find information about something related to
+Writing3D, please feel free to submit a ticket to the `issue tracker
+<https://github.com/wphicks/Writing3D/issues>`_ with the first word
+"Documentation". That way we can make it easier for the next person to find
+what they need. You should also feel free to contact the maintainer directly
+via Twitter (`@whimsicalilk
+<https://twitter.com/intent/tweet?screen_name=whimsicalilk>`_).
 
 Style Guide
 -----------
@@ -22,17 +104,6 @@ revise your code and integrate it into the main codebase.
 Features which introduce new Writing3D functionality should in general inherit
 from the W3DFeature class and *must* implement fromXML and toXML methods for
 creating an archival XML format.
-
-TODO: Describe W3DFeature structure in detail
-
-Git Workflow
-------------
-Writing3D uses a `fork & pull model
-<https://stackoverflow.com/questions/11582995/what-is-the-fork-pull-model-in-github>`_
-for contributions. In general, you should make changes off of the develop
-branch, and they will eventually be pulled into master in the main repo.
-
-TODO: Give more detail on workflow
 
 .. toctree::
    :maxdepth: 2

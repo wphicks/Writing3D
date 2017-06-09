@@ -9,11 +9,11 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-        Getting Started <getting_started.rst>
         Frequently Asked Questions <faq.rst>
         Getting Involved <getting_involved.rst>
+        Developer's Guide <developer_guide.rst>
         Module Documentation <pyw3d.rst>
 
 

@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
     <link rel="next" title="Getting Involved" href="getting_involved.html" />
-    <link rel="prev" title="pyw3d: The Python VR Library" href="pyw3d.html" />
+    <link rel="prev" title="Writing3D" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -58,25 +58,8 @@ backends besides Blender, take a look at the <a class="reference internal" href=
 with supporting Unity, either, but we&#8217;d be happy to talk through them with you
 if you&#8217;re interested.</p>
 </div>
-<div class="section" id="why-does-w3d-writer-use-tkinter">
-<h2>3. Why does w3d_writer use Tkinter?<a class="headerlink" href="#why-does-w3d-writer-use-tkinter" title="Permalink to this headline">¶</a></h2>
-<p>Primarily to limit the number of dependencies and ensure maintainability.
-Python ships with Tkinter by default and Mac and Windows, and is likely to do
-so for the foreseeable future. As such, we can limit the number of potential
-&#8220;points of failure&#8221; for future maintainability by using Tkinter as opposed to
-the awesome new GUI package du jour. That being said, Tkinter has some serious
-limitations, and we&#8217;re looking to move to something else in the near future,
-possibly Qt. No matter what we use, though, we&#8217;ll want it to be something that
-is likely to be in common usage for the foreseeable future.</p>
-</div>
-<div class="section" id="why-doesn-t-w3d-writer-the-gui-wor">
-<h2>4. Why doesn&#8217;t w3d_writer (the GUI) wor?<a class="headerlink" href="#why-doesn-t-w3d-writer-the-gui-wor" title="Permalink to this headline">¶</a></h2>
-<p>Cause it&#8217;s not done! Don&#8217;t worry, we&#8217;ll be getting it up and running as soon as
-possible. Check out <a class="reference internal" href="index.html#development-status"><span>Development Status</span></a> for more
-details.</p>
-</div>
 <div class="section" id="why-is-writing3d-based-on-blender">
-<h2>5. Why is Writing3D based on Blender?<a class="headerlink" href="#why-is-writing3d-based-on-blender" title="Permalink to this headline">¶</a></h2>
+<h2>3. Why is Writing3D based on Blender?<a class="headerlink" href="#why-is-writing3d-based-on-blender" title="Permalink to this headline">¶</a></h2>
 <p>Blender is just about the best open source 3D rendering and game engine out
 there. We think it&#8217;s very important that artists and students have access to
 open source tools for working in VR so that they have full control of their
@@ -86,7 +69,7 @@ like Blender not be crowded out of the VR scene by their proprietary
 competitors.</p>
 </div>
 <div class="section" id="can-you-implement-feature-x-in-writing3d-for-me">
-<h2>6. Can you implement feature X in Writing3D for me?<a class="headerlink" href="#can-you-implement-feature-x-in-writing3d-for-me" title="Permalink to this headline">¶</a></h2>
+<h2>4. Can you implement feature X in Writing3D for me?<a class="headerlink" href="#can-you-implement-feature-x-in-writing3d-for-me" title="Permalink to this headline">¶</a></h2>
 <p>Maybe! If it sounds like an idea that other people would be interested in, we&#8217;d
 love to have a crack at it. <a class="reference external" href="https://help.github.com/articles/creating-an-issue/">Submit an issue</a> marked as a &#8220;feature
 request&#8221; on <a class="reference external" href="https://github.com/wphicks/Writing3D/issues">Github</a>, and we&#8217;ll
@@ -114,20 +97,6 @@ maintainer</a>.</p>
 <h2>9. How can I get your attention?<a class="headerlink" href="#how-can-i-get-your-attention" title="Permalink to this headline">¶</a></h2>
 <p>The best way is to either submit a Github issue or <a class="reference external" href="https://twitter.com/intent/tweet?screen_name=whimsicalilk">Tweet</a> at William Hicks,
 the maintainer for the Writing3D project.</p>
-</div>
-<div class="section" id="why-doesn-t-writing3d-use-a-more-sophisticated-xml-module">
-<h2>10. Why doesn&#8217;t Writing3D use a more sophisticated XML module?<a class="headerlink" href="#why-doesn-t-writing3d-use-a-more-sophisticated-xml-module" title="Permalink to this headline">¶</a></h2>
-<p>Again, the goal is to limit dependencies in order to ensure maintainability and
-accessibility, but we&#8217;re not religious about that. If it becomes clear that the
-benefits of one of the many great xml libraries out there outweighs the
-downsides, we&#8217;ll happily make the switch. For now, the standard library xml
-module seems to be serving our needs fairly well, though.</p>
-</div>
-<div class="section" id="the-blender-game-engine-is-about-to-radically-change-what-will-you-do">
-<h2>11. The Blender Game Engine is about to radically change. What will you do?<a class="headerlink" href="#the-blender-game-engine-is-about-to-radically-change-what-will-you-do" title="Permalink to this headline">¶</a></h2>
-<p>Change with it! We&#8217;re aware of the changes coming down the line, and while we
-may not update the moment the new BGE drops, we&#8217;re prepared to make things work
-soon.</p>
 <div class="toctree-wrapper compound">
 <ul class="simple">
 </ul>
@@ -146,15 +115,11 @@ soon.</p>
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
 <li><a class="reference internal" href="#why-doesn-t-writing3d-support-python2">1. Why doesn&#8217;t Writing3D support Python2?</a></li>
 <li><a class="reference internal" href="#will-writing3d-output-projects-to-unity">2. Will Writing3D output projects to Unity?</a></li>
-<li><a class="reference internal" href="#why-does-w3d-writer-use-tkinter">3. Why does w3d_writer use Tkinter?</a></li>
-<li><a class="reference internal" href="#why-doesn-t-w3d-writer-the-gui-wor">4. Why doesn&#8217;t w3d_writer (the GUI) wor?</a></li>
-<li><a class="reference internal" href="#why-is-writing3d-based-on-blender">5. Why is Writing3D based on Blender?</a></li>
-<li><a class="reference internal" href="#can-you-implement-feature-x-in-writing3d-for-me">6. Can you implement feature X in Writing3D for me?</a></li>
+<li><a class="reference internal" href="#why-is-writing3d-based-on-blender">3. Why is Writing3D based on Blender?</a></li>
+<li><a class="reference internal" href="#can-you-implement-feature-x-in-writing3d-for-me">4. Can you implement feature X in Writing3D for me?</a></li>
 <li><a class="reference internal" href="#does-writing3d-work-on-oculus-vive-playstation-vr-gear-etc">7. Does Writing3D work on Oculus/ Vive/ Playstation VR/ Gear/ etc.?</a></li>
 <li><a class="reference internal" href="#how-can-i-help-with-writing3d">8. How can I help with Writing3D?</a></li>
 <li><a class="reference internal" href="#how-can-i-get-your-attention">9. How can I get your attention?</a></li>
-<li><a class="reference internal" href="#why-doesn-t-writing3d-use-a-more-sophisticated-xml-module">10. Why doesn&#8217;t Writing3D use a more sophisticated XML module?</a></li>
-<li><a class="reference internal" href="#the-blender-game-engine-is-about-to-radically-change-what-will-you-do">11. The Blender Game Engine is about to radically change. What will you do?</a></li>
 </ul>
 </li>
 </ul>
@@ -162,7 +127,7 @@ soon.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="pyw3d.html" title="previous chapter">pyw3d: The Python VR Library</a></li>
+      <li>Previous: <a href="index.html" title="previous chapter">Writing3D</a></li>
       <li>Next: <a href="getting_involved.html" title="next chapter">Getting Involved</a></li>
   </ul></li>
 </ul>

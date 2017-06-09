@@ -25,6 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
     <link rel="up" title="Getting Involved" href="getting_involved.html" />
+    <link rel="next" title="pyw3d: The Python VR Library" href="pyw3d.html" />
     <link rel="prev" title="Getting Involved" href="getting_involved.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -43,11 +44,99 @@
             
   <div class="section" id="developer-s-guide">
 <span id="developer-guide"></span><h1>Developer&#8217;s Guide<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">¶</a></h1>
-<div class="admonition warning">
+<div class="section" id="to-begin">
+<h2>To Begin<a class="headerlink" href="#to-begin" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Begin by <a class="reference external" href="https://help.github.com/articles/fork-a-repo/">forking</a> the
+<a class="reference external" href="https://github.com/wphicks/Writing3D">Writing3D repo</a> on Github.</p>
+</li>
+<li><p class="first">Download and install <a class="reference external" href="https://www.blender.org/download/">Blender</a> on your
+system.</p>
+<blockquote>
+<div><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">This is <em>very much</em> still a work in progress, but please don&#8217;t let that
-keep you from contributing. The maintainer is happy to sort out any style
-issues or workflow problems that are not addressed by this guide.</p>
+<p class="last">Writing3D has only been tested with Blender 2.76. You are welcome to try a
+later version and let us know the results, but only 2.76 is supported at
+the moment.</p>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="https://help.github.com/articles/cloning-a-repository/">Clone</a> your fork
+of the repo to your computer, and <a class="reference external" href="https://git-scm.com/docs/git-checkout">checkout</a> the <code class="docutils literal"><span class="pre">develop</span></code> branch.</p>
+</li>
+<li><p class="first">Create a <a class="reference external" href="https://en.wikipedia.org/wiki/JSON#Example">configuration file</a>
+in your <a class="reference external" href="https://docs.python.org/3/library/os.path.html#os.path.expanduser">home directory</a> called
+.w3d.json with the following fields:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">Blender</span> <span class="pre">executable</span></code>: The (absolute) path to your Blender executable.</li>
+<li><code class="docutils literal"><span class="pre">Blender</span> <span class="pre">player</span> <span class="pre">executable</span></code>: The (absolute) path to your Blender player
+executable.</li>
+</ul>
+</li>
+</ol>
+<p>You should now be able to <a class="reference external" href="https://git-scm.com/docs/git-add">add</a> and <a class="reference external" href="https://git-scm.com/docs/git-commit">commit</a> changes to your local repo and <a class="reference external" href="https://help.github.com/articles/pushing-to-a-remote/">push</a> those changes to your
+fork. When you&#8217;re ready to share those changes with the rest of the Writing3D
+community, open a <a class="reference external" href="https://help.github.com/articles/about-pull-requests/">pull request</a> against the develop
+branch of the Writing3D repo.</p>
+</div>
+<div class="section" id="samples">
+<h2>Samples<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h2>
+<p>The Writing3D repo includes sample projects written both in archival xml format
+and as Python scripts. To test that your install is working properly, try
+running at least some of these samples.</p>
+<div class="section" id="python-samples">
+<h3>Python Samples<a class="headerlink" href="#python-samples" title="Permalink to this headline">¶</a></h3>
+<p>To make it easier to run the Python samples, a script called <code class="docutils literal"><span class="pre">w3dpy.sh</span></code> or
+<code class="docutils literal"><span class="pre">w3dpy.bat</span></code> is included in the scripts directory for your platform. Execute
+this script with the Python sample file as argument. Example (for Linux):</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> Writing3D
+$ ./scripts/Linux/w3dpy.sh samples/link_sample.py
+</pre></div>
+</div>
+</div>
+<div class="section" id="xml-samples">
+<h3>XML Samples<a class="headerlink" href="#xml-samples" title="Permalink to this headline">¶</a></h3>
+<p>To run xml samples, we use <code class="docutils literal"><span class="pre">cwapp.sh</span></code> or <code class="docutils literal"><span class="pre">cwapp.bat</span></code> from the script
+directory for your platform. These scripts take two arguments: either
+<code class="docutils literal"><span class="pre">desktop</span></code> or <code class="docutils literal"><span class="pre">desktopfull</span></code> to run in windowed or fullscreen mode
+respectively and the name of the xml file to run. Example (for Linux):</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> Writing3D
+$ ./scripts/Linux/cwapp.sh desktop samples/xml_samples/random_sample.xml
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="documentation-and-getting-help">
+<h2>Documentation and Getting Help<a class="headerlink" href="#documentation-and-getting-help" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pyw3d-documentation">
+<h3>pyw3d Documentation<a class="headerlink" href="#pyw3d-documentation" title="Permalink to this headline">¶</a></h3>
+<p>Complete documentation of all classes, methods, functions, etc. of the pyw3d
+module is available here:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyw3d.html">     pyw3d Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-classes">pyw3d Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-objects">pyw3d Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-groups">pyw3d Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-sounds">pyw3d Sounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-actions">pyw3d Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-timelines">pyw3d Timelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-event-triggers">pyw3d Event Triggers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#errors">Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#complete-reference">Complete Reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="getting-help">
+<h4>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h4>
+<p>If you have questions on where to find information about something related to
+Writing3D, please feel free to submit a ticket to the <a class="reference external" href="https://github.com/wphicks/Writing3D/issues">issue tracker</a> with the first word
+&#8220;Documentation&#8221;. That way we can make it easier for the next person to find
+what they need. You should also feel free to contact the maintainer directly
+via Twitter (<a class="reference external" href="https://twitter.com/intent/tweet?screen_name=whimsicalilk">&#64;whimsicalilk</a>).</p>
+</div>
+</div>
 </div>
 <div class="section" id="style-guide">
 <h2>Style Guide<a class="headerlink" href="#style-guide" title="Permalink to this headline">¶</a></h2>
@@ -62,14 +151,6 @@ revise your code and integrate it into the main codebase.</p>
 <p>Features which introduce new Writing3D functionality should in general inherit
 from the W3DFeature class and <em>must</em> implement fromXML and toXML methods for
 creating an archival XML format.</p>
-<p>TODO: Describe W3DFeature structure in detail</p>
-</div>
-<div class="section" id="git-workflow">
-<h2>Git Workflow<a class="headerlink" href="#git-workflow" title="Permalink to this headline">¶</a></h2>
-<p>Writing3D uses a <a class="reference external" href="https://stackoverflow.com/questions/11582995/what-is-the-fork-pull-model-in-github">fork &amp; pull model</a>
-for contributions. In general, you should make changes off of the develop
-branch, and they will eventually be pulled into master in the main repo.</p>
-<p>TODO: Give more detail on workflow</p>
 <div class="toctree-wrapper compound">
 <ul class="simple">
 </ul>
@@ -86,8 +167,20 @@ branch, and they will eventually be pulled into master in the main repo.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Developer&#8217;s Guide</a><ul>
+<li><a class="reference internal" href="#to-begin">To Begin</a></li>
+<li><a class="reference internal" href="#samples">Samples</a><ul>
+<li><a class="reference internal" href="#python-samples">Python Samples</a></li>
+<li><a class="reference internal" href="#xml-samples">XML Samples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#documentation-and-getting-help">Documentation and Getting Help</a><ul>
+<li><a class="reference internal" href="#pyw3d-documentation">pyw3d Documentation</a><ul>
+<li><a class="reference internal" href="#getting-help">Getting Help</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#style-guide">Style Guide</a></li>
-<li><a class="reference internal" href="#git-workflow">Git Workflow</a></li>
 </ul>
 </li>
 </ul>
@@ -97,6 +190,7 @@ branch, and they will eventually be pulled into master in the main repo.</p>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="getting_involved.html">Getting Involved</a><ul>
       <li>Previous: <a href="getting_involved.html" title="previous chapter">Getting Involved</a></li>
+      <li>Next: <a href="pyw3d.html" title="next chapter">pyw3d: The Python VR Library</a></li>
   </ul></li>
   </ul></li>
 </ul>

@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="#" />
-    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -56,86 +56,35 @@ from one of the following locations:</p>
 <li><a class="reference external" href="https://drive.google.com/open?id=0B-L9I5ef3FLWRGttR1U2WmFBaE0">Mac</a></li>
 </ul>
 <p>Note that this includes the old (non-FOSS, Java-based) cwapp editor and a copy
-of the appropriate version of Blender. You can then launch CWEditor.jar to
-begin creating Writing3D projects.</p>
+of the appropriate version of Blender. Unzip the archive to any convenient
+location. You can then launch CWEditor.jar to begin creating Writing3D
+projects.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">The first time you open CWEditor.jar, you may need to open the Run menu,
 select &#8220;Configure Paths&#8221; and then simply click &#8220;OK&#8221; to get CWEditor to
 recognize the Writing3D backend.</p>
 </div>
+<div class="section" id="samples">
+<h3>Samples<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h3>
+<p>After installing, try opening up any xml file in the <code class="docutils literal"><span class="pre">Writing3D/samples/xml_samples</span></code>
+directory from within CWEditor. If you then click &#8220;Desktop Preview&#8221; at the
+bottom of the page, the sample should run. If it does not, please
+<span class="xref std std-ref">contact</span> us.</p>
 </div>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>Based on <a class="reference external" href="http://cavewriting.sourceforge.net/">cwapp</a> and inspired by
-projects like <a class="reference external" href="https://processing.org/">Processing</a> and <a class="reference external" href="http://twinery.org/">Twine</a>, which help make a range of technologies more
-accessible to creative coders, Writing3D aims to provide a highly accessible
-point-of-entry for creative work in virtual reality. It is designed with three
-major goals in mind:</p>
-<div class="section" id="accessibility">
-<h3>1. Accessibility<a class="headerlink" href="#accessibility" title="Permalink to this headline">¶</a></h3>
-<p>The layered design of Writing3D helps make it both useful and accessible for
-VR content creators of all technical abilities. Those with limited (or no)
-coding experience can still access all of Writing3D&#8217;s functionality through its
-Python-based graphic user interface (GUI), w3d_writer. For those who have more
-coding experience or those who have become comfortable with the GUI and want to
-create even more sophisticated work, Writing3D provides an easy-to-use Python
-module, pyw3d. Finally, since Writing3D interfaces with <a class="reference external" href="https://www.blender.org">Blender</a> to render VR projects, users who are experienced
-with 3D modeling can directly import their models into the Writing3D framework
-to quickly add interactivity and animation.</p>
+<div class="section" id="for-developers">
+<h3>For Developers<a class="headerlink" href="#for-developers" title="Permalink to this headline">¶</a></h3>
+<p>For developers or those who prefer to work from the command line, check out the
+<a class="reference internal" href="developer_guide.html#developer-guide"><span>Developer&#8217;s Guide</span></a> for install information.</p>
 </div>
-<div class="section" id="extensibility">
-<h3>2. Extensibility<a class="headerlink" href="#extensibility" title="Permalink to this headline">¶</a></h3>
-<p>Writing3D is open source software
-(<a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a>), which means you are
-free to look at and modify its source code. It is also specifically structured
-to make it as easy as possible for users to add their own functionality. This
-means that Writing3D can continue to improve and gain cool new features as the
-community of users grows.</p>
-</div>
-<div class="section" id="maintainability">
-<h3>3. Maintainability<a class="headerlink" href="#maintainability" title="Permalink to this headline">¶</a></h3>
-<p>Writing3D not only uses best practices to ensure that it can be maintained far
-into the future but also contains features to ensure that projects developed
-with this framework will continue to be accessible for the foreseeable future.
-Among other things, Writing3D provides a method to save an &#8220;archival&#8221; copy of
-any VR project using a human-readable XML format. This will help ensure that
-creative developers have access to a valuable &#8220;canon&#8221; of VR work even as
-VR technologies evolve.</p>
-<p>Our commitment to maintaining VR work means that projects from Brown
-University&#8217;s <a class="reference external" href="http://www.wired.com/2003/02/writings-on-the-wall-in-3-d-cave/">Cave Writing</a> program
-going as far back as 1999 can still run through Writing3D and may soon be
-available on new hardware platforms like Google Cardboard and the Oculus Rift.</p>
-</div>
-</div>
-<div class="section" id="more-information">
-<h2>More Information<a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h2>
-<p>For more information, check out our <a class="reference external" href="https://wphicks.github.io/Writing3D/faq.html">FAQ</a> page or dive in with the
-<a class="reference external" href="https://wphicks.github.io/Writing3D/getting_started.html#getting-started">Getting Started</a>
-guide.</p>
 </div>
 <div class="section" id="current-development-status">
-<span id="development-status"></span><h2>Current Development Status<a class="headerlink" href="#current-development-status" title="Permalink to this headline">¶</a></h2>
-<p>Writing3D is currently in a pre-alpha stage. It can read and write to its
-archival xml format and render most project features. It has not been
-extensively tested across platforms and OSes, and some features remain to be
-implemented, including:</p>
-<ol class="arabic simple">
-<li>Particle systems</li>
-<li>Stereo images (images which only appear in one eye of stereo visualizations)</li>
-<li>Support for OpenAL-based 3D audio</li>
-<li>Simplified Python interface for adding Writing3D features</li>
-</ol>
-<p>The GUI is also currently in an unusable skeletal state. That being said, pyw3d
-currently provides almost all features that will eventually make up the core of
-Writing3D, and you can begin using it immediately to create basic interactive
-VR experiences.</p>
-<p>If you are interested in Writing3D and would like to see its core feature set
-completed sooner, please see the
-<a class="reference external" href="https://wphicks.github.io/Writing3D/getting_involved.html">Getting Involved</a> page.</p>
+<h2>Current Development Status<a class="headerlink" href="#current-development-status" title="Permalink to this headline">¶</a></h2>
+<p>Writing3D is currently in a beta stage of development. All of its core features
+have been implemented except the new Python-based FOSS GUI.</p>
 </div>
-<div class="section" id="contact">
-<h2>Contact<a class="headerlink" href="#contact" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>Contact<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>The best ways to contact those involved with the Writing3D project are by
 tweeting <a class="reference external" href="https://twitter.com/intent/tweet?screen_name=whimsicalilk">&#64;whimsicalilk</a> or by logging an
 issue on <a class="reference external" href="https://github.com/wphicks/Writing3D/issues">Github</a>.</p>
@@ -144,47 +93,10 @@ issue on <a class="reference external" href="https://github.com/wphicks/Writing3
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">     Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-python3">Installing Python3</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#downloading-writing3d">Downloading Writing3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-writing3d">Installing Writing3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#using-w3d-writer-the-writing3d-gui">Using w3d_writer: The Writing3D GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#using-pyw3d-the-python-library">Using pyw3d: The Python Library</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">     Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#why-doesn-t-writing3d-support-python2">1. Why doesn&#8217;t Writing3D support Python2?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#will-writing3d-output-projects-to-unity">2. Will Writing3D output projects to Unity?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#why-does-w3d-writer-use-tkinter">3. Why does w3d_writer use Tkinter?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#why-doesn-t-w3d-writer-the-gui-wor">4. Why doesn&#8217;t w3d_writer (the GUI) wor?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#why-is-writing3d-based-on-blender">5. Why is Writing3D based on Blender?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#can-you-implement-feature-x-in-writing3d-for-me">6. Can you implement feature X in Writing3D for me?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#does-writing3d-work-on-oculus-vive-playstation-vr-gear-etc">7. Does Writing3D work on Oculus/ Vive/ Playstation VR/ Gear/ etc.?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#how-can-i-help-with-writing3d">8. How can I help with Writing3D?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#how-can-i-get-your-attention">9. How can I get your attention?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#why-doesn-t-writing3d-use-a-more-sophisticated-xml-module">10. Why doesn&#8217;t Writing3D use a more sophisticated XML module?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html#the-blender-game-engine-is-about-to-radically-change-what-will-you-do">11. The Blender Game Engine is about to radically change. What will you do?</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="getting_involved.html">     Getting Involved</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_involved.html#for-python-coders">For Python Coders</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_involved.html#for-non-coders">For Non-Coders</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_involved.html#for-those-wishing-to-donate">For those wishing to donate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_involved.html#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="pyw3d.html">     Module Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-classes">pyw3d Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-objects">pyw3d Objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-groups">pyw3d Groups</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-sounds">pyw3d Sounds</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-actions">pyw3d Actions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-timelines">pyw3d Timelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#pyw3d-event-triggers">pyw3d Event Triggers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#errors">Errors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.html#complete-reference">Complete Reference</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">     Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_involved.html">     Getting Involved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">     Developer&#8217;s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyw3d.html">     Module Documentation</a></li>
 </ul>
 </div>
 </div>
@@ -207,16 +119,13 @@ issue on <a class="reference external" href="https://github.com/wphicks/Writing3
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Writing3D</a><ul>
-<li><a class="reference internal" href="#quickstart-guide">Quickstart Guide</a></li>
-<li><a class="reference internal" href="#overview">Overview</a><ul>
-<li><a class="reference internal" href="#accessibility">1. Accessibility</a></li>
-<li><a class="reference internal" href="#extensibility">2. Extensibility</a></li>
-<li><a class="reference internal" href="#maintainability">3. Maintainability</a></li>
+<li><a class="reference internal" href="#quickstart-guide">Quickstart Guide</a><ul>
+<li><a class="reference internal" href="#samples">Samples</a></li>
+<li><a class="reference internal" href="#for-developers">For Developers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#more-information">More Information</a></li>
 <li><a class="reference internal" href="#current-development-status">Current Development Status</a></li>
-<li><a class="reference internal" href="#contact">Contact</a></li>
+<li><a class="reference internal" href="#id1">Contact</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
 </li>
@@ -226,7 +135,7 @@ issue on <a class="reference external" href="https://github.com/wphicks/Writing3
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="getting_started.html" title="next chapter">Getting Started</a></li>
+      <li>Next: <a href="faq.html" title="next chapter">Frequently Asked Questions</a></li>
   </ul></li>
 </ul>
 </div>

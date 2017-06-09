@@ -18,24 +18,7 @@ backends besides Blender, take a look at the :ref:`getting_involved` page or
 with supporting Unity, either, but we'd be happy to talk through them with you
 if you're interested.
 
-3. Why does w3d_writer use Tkinter?
------------------------------------
-Primarily to limit the number of dependencies and ensure maintainability.
-Python ships with Tkinter by default and Mac and Windows, and is likely to do
-so for the foreseeable future. As such, we can limit the number of potential
-"points of failure" for future maintainability by using Tkinter as opposed to
-the awesome new GUI package du jour. That being said, Tkinter has some serious
-limitations, and we're looking to move to something else in the near future,
-possibly Qt. No matter what we use, though, we'll want it to be something that
-is likely to be in common usage for the foreseeable future.
-
-4. Why doesn't w3d_writer (the GUI) wor?
-----------------------------------------
-Cause it's not done! Don't worry, we'll be getting it up and running as soon as
-possible. Check out :ref:`Development Status <development_status>` for more
-details.
-
-5. Why is Writing3D based on Blender?
+3. Why is Writing3D based on Blender?
 -------------------------------------
 Blender is just about the best open source 3D rendering and game engine out
 there. We think it's very important that artists and students have access to
@@ -45,7 +28,7 @@ alternatives out there, we think it's important that awesome open source tools
 like Blender not be crowded out of the VR scene by their proprietary
 competitors.
 
-6. Can you implement feature X in Writing3D for me?
+4. Can you implement feature X in Writing3D for me?
 ---------------------------------------------------
 Maybe! If it sounds like an idea that other people would be interested in, we'd
 love to have a crack at it. `Submit an issue
@@ -79,20 +62,6 @@ Check out the :ref:`getting_involved` page!
 The best way is to either submit a Github issue or `Tweet
 <https://twitter.com/intent/tweet?screen_name=whimsicalilk>`_ at William Hicks,
 the maintainer for the Writing3D project.
-
-10. Why doesn't Writing3D use a more sophisticated XML module?
---------------------------------------------------------------
-Again, the goal is to limit dependencies in order to ensure maintainability and
-accessibility, but we're not religious about that. If it becomes clear that the
-benefits of one of the many great xml libraries out there outweighs the
-downsides, we'll happily make the switch. For now, the standard library xml
-module seems to be serving our needs fairly well, though.
-
-11. The Blender Game Engine is about to radically change. What will you do?
----------------------------------------------------------------------------
-Change with it! We're aware of the changes coming down the line, and while we
-may not update the moment the new BGE drops, we're prepared to make things work
-soon.
 
 .. toctree::
    :maxdepth: 2
