@@ -38,6 +38,13 @@ class W3DConfigError(Exception):
         super().__init__(message)
 
 
+def executable_from_app(app_path):
+    if os.path.splitext(app_path)[1].lower() == '.app':
+        executable_name = os.path.splitext(os.path.basename(app_path))[0]
+        return os.path.join(app_path, "Contents", "MacOS", executable_name)
+    return app_path
+
+
 W3D_CONFIG_FILENAME = os.path.join(
     os.path.expanduser("~"),
     '.w3d.json'
@@ -62,9 +69,6 @@ except FileNotFoundError:
                 base_path, "blender", "blenderplayer.app", "Contents", "MacOS",
                 "blenderplayer"
             ),
-            "Export script path": os.path.join(
-                base_path, "Writing3D", "pyw3d", "w3d_export_tools.py"
-            )
         }
     elif platform.system() in ("Windows", "cygwin"):
         W3D_CONFIG = {
@@ -74,9 +78,6 @@ except FileNotFoundError:
             "Blender player executable": os.path.join(
                 base_path, "blender", "blenderplayer.exe"
             ),
-            "Export script path": os.path.join(
-                base_path, "Writing3D", "pyw3d", "w3d_export_tools.py"
-            )
         }
     else:
         W3D_CONFIG = {
@@ -86,16 +87,27 @@ except FileNotFoundError:
             "Blender player executable": os.path.join(
                 base_path, "blender", "blenderplayer"
             ),
-            "Export script path": os.path.join(
-                base_path, "Writing3D", "pyw3d", "w3d_export_tools.py"
-            )
         }
     with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
         json.dump(W3D_CONFIG, w3d_config_file)
 
 BLENDER_EXEC = W3D_CONFIG["Blender executable"]
+if BLENDER_EXEC != executable_from_app(BLENDER_EXEC):
+    BLENDER_EXEC = executable_from_app(BLENDER_EXEC)
+    W3D_CONFIG["Blender executable"] = BLENDER_EXEC
+    with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
+        json.dump(W3D_CONFIG, w3d_config_file)
 BLENDER_PLAY = W3D_CONFIG["Blender player executable"]
-EXPORT_SCRIPT = W3D_CONFIG["Export script path"]
+
+if (
+        BLENDER_EXEC != executable_from_app(BLENDER_EXEC) or
+        BLENDER_PLAY != executable_from_app(BLENDER_PLAY)):
+    BLENDER_EXEC = executable_from_app(BLENDER_EXEC)
+    W3D_CONFIG["Blender executable"] = BLENDER_EXEC
+    BLENDER_EXEC = executable_from_app(BLENDER_PLAY)
+    W3D_CONFIG["Blender executable"] = BLENDER_PLAY
+    with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
+        json.dump(W3D_CONFIG, w3d_config_file)
 
 from . import project
 from . import features
@@ -112,6 +124,7 @@ from . import activators
 from . import triggers
 from . import actions
 from . import groups
+from . import w3d_export_tools
 
 from .features import W3DFeature
 from .project import W3DProject

@@ -25,7 +25,8 @@ import subprocess
 import argparse
 from pyw3d import BLENDER_EXEC, BLENDER_PLAY
 from pyw3d import project
-from pyw3d import EXPORT_SCRIPT
+
+EXPORT_SCRIPT = os.path.abspath(__file__)
 
 
 def pickle_w3dproject(input_project, filename="run.p"):
