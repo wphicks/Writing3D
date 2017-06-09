@@ -61,8 +61,11 @@ function create_tag {
 
 function build {
     create_tag
+    echo "Creating zip installs for each platform..."
     create_platform_specifics
+    echo "Sending build to Google Drive..."
     sync
+    echo "Build complete and synced."
 }
 
 cd $REPO_DIR

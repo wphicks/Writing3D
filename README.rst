@@ -12,14 +12,14 @@ Quickstart Guide
 The easiest way to get started with Writing3D is to download a zipfile install
 from one of the following locations:
 
-* `Linux <https://drive.google.com/open?id=0B-L9I5ef3FLWV3lDdU1McDRRRkU>`_
-* `Windows <https://drive.google.com/open?id=0B-L9I5ef3FLWd1luR1N0MHlVMjQ>`_
+* `Linux <https://drive.google.com/open?id=0B-L9I5ef3FLWY0s1WHJQbk15Zmc>`_
+* `Windows <https://drive.google.com/open?id=0B-L9I5ef3FLWNzFlOWd1dmh1aDQ>`_
 * `Mac <https://drive.google.com/open?id=0B-L9I5ef3FLWRGttR1U2WmFBaE0>`_
 
 Note that this includes the old (non-FOSS, Java-based) cwapp editor and a copy
 of the appropriate version of Blender. Unzip the archive to any convenient
-location. You can then launch CWEditor.jar to begin creating Writing3D
-projects.
+location. You can then launch CWEditor.jar with Java to begin creating
+Writing3D projects.
 
 .. Warning::
     The first time you open CWEditor.jar, you may need to open the Run menu,
