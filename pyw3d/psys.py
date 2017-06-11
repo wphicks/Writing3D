@@ -97,7 +97,8 @@ class W3DPDomain(W3DFeature):
                     key: domain_class.argument_validators[key].coerce(value)
                     for key, value in child.attrib.items()
                 }
-                return domain_class(child.tag, **options)
+                options["type"] = child.tag
+                return domain_class(**options)
 
     def toXML(self, parent_root):
         """Store W3DPDomain as ParticleDomain node within parent node"""
@@ -114,11 +115,12 @@ class W3DPDomain(W3DFeature):
         return domain_node
 
     def generate_logic(self):
-        if self["type"] == "Point":
+        if self["type"] in ("Point", "Plane"):
             return """
     while True:
         yield mathutils.Vector({})
         """.format(self["point"])
+
         if self["type"] == "Line":
             return """
     line_vec = (
@@ -127,6 +129,141 @@ class W3DPDomain(W3DFeature):
     while True:
         yield mathutils.Vector({p1}) + random.random()*line_vec
             """.format(p2=self["p2"], p1=self["p1"])
+
+        if self["type"] == "Triangle":
+            return """
+    p1 = mathutils.Vector({p1})
+    p2 = mathutils.Vector({p2})
+    p3 = mathutils.Vector({p3})
+    while True:
+        r1 = random.uniform(0, 1)
+        r2 = random.uniform(0, 1)
+        yield (
+            (1 - math.sqrt(r1)) * p1 +
+            (math.sqrt(r1) * (1 - math.sqrt(r2))) * p2 +
+            r2 * math.sqrt(r1) * p3
+        )""".format(p1=self["p1"], p2=self["p2"], p3=self["p3"])
+
+        if self["type"] == "Rect":
+            return """
+    point = mathutils.Vector({point})
+    u_vec = mathutils.Vector({u_vec})
+    v_vec = mathutils.Vector({u_vec})
+    while True:
+        r1 = random.uniform(0, 1)
+        r2 = random.uniform(0, 1)
+        yield (
+            point + r1 * u_vec + r2 * v_vec
+        )""".format(
+                point=self["point"], u_vec=self["u-dir"], v_vec=self["v-dir"]
+            )
+
+        if self["type"] == "Box":
+            return """
+    p1 = mathutils.Vector({p1})
+    p2 = mathutils.Vector({p2})
+    diff = p2 - p1
+    while True:
+        new_vec = mathutils.Vector(
+            [diff[i] * random.uniform(0, 1) for i in range(len(diff))]
+        )
+        yield (
+            p1 + new_vec
+        )""".format(p2=self["p2"], p1=self["p1"])
+
+        if self["type"] == "Cylinder":
+            return """
+    p1 = mathutils.Vector({p1})
+    p2 = mathutils.Vector({p2})
+    radii = ({radius}, {radius_inner})
+    radius_inner = min(radii)
+    radius_outer = max(radii)
+    axis = p2 - p1
+    normal = axis.normalized()
+
+    basis = mathutils.Vector((1, 0, 0))
+    if abs(basis.dot(normal)) > 0.999:
+        basis = mathutils.Vector((0, 1, 0))
+
+    u = basis - normal.dot(basis) * normal
+    u.normalize()
+    v = normal.cross(u)
+    while True:
+        theta = 2 * math.pi * random.uniform(0, 1)
+        height = random.uniform(0, 1)
+        dist = random.uniform(radius_inner, radius_outer)
+        yield (
+            p1 + height * axis + dist * math.sin(theta) * u +
+            dist * math.cos(theta) * v
+        )""".format(
+                p1=self["p1"], p2=self["p2"], radius=self["radius"],
+                radius_inner=self["radius-inner"]
+            )
+
+        if self["type"] == "Cone":
+            return """
+    p1 = mathutils.Vector({p1})
+    p2 = mathutils.Vector({p2})
+    radii = ({radius}, {radius_inner})
+    radius_inner = min(radii)
+    radius_outer = max(radii)
+    axis = p2 - p1
+    normal = axis.normalized()
+
+    basis = mathutils.Vector((1, 0, 0))
+    if abs(basis.dot(normal)) > 0.999:
+        basis = mathutils.Vector((0, 1, 0))
+
+    u = basis - normal.dot(basis) * normal
+    u.normalize()
+    v = normal.cross(u)
+    while True:
+        theta = 2 * math.pi * random.uniform(0, 1)
+        height = random.uniform(0, 1)
+        dist = random.uniform(radius_inner, radius_outer) * height
+        yield (
+            p1 + height * axis + dist * math.sin(theta) * u +
+            dist * math.cos(theta) * v
+        )""".format(
+                p1=self["apex"], p2=self["base-center"], radius=self["radius"],
+                radius_inner=self["radius-inner"]
+            )
+
+        if self["type"] == "Blob":
+            return """
+    center = mathutils.Vector({center})
+    stdev = {stdev}
+    while True:
+        yield (
+            center + mathutils.Vector([
+                random.gauss(0, stdev) for i in range(3)
+            ])
+        )""".format(center=self["center"], stdev=self["stdev"])
+
+        if self["type"] == "Disc":
+            return """
+    p1 = mathutils.Vector({p1})
+    radii = ({radius}, {radius_inner})
+    radius_inner = min(radii)
+    radius_outer = max(radii)
+    normal = mathutils.Vector({normal}).normalized()
+
+    basis = mathutils.Vector((1, 0, 0))
+    if abs(basis.dot(normal)) > 0.999:
+        basis = mathutils.Vector((0, 1, 0))
+
+    u = basis - normal.dot(basis) * normal
+    u.normalize()
+    v = normal.cross(u)
+    while True:
+        theta = 2 * math.pi * random.uniform(0, 1)
+        dist = random.uniform(radius_inner, radius_outer)
+        yield (
+            p1 + dist * math.sin(theta) * u + dist * math.cos(theta) * v
+        )""".format(
+                p1=self["center"], normal=self["normal"],
+                radius=self["radius"], radius_inner=self["radius-inner"]
+            )
 
         # if self["type"] == "Sphere":
         else:
@@ -195,13 +332,13 @@ def get_velocity_vector():
     def fromXML(paction_class, paction_root):
         """Create W3DPAction from ParticleActionList root"""
         paction = paction_class()
-        paction["name"] = paction_root["name"]
+        paction["name"] = paction_root.attrib["name"]
 
         source_root = paction_root.find("Source")
         if source_root is None:
             raise BadW3DXML("ParticleActionList must have Source subelement")
         try:
-            paction["rate"] = int(source_root["rate"])
+            paction["rate"] = int(source_root.attrib["rate"])
         except KeyError:
             raise BadW3DXML("Source must specify rate attribute")
         source_domain_root = source_root.find("ParticleDomain")
@@ -222,10 +359,10 @@ def get_velocity_vector():
         """Store W3DPAction as ParticleActionList node within
         ParticleActionRoot node"""
         paction_node = ET.SubElement(parent_root, "ParticleActionList")
-        paction_node["name"] = self["name"]
+        paction_node.attrib["name"] = self["name"]
 
         source_node = ET.SubElement(paction_node, "Source")
-        source_node["rate"] = str(self["rate"])
+        source_node.attrib["rate"] = str(self["rate"])
         self["source_domain"].toXML(source_node)
 
         vel_node = ET.SubElement(paction_node, "Vel")

@@ -1179,7 +1179,7 @@ class W3DPSys(W3DContent):
     argument_validators = {
         "particle_group": ReferenceValidator(
             ValidPyString(),
-            ["group"],
+            ["groups"],
             help_string="Must be the name of an object group"
         ),
         "particle_actions": ValidPyString(),
@@ -1256,33 +1256,39 @@ def activate_particles(cont):
     def fromXML(psys_class, psys_root):
         """Create W3DPSys from ParticleSystem root"""
         psys = psys_class()
+        psys_root = psys_root.find("ParticleSystem")
         try:
-            psys["particle_group"] = psys_root["particle-group"]
+            psys["particle_group"] = psys_root.attrib["particle-group"]
         except KeyError:
             raise BadW3DXML("ParticleSystem must specify particle-group")
         try:
-            psys["particle_actions"] = psys_root["actions-name"]
+            psys["particle_actions"] = psys_root.attrib["actions-name"]
         except KeyError:
             raise BadW3DXML("ParticleSystem must specify actions-name")
         try:
-            psys["max_particles"] = psys_root["max-particles"]
+            psys["max_particles"] = psys_class.argument_validators[
+                'max_particles'
+            ].coerce(
+                psys_root.attrib["max-particles"]
+            )
         except KeyError:
             pass
         try:
-            psys["speed"] = psys_root["speed"]
+            psys["speed"] = psys_root.attrib["speed"]
         except KeyError:
             pass
         return psys
 
-    def toXML(self, parent_root):
+    def toXML(self, object_root):
         """Store W3DPSys as ParticleSystem node within Content node"""
-        psys_node = ET.SubElement(parent_root, "ParticleSystem")
-        psys_node["particle-group"] = self["particle_group"]
-        psys_node["actions-name"] = self["particle_actions"]
+        content_root = ET.SubElement(object_root, "Content")
+        psys_node = ET.SubElement(content_root, "ParticleSystem")
+        psys_node.attrib["particle-group"] = self["particle_group"]
+        psys_node.attrib["actions-name"] = self["particle_actions"]
         if not self.is_default("max_particles"):
-            psys_node["max-particles"] = self["max_particles"]
+            psys_node.attrib["max-particles"] = str(self["max_particles"])
         if not self.is_default("speed"):
-            psys_node["speed"] = self["speed"]
+            psys_node.attrib["speed"] = str(self["speed"])
         return psys_node
 
     def generate_logic(self):

@@ -432,7 +432,7 @@ class IsNumeric(Validator):
                     (self.max_value is None or value <= self.max_value)):
                 return True
 
-        except TypeError:
+        except (TypeError, ValueError):
             return False
 
     def coerce(self, value):
@@ -441,7 +441,10 @@ class IsNumeric(Validator):
                 return value
         except ValueError:
             pass
-        return float(value)
+        try:
+            return float(value)
+        except ValueError:
+            return value
 
 
 class IsInteger(IsNumeric):
@@ -451,6 +454,12 @@ class IsInteger(IsNumeric):
         if not super(IsInteger, self).__call__(value, fallback=fallback):
             return False
         return value == int(value)
+
+    def coerce(self, value):
+        try:
+            return int(value)
+        except ValueError:
+            return value
 
 
 class FeatureValidator(Validator):
