@@ -127,6 +127,14 @@ def generate_object_from_model(filename):
     return generate_object_from_model(filename)
 
 
+def _alpha_prep(slot, material):
+    """Allow transparency in texture slot"""
+    slot.use_map_alpha = True
+    material.use_transparency = True
+    material.transparency_method = "Z_TRANSPARENCY"
+    material.alpha = 0
+
+
 def generate_material_from_image(filename, double_sided=True):
     """Generate Blender material from image for texturing"""
     try:
@@ -155,6 +163,8 @@ def generate_material_from_image(filename, double_sided=True):
         # NOTE: The above already raises a sensible RuntimeError if file is not
         # found
         image_texture.image.use_alpha = True
+        _alpha_prep(texture_slot_single, material_single)
+        _alpha_prep(texture_slot_double, material_double)
 
         texture_slot_single.texture = image_texture
         texture_slot_double.texture = image_texture
