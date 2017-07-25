@@ -1,0 +1,1674 @@
+<?xml version="1.0" ?>
+<Story version="8">
+	<ObjectRoot>
+		<Object name="elem1x0">
+			<Visible>true</Visible>
+			<Color>215,132,115</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(10.138352833823733, 31.20264161073338, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x1">
+			<Visible>true</Visible>
+			<Color>20,207,174</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532809, 31.20264161073338, -5.9591742782591925)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x2">
+			<Visible>true</Visible>
+			<Color>153,139,64</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(3.132923320620941, 31.20264161073338, -9.642146527107498)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x3">
+			<Visible>true</Visible>
+			<Color>183,212,57</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-3.13292332062094, 31.20264161073338, -9.6421465271075)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x4">
+			<Visible>true</Visible>
+			<Color>73,54,48</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532807, 31.20264161073338, -5.959174278259194)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x5">
+			<Visible>true</Visible>
+			<Color>178,168,56</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-10.138352833823733, 31.20264161073338, -1.2415901346568732e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x6">
+			<Visible>true</Visible>
+			<Color>37,216,112</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532809, 31.20264161073338, 5.9591742782591925)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x7">
+			<Visible>true</Visible>
+			<Color>193,214,157</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-3.1329233206209426, 31.20264161073338, 9.642146527107498)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x8">
+			<Visible>true</Visible>
+			<Color>30,235,31</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(3.1329233206209386, 31.20264161073338, 9.6421465271075)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem1x9">
+			<Visible>true</Visible>
+			<Color>119,179,43</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532807, 31.20264161073338, 5.959174278259195)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x0">
+			<Visible>true</Visible>
+			<Color>187,233,185</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(19.284293054215, 26.542552308889352, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x1">
+			<Visible>true</Visible>
+			<Color>62,244,41</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(15.601320805366694, 26.542552308889352, -11.33502305815375)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x2">
+			<Visible>true</Visible>
+			<Color>30,165,68</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(5.959174278259194, 26.542552308889352, -18.340452571356543)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x3">
+			<Visible>true</Visible>
+			<Color>175,200,176</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-5.9591742782591925, 26.542552308889352, -18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x4">
+			<Visible>true</Visible>
+			<Color>63,178,159</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-15.601320805366694, 26.542552308889352, -11.335023058153753)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x5">
+			<Visible>true</Visible>
+			<Color>14,149,18</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-19.284293054215, 26.542552308889352, -2.3616447762663933e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x6">
+			<Visible>true</Visible>
+			<Color>115,110,214</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-15.601320805366695, 26.542552308889352, 11.335023058153748)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x7">
+			<Visible>true</Visible>
+			<Color>52,25,140</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-5.959174278259196, 26.542552308889352, 18.340452571356543)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x8">
+			<Visible>true</Visible>
+			<Color>143,249,131</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(5.95917427825919, 26.542552308889352, 18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem2x9">
+			<Visible>true</Visible>
+			<Color>205,157,160</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(15.601320805366694, 26.542552308889352, 11.335023058153755)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x0">
+			<Visible>true</Visible>
+			<Color>178,44,97</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(26.542552308889352, 19.284293054215, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x1">
+			<Visible>true</Visible>
+			<Color>162,118,245</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(21.473375891977483, 19.284293054215, -15.601320805366694)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x2">
+			<Visible>true</Visible>
+			<Color>189,37,184</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532809, 19.284293054215, -25.24346733247419)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x3">
+			<Visible>true</Visible>
+			<Color>103,237,101</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532807, 19.284293054215, -25.243467332474193)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x4">
+			<Visible>true</Visible>
+			<Color>46,99,66</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-21.47337589197748, 19.284293054215, -15.601320805366695)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x5">
+			<Visible>true</Visible>
+			<Color>239,103,132</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-26.542552308889352, 19.284293054215, -3.2505251726282535e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x6">
+			<Visible>true</Visible>
+			<Color>35,83,26</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-21.473375891977486, 19.284293054215, 15.60132080536669)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x7">
+			<Visible>true</Visible>
+			<Color>225,76,50</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532812, 19.284293054215, 25.24346733247419)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x8">
+			<Visible>true</Visible>
+			<Color>74,101,7</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532803, 19.284293054215, 25.243467332474193)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem3x9">
+			<Visible>true</Visible>
+			<Color>121,217,198</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(21.47337589197748, 19.284293054215, 15.601320805366699)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x0">
+			<Visible>true</Visible>
+			<Color>45,140,216</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(31.20264161073338, 10.138352833823735, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x1">
+			<Visible>true</Visible>
+			<Color>14,172,106</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(25.24346733247419, 10.138352833823735, -18.34045257135654)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x2">
+			<Visible>true</Visible>
+			<Color>61,90,91</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(9.642146527107498, 10.138352833823735, -29.675475629510288)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x3">
+			<Visible>true</Visible>
+			<Color>46,202,59</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-9.642146527107494, 10.138352833823735, -29.675475629510288)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x4">
+			<Visible>true</Visible>
+			<Color>72,103,187</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-25.243467332474182, 10.138352833823735, -18.340452571356543)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x5">
+			<Visible>true</Visible>
+			<Color>129,160,212</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-31.20264161073338, 10.138352833823735, -3.821221517352665e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x6">
+			<Visible>true</Visible>
+			<Color>220,234,66</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-25.243467332474193, 10.138352833823735, 18.340452571356536)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x7">
+			<Visible>true</Visible>
+			<Color>166,249,178</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-9.642146527107503, 10.138352833823735, 29.675475629510288)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x8">
+			<Visible>true</Visible>
+			<Color>235,78,49</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(9.64214652710749, 10.138352833823735, 29.675475629510288)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem4x9">
+			<Visible>true</Visible>
+			<Color>10,14,71</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(25.243467332474182, 10.138352833823735, 18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x0">
+			<Visible>true</Visible>
+			<Color>205,191,226</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(32.808398950131235, 2.00893503797138e-15, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x1">
+			<Visible>true</Visible>
+			<Color>212,128,166</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(26.542552308889352, 2.00893503797138e-15, -19.284293054215)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x2">
+			<Visible>true</Visible>
+			<Color>204,65,68</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(10.138352833823735, 2.00893503797138e-15, -31.20264161073338)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x3">
+			<Visible>true</Visible>
+			<Color>247,126,61</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-10.138352833823731, 2.00893503797138e-15, -31.202641610733387)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x4">
+			<Visible>true</Visible>
+			<Color>143,65,75</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-26.542552308889345, 2.00893503797138e-15, -19.284293054215002)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x5">
+			<Visible>true</Visible>
+			<Color>159,155,34</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-32.808398950131235, 2.00893503797138e-15, -4.01787007594276e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x6">
+			<Visible>true</Visible>
+			<Color>119,83,57</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-26.542552308889356, 2.00893503797138e-15, 19.28429305421499)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x7">
+			<Visible>true</Visible>
+			<Color>77,22,51</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-10.138352833823738, 2.00893503797138e-15, 31.20264161073338)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x8">
+			<Visible>true</Visible>
+			<Color>102,230,24</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(10.138352833823728, 2.00893503797138e-15, 31.202641610733387)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem5x9">
+			<Visible>true</Visible>
+			<Color>140,219,250</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(26.542552308889345, 2.00893503797138e-15, 19.284293054215006)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x0">
+			<Visible>true</Visible>
+			<Color>143,32,139</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(31.202641610733387, -10.138352833823731, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x1">
+			<Visible>true</Visible>
+			<Color>31,7,144</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(25.243467332474193, -10.138352833823731, -18.340452571356543)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x2">
+			<Visible>true</Visible>
+			<Color>253,210,86</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(9.6421465271075, -10.138352833823731, -29.675475629510295)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x3">
+			<Visible>true</Visible>
+			<Color>178,8,13</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-9.642146527107496, -10.138352833823731, -29.675475629510295)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x4">
+			<Visible>true</Visible>
+			<Color>252,21,170</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-25.24346733247419, -10.138352833823731, -18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x5">
+			<Visible>true</Visible>
+			<Color>147,75,184</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-31.202641610733387, -10.138352833823731, -3.821221517352665e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x6">
+			<Visible>true</Visible>
+			<Color>181,89,214</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-25.243467332474196, -10.138352833823731, 18.34045257135654)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x7">
+			<Visible>true</Visible>
+			<Color>56,172,38</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-9.642146527107503, -10.138352833823731, 29.675475629510295)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x8">
+			<Visible>true</Visible>
+			<Color>0,201,169</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(9.642146527107494, -10.138352833823731, 29.675475629510295)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem6x9">
+			<Visible>true</Visible>
+			<Color>235,234,74</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(25.24346733247419, -10.138352833823731, 18.34045257135655)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x0">
+			<Visible>true</Visible>
+			<Color>61,10,240</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(26.542552308889352, -19.28429305421499, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x1">
+			<Visible>true</Visible>
+			<Color>200,24,143</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(21.473375891977483, -19.28429305421499, -15.601320805366694)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x2">
+			<Visible>true</Visible>
+			<Color>134,228,100</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532809, -19.28429305421499, -25.24346733247419)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x3">
+			<Visible>true</Visible>
+			<Color>36,0,181</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532807, -19.28429305421499, -25.243467332474193)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x4">
+			<Visible>true</Visible>
+			<Color>62,22,73</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-21.47337589197748, -19.28429305421499, -15.601320805366695)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x5">
+			<Visible>true</Visible>
+			<Color>123,108,163</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-26.542552308889352, -19.28429305421499, -3.2505251726282535e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x6">
+			<Visible>true</Visible>
+			<Color>147,255,21</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-21.473375891977486, -19.28429305421499, 15.60132080536669)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x7">
+			<Visible>true</Visible>
+			<Color>144,89,210</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532812, -19.28429305421499, 25.24346733247419)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x8">
+			<Visible>true</Visible>
+			<Color>41,200,118</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532803, -19.28429305421499, 25.243467332474193)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem7x9">
+			<Visible>true</Visible>
+			<Color>62,188,253</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(21.47337589197748, -19.28429305421499, 15.601320805366699)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x0">
+			<Visible>true</Visible>
+			<Color>241,211,186</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(19.284293054215002, -26.542552308889345, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x1">
+			<Visible>true</Visible>
+			<Color>37,234,44</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(15.601320805366695, -26.542552308889345, -11.335023058153752)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x2">
+			<Visible>true</Visible>
+			<Color>22,227,252</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(5.959174278259195, -26.542552308889345, -18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x3">
+			<Visible>true</Visible>
+			<Color>32,102,225</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-5.9591742782591925, -26.542552308889345, -18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x4">
+			<Visible>true</Visible>
+			<Color>0,120,12</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-15.601320805366694, -26.542552308889345, -11.335023058153755)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x5">
+			<Visible>true</Visible>
+			<Color>3,55,127</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-19.284293054215002, -26.542552308889345, -2.3616447762663937e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x6">
+			<Visible>true</Visible>
+			<Color>188,227,90</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-15.601320805366699, -26.542552308889345, 11.33502305815375)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x7">
+			<Visible>true</Visible>
+			<Color>249,148,54</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-5.959174278259197, -26.542552308889345, 18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x8">
+			<Visible>true</Visible>
+			<Color>129,216,121</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(5.959174278259191, -26.542552308889345, 18.340452571356547)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem8x9">
+			<Visible>true</Visible>
+			<Color>43,49,8</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(15.601320805366694, -26.542552308889345, 11.335023058153755)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x0">
+			<Visible>true</Visible>
+			<Color>101,7,32</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(10.138352833823737, -31.20264161073338, -0.0)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x1">
+			<Visible>true</Visible>
+			<Color>182,136,103</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532809, -31.20264161073338, -5.959174278259195)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x2">
+			<Visible>true</Visible>
+			<Color>179,124,221</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(3.132923320620942, -31.20264161073338, -9.642146527107501)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x3">
+			<Visible>true</Visible>
+			<Color>94,189,139</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-3.132923320620941, -31.20264161073338, -9.642146527107501)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x4">
+			<Visible>true</Visible>
+			<Color>108,176,119</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.202099737532809, -31.20264161073338, -5.959174278259196)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x5">
+			<Visible>true</Visible>
+			<Color>241,251,253</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-10.138352833823737, -31.20264161073338, -1.2415901346568736e-15)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x6">
+			<Visible>true</Visible>
+			<Color>157,210,104</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-8.20209973753281, -31.20264161073338, 5.959174278259193)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x7">
+			<Visible>true</Visible>
+			<Color>137,116,8</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(-3.132923320620943, -31.20264161073338, 9.642146527107501)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x8">
+			<Visible>true</Visible>
+			<Color>92,94,199</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(3.13292332062094, -31.20264161073338, 9.642146527107501)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+		<Object name="elem9x9">
+			<Visible>true</Visible>
+			<Color>236,143,180</Color>
+			<Lighting>false</Lighting>
+			<ClickThrough>false</ClickThrough>
+			<AroundSelfAxis>false</AroundSelfAxis>
+			<Scale>5.0</Scale>
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(8.202099737532809, -31.20264161073338, 5.959174278259197)</Position>
+				<LookAt angle="0" target="(0.0, 0.0, 0.0)"/>
+			</Placement>
+			<Content>
+				<Text depth="0.0" horiz-align="center" vert-align="center">
+					<text>W3D</text>
+				</Text>
+			</Content>
+		</Object>
+	</ObjectRoot>
+	<GroupRoot/>
+	<TimelineRoot/>
+	<SoundRoot/>
+	<ParticleActionRoot/>
+	<EventRoot/>
+	<Global>
+		<CameraPos far-clip="100">
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(0.0, 0.0, 6.0)</Position>
+			</Placement>
+		</CameraPos>
+		<CaveCameraPos far-clip="100">
+			<Placement>
+				<RelativeTo>Center</RelativeTo>
+				<Position>(0.0, 0.0, -0.0)</Position>
+			</Placement>
+		</CaveCameraPos>
+		<Background color="0, 0, 0"/>
+		<WandNavigation allow-movement="true" allow-rotation="false"/>
+		<Debug>false</Debug>
+	</Global>
+	<PlacementRoot>
+		<Placement name="FloorWall">
+			<RelativeTo>Center</RelativeTo>
+			<Position>(0.0, -4.0, -0.0)</Position>
+			<LookAt angle="0" target="(0.0, 0.0, -0.0)"/>
+		</Placement>
+		<Placement name="Center">
+			<RelativeTo>Center</RelativeTo>
+			<Position>(0.0, 0.0, -0.0)</Position>
+			<Axis angle="0" rotation="(0.0, 1.0, -0.0)"/>
+		</Placement>
+		<Placement name="RightWall">
+			<RelativeTo>Center</RelativeTo>
+			<Position>(4.0, 0.0, -0.0)</Position>
+			<LookAt angle="0" target="(0.0, 0.0, -0.0)"/>
+		</Placement>
+		<Placement name="FrontWall">
+			<RelativeTo>Center</RelativeTo>
+			<Position>(0.0, 0.0, -4.0)</Position>
+			<LookAt angle="0" target="(0.0, 0.0, -0.0)"/>
+		</Placement>
+		<Placement name="LeftWall">
+			<RelativeTo>Center</RelativeTo>
+			<Position>(-4.0, 0.0, -0.0)</Position>
+			<LookAt angle="0" target="(0.0, 0.0, -0.0)"/>
+		</Placement>
+	</PlacementRoot>
+</Story>
