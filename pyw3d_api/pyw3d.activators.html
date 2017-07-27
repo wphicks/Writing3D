@@ -47,12 +47,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pyw3d.activators.triggers.html">pyw3d.activators.triggers package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-pyw3d.activators.triggers.links">pyw3d.activators.triggers.links module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-pyw3d.activators.triggers.look_triggers">pyw3d.activators.triggers.look_triggers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-pyw3d.activators.triggers.object_triggers">pyw3d.activators.triggers.object_triggers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-pyw3d.activators.triggers.triggers">pyw3d.activators.triggers.triggers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-pyw3d.activators.triggers.user_triggers">pyw3d.activators.triggers.user_triggers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-pyw3d.activators.triggers">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#pyw3d-activators-triggers-links-module">pyw3d.activators.triggers.links module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#pyw3d-activators-triggers-look-triggers-module">pyw3d.activators.triggers.look_triggers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#pyw3d-activators-triggers-object-triggers-module">pyw3d.activators.triggers.object_triggers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#pyw3d-activators-triggers-triggers-module">pyw3d.activators.triggers.triggers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#pyw3d-activators-triggers-user-triggers-module">pyw3d.activators.triggers.user_triggers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyw3d.activators.triggers.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -61,199 +61,14 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-pyw3d.activators.activators">
-<span id="pyw3d-activators-activators-module"></span><h2>pyw3d.activators.activators module<a class="headerlink" href="#module-pyw3d.activators.activators" title="Permalink to this headline">¶</a></h2>
-<p>Classes used to initiate actions in Blender</p>
-<dl class="class">
-<dt id="pyw3d.activators.activators.Activator">
-<em class="property">class </em><code class="descclassname">pyw3d.activators.activators.</code><code class="descname">Activator</code><span class="sig-paren">(</span><em>name_string</em>, <em>actions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>An object used to create BGE logic for triggering W3DActions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name_string</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; A string which is used to generate the name of the</td>
-</tr>
-</tbody>
-</table>
-<p>object associated with this activator (e.g. the user-assigned name of a
-timeline)
-:param SortedList actions: A list of actions to be activated by this
-activator</p>
-<p>Associated with every Activator is a single Blender object called
-base_object, which has a &#8220;status&#8221; property. This status is used to control
-when execution of actions is triggered.</p>
-<dl class="attribute">
-<dt id="pyw3d.activators.activators.Activator.base_object">
-<code class="descname">base_object</code><a class="headerlink" href="#pyw3d.activators.activators.Activator.base_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the object which controls the current status of the
-activator, creating it if necessary</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.create_actuators">
-<code class="descname">create_actuators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.create_actuators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.create_actuators" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create any Blender actuators</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.create_blender_objects">
-<code class="descname">create_blender_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.create_blender_objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.create_blender_objects" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate all new objects, properties, sensors, and controllers
-associated with this activator in Blender</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This is a separate step from connecting logic bricks in order</p>
+<div class="section" id="pyw3d-activators-activators-module">
+<h2>pyw3d.activators.activators module<a class="headerlink" href="#pyw3d-activators-activators-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<p>to ensure that all necessary objects, sensors, controllers, and
-actuators are created before we attempt to link them. Nevertheless, it
-is crucial that both of these steps (and writing Python logic, if
-necessary) be called when creating an Activator.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.create_controller">
-<code class="descname">create_controller</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.create_controller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.create_controller" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a Python controller used to effect actions triggered by this
-Activator</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.create_enabled_property">
-<code class="descname">create_enabled_property</code><span class="sig-paren">(</span><em>initial_value=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.create_enabled_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.create_enabled_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a property called &#8220;enabled&#8221; which defines whether or not
-activator can currently be activated</p>
-<p>start an activator. It is NOT checked by the activator itself. This is
-to allow the activator to be immediately disabled after activation but
-still process the remainder of its actions</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.create_status_property">
-<code class="descname">create_status_property</code><span class="sig-paren">(</span><em>initial_value='Stop'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.create_status_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.create_status_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a property called &#8220;status&#8221; which defines whether the
-activator is in a &#8220;Start&#8221;, &#8220;Stop&#8221;, or &#8220;Continue&#8221; state</p>
-<p>Note that Stop essentially pauses any partially completed actions for
-an activator, if possible. Continue means that the actions are ongoing,
-and Start is used to initially start the actions associated with this
-activator</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.create_status_sensors">
-<code class="descname">create_status_sensors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.create_status_sensors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.create_status_sensors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates sensors to detect change in &#8220;status&#8221; of activator</p>
-<p>Generates three sensors: &#8220;start_sensor&#8221; which detects when the status
-is set to &#8220;Start&#8221;, &#8220;active_sensor&#8221; which sends continuous pulses so
-long as the status is set to &#8220;Continue&#8221;, and &#8220;stop_sensor&#8221; which
-detects when the status is set to &#8220;Stop&#8221;</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.generate_action_logic">
-<code class="descname">generate_action_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.generate_action_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.generate_action_logic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string to be written into Python control script for
-activating W3DActions</p>
-<p>execution of actions into the script_footer. Failure to do this will
-result in BGE complaining about attempting to compare a dictionary with
-an integer or having the name max_time not defined</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.link_actuators">
-<code class="descname">link_actuators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.link_actuators"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.link_actuators" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link actuators necessary to invoke actions</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.link_logic_bricks">
-<code class="descname">link_logic_bricks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.link_logic_bricks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.link_logic_bricks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link together any Blender &#8220;logic bricks&#8221; for this activator</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.link_status_sensors">
-<code class="descname">link_status_sensors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.link_status_sensors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.link_status_sensors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link the start, active, and stop sensors to the controller</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>EBKAC</strong> &#8211; if controller or sensors do not exist</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pyw3d.activators.activators.Activator.name">
-<code class="descname">name</code><a class="headerlink" href="#pyw3d.activators.activators.Activator.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>A method intended to be overridden with the proper function from
-names.py</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pyw3d.activators.activators.Activator.script">
-<code class="descname">script</code><a class="headerlink" href="#pyw3d.activators.activators.Activator.script" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Python control script for base_object, creating it if
-necessary</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.select_base_object">
-<code class="descname">select_base_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.select_base_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.select_base_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select base_object in Blender for modifications</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.activators.Activator.write_python_logic">
-<code class="descname">write_python_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/activators.html#Activator.write_python_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.activators.Activator.write_python_logic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write any necessary Python controller scripts for this activator</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="pyw3d-activators-timelines-module">
+<h2>pyw3d.activators.timelines module<a class="headerlink" href="#pyw3d-activators-timelines-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-pyw3d.activators.timelines">
-<span id="pyw3d-activators-timelines-module"></span><h2>pyw3d.activators.timelines module<a class="headerlink" href="#module-pyw3d.activators.timelines" title="Permalink to this headline">¶</a></h2>
-<p>A Blender-based timeline implementation</p>
-<dl class="class">
-<dt id="pyw3d.activators.timelines.BlenderTimeline">
-<em class="property">class </em><code class="descclassname">pyw3d.activators.timelines.</code><code class="descname">BlenderTimeline</code><span class="sig-paren">(</span><em>name</em>, <em>actions</em>, <em>start_immediately=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/timelines.html#BlenderTimeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.timelines.BlenderTimeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyw3d.activators.activators.Activator" title="pyw3d.activators.activators.Activator"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.activators.activators.Activator</span></code></a></p>
-<p>Activates actions at specified times</p>
-<dl class="method">
-<dt id="pyw3d.activators.timelines.BlenderTimeline.create_status_property">
-<code class="descname">create_status_property</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/timelines.html#BlenderTimeline.create_status_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.timelines.BlenderTimeline.create_status_property" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.timelines.BlenderTimeline.generate_action_logic">
-<code class="descname">generate_action_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/timelines.html#BlenderTimeline.generate_action_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.timelines.BlenderTimeline.generate_action_logic" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.activators.timelines.BlenderTimeline.get_actions">
-<code class="descname">get_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyw3d/activators/timelines.html#BlenderTimeline.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.activators.timelines.BlenderTimeline.get_actions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of W3DActions that are controlled by this activator</p>
-<p>This method is necessary because of a very bad design decision which
-assigned different meanings to self.actions for different activators.
-This <em>will</em> be corrected in an upcoming refactoring but must remain for
-now in an effort to prepare for the next semester of the Writing3D
-workshop as soon as possible.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pyw3d.activators.timelines.BlenderTimeline.name">
-<code class="descname">name</code><a class="headerlink" href="#pyw3d.activators.timelines.BlenderTimeline.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-pyw3d.activators">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyw3d.activators" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -268,9 +83,9 @@ workshop as soon as possible.</p>
 <li><a class="reference internal" href="#">pyw3d.activators package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pyw3d.activators.activators">pyw3d.activators.activators module</a></li>
-<li><a class="reference internal" href="#module-pyw3d.activators.timelines">pyw3d.activators.timelines module</a></li>
-<li><a class="reference internal" href="#module-pyw3d.activators">Module contents</a></li>
+<li><a class="reference internal" href="#pyw3d-activators-activators-module">pyw3d.activators.activators module</a></li>
+<li><a class="reference internal" href="#pyw3d-activators-timelines-module">pyw3d.activators.timelines module</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>

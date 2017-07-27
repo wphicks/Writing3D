@@ -44,58 +44,6 @@
 <p>It is often convenient to organize <a class="reference internal" href="pyw3d_actions.html#pyw3d-docs-actions"><span>W3DActions</span></a> in
 timelines using the W3DTimeline class:</p>
 <p>TODO: Sample</p>
-<dl class="class">
-<dt id="pyw3d.W3DTimeline">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DTimeline</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/timeline.html#W3DTimeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DTimeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
-<p>Represent timeline for choreography of actions in the W3D</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of timeline</li>
-<li><strong>start_immediately</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Start timeline when project starts?</li>
-<li><strong>actions</strong> (<em>list</em>) &#8211; A list of two-element tuples specifying (start time</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>for action, W3DAction)</p>
-<dl class="method">
-<dt id="pyw3d.W3DTimeline.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/timeline.html#W3DTimeline.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DTimeline.blend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create Blender object to implement W3DTimeline</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="pyw3d.W3DTimeline.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>timeline_class</em>, <em>timeline_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/timeline.html#W3DTimeline.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DTimeline.fromXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create W3DTimeline from Timeline node of W3D XML</p>
-<p>:param :py:class:xml.etree.ElementTree.Element timeline_root</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DTimeline.link_blender_logic">
-<code class="descname">link_blender_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/timeline.html#W3DTimeline.link_blender_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DTimeline.link_blender_logic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link BGE logic bricks for this W3DTimeline</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DTimeline.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_timelines_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/timeline.html#W3DTimeline.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DTimeline.toXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store W3DTimeline as Timeline node within TimelineRoot node</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DTimeline.write_blender_logic">
-<code class="descname">write_blender_logic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/timeline.html#W3DTimeline.write_blender_logic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DTimeline.write_blender_logic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write any necessary game engine logic for this W3DTimeline</p>
-</dd></dl>
-
-</dd></dl>
-
 <div class="toctree-wrapper compound">
 <ul class="simple">
 </ul>

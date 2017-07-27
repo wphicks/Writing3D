@@ -24,9 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Writing3D 0.0.1 documentation" href="index.html" />
-    <link rel="up" title="Getting Started" href="getting_started.html" />
-    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" />
+    <link rel="up" title="Developer’s Guide" href="developer_guide.html" />
+    <link rel="prev" title="Developer’s Guide" href="developer_guide.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -42,9 +41,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-pyw3d">
-<span id="pyw3d-the-python-vr-library"></span><span id="pyw3d-docs"></span><h1>pyw3d: The Python VR Library<a class="headerlink" href="#module-pyw3d" title="Permalink to this headline">¶</a></h1>
-<p>A module for working with W3D Writing projects</p>
+  <div class="section" id="pyw3d-the-python-vr-library">
+<span id="pyw3d-docs"></span><h1>pyw3d: The Python VR Library<a class="headerlink" href="#pyw3d-the-python-vr-library" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="pyw3d-classes">
 <h2>pyw3d Classes<a class="headerlink" href="#pyw3d-classes" title="Permalink to this headline">¶</a></h2>
 <p>The backbone of pyw3d is the W3DFeature class. It is a container class for
@@ -61,91 +59,6 @@ valid key can also be used as a keyword argument when initializing a W3DFeature
 object.</p>
 <p>W3DFeature subclasses can also specify a default_arguments dictionary which
 provides default values for given keys if they have not been set.</p>
-<dl class="class">
-<dt id="pyw3d.W3DFeature">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DFeature</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/features.html#W3DFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DFeature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a></p>
-<p>Base class for all W3D features</p>
-<p>By overriding argument_validators and default_arguments, subclasses can
-easily validate input and provide sensible default arguments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature.argument_validators" title="pyw3d.features.W3DFeature.argument_validators"><strong>argument_validators</strong></a> &#8211; Dictionary mapping names of valid arguments to
-callable objects that return true if a given value is valid for that
-argument</li>
-<li><a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.objects.W3DLight.default_arguments" title="pyw3d.objects.W3DLight.default_arguments"><strong>default_arguments</strong></a> &#8211; Dictionary mapping names of arguments to their
-default values</li>
-<li><a class="reference internal" href="#pyw3d.W3DFeature.blender_scaling" title="pyw3d.W3DFeature.blender_scaling"><strong>blender_scaling</strong></a> &#8211; Scaling factor used to convert back and forth
-between Blender and legacy units</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="pyw3d.W3DFeature.argument_validators">
-<code class="descname">argument_validators</code><em class="property"> = {}</em><a class="headerlink" href="#pyw3d.W3DFeature.argument_validators" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="pyw3d.W3DFeature.blender_scaling">
-<code class="descname">blender_scaling</code><em class="property"> = 1</em><a class="headerlink" href="#pyw3d.W3DFeature.blender_scaling" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="pyw3d.W3DFeature.default_arguments">
-<code class="descname">default_arguments</code><em class="property"> = {}</em><a class="headerlink" href="#pyw3d.W3DFeature.default_arguments" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="pyw3d.W3DFeature.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>feature_class</em>, <em>xml_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/features.html#W3DFeature.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DFeature.fromXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create W3DFeature object from xml node for such a feature</p>
-<p>Since this differs for every W3D feature, subclasses MUST override
-this function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xml_root</strong> (<a class="reference external" href="https://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">xml.etree.ElementTree.Element</span></code></a>) &#8211; The XML node from which to create class instance</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DFeature.is_default">
-<code class="descname">is_default</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/features.html#W3DFeature.is_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DFeature.is_default" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return true if value has not been set for key and default exists,
-false otherwise</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DFeature.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>parent_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/features.html#W3DFeature.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DFeature.toXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store data in W3D XML format within parent_root</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent_root</strong> (<a class="reference external" href="https://docs.python.org/library/xml.etree.elementtree.html#xml.etree.ElementTree.Element" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">xml.etree.ElementTree.Element</span></code></a>) &#8211; The XML node in which to store data</td>
-</tr>
-</tbody>
-</table>
-<p>Since this differs for every W3D feature, subclasses MUST override
-this function.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DFeature.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/features.html#W3DFeature.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DFeature.update" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="pyw3d-objects">
 <h2>pyw3d Objects<a class="headerlink" href="#pyw3d-objects" title="Permalink to this headline">¶</a></h2>
@@ -156,98 +69,11 @@ details.</p>
 <div class="section" id="pyw3d-groups">
 <h2>pyw3d Groups<a class="headerlink" href="#pyw3d-groups" title="Permalink to this headline">¶</a></h2>
 <p>The W3DGroup class allows you to more easily reference groups of W3DObjects:</p>
-<dl class="class">
-<dt id="pyw3d.W3DGroup">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DGroup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/groups.html#W3DGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
-<p>Organize W3DObjects (or other W3DGroups) into groups</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of this group</li>
-<li><strong>objects</strong> (<em>list</em>) &#8211; List of names of objects in this group</li>
-<li><strong>groups</strong> (<em>list</em>) &#8211; List of names of groups in this group</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="pyw3d.W3DGroup.blend_groups">
-<code class="descname">blend_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/groups.html#W3DGroup.blend_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DGroup.blend_groups" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store data on groups in group in Blender script</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DGroup.blend_objects">
-<code class="descname">blend_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/groups.html#W3DGroup.blend_objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DGroup.blend_objects" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store data on objects in group in Blender script</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DGroup.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>group_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/groups.html#W3DGroup.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DGroup.toXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store W3DGroup as Group node within GroupRoot node)</p>
-<p>:param :py:class:xml.etree.ElementTree.Element object_root</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="pyw3d-sounds">
 <h2>pyw3d Sounds<a class="headerlink" href="#pyw3d-sounds" title="Permalink to this headline">¶</a></h2>
 <p>The W3DSound class has not yet been fully implemented. See <a class="reference internal" href="index.html#development-status"><span>Development
 Status</span></a> for more details.</p>
-<dl class="class">
-<dt id="pyw3d.W3DSound">
-<em class="property">class </em><code class="descclassname">pyw3d.</code><code class="descname">W3DSound</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/sounds.html#W3DSound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DSound" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="pyw3d_api/pyw3d.html#pyw3d.features.W3DFeature" title="pyw3d.features.W3DFeature"><code class="xref py py-class docutils literal"><span class="pre">pyw3d.features.W3DFeature</span></code></a></p>
-<p>Store data on a sound to be used in the W3D</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Unique name of this sound object</li>
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; File from which to take audio</li>
-<li><strong>autostart</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Start sound when project starts?</li>
-<li><strong>movement_mode</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of Positional or Fixed, determining if the</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>sound is ambient or coming from an apparent position
-:param int repetitions: Number of times to repeat sound. Negative value
-indicates sound should loop forever
-:param float frequency_scale: Factor by which to scale frequency (0.5 to 2)
-:param float volume_scale: Factor by which to scale volume (must be
-0.0-1.0)
-:param float pan: Stereo panning left to right (-1.0 to 1.0)</p>
-<dl class="method">
-<dt id="pyw3d.W3DSound.blend">
-<code class="descname">blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/sounds.html#W3DSound.blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DSound.blend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create representation of W3DSound in Blender</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="pyw3d.W3DSound.fromXML">
-<em class="property">classmethod </em><code class="descname">fromXML</code><span class="sig-paren">(</span><em>sound_class</em>, <em>sound_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/sounds.html#W3DSound.fromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DSound.fromXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create W3DSound from Sound node</p>
-<p>:param :py:class:xml.etree.ElementTree.Element sound_root</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyw3d.W3DSound.toXML">
-<code class="descname">toXML</code><span class="sig-paren">(</span><em>all_sounds_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/sounds.html#W3DSound.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.W3DSound.toXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store W3DSound as Sound node within SoundRoot node</p>
-<p>:param :py:class:xml.etree.ElementTree.Element all_sounds_root</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="pyw3d-actions">
 <h2>pyw3d Actions<a class="headerlink" href="#pyw3d-actions" title="Permalink to this headline">¶</a></h2>
@@ -269,47 +95,6 @@ user looking in a particular direction). See <a class="reference internal" href=
 <h2>Errors<a class="headerlink" href="#errors" title="Permalink to this headline">¶</a></h2>
 <p>pyw3d defines a number of custom exceptions in the pyw3d.errors module, as
 documented here:</p>
-<span class="target" id="module-pyw3d.errors"></span><p>Exceptions raised when working with W3D projects</p>
-<dl class="class">
-<dt id="pyw3d.errors.BadW3DXML">
-<em class="property">class </em><code class="descclassname">pyw3d.errors.</code><code class="descname">BadW3DXML</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/errors.html#BadW3DXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.errors.BadW3DXML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
-<p>Exception thrown for attempting to use malformed W3D XML</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.errors.InvalidArgument">
-<em class="property">class </em><code class="descclassname">pyw3d.errors.</code><code class="descname">InvalidArgument</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/errors.html#InvalidArgument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.errors.InvalidArgument" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
-<p>Exception thrown for invalid argument to a W3D feature</p>
-<p>Examples could include an option not defined in the XML schema or a bad
-value passed for such an option.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.errors.ConsistencyError">
-<em class="property">class </em><code class="descclassname">pyw3d.errors.</code><code class="descname">ConsistencyError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/errors.html#ConsistencyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.errors.ConsistencyError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
-<p>Exception thrown for use of a W3D feature with options set incorrectly</p>
-<p>Examples could include not specifying a required attribute or specifying a
-value that does not make sense in the context of the entire project. More
-concretely, if an ObjectAction does not specify what object it is changing,
-a ConsistencyError will be thrown before that action can be written to XML
-or displayed in the W3D.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="pyw3d.errors.EBKAC">
-<em class="property">class </em><code class="descclassname">pyw3d.errors.</code><code class="descname">EBKAC</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyw3d/errors.html#EBKAC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyw3d.errors.EBKAC" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
-<p>Exception thrown when methods are called in a logically nonsensical
-order or given obviously nonsensical input</p>
-<p>E.g. Setting a property on an object before creating that object.
-This error should never be raised for improper input of a value for a W3D
-feature (i.e. in a GUI project creator) but only when someone is using the
-underlying methods of that feature in a dangerous and irrational way.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="complete-reference">
 <h2>Complete Reference<a class="headerlink" href="#complete-reference" title="Permalink to this headline">¶</a></h2>
@@ -347,9 +132,10 @@ module, take a look at the <a class="reference internal" href="py-modindex.html"
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="getting_started.html">Getting Started</a><ul>
-      <li>Previous: <a href="getting_started.html" title="previous chapter">Getting Started</a></li>
-      <li>Next: <a href="faq.html" title="next chapter">Frequently Asked Questions</a></li>
+  <li><a href="getting_involved.html">Getting Involved</a><ul>
+  <li><a href="developer_guide.html">Developer&#8217;s Guide</a><ul>
+      <li>Previous: <a href="developer_guide.html" title="previous chapter">Developer&#8217;s Guide</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>
