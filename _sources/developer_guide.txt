@@ -20,6 +20,12 @@ To Begin
    of the repo to your computer, and `checkout
    <https://git-scm.com/docs/git-checkout>`_ the ``develop`` branch.
 
+5. Create a feature branch to commit your changes to by running the following
+   within your local repo:
+    .. code-block:: bash
+        
+        $ git branch my_cool_feature_name
+
 4. Create a `configuration file <https://en.wikipedia.org/wiki/JSON#Example>`_
    in your `home directory
    <https://docs.python.org/3/library/os.path.html#os.path.expanduser>`_ called
@@ -30,11 +36,6 @@ To Begin
    * ``Blender player executable``: The (absolute) path to your Blender player
      executable.
 
-5. Create a feature branch to commit your changes to by running the following
-   within your local repo:
-    .. code-block:: bash
-        
-        $ git branch my_cool_feature_name
 
 You should now be able to `add <https://git-scm.com/docs/git-add>`_ and `commit
 <https://git-scm.com/docs/git-commit>`_ changes to your local repo and `push
