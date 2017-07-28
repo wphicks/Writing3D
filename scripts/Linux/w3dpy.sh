@@ -11,6 +11,5 @@ fi
 
 echo "INVOCATION >> $blender_exec --background --python $@"
 
-echo $blender_site_script
 $blender_exec --background --python "$blender_site_script"
 $blender_exec --background --python "$@"
