@@ -1209,7 +1209,8 @@ from angles import *
 from group_defs import *
 import bge
 from w3d_settings import *
-from {particle_actions} import get_source_vector, get_velocity_vector, rate
+from {particle_actions} import get_source_vector, get_velocity_vector, rate,\
+    apply_actions
 
 
 def get_particle_template():
@@ -1225,9 +1226,12 @@ def activate_particles(cont):
         own["particle_count"] = 0
         own["particle_tick"] = 0
         particle_count = 0
-        activate_particles.particle_list =[]
+        activate_particles.particle_list = []
 
-    max_age = bge.logic.getLogicTicRate()*{max_age}
+    tic_rate = bge.logic.getLogicTicRate()
+    max_age = tic_rate*{max_age}
+    dt = 1/tic_rate
+    speed = {speed}
 
     if (
             own["particle_tick"] % rate == 0 and
@@ -1240,7 +1244,7 @@ def activate_particles(cont):
         activate_particles.particle_list.append(new_particle)
         own["particle_count"] += 1
         new_particle.visible = True
-        new_particle.setLinearVelocity({speed}*get_velocity_vector())
+        new_particle.setLinearVelocity(speed*get_velocity_vector())
         new_particle.worldPosition = (
             own.worldPosition + get_source_vector()
         )
@@ -1260,6 +1264,8 @@ def activate_particles(cont):
     own["particle_count"] = len(activate_particles.particle_list)
     for particle in activate_particles.particle_list:
         particle.color[3] = own.color[3]
+
+    apply_actions(activate_particles.particle_list)
     """
 
     @classmethod

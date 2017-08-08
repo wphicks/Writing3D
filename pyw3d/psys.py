@@ -286,13 +286,40 @@ class W3DPDomain(W3DFeature):
 
 
 class W3DPAction(W3DFeature):
-    """Represents the actions for a particle system
+    """Represents additional behaviors that can be applied to particles
+    """
+
+
+class W3DPDynamic(W3DPAction):
+    """Represents an acceleration-based behavior applied to particles
+    """
+
+    argument_validators = {
+        "type": OptionValidator("Gravity"),
+        "direction": ListValidator(IsNumeric(), required_length=3),
+    }
+
+    default_arguments = {
+        "direction": None
+    }
+
+    def generate_logic_list(self):
+        if self["type"] in ("Gravity",):
+            return [
+                "pass",
+                "# TODO: @psiviero"
+            ]
+
+
+class W3DPSpecs(W3DFeature):
+    """Represents all specifications for a particle system
     """
 
     argument_validators = {
         "name": ValidPyString(),
         "source_domain": FeatureValidator(W3DPDomain),
         "velocity_domain": FeatureValidator(W3DPDomain),
+        "actions": ListValidator(FeatureValidator(W3DPAction)),
         "rate": IsInteger(min_value=1)
     }
 
@@ -307,7 +334,9 @@ import random
 import math
 import logging
 W3D_LOG = logging.getLogger('W3D')
-rate = max(int(bge.logic.getLogicTicRate()/{spec_rate}), 1)
+tic_rate = bge.logic.getLogicTicRate()
+rate = max(int(tic_rate/{spec_rate}), 1)
+dt = 1/tic_rate
 
 def _get_source_vector():
 {source_domain_logic}
@@ -326,11 +355,14 @@ _vel_gen = _get_velocity_vector()
 def get_velocity_vector():
     W3D_LOG.debug("Getting velocity vector...")
     return next(_vel_gen)
+
+def apply_actions(particle_list):
+{action_logic}
     """
 
     @classmethod
     def fromXML(paction_class, paction_root):
-        """Create W3DPAction from ParticleActionList root"""
+        """Create W3DPSpecs from ParticleActionList root"""
         paction = paction_class()
         paction["name"] = paction_root.attrib["name"]
 
@@ -356,7 +388,7 @@ def get_velocity_vector():
         return paction
 
     def toXML(self, parent_root):
-        """Store W3DPAction as ParticleActionList node within
+        """Store W3DPSpecs as ParticleActionList node within
         ParticleActionRoot node"""
         paction_node = ET.SubElement(parent_root, "ParticleActionList")
         paction_node.attrib["name"] = self["name"]
@@ -369,10 +401,22 @@ def get_velocity_vector():
         self["velocity_domain"].toXML(vel_node)
 
     def generate_logic(self):
+        action_logic = []
+        for paction in self["actions"]:
+            action_logic.extend(
+                [
+                    "    {}".format(line) for line in
+                    paction.generate_logic_list()
+                ]
+            )
+
+        action_logic = "\n".join(action_logic)
+
         return self.logic_template.format(
             spec_rate=self["rate"],
             source_domain_logic=self["source_domain"].generate_logic(),
-            velocity_domain_logic=self["velocity_domain"].generate_logic()
+            velocity_domain_logic=self["velocity_domain"].generate_logic(),
+            action_logic=action_logic
         )
 
     def blend(self):

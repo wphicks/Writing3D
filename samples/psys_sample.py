@@ -62,7 +62,7 @@ my_project["groups"].append(
 
 # Next, we describe the actions that will describe the system
 my_project["particle_actions"].append(
-    psys.W3DPAction(
+    psys.W3DPSpecs(
         name="my_actions",
         source_domain=psys.W3DPDomain(
             type="Line",
@@ -71,8 +71,14 @@ my_project["particle_actions"].append(
         ),
         velocity_domain=psys.W3DPDomain(
             type="Point",
-            point=(0, 0, -1)
-        )
+            point=(0, 0, 1)
+        ),
+        actions=[
+            psys.W3DPDynamic(
+                type="Gravity",
+                direction=(0, 0, -1)
+            )
+        ]
     )
 )
 
