@@ -39,12 +39,14 @@ function create_platform_specifics {
                 chmod +x "../$script"
             fi
         done
+        cd $BUILD_DIR
         if [ "$platform" == "Linux" ]
         then
-            tar czf "$BUILD_DIR/W3DZip-$platform.tar.gz" "$ROOT_DIR/W3DZip-$platform"
+            tar czf "W3DZip-$platform.tar.gz" "W3DZip-$platform"
         else
-            zip -r "$BUILD_DIR/W3DZip-$platform.zip" "$ROOT_DIR/W3DZip-$platform"
+            zip -r "W3DZip-$platform.zip" "W3DZip-$platform"
         fi
+        cd -
     done
 }
 
