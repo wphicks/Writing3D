@@ -10,7 +10,8 @@ BUILD_DIR="$ROOT_DIR/W3DBuilds"
 echo $BUILD_DIR
 
 function sync {
-    rclone sync $BUILD_DIR W3D_Builds:W3D_Development
+    cd $BUILD_DIR
+    sftp -b "$SCRIPT_DIR/Linux/dev/deploy.sftp" w3dhost
 }
 
 function create_platform_specifics {
@@ -39,12 +40,12 @@ function create_platform_specifics {
                 chmod +x "../$script"
             fi
         done
-        cd $BUILD_DIR
+        cd $ROOT_DIR
         if [ "$platform" == "Linux" ]
         then
-            tar czf "W3DZip-$platform.tar.gz" "W3DZip-$platform"
+            tar czf "$BUILD_DIR/W3DZip-$platform.tar.gz" "W3DZip-$platform"
         else
-            zip -r "W3DZip-$platform.zip" "W3DZip-$platform"
+            zip -r "$BUILD_DIR/W3DZip-$platform.zip" "W3DZip-$platform"
         fi
         cd -
     done
@@ -65,7 +66,7 @@ function build {
     create_tag
     echo "Creating zip installs for each platform..."
     create_platform_specifics
-    echo "Sending build to Google Drive..."
+    echo "Sending build to writing3d.xyz host..."
     sync
     echo "Build complete and synced."
 }
