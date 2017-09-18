@@ -12,9 +12,9 @@ Quickstart Guide
 The easiest way to get started with Writing3D is to download a zipfile install
 from one of the following locations:
 
-* `Linux <https://drive.google.com/open?id=0B-L9I5ef3FLWY0s1WHJQbk15Zmc>`_
-* `Windows <https://drive.google.com/open?id=0B-L9I5ef3FLWNzFlOWd1dmh1aDQ>`_
-* `Mac <https://drive.google.com/open?id=0B-L9I5ef3FLWRGttR1U2WmFBaE0>`_
+* `Linux <http://writing3d.xyz/downloads/w3dLinux/W3DZip-Linux.tar.gz>`_
+* `Windows <http://writing3d.xyz/downloads/w3dWindows/W3DZip-Windows.zip>`_
+* `Mac <http://writing3d.xyz/downloads/w3dMac/W3DZip-Mac.zip>`_
 
 Note that this includes the old (non-FOSS, Java-based) cwapp editor and a copy
 of the appropriate version of Blender. Unzip the archive to any convenient
