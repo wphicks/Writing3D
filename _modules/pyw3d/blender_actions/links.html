@@ -41,7 +41,7 @@
           <div class="body" role="main">
             
   <h1>Source code for pyw3d.blender_actions.links</h1><div class="highlight"><pre>
-<span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
 <span class="c1">#</span>
 <span class="c1"># This file is part of Writing3D.</span>
 <span class="c1">#</span>
@@ -113,7 +113,7 @@
     <span class="k">def</span> <span class="nf">end_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{}pass&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">link_name</span> <span class="o">=</span> <span class="n">generate_link_name</span><span class="p">(</span>
             <span class="n">generate_blender_object_name</span><span class="p">(</span><span class="n">object_name</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">change</span> <span class="o">=</span> <span class="n">change</span>

@@ -64,21 +64,10 @@ the moment.</p>
 <li><p class="first"><a class="reference external" href="https://help.github.com/articles/cloning-a-repository/">Clone</a> your fork
 of the repo to your computer, and <a class="reference external" href="https://git-scm.com/docs/git-checkout">checkout</a> the <code class="docutils literal"><span class="pre">develop</span></code> branch.</p>
 </li>
-</ol>
-<ol class="arabic" start="5">
-<li><p class="first">Create a feature branch to commit your changes to by running the following
-within your local repo:</p>
-<blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre>$ git branch my_cool_feature_name
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ol>
-<ol class="arabic simple" start="4">
-<li>Create a <a class="reference external" href="https://en.wikipedia.org/wiki/JSON#Example">configuration file</a>
+<li><p class="first">Create a <a class="reference external" href="https://en.wikipedia.org/wiki/JSON#Example">configuration file</a>
 in your <a class="reference external" href="https://docs.python.org/3/library/os.path.html#os.path.expanduser">home directory</a> called
-.w3d.json with the following fields:<ul>
+.w3d.json with the following fields:</p>
+<ul class="simple">
 <li><code class="docutils literal"><span class="pre">Blender</span> <span class="pre">executable</span></code>: The (absolute) path to your Blender executable.</li>
 <li><code class="docutils literal"><span class="pre">Blender</span> <span class="pre">player</span> <span class="pre">executable</span></code>: The (absolute) path to your Blender player
 executable.</li>
@@ -100,7 +89,7 @@ running at least some of these samples.</p>
 <p>To make it easier to run the Python samples, a script called <code class="docutils literal"><span class="pre">w3dpy.sh</span></code> or
 <code class="docutils literal"><span class="pre">w3dpy.bat</span></code> is included in the scripts directory for your platform. Execute
 this script with the Python sample file as argument. Example (for Linux):</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> Writing3D
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> Writing3D
 $ ./scripts/Linux/w3dpy.sh samples/link_sample.py
 </pre></div>
 </div>
@@ -111,7 +100,7 @@ $ ./scripts/Linux/w3dpy.sh samples/link_sample.py
 directory for your platform. These scripts take two arguments: either
 <code class="docutils literal"><span class="pre">desktop</span></code> or <code class="docutils literal"><span class="pre">desktopfull</span></code> to run in windowed or fullscreen mode
 respectively and the name of the xml file to run. Example (for Linux):</p>
-<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> Writing3D
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> Writing3D
 $ ./scripts/Linux/cwapp.sh desktop samples/xml_samples/random_sample.xml
 </pre></div>
 </div>

@@ -41,7 +41,7 @@
           <div class="body" role="main">
             
   <h1>Source code for pyw3d.errors</h1><div class="highlight"><pre>
-<span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
 <span class="c1">#</span>
 <span class="c1"># This file is part of Writing3D.</span>
 <span class="c1">#</span>
@@ -63,8 +63,8 @@
 
 <div class="viewcode-block" id="BadW3DXML"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.errors.BadW3DXML">[docs]</a><span class="k">class</span> <span class="nc">BadW3DXML</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Exception thrown for attempting to use malformed W3D XML&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BadW3DXML</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BadW3DXML</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="InvalidArgument"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.errors.InvalidArgument">[docs]</a><span class="k">class</span> <span class="nc">InvalidArgument</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -72,8 +72,8 @@
 
 <span class="sd">    Examples could include an option not defined in the XML schema or a bad</span>
 <span class="sd">    value passed for such an option.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidArgument</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidArgument</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ConsistencyError"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.errors.ConsistencyError">[docs]</a><span class="k">class</span> <span class="nc">ConsistencyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -84,8 +84,8 @@
 <span class="sd">    concretely, if an ObjectAction does not specify what object it is changing,</span>
 <span class="sd">    a ConsistencyError will be thrown before that action can be written to XML</span>
 <span class="sd">    or displayed in the W3D.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ConsistencyError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConsistencyError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EBKAC"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.errors.EBKAC">[docs]</a><span class="k">class</span> <span class="nc">EBKAC</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -97,8 +97,8 @@
 <span class="sd">    feature (i.e. in a GUI project creator) but only when someone is using the</span>
 <span class="sd">    underlying methods of that feature in a dangerous and irrational way.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">EBKAC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EBKAC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

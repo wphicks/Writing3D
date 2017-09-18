@@ -41,7 +41,7 @@
           <div class="body" role="main">
             
   <h1>Source code for pyw3d</h1><div class="highlight"><pre>
-<span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
 <span class="c1">#</span>
 <span class="c1"># This file is part of Writing3D.</span>
 <span class="c1">#</span>
@@ -77,8 +77,8 @@
     <span class="sd">&quot;&quot;&quot;Exception thrown when an error is detected in the configuration or</span>
 <span class="sd">    installation of Writing3D</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <span class="n">W3D_CONFIG_FILENAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -91,7 +91,7 @@
         <span class="n">W3D_CONFIG</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">w3d_config_file</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;No W3D config file found. Creating default...&quot;</span><span class="p">)</span>
-    <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pardir</span><span class="p">)</span>
     <span class="p">)</span>

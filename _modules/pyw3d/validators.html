@@ -41,7 +41,7 @@
           <div class="body" role="main">
             
   <h1>Source code for pyw3d.validators</h1><div class="highlight"><pre>
-<span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
 <span class="c1">#</span>
 <span class="c1"># This file is part of Writing3D.</span>
 <span class="c1">#</span>
@@ -67,7 +67,7 @@
 <span class="kn">from</span> <span class="nn">.path</span> <span class="kn">import</span> <span class="n">ProjectPath</span><span class="p">,</span> <span class="n">UnsetValueError</span>
 
 
-<span class="n">PY_ID_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;^[A-Za-z0-9_]+$&quot;</span><span class="p">)</span>
+<span class="n">PY_ID_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9_]+$&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Validator"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.Validator">[docs]</a><span class="k">class</span> <span class="nc">Validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -77,18 +77,18 @@
 <span class="sd">        If specified, this allows for consistency checks between related</span>
 <span class="sd">        elements of the project.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;No help available for this option&quot;</span>
         <span class="c1"># def_value is an attribute used to provide some guidance on a</span>
         <span class="c1"># reasonable value to default to when first creating an instance of</span>
         <span class="c1"># this option for editing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">False</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
 <div class="viewcode-block" id="Validator.coerce"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.Validator.coerce">[docs]</a>    <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Attempt to coerce input to a valid value for this validator&quot;&quot;&quot;</span>
@@ -102,15 +102,15 @@
 <div class="viewcode-block" id="TextValidator"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.TextValidator">[docs]</a><span class="k">class</span> <span class="nc">TextValidator</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Callable object for checking if value is valid text&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;Must be text&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">True</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
 
 <div class="viewcode-block" id="TextValidator.coerce"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.TextValidator.coerce">[docs]</a>    <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">new_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -121,33 +121,33 @@
     <span class="sd">&quot;&quot;&quot;Callable object for checking if string can be used as part of a Python</span>
 <span class="sd">    variable name&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;Name must be unique and contain only alphanumeric&quot;</span>
         <span class="s2">&quot; characters or underscore&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">PY_ID_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
 
 <div class="viewcode-block" id="ValidPyString.coerce"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.ValidPyString.coerce">[docs]</a>    <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">new_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="n">new_value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;[^A-Za-z0-9_]&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
+        <span class="n">new_value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^A-Za-z0-9_]&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_value</span></div></div>
 
 
 <div class="viewcode-block" id="ValidFile"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.ValidFile">[docs]</a><span class="k">class</span> <span class="nc">ValidFile</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">help_string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;Must be an existing file&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="n">help_string</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;Could not find file {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -158,8 +158,8 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
 
 <div class="viewcode-block" id="ValidFile.coerce"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.ValidFile.coerce">[docs]</a>    <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># TODO: Think about something clever with os.path here</span>
@@ -167,13 +167,13 @@
 
 
 <div class="viewcode-block" id="ValidFontFile"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.ValidFontFile">[docs]</a><span class="k">class</span> <span class="nc">ValidFontFile</span><span class="p">(</span><span class="n">ValidFile</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">True</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">new_value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;fonts&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
             <span class="n">help_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span>
-            <span class="n">validity</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+            <span class="n">validity</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="n">help_string</span>
             <span class="k">return</span> <span class="n">validity</span>
         <span class="k">except</span><span class="p">:</span>
@@ -184,7 +184,7 @@
     <span class="sd">&quot;&quot;&quot;Callable object that returns true if value is in given list of options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">valid_options</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">valid_options</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valid_options</span> <span class="o">=</span> <span class="n">valid_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valid_menu_items</span> <span class="o">=</span> <span class="p">[</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">option</span><span class="p">)</span> <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_options</span><span class="p">]</span>
@@ -195,11 +195,11 @@
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_options</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_menu_items</span><span class="p">))</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;{}{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_menu_items</span><span class="p">))</span>
 
 <div class="viewcode-block" id="OptionValidator.coerce"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.OptionValidator.coerce">[docs]</a>    <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_options</span><span class="p">:</span>
@@ -221,7 +221,7 @@
 <span class="sd">        length, this parameter should be set to an integer. Otherwise, this</span>
 <span class="sd">        should be None.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">base_validators</span><span class="p">,</span> <span class="n">item_label</span><span class="o">=</span><span class="s2">&quot;Item&quot;</span><span class="p">,</span> <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
             <span class="n">required_length</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -263,13 +263,13 @@
                 <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">required_length</span><span class="p">)]</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{}&lt;{}|{}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">base_validators</span><span class="p">),</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">base_validators</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">required_length</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iterable</span><span class="p">)):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_validator</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
                 <span class="k">return</span> <span class="bp">False</span>
@@ -279,7 +279,7 @@
 <div class="viewcode-block" id="SortedListValidator"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.SortedListValidator">[docs]</a><span class="k">class</span> <span class="nc">SortedListValidator</span><span class="p">(</span><span class="n">ListValidator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if input is sorted iterable&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iterable</span><span class="p">)):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_validator</span><span class="p">(</span><span class="n">i</span><span class="p">)(</span><span class="n">iterable</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
                 <span class="k">return</span> <span class="bp">False</span>
@@ -300,7 +300,7 @@
         <span class="sd">&quot;&quot;&quot;Return validator for dictionary values&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span></div>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">key_validator</span><span class="p">,</span> <span class="n">value_validator</span><span class="p">,</span> <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span> <span class="o">=</span> <span class="n">key_validator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span> <span class="o">=</span> <span class="n">value_validator</span>
@@ -313,11 +313,11 @@
     <span class="k">def</span> <span class="nf">def_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{}&lt;{}, {}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_validator</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span>
                     <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_validator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">or</span>
@@ -337,7 +337,7 @@
 <span class="sd">    ProjectPath pointing to the element used to populate available options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">fallback_validator</span><span class="p">,</span> <span class="n">reference_path</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
             <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">help_string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -348,11 +348,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_validator</span><span class="o">.</span><span class="n">def_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ref_path</span> <span class="o">=</span> <span class="n">ProjectPath</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">reference_path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{}&lt;{}, {}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_validator</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_validator</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_path</span><span class="o">.</span><span class="n">project</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cannot check relative reference to {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">value</span><span class="p">))</span>
@@ -402,14 +402,14 @@
 <span class="sd">    returns true. Included to provide convenient methods for inputting Boolean</span>
 <span class="sd">    options&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">IsBoolean</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IsBoolean</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="bp">True</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;{}()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">True</span></div>
 
 
@@ -422,7 +422,7 @@
 <span class="sd">    not performed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
 
@@ -441,11 +441,11 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">def_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{}&lt;{}, {}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">)</span> <span class="ow">and</span>
@@ -467,8 +467,8 @@
 <div class="viewcode-block" id="IsInteger"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.IsInteger">[docs]</a><span class="k">class</span> <span class="nc">IsInteger</span><span class="p">(</span><span class="n">IsNumeric</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if value is an integer&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">IsInteger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">IsInteger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="n">value</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
@@ -476,7 +476,7 @@
 <div class="viewcode-block" id="FeatureValidator"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.FeatureValidator">[docs]</a><span class="k">class</span> <span class="nc">FeatureValidator</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if value is a W3DFeature of specified type&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correct_class</span><span class="p">,</span> <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correct_class</span><span class="p">,</span> <span class="n">help_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">correct_class</span> <span class="o">=</span> <span class="n">correct_class</span>
         <span class="k">if</span> <span class="n">help_string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;Value must be of type {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -484,11 +484,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">help_string</span> <span class="o">=</span> <span class="n">help_string</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{}&lt;{}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_class</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_class</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_class</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FeatureValidator.coerce"><a class="viewcode-back" href="../../pyw3d_api/pyw3d.html#pyw3d.validators.FeatureValidator.coerce">[docs]</a>    <span class="k">def</span> <span class="nf">coerce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>

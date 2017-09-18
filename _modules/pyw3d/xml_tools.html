@@ -41,7 +41,7 @@
           <div class="body" role="main">
             
   <h1>Source code for pyw3d.xml_tools</h1><div class="highlight"><pre>
-<span class="c1"># Copyright (C) 2016 William Hicks</span>
+<span></span><span class="c1"># Copyright (C) 2016 William Hicks</span>
 <span class="c1">#</span>
 <span class="c1"># This file is part of Writing3D.</span>
 <span class="c1">#</span>
@@ -71,7 +71,7 @@
 <span class="sd">    sequence. For instance &quot;float&quot; could be used to read in a tuple of floats.</span>
 <span class="sd">    Default is &quot;str&quot;, yielding a tuple of strings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sep_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;,\s*&#39;</span><span class="p">)</span>
+    <span class="n">sep_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;,\s*&#39;</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[()]&quot;</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">sep_regex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
