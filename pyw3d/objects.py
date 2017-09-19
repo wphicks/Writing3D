@@ -21,11 +21,12 @@ import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 import math
-from .errors import BadW3DXML, InvalidArgument, EBKAC
+import platform
+from .errors import BadW3DXML, InvalidArgument, EBKAC, ConsistencyError
 from .xml_tools import find_xml_text, text2bool, text2tuple, bool2text
 from .features import W3DFeature
-from .actions import W3DAction, ObjectAction, GroupAction, TimelineAction,\
-    SoundAction, EventTriggerAction, MoveVRAction, W3DResetAction
+from .actions import W3DAction, ObjectAction, GroupAction,\
+    SoundAction, EventTriggerAction
 from .placement import W3DPlacement
 from .validators import OptionValidator, IsNumeric, ListValidator, IsInteger,\
     ValidPyString, IsBoolean, FeatureValidator, DictValidator,\
@@ -553,36 +554,46 @@ class W3DText(W3DContent):
             "text_{}".format(type(self).object_count), text_content
         )
         lines = line_count(text_content)
+        font_spec = self["font"]
         if (
-                self["font"] is not None and self["font"] not in
-                self._loaded_fonts):
-            if not os.path.isabs(self["font"]):
-                font_file = os.path.join(os.getcwd(), self["font"])
+                self["font"] not in self._loaded_fonts):
+            if font_spec is None:
+                if platform.system() == "Darwin":
+                    font_spec = "/Library/Fonts/Courier New Bold.ttf"
+                elif platform.system() in ("Windows", "cygwin"):
+                    font_spec = r"C:\Windows\Fonts\Courier New Bold.ttf"
+                else:
+                    pass
+
+        if font_spec is not None:
+            if self["font"] in self._loaded_fonts:
+                new_text_object.data.font = self._loaded_fonts[self["font"]]
+            elif not os.path.isabs(font_spec):
+                font_file = os.path.join(os.getcwd(), font_spec)
                 try:
                     new_text_object.data.font = bpy.data.fonts.load(font_file)
                 except:
                     try:
                         new_text_object.data.font = bpy.data.fonts.load(
-                            os.path.join(os.getcwd(), "fonts", self["font"])
+                            os.path.join(os.getcwd(), "fonts", font_spec)
                         )
                     except:
                         raise ConsistencyError(
                             "Font file {} could not be found".format(font_file)
                         )
+                self._loaded_fonts[self["font"]] = new_text_object.data.font
             else:
-                font_file = self["font"]
+                font_file = font_spec
                 try:
                     new_text_object.data.font = bpy.data.fonts.load(font_file)
                 except:
                     raise ConsistencyError(
                         "Font file {} could not be found".format(font_file)
                     )
-            self._loaded_fonts[self["font"]] = new_text_object.data.font
-        elif self["font"] is not None:
-            new_text_object.data.font = self._loaded_fonts[self["font"]]
-        if self["font"] is not None:
-            new_text_object.data.resolution_u = 1
-            new_text_object.data.resolution_v = 1
+                self._loaded_fonts[self["font"]] = new_text_object.data.font
+        #if font_spec is not None:
+        #    new_text_object.data.resolution_u = 1
+        #    new_text_object.data.resolution_v = 1
         new_text_object.data.extrude = self["depth"]
         new_text_object.location.y += new_text_object.data.extrude
         new_text_object.data.fill_mode = "BOTH"
@@ -1086,10 +1097,9 @@ class W3DObject(W3DFeature):
         self["placement"].place(blender_object)
         LOGGER.debug("Object: {}".format(blender_object.name))
         LOGGER.debug("Position: {}".format(blender_object.location))
+
         for object_ in bpy.context.selectable_objects:
             object_.select = False
-        blender_object.select = True
-        bpy.context.scene.objects.active = blender_object
 
         blender_object.select = True
         bpy.context.scene.objects.active = blender_object
