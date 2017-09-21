@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import platform
 import urllib.request
 import zipfile
@@ -53,8 +54,7 @@ def download_blender():
 
 
 def update_blender():
-    print(bpy.app.version)
-    if REQUIRED_VERSION < bpy.app.version:
+    if REQUIRED_VERSION <= bpy.app.version:
         return
     print("Updating Blender...")
     download_blender()
@@ -70,6 +70,9 @@ def update_blender():
     if os.path.isfile(old_config):
         shutil.move(old_config, "{}.old".format(old_config))
     shutil.move(new_blend_dir, blend_dir)
+    home_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.abspath(os.path.join(home_dir, os.pardir)))
+    import pyw3d
 
 
 if __name__ == "__main__":
