@@ -603,21 +603,8 @@ class W3DText(W3DContent):
         new_text_object.data.extrude = self["depth"]
         new_text_object.location.y += new_text_object.data.extrude
         new_text_object.data.fill_mode = "BOTH"
-        new_text_object.data.align = self["halign"].upper()
-
-        height = new_text_object.dimensions[1]
-        if self["valign"] == "top":
-            new_text_object.data.offset_y = (
-                - 3 * height / 4
-            )
-        elif self["valign"] == "center":
-            new_text_object.data.offset_y = (
-                - height / 4 + (lines - 1) * height / 2
-            )
-        elif self["valign"] == "bottom":
-            new_text_object.data.offset_y = (
-                height / 4 + 0.85 * height * (lines - 1)
-            )
+        new_text_object.data.align_x = self["halign"].upper()
+        new_text_object.data.align_y = self["valign"].upper()
 
         mesh = new_text_object.to_mesh(bpy.context.scene, False, 'PREVIEW')
 
