@@ -4,65 +4,92 @@ import urllib.request
 import os
 import zipfile
 import subprocess
-import sys
+import shutil
 import pyw3d
+
+
+INSTALL_PATH = os.path.abspath(
+    os.path.normpath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.pardir
+        )
+    )
+)
 
 
 def update_dulwich():
     try:
-        import dulwich
+        import dulwich.repo
+        from dulwich import porcelain
     except ImportError:
         install_dulwich()
-
-
-def install_distutils():
-    subprocess.call(
-        [
-            pyw3d.BLENDER_EXEC, "--background", "--python",
-            os.path.join(os.path.dirname(__file__), "ez_setup.py")
-        ]
-    )
-
-
-def install_pip():
+        return
     try:
-        import pip
-    except ImportError:
-        pip_filename, headers = urllib.request.urlretrieve(
-            "https://bootstrap.pypa.io/get-pip.py"
+        dulwich_repo = dulwich.repo.Repo(
+            os.path.join(INSTALL_PATH, "dulwich")
         )
-        subprocess.call(
-            [pyw3d.BLENDER_EXEC, "--background", "--python", pip_filename]
+    except dulwich.errors.NotGitRepository:
+        shutil.rmtree(os.path.join(INSTALL_PATH, "dulwich"))
+        dulwich_repo = porcelain.clone(
+            "https://github.com/jelmer/dulwich.git",
+            os.path.join(INSTALL_PATH, "dulwich")
         )
+    porcelain.reset(dulwich_repo, "hard")
+    porcelain.pull(
+        dulwich_repo, remote_location="https://github.com/jelmer/dulwich.git"
+    )
+    install_dulwich()
 
 
-def install_dulwich():
-    install_path = os.path.abspath(
+def apply_shim(setup_filename):
+    new_content = []
+    shim_content = []
+    shim_path = os.path.abspath(
         os.path.normpath(
             os.path.join(
                 os.path.dirname(__file__),
-                os.pardir
+                "dulwich_shim.py"
             )
         )
     )
-    os.chdir(install_path)
+    with open(shim_path, 'r') as shim_file:
+        shim_content.extend(shim_file)
 
-    if not os.path.isdir("dulwich-master"):
+    with open(setup_filename, 'r') as setup_file:
+        for line in setup_file:
+            new_content.append(line)
+            if line.startswith("#!"):
+                new_content.extend(shim_content)
+
+    with open(setup_filename, 'w') as setup_file:
+        setup_file.write("".join(new_content))
+
+
+def install_dulwich():
+    if not os.path.isdir(os.path.join(INSTALL_PATH, "dulwich")):
         dulwich_filename, headers = urllib.request.urlretrieve(
             "https://github.com/jelmer/dulwich/archive/master.zip"
         )
         dulwich_zip = zipfile.ZipFile(dulwich_filename)
-        dulwich_zip.extractall()
+        dulwich_zip.extractall(path=INSTALL_PATH)
+
+        os.rename(
+            os.path.join(INSTALL_PATH, "dulwich-master"),
+            os.path.join(INSTALL_PATH, "dulwich")
+        )
+
+    setup_filename = os.path.join(INSTALL_PATH, "dulwich", "setup.py")
+
+    apply_shim(setup_filename)
 
     subprocess.call(
         [
             pyw3d.BLENDER_EXEC, "--background", "--python",
-            os.path.join("dulwich-master", "setup.py"), "--", "--pure", "install"
+            setup_filename, "--", "--pure", "install", "--force"
         ]
     )
 
-update_dulwich()
-#try:
-#    import dulwich
-#except ImportError:
-#    raise ImportError("Dulwich could not be found or installed")
+
+if __name__ == "__main__":
+    update_dulwich()
