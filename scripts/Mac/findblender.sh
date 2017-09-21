@@ -12,9 +12,9 @@ fi
 
 cd $SCRIPT_DIR
 
-if [ -f ../../../blender/blender ]
+if [ -f ../../../blender/blender.app/Contents/MacOS/blender ]
 then
-    blender_exec="${PWD}/../../../blender/blender"
+    blender_exec="${PWD}/../../../blender/blender.app/Contents/MacOS/blender"
     echo "$blender_exec"
     exit 0
 else
