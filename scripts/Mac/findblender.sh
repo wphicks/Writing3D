@@ -1,5 +1,17 @@
 #!/bin/bash
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+if [ ! -z "$BASH_SOURCE" ]
+then
+    SCRIPT_NAME="${BASH_SOURCE[0]}"
+else
+    SCRIPT_NAME="$0"
+fi
+if command -v readlink > /dev/null 2>&1
+then
+    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"
+else
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"
+fi
+
 if [ -f ~/.w3d.json ]
 then
     blender_exec=`perl -nle 'print $& if m{(?<="Blender executable": ")[^"]*}' ~/.w3d.json`
@@ -10,7 +22,7 @@ then
     exit 0
 fi
 
-cd $SCRIPT_DIR
+cd "$SCRIPT_DIR"
 
 if [ -f ../../../blender/blender.app/Contents/MacOS/blender ]
 then

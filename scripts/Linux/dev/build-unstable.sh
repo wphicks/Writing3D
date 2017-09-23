@@ -18,7 +18,7 @@ BUILD_DIR="$ROOT_DIR/W3DBuilds"
 
 function sync {
     cd "$BUILD_DIR"
-    sftp -b "$SCRIPT_DIR/Linux/dev/deploy.sftp" w3dhost
+    sftp -b "$SCRIPT_DIR/Linux/dev/deploy-unstable.sftp" w3dhost
 }
 
 function create_platform_specifics {
@@ -28,7 +28,7 @@ function create_platform_specifics {
         platform=${dir%?}
         cd "$ROOT_DIR/W3DZip-$platform/Writing3D"
         git fetch --tags
-        git reset --hard $(git describe --tags `git rev-list --tags --max-count=1`)
+        git reset --hard origin/develop
         for script in `ls scripts/$dir`
         do
             script_loc="scripts/$platform/$script"
@@ -61,27 +61,21 @@ function create_platform_specifics {
         cd $ROOT_DIR
         if [ "$platform" == "Linux" ]
         then
-            tar czf "$BUILD_DIR/W3DZip-$platform.tar.gz" "W3DZip-$platform"
+            tar czf "$BUILD_DIR/W3DZip-${platform}-unstable.tar.gz" "W3DZip-$platform"
         else
-            zip -r "$BUILD_DIR/W3DZip-$platform.zip" "W3DZip-$platform"
+            zip -r "$BUILD_DIR/W3DZip-${platform}-unstable.zip" "W3DZip-$platform"
         fi
         cd -
     done
 }
 
-function create_tag {
-    git checkout master
+function push_develop {
+    git checkout develop
     git push
-    echo "Last version was `git tag | tail -1`"
-    read -p "Version? v" version
-    version="v$version"
-    echo $version
-    git tag -s $version
-    git push --follow-tags
 }
 
 function build {
-    create_tag
+    push_develop
     echo "Creating zip installs for each platform..."
     create_platform_specifics
     echo "Sending build to writing3d.xyz host..."
