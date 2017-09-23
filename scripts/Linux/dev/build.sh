@@ -12,6 +12,7 @@ then
 else
     SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"
 fi
+SCRIPT_DIR="$SCRIPT_DIR/../.."
 REPO_DIR="$SCRIPT_DIR/.."
 ROOT_DIR="$REPO_DIR/.."
 BUILD_DIR="$ROOT_DIR/W3DBuilds"
