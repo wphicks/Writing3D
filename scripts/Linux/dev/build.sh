@@ -1,21 +1,28 @@
 #!/bin/bash
 set -eu -o pipefail
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )/../.."
-echo $SCRIPT_DIR
+if [ ! -z "$BASH_SOURCE" ]
+then
+    SCRIPT_NAME="${BASH_SOURCE[0]}"
+else
+    SCRIPT_NAME="$0"
+fi
+if command -v readlink > /dev/null 2>&1
+then
+    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"
+else
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"
+fi
 REPO_DIR="$SCRIPT_DIR/.."
-echo $REPO_DIR
 ROOT_DIR="$REPO_DIR/.."
-echo $ROOT_DIR
 BUILD_DIR="$ROOT_DIR/W3DBuilds"
-echo $BUILD_DIR
 
 function sync {
-    cd $BUILD_DIR
+    cd "$BUILD_DIR"
     sftp -b "$SCRIPT_DIR/Linux/dev/deploy.sftp" w3dhost
 }
 
 function create_platform_specifics {
-    cd $SCRIPT_DIR
+    cd "$SCRIPT_DIR"
     for dir in `ls -d */`
     do
         platform=${dir%?}
@@ -34,9 +41,20 @@ function create_platform_specifics {
                 echo '@echo off' > "../$script"
                 echo "%~dp0\\Writing3D\\scripts\\$platform\\$script %*" >> "../$script"
             else
-                echo '#!/bin/bash' > "../$script"
-                echo 'SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"' >> "../$script"
-                echo '$SCRIPT_DIR/Writing3D/scripts/'"$platform/$script"' "$@"' >> "../$script"
+                echo '#!/bin/bash' >> "../$script"
+                echo 'if [ ! -z "$BASH_SOURCE" ]' >> "../$script"
+                echo 'then' >> "../$script"
+                echo '    SCRIPT_NAME="${BASH_SOURCE[0]}"' >> "../$script"
+                echo 'else' >> "../$script"
+                echo '    SCRIPT_NAME="$0"' >> "../$script"
+                echo 'fi' >> "../$script"
+                echo 'if command -v readlink > /dev/null 2>&1' >> "../$script"
+                echo 'then' >> "../$script"
+                echo '    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"' >> "../$script"
+                echo 'else' >> "../$script"
+                echo '    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"' >> "../$script"
+                echo 'fi' >> "../$script"
+                echo '"$SCRIPT_DIR/Writing3D/scripts/Linux/cwapp.sh" "$@"' >> "../$script"
                 chmod +x "../$script"
             fi
         done
