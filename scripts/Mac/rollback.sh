@@ -1,6 +1,17 @@
 #!/bin/bash
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd $SCRIPT_DIR
+if [ ! -z "$BASH_SOURCE" ]
+then
+    SCRIPT_NAME="${BASH_SOURCE[0]}"
+else
+    SCRIPT_NAME="$0"
+fi
+if command -v readlink > /dev/null 2>&1
+then
+    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"
+else
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"
+fi
+cd "$SCRIPT_DIR"
 
 if [[ -f "last_good.txt" ]]
 then
