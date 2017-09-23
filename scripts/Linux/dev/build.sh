@@ -1,17 +1,13 @@
 #!/bin/bash
-set -eu -o pipefail
 if [ ! -z "$BASH_SOURCE" ]
 then
     SCRIPT_NAME="${BASH_SOURCE[0]}"
 else
     SCRIPT_NAME="$0"
 fi
-if command -v readlink > /dev/null 2>&1
-then
-    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"
-else
-    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"
-fi
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$SCRIPT_NAME" 2>/dev/null ||\
+    greadlink -f "$SCRIPT_NAME" 2>/dev/null ||\
+    echo "$SCRIPT_NAME")")" && pwd -P)"
 SCRIPT_DIR="$SCRIPT_DIR/../.."
 REPO_DIR="$SCRIPT_DIR/.."
 ROOT_DIR="$REPO_DIR/.."
@@ -49,12 +45,9 @@ function create_platform_specifics {
                 echo 'else' >> "../$script"
                 echo '    SCRIPT_NAME="$0"' >> "../$script"
                 echo 'fi' >> "../$script"
-                echo 'if command -v readlink > /dev/null 2>&1' >> "../$script"
-                echo 'then' >> "../$script"
-                echo '    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"' >> "../$script"
-                echo 'else' >> "../$script"
-                echo '    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"' >> "../$script"
-                echo 'fi' >> "../$script"
+                echo 'SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$SCRIPT_NAME" 2>/dev/null ||\' >> "../$script"
+                echo '    greadlink -f "$SCRIPT_NAME" 2>/dev/null ||\' >> "../$script"
+                echo '    echo "$SCRIPT_NAME")")" && pwd -P)"' >> "../$script"
                 echo '"$SCRIPT_DIR/Writing3D/scripts/Linux/cwapp.sh" "$@"' >> "../$script"
                 chmod +x "../$script"
             fi

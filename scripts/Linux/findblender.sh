@@ -5,12 +5,9 @@ then
 else
     SCRIPT_NAME="$0"
 fi
-if command -v readlink > /dev/null 2>&1
-then
-    SCRIPT_DIR="$(dirname "$(readlink -f "$SCRIPT_NAME")")"
-else
-    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_NAME")" && pwd -P)"
-fi
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$SCRIPT_NAME" 2>/dev/null ||\
+    greadlink -f "$SCRIPT_NAME" 2>/dev/null ||\
+    echo "$SCRIPT_NAME")")" && pwd -P)"
 
 if [ -f ~/.w3d.json ]
 then
