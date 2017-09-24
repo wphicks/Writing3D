@@ -42,7 +42,7 @@ import sys
 home_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(home_dir, os.pardir)))
 
-from pyw3d import project, export_to_blender, W3D_CONFIG
+from pyw3d import project, export_to_blender, W3D_CONFIG, LOGGER
 
 
 if __name__ == "__main__":
@@ -62,7 +62,11 @@ if __name__ == "__main__":
     blend_filename = "run.blend"
 
     # ...and exporting it!
-    export_to_blender(
-        my_project, filename=blend_filename, display=True,
-        fullscreen=(args.config == "desktopfull")
-    )
+    try:
+        export_to_blender(
+            my_project, filename=blend_filename, display=True,
+            fullscreen=(args.config == "desktopfull")
+        )
+    except Exception as exc:
+        LOGGER.critical(str(exc))
+        raise

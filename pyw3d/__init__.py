@@ -20,13 +20,15 @@
 import os
 import json
 import logging
+import logging.handlers
 import platform
+import errno
 LOGGER = logging.getLogger("pyw3d")
-log_handler = logging.StreamHandler()
-log_handler.setFormatter(
+term_handler = logging.StreamHandler()
+term_handler.setFormatter(
     logging.Formatter('%(asctime)-15s %(levelname)8s %(name)s %(message)s')
 )
-LOGGER.addHandler(log_handler)
+LOGGER.addHandler(term_handler)
 LOGGER.setLevel(logging.WARNING)
 
 
@@ -98,6 +100,36 @@ if BLENDER_EXEC != executable_from_app(BLENDER_EXEC):
     with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
         json.dump(W3D_CONFIG, w3d_config_file)
 BLENDER_PLAY = W3D_CONFIG["Blender player executable"]
+
+try:
+    WORKSPACE = W3D_CONFIG["Workspace"]
+except KeyError:
+    W3D_CONFIG["Workspace"] = os.path.join(
+        os.path.expanduser("~"), "w3d_workspace"
+    )
+    with open(W3D_CONFIG_FILENAME, 'w') as w3d_config_file:
+        json.dump(W3D_CONFIG, w3d_config_file)
+    WORKSPACE = W3D_CONFIG["Workspace"]
+
+LOG_DIR = os.path.join(WORKSPACE, "logs")
+if not os.path.isdir(LOG_DIR):
+    try:
+        os.makedirs(LOG_DIR)
+    except OSError as exc:
+        if not (exc.errno == errno.EEXIST or os.path.isdir(LOG_DIR)):
+            raise
+
+LOG_FILE = os.path.join(LOG_DIR, "w3d_log.txt")
+
+
+logfile_handler = logging.handlers.TimedRotatingFileHandler(
+    LOG_FILE, when='midnight', backupCount=7
+)
+logfile_handler.setFormatter(
+    logging.Formatter('%(asctime)-15s %(levelname)8s %(name)s %(message)s')
+)
+LOGGER.addHandler(logfile_handler)
+
 
 if (
         BLENDER_EXEC != executable_from_app(BLENDER_EXEC) or
