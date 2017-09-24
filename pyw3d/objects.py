@@ -555,16 +555,13 @@ class W3DText(W3DContent):
         )
         lines = line_count(text_content)
         font_spec = self["font"]
-        if (
-                self["font"] not in self._loaded_fonts):
-            if font_spec is None:
-                if platform.system() == "Darwin":
-                    font_spec = "/Library/Fonts/Courier New Bold.ttf"
-                elif platform.system() in ("Windows", "cygwin"):
-                    font_spec = r"C:\Windows\Fonts\Courier New Bold.ttf"
-                else:
-                    pass
-        LOGGER.debug("Specified font: {}".format(font_spec))
+        if font_spec is None:
+            if platform.system() == "Darwin":
+                font_spec = "/Library/Fonts/Courier New Bold.ttf"
+            elif platform.system() in ("Windows", "cygwin"):
+                font_spec = r"C:\Windows\Fonts\Courier New Bold.ttf"
+            else:
+                pass
 
         if font_spec is not None:
             if self["font"] in self._loaded_fonts:
@@ -592,7 +589,6 @@ class W3DText(W3DContent):
                         "Font file {} could not be found".format(font_file)
                     )
                 self._loaded_fonts[self["font"]] = new_text_object.data.font
-            new_text_object.data.font = self._loaded_fonts[self["font"]]
         #if font_spec is not None:
         #    new_text_object.data.resolution_u = 1
         #    new_text_object.data.resolution_v = 1
