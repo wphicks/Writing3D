@@ -38,7 +38,7 @@ function create_platform_specifics {
                 echo '@echo off' > "../$script"
                 echo "%~dp0\\Writing3D\\scripts\\$platform\\$script %*" >> "../$script"
             else
-                echo '#!/bin/bash' >> "../$script"
+                echo '#!/bin/bash' > "../$script"
                 echo 'if [ ! -z "$BASH_SOURCE" ]' >> "../$script"
                 echo 'then' >> "../$script"
                 echo '    SCRIPT_NAME="${BASH_SOURCE[0]}"' >> "../$script"
