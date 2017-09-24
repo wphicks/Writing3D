@@ -24,7 +24,7 @@ function create_platform_specifics {
     do
         platform=${dir%?}
         cd "$ROOT_DIR/W3DZip-$platform/Writing3D"
-        git fetch --tags
+        git fetch
         git reset --hard origin/develop
         for script in `ls scripts/$dir`
         do
@@ -48,7 +48,7 @@ function create_platform_specifics {
                 echo 'SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$SCRIPT_NAME" 2>/dev/null ||\' >> "../$script"
                 echo '    greadlink -f "$SCRIPT_NAME" 2>/dev/null ||\' >> "../$script"
                 echo '    echo "$SCRIPT_NAME")")" && pwd -P)"' >> "../$script"
-                echo '"$SCRIPT_DIR/Writing3D/scripts/Linux/cwapp.sh" "$@"' >> "../$script"
+                echo '"$SCRIPT_DIR/Writing3D/scripts/${platform}/cwapp.sh" "$@"' >> "../$script"
                 chmod +x "../$script"
             fi
         done
