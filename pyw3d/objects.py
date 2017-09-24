@@ -564,6 +564,7 @@ class W3DText(W3DContent):
                     font_spec = r"C:\Windows\Fonts\Courier New Bold.ttf"
                 else:
                     pass
+        LOGGER.debug("Specified font: {}".format(font_spec))
 
         if font_spec is not None:
             if self["font"] in self._loaded_fonts:
@@ -591,6 +592,7 @@ class W3DText(W3DContent):
                         "Font file {} could not be found".format(font_file)
                     )
                 self._loaded_fonts[self["font"]] = new_text_object.data.font
+            new_text_object.data.font = self._loaded_fonts[self["font"]]
         #if font_spec is not None:
         #    new_text_object.data.resolution_u = 1
         #    new_text_object.data.resolution_v = 1
