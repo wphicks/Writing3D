@@ -559,7 +559,7 @@ class W3DText(W3DContent):
             if platform.system() == "Darwin":
                 font_spec = "/Library/Fonts/Courier New Bold.ttf"
             elif platform.system() in ("Windows", "cygwin"):
-                font_spec = r"C:\Windows\Fonts\Courier New Bold.ttf"
+                font_spec = r"C:\Windows\Fonts\courbd.ttf"
             else:
                 pass
 
