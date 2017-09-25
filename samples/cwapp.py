@@ -55,11 +55,17 @@ if __name__ == "__main__":
     else:
         args = parser.parse_args()
 
-    print("Configuration information: ", W3D_CONFIG)
-
     # It's as simple as loading the project...
-    my_project = project.W3DProject.fromXML_file(args.project_file)
+    try:
+        my_project = project.W3DProject.fromXML_file(args.project_file)
+    except Exception as exc:
+        LOGGER.critical(str(exc))
+        raise
     blend_filename = "run.blend"
+
+    LOGGER.debug("Invocation information: {}".format(" ".join(sys.argv)))
+
+    LOGGER.debug("Configuration information: {}".format(str(W3D_CONFIG)))
 
     # ...and exporting it!
     try:
