@@ -8,7 +8,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$SCRIPT_NAME" 2>/dev/null ||\
     greadlink -f "$SCRIPT_NAME" 2>/dev/null ||\
     echo "$SCRIPT_NAME")")" && pwd -P)"
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR/../../.."
 
 if [[ -f "last_good.txt" ]]
 then
