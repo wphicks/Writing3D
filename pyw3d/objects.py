@@ -571,9 +571,13 @@ class W3DText(W3DContent):
                 try:
                     new_text_object.data.font = bpy.data.fonts.load(font_file)
                 except:
+                    fontdirs = ["fonts", "Fonts", "FONTS"]
+                    for fontdir in fontdirs:
+                        if os.path.exists(os.path.join(os.getcwd(), fontdir)):
+                            break
                     try:
                         new_text_object.data.font = bpy.data.fonts.load(
-                            os.path.join(os.getcwd(), "fonts", font_spec)
+                            os.path.join(os.getcwd(), fontdir, self["font"])
                         )
                     except:
                         raise ConsistencyError(
