@@ -243,7 +243,7 @@ class W3DPlacement(W3DFeature):
                 "FrontWall": convert_to_blender_axes((0, 0, -4)),
                 "LeftWall": convert_to_blender_axes((-4, 0, 0)),
                 "RightWall": convert_to_blender_axes((4, 0, 0)),
-                "FloorWall": convert_to_blender_axes((0, 0, -4))},
+                "FloorWall": convert_to_blender_axes((0, -4, 0))},
             wall_rotations={
                 "Center": (0, 0, 0),
                 "FrontWall": (0, 0, 0),
@@ -268,9 +268,9 @@ class W3DPlacement(W3DFeature):
                     place_class.relative_to_objects[
                         wall_name].name = generate_relative_to_name(wall_name)
 
-        for name, obj in place_class.relative_to_objects.items():
-            if name != "Center":
-                obj.parent = place_class.relative_to_objects["Center"]
+            for name, obj in place_class.relative_to_objects.items():
+                if name != "Center":
+                    obj.parent = place_class.relative_to_objects["Center"]
 
         return place_class.relative_to_objects
 
