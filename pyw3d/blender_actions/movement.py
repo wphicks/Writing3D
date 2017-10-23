@@ -102,6 +102,8 @@ class MoveAction(object):
         script_text.extend([
             "data['active_actions'][current_index]['target_orientation'] ="
             " target_orientation",
+            "data['active_actions'][current_index]['initial_orientation'] ="
+            " initial_orientation",
             "pos_vector.rotate(relative_object.orientation.to_quaternion()"
             ".rotation_difference(scene.objects['VRCENTER']"
             ".orientation.to_quaternion()))",
@@ -243,13 +245,13 @@ class MoveAction(object):
         script_text = []
         script_text.extend([
             "orientation = blender_object.orientation.to_quaternion()",
-            "new_orientation = orientation.slerp("
+            "new_orientation = "
+            "data['active_actions'][current_index]["
+            "'initial_orientation'].slerp("
             "data['active_actions'][current_index]['target_orientation'],"
-            " (1 - remaining_time/{duration})/10)".format(
+            " (1 - remaining_time/{duration}))".format(
                 duration=self.duration),
-            # NOTE: I have less than zero idea why the factor of 10 is
-            # necessary in the above, but it is absolutely necessary.
-            "blender_object.orientation = new_orientation",
+            "blender_object.orientation = new_orientation"
         ])
 
         if "position" in self.placement:
