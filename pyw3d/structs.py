@@ -27,7 +27,7 @@ class SortedList(MutableSequence):
     :param sort_key: Key function for sorting"""
     def __init__(self, init_list=[], sort_key=None):
         self.sort_key = sort_key
-        self._data = init_list
+        self._data = init_list[:]
         self.sort()
 
     def __setitem__(self, index, value):
