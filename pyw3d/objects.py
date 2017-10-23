@@ -329,6 +329,8 @@ class W3DLink(W3DFeature):
             enable_color=self["enabled_color"],
             reset_clicks=self['reset']
         )
+        self.activator.base_object.game.use_collision_bounds = True
+        self.activator.base_object.game.collision_bounds_type = "CONVEX_HULL"
         self.activator.create_blender_objects()
         return self.activator.base_object
 
