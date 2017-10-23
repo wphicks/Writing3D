@@ -456,11 +456,10 @@ class W3DProject(W3DFeature):
     def setup_controls(self):
         self.add_move_toggle()
 
-        if self["allow_movement"]:
-            add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
-            add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
-            add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
-            add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
+        add_key_movement(self.main_camera, "Forward", "W", 2, -0.15)
+        add_key_movement(self.main_camera, "Backward", "S", 2, 0.15)
+        add_key_movement(self.main_camera, "Left", "A", 0, -0.15)
+        add_key_movement(self.main_camera, "Right", "D", 0, 0.15)
 
     def setup_scripts(self):
         """Load pre-written scripts into blend"""
