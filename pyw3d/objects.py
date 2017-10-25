@@ -76,17 +76,19 @@ def find_object_midpoint(blender_object):
     midpoint = mathutils.Vector((0, 0, 0))
     for vert in blender_object.data.vertices:
         midpoint += vert.co
-    return (
+    avg = (
         midpoint / len(blender_object.data.vertices)
     )
+    return avg
 
 
 def set_object_center(blender_object, center_vec):
-    blender_object.data.transform(
-        mathutils.Matrix.Translation(
-            blender_object.matrix_world.translation - center_vec
-        )
+    trans = mathutils.Matrix.Translation(
+        blender_object.matrix_world.translation - center_vec
     )
+    blender_object.data.transform(trans)
+    blender_object.data.update()
+    blender_object.matrix_world.translation = center_vec
 
 
 def duplicate_object(original):
@@ -618,9 +620,21 @@ class W3DText(W3DContent):
             )
 
         mesh = new_text_object.to_mesh(bpy.context.scene, False, 'PREVIEW')
+
+
         final_object = bpy.data.objects.new(
             "mesh_text_{}".format(type(self).object_count), mesh
         )
+
+        depth = final_object.bound_box[1][2]
+        depth_vec = mathutils.Vector((0, depth, 0))
+        trans = mathutils.Matrix.Translation(
+            final_object.matrix_world.translation - depth_vec
+        )
+        final_object.data.transform(trans)
+        final_object.data.update()
+        final_object.matrix_world.translation = depth_vec
+
         bpy.context.scene.objects.link(final_object)
         apply_euler_rotation(final_object, math.pi / 2, 0, 0)
         return final_object
@@ -1097,6 +1111,12 @@ class W3DObject(W3DFeature):
         blender_object = self["content"].blend()
         blender_object.name = generate_blender_object_name(self["name"])
         blender_object.hide_render = not self["visible"]
+        try:
+            new_center = find_object_midpoint(blender_object)
+            new_center.y = 0
+            set_object_center(blender_object, new_center)
+        except AttributeError:  # Non-mesh
+            pass
         blender_object.scale = [self["scale"], ] * 3
         self["placement"].place(blender_object)
         LOGGER.debug("Object: {}".format(blender_object.name))
@@ -1133,10 +1153,6 @@ class W3DObject(W3DFeature):
         self.apply_material(blender_object)
         blender_object.layers = [layer == 0 for layer in range(20)]
 
-        if self["around_own_axis"]:
-            set_object_center(
-                blender_object, find_object_midpoint(blender_object)
-            )
 
         # TODO: It is *ridiculous* to duplicate every single object to get
         # particle copies. This should be handled smartly in psys.py

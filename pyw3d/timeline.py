@@ -115,6 +115,7 @@ class W3DTimeline(W3DFeature):
         self.activator = BlenderTimeline(
             self["name"], self["actions"],
             start_immediately=self["start_immediately"])
+        LOGGER.debug("Creating timeline {}".format(self["name"]))
         self.activator.create_blender_objects()
         return self.activator.base_object
 
