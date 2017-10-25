@@ -181,6 +181,8 @@ my_project["sounds"].append(left_sound)
 my_project["sounds"].append(right_sound)
 my_project["sounds"].append(long_sound)
 
+my_project.save_XML("sound_sample.xml")
+
 # Finally, we render the whole thing using Blender, export it, and display the
 # result
 export_to_blender(my_project, filename="sound_sample.blend", display=True)
