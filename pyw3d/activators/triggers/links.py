@@ -270,7 +270,7 @@ class BlenderClickTrigger(BlenderTrigger):
             )
         ]
         for clicks, all_actions in self.actions.items():
-            duration = max(action["duration"] for action in all_actions)
+            duration = max(action.get("duration", 0) for action in all_actions)
             end_condition.append(
                 "(own['clicks'] == {} and time >= {})".format(
                     clicks, duration
