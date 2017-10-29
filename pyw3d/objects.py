@@ -968,7 +968,7 @@ class W3DObject(W3DFeature):
         "scale": IsNumeric(min_value=0),
         "click_through": IsBoolean(),
         "around_own_axis": IsBoolean(),
-        "sound": TextValidator(),  # TODO: FIX THIS
+        "sound": ValidPyString(),  # TODO: FIX THIS
         "content": FeatureValidator(W3DContent)}
 
     default_arguments = {
@@ -1062,7 +1062,10 @@ class W3DObject(W3DFeature):
             try:
                 new_object["sound"] = node.attrib["name"]
             except KeyError:
-                raise BadW3DXML("SoundRef node must have name attribute set")
+                new_object["sound"] = node.text.strip()
+                if not new_object["sound"]:
+                    raise BadW3DXML(
+                        "SoundRef node must specify name attribute")
         node = object_root.find("Placement")
         if node is not None:
             new_object["placement"] = W3DPlacement.fromXML(node)

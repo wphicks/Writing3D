@@ -133,7 +133,7 @@ class W3DSound(W3DFeature):
         settings = {}
         attrib_map = {
             "frequency_scale": "freq", "volume_scale": "volume", "pan": "pan"}
-        for key, xml_attrib in attrib_map:
+        for key, xml_attrib in attrib_map.items():
             if not self.is_default(key):
                 settings[xml_attrib] = str(self[key])
         node = ET.SubElement(sound_root, "Settings", attrib=settings)

@@ -336,7 +336,7 @@ class ObjectAction(W3DAction):
                 new_action["scale"] = 1
         node = trans_root.find("Sound")
         if node is not None:
-            raw_sound_change = node.text.strip()
+            raw_sound_change = node.attrib["action"].strip()
             for key, value in new_action.sound_xml_tags.items():
                 if raw_sound_change == value:
                     new_action["sound_change"] = key
@@ -700,7 +700,9 @@ class SoundAction(W3DAction):
         try:
             new_action["sound_name"] = soundref_root.attrib["name"]
         except KeyError:
-            raise BadW3DXML("SoundRef node must specify name attribute")
+            new_action["sound_name"] = soundref_root.text.strip()
+            if not new_action["sound_name"]:
+                raise BadW3DXML("SoundRef node must specify name attribute")
         if "action" in soundref_root.attrib:
             new_action["change"] = soundref_root.attrib["action"]
 
