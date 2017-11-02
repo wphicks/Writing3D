@@ -12,7 +12,7 @@ INSTALL_PATH = os.path.abspath(
     os.path.normpath(
         os.path.join(
             os.path.dirname(__file__),
-            os.pardir
+            os.pardir, os.pardir
         )
     )
 )
@@ -30,7 +30,10 @@ def update_dulwich():
             os.path.join(INSTALL_PATH, "dulwich")
         )
     except dulwich.errors.NotGitRepository:
-        shutil.rmtree(os.path.join(INSTALL_PATH, "dulwich"))
+        try:
+            shutil.rmtree(os.path.join(INSTALL_PATH, "dulwich"))
+        except FileNotFoundError:
+            pass  # Directory already gone
         dulwich_repo = porcelain.clone(
             "https://github.com/jelmer/dulwich.git",
             os.path.join(INSTALL_PATH, "dulwich")

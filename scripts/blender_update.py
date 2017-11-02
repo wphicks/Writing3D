@@ -7,6 +7,7 @@ import zipfile
 import tarfile
 import shutil
 import bpy
+import site
 
 REQUIRED_VERSION = (2, 79, 0)
 
@@ -61,8 +62,8 @@ def update_blender():
     blend_dir = os.path.join(INSTALL_PATH, "blender")
     old_config = os.path.join(os.path.expanduser("~"), ".w3d.json")
     new_blend_dir = [
-        file_ for file_ in os.listdir(INSTALL_PATH) if
-        os.path.isdir(os.path.join(INSTALL_PATH, file_)) and
+        os.path.join(INSTALL_PATH, file_) for file_ in os.listdir(INSTALL_PATH)
+        if os.path.isdir(os.path.join(INSTALL_PATH, file_)) and
         file_.startswith("blender-{}.{}".format(*REQUIRED_VERSION[:-1]))
     ][0]
     if os.path.isdir(blend_dir):
@@ -72,8 +73,25 @@ def update_blender():
     shutil.move(new_blend_dir, blend_dir)
     home_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.abspath(os.path.join(home_dir, os.pardir)))
-    import pyw3d
+
+
+def update_sitepath():
+    w3d_path = os.path.abspath(
+        os.path.normpath(
+            os.path.join(
+                os.path.dirname(__file__),
+                os.pardir
+            )
+        )
+    )
+
+    all_sites = site.getsitepackages()
+    for site_ in all_sites:
+        if "site-packages" in os.path.split(site_)[1]:
+            with open(os.path.join(site_, "Writing3D.pth"), "w") as pthfile:
+                pthfile.write(w3d_path)
 
 
 if __name__ == "__main__":
     update_blender()
+    update_sitepath()
