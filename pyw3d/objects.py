@@ -608,10 +608,22 @@ class W3DText(W3DContent):
 
         mesh = new_text_object.to_mesh(bpy.context.scene, False, 'PREVIEW')
 
-
         final_object = bpy.data.objects.new(
             "mesh_text_{}".format(type(self).object_count), mesh
         )
+
+        if final_object.data is None:
+            LOGGER.warn(
+                "Could not render symbol in {} with font {}".format(
+                    self["text"], self["font"]
+                )
+            )
+            BPY_OPS_CALL(
+                "object.add", None,
+                {'type': "EMPTY", 'location': (0, 0, 0)}
+            )
+            final_object = bpy.context.object
+            return final_object
 
         depth = final_object.bound_box[1][2]
         depth_vec = mathutils.Vector((0, depth, 0))
