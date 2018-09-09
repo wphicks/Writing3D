@@ -12,8 +12,8 @@ To Begin
    system.
 
     .. warning::
-        Writing3D has only been tested with Blender 2.76. You are welcome to try a
-        later version and let us know the results, but only 2.76 is supported at
+        Writing3D has only been tested with Blender 2.79. You are welcome to try a
+        later version and let us know the results, but only 2.79 is supported at
         the moment.
 
 3. `Clone <https://help.github.com/articles/cloning-a-repository/>`_ your fork
